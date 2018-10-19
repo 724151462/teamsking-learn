@@ -8,6 +8,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "element-ui": "^2.3.6",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",
@@ -26,6 +27,7 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "typescript": "^3.0.0",
+    "vue-cli-plugin-element-ui": "^1.1.4",
     "vue-template-compiler": "^2.5.17"
   }
 }
