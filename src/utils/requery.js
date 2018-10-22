@@ -6,7 +6,7 @@ import { getToken, removeToken } from './auth'
 if (getToken()) {
   axios.defaults.headers.token = getToken()
 }
-axios.defaults.headers.token = '874d4c7f4048031f525f2b8db12e8625'
+axios.defaults.headers.token = '40347a4bbe35a4b8501468a27089d64f'
 axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 axios.defaults.responseType = 'json'
@@ -49,7 +49,6 @@ export function commonsAjax (url, data, method, headers) {
   return new Promise((resolve, reject) => {
     let date = {
       url: url,
-      // data: data,
       method: method
     }
     if (data !== '') {
