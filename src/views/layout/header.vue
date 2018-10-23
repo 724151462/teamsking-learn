@@ -16,7 +16,7 @@
           },
           {
             name:'学习管理',
-            url:''
+            url:'/school'
           },
           {
             name:'校管中心',
