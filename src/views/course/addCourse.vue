@@ -120,7 +120,7 @@
       </el-form>
       <el-row style="text-align: right">
         <el-button type="primary">完成</el-button>
-        <el-button type="success">下一步，上传课程资源</el-button>
+        <el-button type="success" @click="goUpCourseResource">下一步，上传课程资源</el-button>
       </el-row>
     </div>
 
@@ -232,7 +232,7 @@
             :visible.sync="isTeacher"
             width="50%">
 
-          <addTeacher></addTeacher>
+          <addTeachers></addTeachers>
 
           <span slot="footer" class="dialog-footer">
             <el-button @click="isTeacher = false">取 消</el-button>
@@ -245,10 +245,10 @@
 <script>
   import wangEditor from 'wangeditor'
   import echarts from 'echarts'
-  import addTeacher from '@/views/course/upCourse/addTeacher.vue'
+  import addTeachers from './upCourse/addTeacher.vue'
   export default {
-    computed:{
-      addTeacher
+    components:{
+      addTeachers
     },
     data(){
       return{
@@ -301,6 +301,11 @@
       }
     },
     methods:{
+      goUpCourseResource(){
+        this.$router.push({
+          path:'/course/upCourses'
+        })
+      },
       //弹出设置
       isSys(){
         this.isSysTem = true

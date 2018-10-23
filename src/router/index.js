@@ -55,6 +55,49 @@ export const constantRouterMap = [
         path: 'addCourse',
         component: _import('course/addCourse'),
         name: '课程编辑'
+      },
+      {
+        path: 'upCourses',
+        component: _import('course/upCourses'),
+        name: '编辑课程资源',
+        redirect:'/course/upCourses',
+        children:[
+          {
+            path:'/',
+            component:_import('course/upCourse/resource'),
+            name:'课程资源'
+          },
+          {
+            path:'chapter',
+            component:_import('course/upCourse/chapter'),
+            name:'章节内容'
+          },
+          {
+            path:'activityUp',
+            component:_import('course/upCourse/activityUp'),
+            name:'活动'
+          },
+          {
+            path:'member',
+            component:_import('course/upCourse/member'),
+            name:'成员'
+          },
+          {
+            path:'teaching',
+            component:_import('course/upCourse/teaching'),
+            name:'教学管理'
+          },
+          {
+            path:'notice',
+            component:_import('course/upCourse/notice'),
+            name:'通知管理'
+          },
+          {
+            path:'discuss',
+            component:_import('course/upCourse/discuss'),
+            name:'讨论中心'
+          },
+        ]
       }
     ]
   },
