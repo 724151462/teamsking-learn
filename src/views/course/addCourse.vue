@@ -11,7 +11,7 @@
         </el-form-item>
 
         <el-form-item label="课程分类" required>
-          <el-select v-model="selectValue" placeholder="请选择">
+          <el-select v-model="data.courseCategory" placeholder="请选择">
             <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -23,40 +23,40 @@
 
         <el-form-item label="起止时间" required>
           <el-date-picker
-                  v-model="data.time"
-                  type="datetimerange"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期">
+              v-model="courseTime"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
           </el-date-picker>
         </el-form-item>
 
         <el-form-item label="课程封面" required>
           <el-upload
-                  class="avatar-uploader"
-                  action="https://jsonplaceholder.typicode.com/posts/"
-                  :show-file-list="false"
-                  :on-success="handleAvatarSuccess"
-                  :before-upload="beforeAvatarUpload">
-            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+              class="avatar-uploader"
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :show-file-list="false"
+              :on-success="handleAvatarSuccess"
+              :before-upload="beforeAvatarUpload">
+            <img v-if="data.courseCover" :src="data.courseCover" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
 
         <el-form-item label="课程价格" required>
-          <el-radio v-model="data.courseStatus" label="1">免费</el-radio>
-          <el-radio v-model="data.courseStatus" label="2">收费</el-radio>
-          <el-input v-model="data.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;"></el-input>
-          <span>元</span>
+          <el-radio v-model="data.payMode" label="10">免费</el-radio>
+          <el-radio v-model="data.payMode" label="20">收费</el-radio>
+          <el-input v-model="data.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;" v-show="Number(data.payMode) === 20"></el-input>
+          <span v-show="Number(data.payMode) === 20">元</span>
         </el-form-item>
 
         <el-form-item label="课程标签" required>
-          <el-select v-model="selectValue" placeholder="请选择">
+          <el-select v-model="data.courseTagParent" placeholder="请选择">
             <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -64,22 +64,22 @@
         <el-form-item label="讲师" required>
           <el-select v-model="selectValue" placeholder="请选择">
             <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
             </el-option>
           </el-select>
-          <el-button type="primary" round style="margin-left: 20px;">创建讲师</el-button>
+          <el-button type="primary" round style="margin-left: 20px;" @click="isTeacher = true">创建讲师</el-button>
         </el-form-item>
 
         <el-form-item label="教学老师" required>
           <el-select v-model="selectValue" placeholder="请选择">
             <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -87,19 +87,23 @@
         <el-form-item label="选课名单" required>
           <el-row>
             <span>开放范围：</span>
-            <el-radio v-model="data.courseStatus" label="1">选课名单学员</el-radio>
-            <el-radio v-model="data.courseStatus" label="2">本校学员</el-radio>
-            <el-radio v-model="data.courseStatus" label="3">全部学员</el-radio>
+            <el-radio v-model="data.courseMode" label="10">选课名单学员</el-radio>
+            <el-radio v-model="data.courseMode" label="20">本校学员</el-radio>
+            <el-radio v-model="data.courseMode" label="30">全部学员</el-radio>
           </el-row>
           <el-row>
             <span>退课权限：</span>
-            <el-checkbox v-model="data.isQuitCourse">允许退课</el-checkbox>
+            <el-checkbox v-model="data.dropCourse">允许退课</el-checkbox>
           </el-row>
         </el-form-item>
 
         <el-form-item label="成绩考核" required>
           <span class="courseExplanation">视频50% | 测验30% | 讨论20%</span>
           <a class="sysTem" @click="isSys">设置</a>
+        </el-form-item>
+
+        <el-form-item label="课程代码">
+          <el-input v-model="data.courseCode" style="width: 120px;"></el-input>
         </el-form-item>
 
         <el-form-item label="课程介绍" required>
@@ -116,39 +120,170 @@
       </el-form>
       <el-row style="text-align: right">
         <el-button type="primary">完成</el-button>
-        <el-button type="success">下一步，上传课程资源</el-button>
+        <el-button type="success" @click="goUpCourseResource">下一步，上传课程资源</el-button>
       </el-row>
     </div>
 
     <!--弹出的设置说明-->
     <el-dialog
-            title="设置"
-            :visible.sync="isSysTem"
-            width="50%">
-      <span>这是一段信息</span>
+        title="成绩权重设定"
+        :visible.sync="isSysTem"
+        style="z-index: 10002"
+        class="isSystem"
+        width="70%">
       <el-row>
+        <div class="top">
+          <span>满分：100</span>
+          <span>最终得分 = A + B + C + D + E + F +G</span>
+          <span>*单项考核权重为0则不计入成绩！</span>
+        </div>
+        <div class="center">
+          <div class="left">
+            <table class="tables">
+              <tr class="tr-h no-tr">
+                <td>评分项</td>
+                <td>视频</td>
+                <td>测验</td>
+                <td>作业</td>
+                <td>讨论</td>
+                <td>线下</td>
+                <td>投票问卷</td>
+                <td>头脑风暴</td>
+              </tr>
+              <tr class="tr-h">
+                <td>权重共100%</td>
+                <td>
+                  <el-input v-model="CourseSetEntity.videoPercent" style="width:50px;" @change="canvasTab"></el-input>%
+                </td>
+                <td>
+                  <el-input v-model="CourseSetEntity.quizPercent" style="width:50px"></el-input>%
+                </td>
+                <td>
+                  <el-input v-model="CourseSetEntity.homeworkPercent" style="width:50px"></el-input>%
+                </td>
+                <td>
+                  <el-input v-model="CourseSetEntity.topicPercent" style="width:50px"></el-input>%
+                </td>
+                <td>
+                  <el-input v-model="CourseSetEntity.offlinePercent" style="width:50px"></el-input>%
+                </td>
+                <td>
+                  <el-input v-model="CourseSetEntity.votePercent" style="width:50px"></el-input>%
+                </td>
+                <td>
+                  <el-input v-model="CourseSetEntity.stormPercent" style="width:50px"></el-input>%
+                </td>
+              </tr>
+              <tr class="tr-h">
+                <td>单项分数</td>
+                <td>
+                  <span class="icons" style="background:#FE6370">A</span>
+                </td>
+                <td>
+                  <span class="icons" style="background:#63BAEE">B</span>
+                </td>
+                <td>
+                  <span class="icons" style="background:#B8E664">C</span>
+                </td>
+                <td>
+                  <span class="icons" style="background:#E38EF7">D</span>
+                </td>
+                <td>
+                  <span class="icons" style="background:#FFB8CA">E</span>
+                </td>
+                <td>
+                  <span class="icons" style="background:#ED9B63">F</span>
+                </td>
+                <td>
+                  <span class="icons" style="background:#FFC0CB">G</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="right">
+            <div id="echart"></div>
+          </div>
+        </div>
+        <div class="norm">
+          <span>单项评分标准</span>
+          <span class="norm-right">（默认分数全部为100分，投票问卷默认90分）</span>
+        </div>
+        <div class="score">
+          <div class="list">视频得分 = 完整观看视频 / 总视频数 * 100 分 * {{CourseSetEntity.videoPercent}}%</div>
+          <div class="list">测试得分 = 测试得分总和 / 测验次数 * {{CourseSetEntity.quizPercent}}%</div>
+          <div class="list">作业得分 = 作业得分总和 / 作业次数 * {{CourseSetEntity.homeworkPercent}}%</div>
+          <div class="list">讨论得分 = 获得分数的讨论数 / 讨论次数 * 100分 * {{CourseSetEntity.topicPercent}}%</div>
+          <div class="list">线下得分 = 线下得分 * {{CourseSetEntity.offlinePercent}}%</div>
+          <div class="list">投票问卷得分 = 投票问卷得分 * {{CourseSetEntity.votePercent}}%</div>
+          <div class="list">头脑风暴得分 = 头脑风暴得分 * {{CourseSetEntity.stormPercent}}%</div>
+        </div>
+      </el-row>
+<!--
+      <el-row style="text-align: right;">
         <el-button @click="isSysTem = false">取 消</el-button>
         <el-button type="primary" @click="isSysTem = false">确 定</el-button>
       </el-row>
+-->
     </el-dialog>
+
+    <!--创建讲师-->
+        <el-dialog
+            title="添加授课老师"
+            :visible.sync="isTeacher"
+            width="50%">
+
+          <addTeachers></addTeachers>
+
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="isTeacher = false">取 消</el-button>
+            <el-button type="primary" @click="isTeacher = false">确 定</el-button>
+          </span>
+        </el-dialog>
   </div>
 </template>
 
 <script>
   import wangEditor from 'wangeditor'
+  import echarts from 'echarts'
+  import addTeachers from './upCourse/addTeacher.vue'
   export default {
+    components:{
+      addTeachers
+    },
     data(){
       return{
         data:{
           courseName:'',  //课程名称
-          courseCategoryParent:'',  //课程分类
-          time:[],  //开始时间结束时间
-          courseStatus:'1', //是否免费
-          coursePrice:0,  //收费价格
-          isQuitCourse:false, //是否允许退课
+          courseCategory:'',  //课程分类
+          beginTime:'', //开课时间
+          endTime:'', //结课时间
+          courseCover:'', //课程封面
+          payMode:'10',  //课程价格 10授课 20售卖
+          coursePrice:0, //课程价格
+          courseTagParent:'', //课程标签
+          courseMode:'10',  //10：教师导入 20 本校学生 30 全部学员 ,
+          dropCourse:false, //1 允许退课 2 不允许
+          courseCode:'',  //课程代码/课程编码
         },
+        //课程完成度
+        CourseSetEntity:{
+          homeworkPercent:0, // 作业成绩占比
+          offlinePercent:0,  // 线下成绩占比
+          quizPercent:30, //测验成绩占比
+          stormPercent:0,  //头脑风暴占比
+          topicPercent:20,  //讨论成绩占比
+          videoPercent:50,  //视频成绩占比
+          votePercent:0, //投票问卷占比
+        },
+        //课程相关
+        CourseInfoEntity:{
+          courseDescription:'', //课程信息
+          teachingArrangement:'', //教学安排
+          teachingTarget :'', //教学目标
+        },
+        courseTime:[],  //课程开始 and 结束时间
         isSysTem:false, //弹出设置
-        imageUrl:'',  //封面图片字段
+        isTeacher:false,  //弹出添加老师
         rules:[],
         //以下三个是富文本属性
         editor1:null,
@@ -166,9 +301,53 @@
       }
     },
     methods:{
+      goUpCourseResource(){
+        this.$router.push({
+          path:'/course/upCourses'
+        })
+      },
       //弹出设置
       isSys(){
         this.isSysTem = true
+        this.canvasTab()
+      },
+      //表格渲染
+      canvasTab(){
+        let self = this
+        setTimeout(function () {
+          let myChart = echarts.init(document.getElementById('echart'));
+          // 绘制图表
+          myChart.setOption({
+            color:['#FE6370','#63BAEE','#B8E664','#E38EF7','#FFB8CA','#ED9B63','#FFC0CB'],
+            series: [
+              {
+                type:'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                  normal: {
+                    show: false,
+                    position: 'center'
+                  },
+                },
+                labelLine: {
+                  normal: {
+                    show: false
+                  }
+                },
+                data:[
+                  {value:self.CourseSetEntity.videoPercent, name:'视频'},
+                  {value:self.CourseSetEntity.quizPercent, name:'测验'},
+                  {value:self.CourseSetEntity.homeworkPercent, name:'作业'},
+                  {value:self.CourseSetEntity.topicPercent, name:'讨论'},
+                  {value:self.CourseSetEntity.offlinePercent, name:'线下'},
+                  {value:self.CourseSetEntity.votePercent, name:'投票问卷'},
+                  {value:self.CourseSetEntity.stormPercent, name:'头脑风暴'}
+                ]
+              }
+            ]
+          })
+        },0)
       },
       //图片上传方法
       handleAvatarSuccess(res, file) {
@@ -188,11 +367,26 @@
       }
     },
     mounted(){
+      //课程介绍
       this.editor1 = new wangEditor('#editor1')
+      this.editor1.customConfig.onblur = function (html) {
+        this.CourseInfoEntity.courseDescription = html
+      }
+      this.editor1.customConfig.zIndex = 100
       this.editor1.create()
+      //教学目标
       this.editor2 = new wangEditor('#editor2')
+      this.editor2.customConfig.onblur = function (html) {
+        this.CourseInfoEntity.teachingTarget = html
+      }
+      this.editor2.customConfig.zIndex = 100
       this.editor2.create()
+      //教学安排
       this.editor3 = new wangEditor('#editor3')
+      this.editor3.customConfig.onblur = function (html) {
+        this.CourseInfoEntity.teachingArrangement  = html
+      }
+      this.editor3.customConfig.zIndex = 100
       this.editor3.create()
     }
   }
@@ -202,6 +396,88 @@
   .addCourse
     overflow: hidden
     height:50px
+
+  .isSystem
+    .top
+      padding-bottom:10px
+      overflow:hidden
+
+    .center
+      .left
+        display:inline-block
+
+        .tables
+          border:1px solid #E4E4E6
+
+          .tr-h
+            height:45px
+            line-height: 45px
+            border-top:1px solid #E4E4E6
+            display:block
+
+            td
+              width:80px
+              text-align:center
+              border-right:1px solid #E4E4E6
+
+              .icons
+                display: inline-block
+                background: #000
+                color:#ffffff
+                width:30px
+                height: 30px
+                line-height:30px
+                -webkit-border-radius: 50%
+                -moz-border-radius: 50%
+                border-radius: 50%
+                margin-top: 10px
+
+            td:nth-child(1)
+              background:#F2FCFF
+
+            td:nth-last-child(1)
+              border-right:none
+
+              input
+                height:30px
+                padding:0
+
+          .no-tr
+            border-top:none
+
+      .right
+        margin-left:50px
+        display:inline-block
+        width:100px
+        height:100px
+        vertical-align:top
+
+        #echart
+          width: 100%
+          height:100%
+
+    .norm
+      margin-top:10px
+      border:1px solid #E4E4E6
+      padding-top:10px
+      padding-bottom:10px
+      text-indent:10px
+
+      .norm-right
+        font-size:12px
+        color:#59C2BB
+
+    .score
+      padding-top:10px
+      border-left:1px solid #E4E4E6
+      border-right:1px solid #E4E4E6
+      border-bottom:1px solid #E4E4E6
+      text-indent:10px
+      margin-bottom:10px
+
+      .list
+        padding-top:10px
+        padding-bottom:10px
 
   .addCourse-center
     .courseExplanation
