@@ -77,7 +77,7 @@
 </template>
 
 <script>
-  import { courseSetPage } from '../../api/course'
+  import {courseSetPage} from '@/api/course'
   export default {
     data() {
       return {

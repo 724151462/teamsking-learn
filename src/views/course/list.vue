@@ -46,7 +46,7 @@
               <a class="list">删除</a>
               <a class="list" @click="sell">售卖</a>
             </div>
-            <el-button type="primary">教学管理</el-button>
+            <el-button type="primary" @click="goAddCourse">教学管理</el-button>
           </div>
         </el-row>
       </el-row>
@@ -116,6 +116,7 @@
       }
     },
     created(){
+      this.$emit('floorStatus','course')
       this.getList()
     },
     methods: {

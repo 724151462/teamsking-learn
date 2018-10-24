@@ -60,12 +60,35 @@ export const constantRouterMap = [
         path: 'upCourses',
         component: _import('course/upCourses'),
         name: '编辑课程资源',
-        redirect:'/course/upCourses',
+        redirect:'/course/upCourses/resource',
         children:[
           {
-            path:'/',
+            path:'resource',
             component:_import('course/upCourse/resource'),
-            name:'课程资源'
+            name:'课程资源',
+            redirect:'/course/upCourses/resource/videos',
+            children:[
+              {
+                path:'videos',
+                component:_import('course/upCourse/upCourseUp/videos'),
+                name:'视频库'
+              },
+              {
+                path:'document',
+                component:_import('course/upCourse/upCourseUp/document'),
+                name:'文档库'
+              },
+              {
+                path:'exercise',
+                component:_import('course/upCourse/upCourseUp/exercise'),
+                name:'习题库'
+              },
+              {
+                path:'activity',
+                component:_import('course/upCourse/upCourseUp/activity'),
+                name:'活动库'
+              },
+            ]
           },
           {
             path:'chapter',

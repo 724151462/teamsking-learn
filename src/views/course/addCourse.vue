@@ -119,7 +119,6 @@
         </el-form-item>
       </el-form>
       <el-row style="text-align: right">
-        <el-button type="primary">完成</el-button>
         <el-button type="success" @click="goUpCourseResource">下一步，上传课程资源</el-button>
       </el-row>
     </div>
@@ -300,10 +299,13 @@
         selectValue:0,
       }
     },
+    created(){
+      this.$emit('floorStatus','course')
+    },
     methods:{
       goUpCourseResource(){
         this.$router.push({
-          path:'/course/upCourses'
+          path:'/course/upCourses/resource'
         })
       },
       //弹出设置

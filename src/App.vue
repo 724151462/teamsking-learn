@@ -9,4 +9,8 @@
 </script>
 <style lang="stylus" type="text/stylus">
   @import "assets/css/reset.styl"
+
+  #app
+    width: 100%
+    height:100%
 </style>
