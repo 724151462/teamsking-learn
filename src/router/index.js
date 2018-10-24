@@ -73,7 +73,8 @@ export const constantRouterMap = [
       {path:'portal',component:_import('school/portal'),name:'门户配置'},
       {path:'course',component:_import('school/course'),name:'课程管理'},
       {path:'certificate',component:_import('school/certificate'),name:'证书审核'},
-      {path:'department',component:_import('school/department'),name:'院系管理'},
+      {path:'academy',component:_import('school/academy'),name:'院管理'},
+      {path:'department',component:_import('school/department'),name:'系管理'},
       {path:'specialty',component:_import('school/specialty'),name:'专业管理'},
       {path:'class',component:_import('school/class'),name:'班级管理'},
     ]

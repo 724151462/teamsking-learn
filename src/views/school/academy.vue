@@ -1,28 +1,10 @@
 <template>
-    <div class="class">
-        班级管理
+    <div class="academy">
+        院管理
 
         <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
             <el-form-item label="输入搜索：">
-                <el-input v-model="form.appraisal" placeholder="班级名称"></el-input>
-            </el-form-item>
-            <el-form-item label="专业：">
-                <el-select v-model="form.teacher" placeholder="请选择专业">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="年级：">
-                <el-select v-model="form.teacher" placeholder="请选择年级">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="系：">
-                <el-select v-model="form.teacher" placeholder="请选择系">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                </el-select>
+                <el-input v-model="form.appraisal" placeholder="院名称"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="onSubmit">查询</el-button>
@@ -74,11 +56,11 @@
                     teacher: ''
                 },
                 dialogVisible: false,
-                tableTitle:'班级列表',
+                tableTitle:'院列表',
                 tableOperate:[
                     {
-                        content:'添加班级',
-                        type:'addCourse'
+                        content:'添加',
+                        type:'add'
                     },
                     {
                         content:'批量删除',
@@ -94,25 +76,17 @@
                         prop:'courseId'
                     },
                     {
-                        name:'所属院系',
+                        name:'专业',
                         prop:'courseName'
                     },
                     {
-                        name:'专业',
+                        name:'学院',
                         prop:'courseRank'
                     },
                     {
-                        name:'班级',
+                        name:'学院负责人',
                         prop:'startTime'
                     },
-                    {
-                        name:'班级负责人',
-                        prop:'endTime'
-                    },
-                    {
-                        name:'年级',
-                        prop:'count'
-                    }
                 ],
                 operateList:[
                     {
@@ -175,7 +149,7 @@
 
 <style scoped lang="stylus" type="text/stylus">
 
-    .class
+    .academy
         .el-pagination{
             margin:20px 2.5% 0 0
             display:flex
