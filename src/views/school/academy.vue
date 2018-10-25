@@ -1,6 +1,7 @@
 <template>
     <div class="academy">
-        院管理
+        <!--院管理-->
+      <header-the-again headerTitle="院管理"></header-the-again>
 
         <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
             <el-form-item label="输入搜索：">
@@ -46,6 +47,10 @@
 
 <script>
     import tableTheAgain from '../../components/table-theAgain'
+    import headerTheAgain from '../../components/header-theAgain'
+
+    import { sysCollegePage } from '../../api/course'
+
     export default {
         name: "",
         data(){
@@ -115,8 +120,29 @@
             }
         },
         components:{
-            tableTheAgain
+            tableTheAgain,
+            headerTheAgain
         },
+      created:function(){
+
+        var form = {
+          pageSize:5,
+          pageIndex:1
+        }
+        // datas="pageSize=5&pageIndex=1";
+        sysCollegePage( form ).then(
+          res=>{
+            console.log("res数据：")
+          console.log(res);
+          if( res.code === 200 ){
+            console.log("200");
+          }
+          }).catch(
+            error=>{
+          console.log(error);
+        })
+
+      },
         methods:{
             showComponentInfo:function(type,info){
                 console.log( '父组件接收到的类型：' + type + '父组件接收到的信息：' + info );

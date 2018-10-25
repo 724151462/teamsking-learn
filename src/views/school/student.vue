@@ -83,26 +83,34 @@
                         type:'selection'
                     },
                     {
-                        name:'工号',
+                        name:'姓名',
                         prop:'id'
                     },
                     {
-                        name:'用户名',
+                        name:'学号',
                         prop:'userType'
                     },
                     {
-                        name:'用户昵称',
+                        name:'手机号',
                         prop:'userName'
                     },
                     {
-                        name:'创建时间',
+                        name:'系',
                         prop:'createdTime',
                         fit:true
                     },
                     {
-                        name:'状态',
+                        name:'专业',
                         prop:'status'
-                    }
+                    },
+                    {
+                     name:'班级',
+                     prop:'status'
+                    },
+                  {
+                    name:'创建时间',
+                    prop:'status'
+                  }
                 ],
                 operateList:[
                     {

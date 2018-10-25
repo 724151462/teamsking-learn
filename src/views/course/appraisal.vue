@@ -180,7 +180,7 @@
     methods: {
       getList(){
         coursePage(this.listQuery).then(res=>{
-        console.log(res)
+          console.log(res)
           if (res.code === 200){
               //this.tableData3 = res.data.xxx
               // /api/v1/sys/category/page

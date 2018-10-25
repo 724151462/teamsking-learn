@@ -7,7 +7,7 @@ if (getToken()) {
   axios.defaults.headers.token = getToken()
 }
 // axios.defaults.headers.token = '40347a4bbe35a4b8501468a27089d64f'
-axios.defaults.headers.token = '69c512bcd59ed7692a4e0cdace5a81c0'
+axios.defaults.headers.token = 'f5c67e8b383ab270d5055db2a438d753'
 axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 axios.defaults.responseType = 'json'
