@@ -38,6 +38,9 @@
         isNav:''
       }
     },
+    created(){
+      this.$emit('upCoursesNav','resource')
+    },
     methods:{
       resourceNavs(e){
         console.log(e)
