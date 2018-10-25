@@ -1,32 +1,32 @@
 <template>
-  <div>
+  <div class="upCourseUp-activity">
     <el-table
         :data="tableData"
         style="width: 100%">
       <el-table-column
-          width="180">
+          width="100">
         <template slot-scope="scope">
-          <img :src="scope.row.icon">
+          <img :src="scope.row.icon" class="img">
         </template>
       </el-table-column>
       <el-table-column
-          width="180">
+          width="220">
         <template slot-scope="scope">
-          <div>{{scope.row.style}}</div>
-          <div>{{scope.row.time}}</div>
+          <div class="title">{{scope.row.style}}</div>
+          <div class="time">{{scope.row.time}}</div>
+        </template>
+      </el-table-column>
+      <el-table-column>
+        <template slot-scope="scope">
+          <div class="title">{{scope.row.style}}题目</div>
+          <div class="time">来自{{scope.row.car}}</div>
         </template>
       </el-table-column>
       <el-table-column
-          width="180">
+        fixed="right"
+        width="60">
         <template slot-scope="scope">
-          <div>{{scope.row.style}}题目</div>
-          <div>来自{{scope.row.car}}</div>
-        </template>
-      </el-table-column>
-      <el-table-column
-        width="180">
-        <template>
-          <a>添加</a>
+          <a class="adds">添加</a>
         </template>
       </el-table-column>
     </el-table>
@@ -57,11 +57,24 @@
     },
     created(){
       this.$emit('floorStatus','course')
-      this.$emit('resourceNav','activity  ')
+      this.$emit('resourceNav','activity')
     }
   }
 </script>
 
-<style scoped>
+<style scoped lang="stylus" type="text/stylus">
+  .upCourseUp-activity
+    .img
+      width:60px
+      height:50px
 
+    .title
+      font-size:16px
+
+    .time
+      font-size: 14px
+      color: #9c9c9c
+
+    .adds
+      color:#76CAE8
 </style>
