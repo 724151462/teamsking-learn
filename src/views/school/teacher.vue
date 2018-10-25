@@ -1,13 +1,8 @@
 <template>
   <div class="teacher">
 
-    <el-row>
-      <el-col :span="24">
-        <div class="grid-content bg-purple-dark">
-          教师管理
-        </div>
-      </el-col>
-    </el-row>
+    <header-the-again headerTitle="教师管理"></header-the-again>
+
 
     <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
@@ -69,6 +64,8 @@
 
 <script>
   import tableTheAgain from '../../components/table-theAgain'
+  import headerTheAgain from '../../components/header-theAgain'
+
   export default{
     name:'',
     data(){
@@ -94,26 +91,29 @@
           {
             type:"selection"
           },
-          // 序号列表
+          {
+            name:'姓名',
+            prop:'id'
+          },
           {
             name:'工号',
             prop:'id'
           },
           {
-            name:'用户名',
+            name:'手机号',
             prop:'userType'
           },
           {
-            name:'用户昵称',
+            name:'创建课程',
             prop:'userName'
           },
           {
-            name:'创建时间',
+            name:'开课数量',
             prop:'createdTime',
             fit:true
           },
           {
-            name:'状态',
+            name:'创建时间',
             prop:'status'
           }
         ],
@@ -166,7 +166,8 @@
       }
     },
     components:{
-        tableTheAgain
+        tableTheAgain,
+        headerTheAgain
     },
     mounted:function(){ },
     methods:{

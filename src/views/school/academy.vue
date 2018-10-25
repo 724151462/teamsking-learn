@@ -5,10 +5,10 @@
 
         <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
             <el-form-item label="输入搜索：">
-                <el-input v-model="form.appraisal" placeholder="院名称"></el-input>
+                <el-input v-model="form.collegeName" placeholder="院名称"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="onSubmit">查询</el-button>
+                <el-button type="primary" @click="querAcademy">查询</el-button>
             </el-form-item>
         </el-form>
 
@@ -16,7 +16,7 @@
                 :tableTitle="tableTitle"
                 :tableOperate="tableOperate"
                 :columnNameList="columnNameList"
-                :tableData="tableData3"
+                :tableData="tableData.pageData"
                 :operateList="operateList"
                 @showComponentInfo="showComponentInfo">
         </table-the-again>
@@ -24,7 +24,10 @@
         <el-pagination
                 background
                 layout="prev, pager, next"
-                :total="1000">
+                :page-size="tableData.pageSize"
+                :page-count="tableData.totalPage"
+                :current-page="tableData.pageIndex"
+                @current-change="handleCurrentChange">
         </el-pagination>
 
         <el-dialog
@@ -56,10 +59,11 @@
         data(){
             return{
                 form: {
-                    appraisal: '',
-                    catagory: '',
-                    teacher: ''
+                  pageSize:5,
+                  pageIndex:1,
+                  collegeName:''
                 },
+                tableData:{},
                 dialogVisible: false,
                 tableTitle:'院列表',
                 tableOperate:[
@@ -78,19 +82,15 @@
                     },
                     {
                         name:'编号',
-                        prop:'courseId'
-                    },
-                    {
-                        name:'专业',
-                        prop:'courseName'
+                        prop:'collegeId'
                     },
                     {
                         name:'学院',
-                        prop:'courseRank'
+                        prop:'collegeName'
                     },
                     {
                         name:'学院负责人',
-                        prop:'startTime'
+                        prop:'manager'
                     },
                 ],
                 operateList:[
@@ -125,23 +125,19 @@
         },
       created:function(){
 
-        var form = {
-          pageSize:5,
-          pageIndex:1
-        }
-        // datas="pageSize=5&pageIndex=1";
-        sysCollegePage( form ).then(
-          res=>{
-            console.log("res数据：")
-          console.log(res);
-          if( res.code === 200 ){
-            console.log("200");
-          }
-          }).catch(
-            error=>{
-          console.log(error);
-        })
-
+        // var form = {
+        //   pageSize:5,
+        //   pageIndex:1
+        // }
+        // sysCollegePage( form ).then(
+        //   res => {
+        //     this.tableData = res.data;
+        //     console.log( this.tableData );
+        //   }).catch(
+        //     error=>{
+        //   console.log(error);
+        // })
+        this.getTableData();
       },
         methods:{
             showComponentInfo:function(type,info){
@@ -154,7 +150,6 @@
                         this.check(info);
                         break;
                 }
-
             },
             check:function(){
                 this.dialogVisible = !this.dialogVisible;
@@ -166,8 +161,26 @@
                     })
                     .catch(_ => {});
             },
+            getTableData:function() {
+              sysCollegePage( this.form ).then(
+                res => {
+                  this.tableData = res.data;
+                  console.log( this.tableData );
+                }).catch(
+                error=>{
+                  console.log(error);
+                })
+            },
             onSubmit:function(){
                 console.log('onSubmit!!');
+            },
+            handleCurrentChange:function( number ){
+              console.log( number );
+              this.form.pageIndex = number;
+              this.getTableData();
+            },
+            querAcademy:function(){
+              this.getTableData();
             }
         }
     }
