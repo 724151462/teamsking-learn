@@ -4,7 +4,15 @@
 
 <script>
   export default {
-    name: "activity"
+    data(){
+      return{
+        data:[]
+      }
+    },
+    created(){
+      this.$emit('floorStatus','course')
+      this.$emit('resourceNav','activity')
+    }
   }
 </script>
 
