@@ -74,7 +74,7 @@
         ],
         buttonType:[
           {
-            name:'角色设置',
+            name:'设为助教',
             type:'sys'
           },
           {
