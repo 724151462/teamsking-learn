@@ -49,7 +49,7 @@
     import tableTheAgain from '../../components/table-theAgain'
     import headerTheAgain from '../../components/header-theAgain'
 
-    import { sysCollegePage } from '../../api/course'
+    import { sysCollegePage } from '../../api/school'
 
     export default {
         name: "",
