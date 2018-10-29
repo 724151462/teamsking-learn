@@ -33,6 +33,22 @@ export function tags (data) {
  * 获取讲师列表
  */
 export function instructorList (data) {
-  return commonsAjax('/api/v1/course/instructor/list', 'data', 'get')
+  return commonsAjax('/api/v1/course/instructor/list', '', 'get')
+}
+
+/**
+ * 获取教师列表
+ */
+export function teachersList (data) {
+  let url = '/api/v1/tenant/' + 1 + '/teachers'
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 获取教师列表
+ */
+export function addInstructor (data) {
+  console.log('要穿的数据',data)
+  return commonsAjax('/api/v1/course/instructor', data, 'post')
 }
 

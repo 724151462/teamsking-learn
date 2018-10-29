@@ -7,10 +7,15 @@ if (getToken()) {
   axios.defaults.headers.token = getToken()
 }
 // axios.defaults.headers.token = '40347a4bbe35a4b8501468a27089d64f'
-axios.defaults.headers.token = '2ba67c6b698a1cde7cfdb19c68132d09'
+axios.defaults.headers.token = '7c7ca7451073f3c94f9a4ae26fabbd03'
 axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 axios.defaults.responseType = 'json'
+/*
+axios.defaults.headers = {
+  "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+}
+*/
 
 /**
  * 请求拦截器
@@ -52,8 +57,11 @@ export function commonsAjax (url, data, method, headers) {
       url: url,
       method: method
     }
-    if (data !== '') {
+    if (data !== '' && method === 'get') {
       date.url += '?' + qs.stringify(data)
+    }
+    if(data !== '' && method === 'post'){
+      date.data = data
     }
     axios(date).then(res => {
       reject(res.data)

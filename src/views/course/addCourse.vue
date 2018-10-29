@@ -60,42 +60,38 @@
         </el-form-item>
 
         <el-form-item label="讲师" required>
-<!--
           <el-select
-              v-model="value10"
+              v-model="CourseForm.instructor"
               multiple
               filterable
               allow-create
               default-first-option
-              placeholder="请选择文章标签">
+              @change="yesInstructor"
+              placeholder="请选择讲师">
             <el-option
-                v-for="item in options5"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="item in instructorLists"
+                :key="item.instructorId"
+                :label="item.instructorName"
+                :value="item.instructorId">
             </el-option>
           </el-select>
--->
-<!--
-          <el-select v-model="selectValue" placeholder="请选择">
-            <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-            </el-option>
-          </el-select>
--->
           <el-button type="primary" round style="margin-left: 20px;" @click="isTeacher = true">创建讲师</el-button>
         </el-form-item>
 
         <el-form-item label="教学老师" required>
-          <el-select v-model="selectValue" placeholder="请选择">
+          <el-select
+              v-model="CourseForm.teacher"
+              multiple
+              filterable
+              allow-create
+              default-first-option
+              @change="yesTeacher"
+              placeholder="请选择讲师">
             <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="item in teachersLists"
+                :key="item.userId"
+                :label="item.teacherName"
+                :value="item.userId">
             </el-option>
           </el-select>
         </el-form-item>
@@ -247,12 +243,7 @@
             :visible.sync="isTeacher"
             width="50%">
 
-          <addTeachers></addTeachers>
-
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="isTeacher = false">取 消</el-button>
-            <el-button type="primary" @click="isTeacher = false">确 定</el-button>
-          </span>
+          <addTeachers v-on:goAddTeachersData="teachersData"></addTeachers>
         </el-dialog>
   </div>
 </template>
@@ -261,7 +252,7 @@
   import wangEditor from 'wangeditor'
   import echarts from 'echarts'
   import addTeachers from './upCourse/addTeacher.vue'
-  import { categories, tags, instructorList } from '../../api/course'
+  import { categories, tags, instructorList, teachersList } from '../../api/course'
   import { formatDate } from '../../utils/utils'
   export default {
     components:{
@@ -302,9 +293,9 @@
         },
         //课程相关
         CourseInfoEntity:{
-          courseDescription:'', //课程信息
-          teachingArrangement:'', //教学安排
-          teachingTarget :'', //教学目标
+          courseDescription:null, //课程信息
+          teachingArrangement:null, //教学安排
+          teachingTarget:null, //教学目标
         },
         courseTime:[],  //课程开始 and 结束时间
         isSysTem:false, //弹出设置
@@ -314,14 +305,10 @@
         editor1:null,
         editor2:null,
         editor3:null,
-        //下拉框选择
-        options:[{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }],
+        //一下是三个的监听方法
+        addEditor1:null,
+        addEditor2:null,
+        addEditor3:null,
         //课程分类
         categoriesList:[],
         //配置二级
@@ -340,7 +327,8 @@
         },
         //讲师列表
         instructorLists:[],
-        selectValue:0,
+        //教师列表
+        teachersLists:[]
       }
     },
     watch:{
@@ -355,6 +343,18 @@
       this.selectList()
     },
     methods:{
+      //创建讲师
+      teachersData (e) {
+        console.log('创建讲师返回数据',e)
+      },
+      //教师
+      yesTeacher (e) {
+        this.CourseForm.teacher = e
+      },
+      //讲师
+      yesInstructor (e) {
+        this.CourseForm.instructor = e
+      },
       //标签数据赋值
       yesTages(e){
         this.Course.courseTagParent = e[0]
@@ -464,12 +464,26 @@
         })
         //讲师列表
         instructorList().then(res=>{
-          console.log(res)
+          // console.log(res)
           if(Number(res.code) === 200){
             this.instructorLists = res.data
           }else{
             this.$message({
               message:'讲师列表获取失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+        //教师列表
+        teachersList().then(res=>{
+          // console.log(res)
+          if(Number(res.code) === 200){
+            this.teachersLists = res.data
+          }else{
+            this.$message({
+              message:'获取教师列表失败',
               type:'error'
             })
           }
@@ -496,6 +510,9 @@
         this.CourseInfoEntity.courseDescription = html
       }
       this.editor1.customConfig.zIndex = 100
+      this.addEditor1 = this.editor1.customConfig.onchange = function (html) {
+        this.CourseInfoEntity.courseDescription = html
+      }
       this.editor1.create()
       //教学目标
       this.editor2 = new wangEditor('#editor2')
@@ -503,6 +520,9 @@
         this.CourseInfoEntity.teachingTarget = html
       }
       this.editor2.customConfig.zIndex = 100
+      this.addEditor2 = this.editor1.customConfig.onchange = function (html) {
+        this.CourseInfoEntity.teachingArrangement = html
+      }
       this.editor2.create()
       //教学安排
       this.editor3 = new wangEditor('#editor3')
@@ -510,6 +530,9 @@
         this.CourseInfoEntity.teachingArrangement  = html
       }
       this.editor3.customConfig.zIndex = 100
+      this.addEditor3 = this.editor1.customConfig.onchange = function (html) {
+        this.CourseInfoEntity.teachingTarget = html
+      }
       this.editor3.create()
     }
   }
