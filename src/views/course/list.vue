@@ -81,7 +81,7 @@
 </template>
 
 <script>
-  import { coursePage } from '../../api/course'
+  import { coursePage, publish } from '../../api/course'
   export default {
     data (){
       return {
@@ -141,11 +141,24 @@
       },
       //发布课程
       release (val) {
-
+        publish(val).then(res=>{
+          if(res.code === 200){
+            this.$message({
+              message:'发布成功',
+              type:'success'
+            })
+          }else{
+            this.$message({
+              message:'发布失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
       },
       getList () {
         coursePage(this.listQuery).then(res => {
-          console.log(res)
           if (res.code === 200) {
             this.data = res.data.pageData
             this.listQuery.total = res.data.totalCount
@@ -155,7 +168,6 @@
               type:'error'
             })
           }
-          console.log(res.data.pageData)
         }).catch(error => {
           console.log(error)
         })

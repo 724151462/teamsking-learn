@@ -7,7 +7,7 @@ if (getToken()) {
   axios.defaults.headers.token = getToken()
 }
 // axios.defaults.headers.token = '40347a4bbe35a4b8501468a27089d64f'
-axios.defaults.headers.token = '2968da0b4b39a7faafbd0673d9e8cc9d'
+axios.defaults.headers.token = '2ba67c6b698a1cde7cfdb19c68132d09'
 axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 axios.defaults.responseType = 'json'
@@ -55,7 +55,6 @@ export function commonsAjax (url, data, method, headers) {
     if (data !== '') {
       date.url += '?' + qs.stringify(data)
     }
-    console.log(date)
     axios(date).then(res => {
       reject(res.data)
     }).catch(error => {
