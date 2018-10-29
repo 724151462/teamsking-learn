@@ -11,11 +11,6 @@ axios.defaults.headers.token = '7c7ca7451073f3c94f9a4ae26fabbd03'
 axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 axios.defaults.responseType = 'json'
-/*
-axios.defaults.headers = {
-  "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-}
-*/
 
 /**
  * 请求拦截器

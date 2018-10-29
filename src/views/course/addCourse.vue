@@ -367,7 +367,7 @@
       },
       goUpCourseResource(){
         console.log(this.Course)
-        return
+        // return
         this.$router.push({
           path:'/course/upCourses/resource'
         })
