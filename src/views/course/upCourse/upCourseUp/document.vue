@@ -19,15 +19,19 @@
             v-for="list in tables"
             :prop="list.prop"
             :label="list.name"
+            align="center"
             :width="list.width">
         </el-table-column>
         <el-table-column
             label="操作"
-            width="120"
+            width="160"
+            align="center"
         >
           <template slot-scope="scope">
-            <a class="preview" @click="alertVideo(scope.row)">预览</a>
-            <a class="down">下载</a>
+            <a class="preview" :href="scope.row.resourceUrl">预览</a>
+            <a class="preview" @click="deletes(scope.row)">删除</a>
+            <!--<a class="preview" @click="alertVideo(scope.row)" href="scope.row.resourceUrl">预览</a>-->
+            <a class="down" :href="scope.row.resourceUrl">下载</a>
           </template>
         </el-table-column>
       </el-table>
@@ -44,47 +48,84 @@
 </template>
 
 <script>
+  import { resourcePage, deletedResource } from '../../../../api/course'
   export default {
     data(){
       return{
         tables:[
           {
             name:'文档名称',
-            prop:'name',
+            prop:'resourceTitle',
             // width:120
           },
           {
             name:'文档类型',
-            prop:'time',
+            prop:'contentType',
             width:120
           },
           {
             name:'发布人',
-            prop:'fbr',
+            prop:'creatorId',
             width:120
           },
           {
             name:'发布时间',
-            prop:'fbtime',
+            prop:'createTime',
             width:120
           },
         ],
-        data:[
-          {
-            name:'xx文档',  //视频名称
-            time:'word',    //视频时长
-            fbr:'x老师',  //发布人
-            fbtime:'2018-1-1',  //发布时间
-          }
-        ],
+        data:[],
         isDocument:false,  //是否打开弹窗预览
+        courseid:'',
+        listQuery:{
+          resourceType:20, // 10:video 20:doc 30:audio
+          pageIndex:1,
+          pageSize:10
+        }
       }
     },
     created(){
       this.$emit('floorStatus','course')
       this.$emit('resourceNav','document')
+      if(this.$route.query.courseid && this.$route.query.courseid !== '') {
+        this.courseid = this.$route.query.courseid
+        this.getList()
+      }
     },
     methods:{
+      deletes (e) {
+        deletedResource(e.resourceId).then(res=>{
+          // console.log(res)
+          if(Number(res.code) === 200){
+            this.getList()
+            this.$message({
+              message:'删除成功',
+              type:'success'
+            })
+          }else{
+            this.$message({
+              message:res.msg,
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
+      getList () {
+        resourcePage(this.courseid,this.listQuery).then(res=>{
+          if(Number(res.code) === 200){
+            this.data = res.data.pageData
+          }else{
+            this.$message({
+              message:'获取文档数据错误',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
       //上传成功后直接刷新文档库内容
       handleAvatarSuccess(res, file) {
         // this.imageUrl = URL.createObjectURL(file.raw);

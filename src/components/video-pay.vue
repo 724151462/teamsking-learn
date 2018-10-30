@@ -16,7 +16,14 @@
 <script>
   import { videoPlayer } from 'vue-video-player'
   export default {
-    props:['isMp4'],
+    props:{
+      isMp4:{
+        default:''
+      },
+      cover:{
+        default:'poster.jpg'
+      }
+    },
     data(){
       return{
         playerOptions: {
@@ -34,7 +41,7 @@
             src: this.isMp4 //你的m3u8地址（必填）
             // src: "http://vjs.zencdn.net/v/oceans.mp4" //你的m3u8地址（必填）
           }],
-          poster: "poster.jpg", //你的封面地址
+          poster: this.cover, //你的封面地址
           width: document.documentElement.clientWidth,
           notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
 //        controlBar: {

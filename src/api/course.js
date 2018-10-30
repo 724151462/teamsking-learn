@@ -75,3 +75,27 @@ export function resourcePage (id, data) {
   return commonsAjax(url, data, 'get')
 }
 
+/**
+ * 删除课程下资源
+ */
+export function deletedResource (id, data) {
+  // resourceId
+  let url = '/api/v1/course/resource/' + id
+  return commonsAjax(url, data, 'delete')
+}
+
+/**
+ * 获取试题列表
+ */
+export function quizPage (id, data) {
+  let url = '/api/v1/course/' + id + '/quiz/page'
+  return commonsAjax(url, data, 'get')
+}
+
+/**
+ * 保存试题
+ */
+export function saveQuiz (data) {
+  return commonsAjax('/api/v1/course/quiz', data, 'post')
+}
+
