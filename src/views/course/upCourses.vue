@@ -1,7 +1,7 @@
 <template>
   <div class="course-up">
     <div class="nav">
-        <router-link v-for="list in nav" :class="navs === list.isNav ? 'list yes' : 'list'" :to="list.url">{{list.name}}</router-link>
+      <a v-for="list in nav" :class="navs === list.isNav ? 'list yes' : 'list'" @click="goUrl(list.url)">{{list.name}}</a>
     </div>
     <router-view v-on:upCoursesNav="upCoursesNav"></router-view>
   </div>
@@ -48,10 +48,24 @@
             isNav:'discuss'
           },
         ],
-        navs:'resource'
+        navs:'resource',
+        courseid:''
+      }
+    },
+    created(){
+      if(this.$route.query.courseid && this.$route.query.courseid !== ''){
+        this.courseid = this.$route.query.courseid
       }
     },
     methods:{
+      goUrl (e) {
+        this.$router.push({
+          path:e,
+          query:{
+            courseid:this.courseid
+          }
+        })
+      },
       upCoursesNav(e){
         this.navs = e
       }

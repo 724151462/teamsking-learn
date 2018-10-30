@@ -29,13 +29,13 @@
           </div>
           <div class="button">
             <div class="top">
-              <a class="list">编辑</a>
+              <a class="list" @click="upData(list.courseId)">编辑</a>
               <a class="list">复制</a>
               <a class="list" @click="release(list.courseId)">发布</a>
               <a class="list">删除</a>
               <a class="list" @click="sell">售卖</a>
             </div>
-            <el-button type="primary" @click="goAddCourse">教学管理</el-button>
+            <el-button type="primary" @click="goAddCourse(list.courseId)">教学管理</el-button>
           </div>
         </el-row>
       </el-row>
@@ -111,6 +111,15 @@
       this.getList()
     },
     methods: {
+      upData (e) {
+        this.$router.push({
+          path:'/course/addCourse',
+          query:{
+            type:'upData',
+            courseId:e
+          }
+        })
+      },
       courseStatus(val){
         let vals = Number(val)
         //10 待发布 20 预发布 30 已发布 40 关闭 50 已归档 ,
@@ -134,10 +143,18 @@
       sell () {
         this.isDialog = true
       },
-      goAddCourse () {
+      goAddCourse (e) {
+        this.$router.push({
+          path:'/course/upCourses',
+          query:{
+            courseid:e
+          }
+        })
+/*
         this.$router.push({
           path:'/course/addCourse'
         })
+*/
       },
       //发布课程
       release (val) {
@@ -182,6 +199,8 @@
 
   .course-table
     overflow hidden
+    margin-bottom:10px
+    border-bottom:1px solid #CCCCCC
 
     .img
       position: relative
@@ -235,4 +254,5 @@
         .list
           margin-right:20px
           color: #0EA5F0
+          cursor: pointer
 </style>

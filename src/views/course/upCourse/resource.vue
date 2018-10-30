@@ -1,7 +1,7 @@
 <template>
   <div class="course-resource">
     <div class="headers">
-      <router-link v-for="list in nav" :to="list.url" :class="isNav === list.isNav ? 'list yes' : 'list'">{{list.name}}</router-link>
+      <a v-for="list in nav" @click="goUrl(list.url)" :class="isNav === list.isNav ? 'list yes' : 'list'">{{list.name}}</a>
     </div>
     <div class="bottom">
       <router-view v-on:resourceNav="resourceNavs"></router-view>
@@ -35,15 +35,26 @@
             isNav:'activity'
           },
         ],
-        isNav:''
+        isNav:'',
+        courseid:''
       }
     },
     created(){
       this.$emit('upCoursesNav','resource')
+      if(this.$route.query.courseid && this.$route.query.courseid !== ''){
+        this.courseid = this.$route.query.courseid
+      }
     },
     methods:{
-      resourceNavs(e){
-        console.log(e)
+      goUrl (e) {
+        this.$router.push({
+          path:e,
+          query:{
+            courseid:this.courseid
+          }
+        })
+      },
+      resourceNavs (e) {
         this.isNav = e
       }
     }

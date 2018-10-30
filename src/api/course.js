@@ -52,3 +52,26 @@ export function addInstructor (data) {
   return commonsAjax('/api/v1/course/instructor', data, 'post')
 }
 
+/**
+ * 保存课程
+ */
+export function saveCourse (data) {
+  return commonsAjax('/api/v1/course', data, 'post')
+}
+
+/**
+ * 查询课程信息
+ */
+export function courseInfo (data) {
+  let url = '/api/v1/course/info/' + data
+  return commonsAjax(url, '', 'post')
+}
+
+/**
+ * 查询课程下资源列表
+ */
+export function resourcePage (id, data) {
+  let url = '/api/v1/course/' + id + '/resource/page'
+  return commonsAjax(url, data, 'get')
+}
+
