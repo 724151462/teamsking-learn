@@ -40,31 +40,59 @@
                 ],
     -->
     <div class="table-theAgain">
-
-        <!--<div class="tableOperate">-->
-            <!--<el-button type="primary" class="" @click="onSubmit('add')" >添加管理员</el-button>-->
-            <!--<el-button type="primary" class="" @click="onSubmit('add')" >批量删除</el-button>-->
-        <!--</div>-->
-
         <div class="tableOperate">
-            <el-button v-for="item in tableOperate" type="primary" class="" @click="onSubmit(item.type)" >{{ item.content }}</el-button>
-            <!--<el-button type="primary" class="" @click="onSubmit('add')" >批量删除</el-button>-->
+            <el-button v-for="item in tableOperate" type="primary" class="" @click="onSubmit(item.type,multipleSelection)" >{{ item.content }}</el-button>
         </div>
 
         <el-table
                 ref="multipleTable"
                 :data="tableData"
                 tooltip-effect="dark"
-                style="width: 95%;margin-left:2.5%;position: relative">
+                style="width: 95%;margin-left:2.5%;position: relative"
+                @selection-change="handleSelectionChange">
 
             <el-table-column :label="tableTitle" class="addButton">
-                <el-table-column v-for="item in columnNameList"
-                                 :prop="item.prop"
-                                 :label="item.name"
-                                 :width="item.width"
-                                 :type="item.type"
-                                 align="center">
-                </el-table-column>
+                <!--<el-table-column v-for="item in columnNameList"-->
+                                 <!--:prop="item.prop"-->
+                                 <!--:label="item.name"-->
+                                 <!--:width="item.width"-->
+                                 <!--:type="item.type"-->
+                                 <!--align="center">-->
+                <!--</el-table-column>-->
+
+              <!--<el-table-column v-if=""-->
+                               <!--:prop="item.prop"-->
+                               <!--:label="item.name"-->
+                               <!--:width="item.width"-->
+                               <!--:type="item.type"-->
+                               <!--align="center">-->
+                <!--<template slot-scope="scope">-->
+                  <!---->
+                <!--</template>-->
+              <!--</el-table-column>-->
+              <template v-for="list in columnNameList">
+                <template v-if="list.formatter">
+                  <el-table-column :label="list.name"
+                                   align="center">
+                    <template scope="scope">
+                      <div>
+                        {{ list.formatter(scope.row[list.prop],scope.row) }}
+                      </div>
+                    </template>
+                  </el-table-column>
+
+                </template>
+                <template v-else>
+                  <el-table-column
+                                   :prop="list.prop"
+                                   :label="list.name"
+                                   :width="list.width"
+                                   :type="list.type"
+                                   align="center">
+                  </el-table-column>
+                </template>
+
+              </template>
                 <el-table-column
                         fixed="right"
                         label="操作"
@@ -90,6 +118,8 @@
         methods:{
             handleSelectionChange(val) {
                 this.multipleSelection = val;
+
+                console.log( this.multipleSelection )
             },
             onSubmit( type,info ) {
                 console.log( '子组件类型：' + type + '\n子组件信息:' + info );
@@ -104,7 +134,7 @@
     .table-theAgain
         position relative
 
-        .tableOperate{
+        .tableOperate
             box-sizing:border-box
             padding-left: 10px
             padding-right: 10px
@@ -113,7 +143,7 @@
             right:7.5%;
             display:inline-block
             z-index:1
-        }
+
         a
             display:inline-block
             margin-right:5px

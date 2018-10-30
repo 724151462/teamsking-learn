@@ -8,18 +8,53 @@ export function coursePage (data) {
 }
 
 /**
- * 获取课程分类列表
+ * 发布课程
  */
-// export function sysCategoryPage (data) {
-//     return commonsAjax('/api/v1/sys/category/page',data,'get')
-// }
-
-// /api/v1/sys/category/page
+export function publish (data) {
+  let url = '/api/v1/course/' + data + '/publish'
+  return commonsAjax(url, '', 'put')
+}
 
 /**
- * 学院页面
+ * 获取课程分类列表
  */
-export function sysCollegePage (data) {
-  return commonsAjax('http://www.tms.teamsking.com:9008/api/v1/sys/college/page/',data,'get')
-  //return commonsAjax('/api/v1/course/page', data, 'get')
+export function categories (data) {
+  return commonsAjax('/api/v1/common/categories', 'data', 'get')
 }
+
+/**
+ * 获取课程分类列表
+ */
+export function tags (data) {
+  return commonsAjax('/api/v1/common/tags', 'data', 'get')
+}
+
+/**
+ * 获取讲师列表
+ */
+export function instructorList (data) {
+  return commonsAjax('/api/v1/course/instructor/list', '', 'get')
+}
+
+/**
+ * 获取教师列表
+ */
+// <<<<<<< HEAD
+// export function sysCollegePage (data) {
+//   return commonsAjax('http://www.tms.teamsking.com:9008/api/v1/sys/college/page/',data,'get')
+//   //return commonsAjax('/api/v1/course/page', data, 'get')
+// =======
+// export function teachersList (data) {
+//   let url = '/api/v1/tenant/' + 1 + '/teachers'
+//   return commonsAjax(url, '', 'get')
+// >>>>>>> 9dfe0d8c1c3b3dfeab5a3ae9c3eaad64897b7979
+// }
+
+/**
+ * 获取教师列表
+ */
+export function addInstructor (data) {
+  console.log('要穿的数据',data)
+  return commonsAjax('/api/v1/course/instructor', data, 'post')
+}
+

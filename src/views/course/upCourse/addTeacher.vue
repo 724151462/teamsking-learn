@@ -14,15 +14,15 @@
       </el-form-item>
 
       <el-form-item label="老师姓名" required>
-        <el-input v-model="data.name" style="width: 220px;"></el-input>
+        <el-input v-model="data.instructorName" style="width: 220px;"></el-input>
       </el-form-item>
 
       <el-form-item label="老师头街" required>
-        <el-input v-model="data.introduction" style="width: 220px;"></el-input>
+        <el-input v-model="data.instructorType" style="width: 220px;"></el-input>
       </el-form-item>
 
       <el-form-item label="老师介绍" required>
-        <el-input type="textarea" v-model="data.introduction"></el-input>
+        <el-input type="textarea" v-model="data.instructorInfo"></el-input>
       </el-form-item>
 
       <el-form-item label="新浪微博">
@@ -38,27 +38,45 @@
         <div>使用空格间隔标签</div>
       </el-form-item>
     </el-form>
+
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="isTeacher = false">取 消</el-button>
+      <el-button type="primary" @click="yesGoInstructor">确 定</el-button>
+    </span>
   </div>
 </template>
 
 <script>
+  import { addInstructor } from '../../../api/course'
   export default {
     data(){
       return{
         data:{
-          imageUrl:'',  //头像图片
-          name:'',  //老师姓名
-          introduction:'',  //老师介绍
+          instructorAvatar:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3534289497,3677101726&fm=27&gp=0.jpg',  //头像图片
+          instructorName:'',  //老师姓名
+          instructorType:'',  //老师职位
+          instructorInfo:'',  //老师介绍
+          // introduction:'',  //老师介绍
         }
       }
     },
     methods:{
+      //创建讲师
+      yesGoInstructor () {
+        console.log('创建讲师数据',this.data)
+        addInstructor(this.data).then(res=>{
+          console.log(res)
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
       //图片上传方法
       handleAvatarSuccess(res, file) {
-        this.imageUrl = URL.createObjectURL(file.raw);
+        this.instructorAvatar = URL.createObjectURL(file.raw);
+
       },
       beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
+        const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
         const isLt2M = file.size / 1024 / 1024 < 2;
 
         if (!isJPG) {

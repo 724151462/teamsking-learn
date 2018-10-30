@@ -7,10 +7,20 @@ if (getToken()) {
   axios.defaults.headers.token = getToken()
 }
 // axios.defaults.headers.token = '40347a4bbe35a4b8501468a27089d64f'
-axios.defaults.headers.token = '565cfe13309c7734724cdabdd77d8b40'
+// <<<<<<< HEAD
+// axios.defaults.headers.token = '565cfe13309c7734724cdabdd77d8b40'
+// =======
+// axios.defaults.headers.token = '7c7ca7451073f3c94f9a4ae26fabbd03'
+// >>>>>>> 9dfe0d8c1c3b3dfeab5a3ae9c3eaad64897b7979
+axios.defaults.headers.token = 'be21a67db991ca0c3c1f3f3fbcaf4e7a'
 axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 axios.defaults.responseType = 'json'
+/*
+axios.defaults.headers = {
+  "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+}
+*/
 
 /**
  * 请求拦截器
@@ -52,10 +62,18 @@ export function commonsAjax (url, data, method, headers) {
       url: url,
       method: method
     }
-    if (data !== '') {
+    if (data !== '' && method === 'get') {
       date.url += '?' + qs.stringify(data)
     }
-    console.log(date)
+    if(data !== '' && method === 'post'){
+      date.data = data
+    }
+    if( data !== '' && method === 'delete'){
+      date.data = data
+    }
+    if( data !== '' && method === 'put'){
+      date.data = data
+    }
     axios(date).then(res => {
       reject(res.data)
     }).catch(error => {

@@ -5,20 +5,19 @@
       <el-button plain style="float:right">返回</el-button>
     </div>
     <div class="addCourse-center">
-      <el-form :model="data" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+      <el-form :model="Course" ref="ruleForm" label-width="100px" class="demo-ruleForm">
         <el-form-item label="课程名称" required>
-          <el-input v-model="data.courseName" style="width: 220px;"></el-input>
+          <el-input v-model="Course.courseName" style="width: 220px;"></el-input>
         </el-form-item>
 
         <el-form-item label="课程分类" required>
-          <el-select v-model="data.courseCategory" placeholder="请选择">
-            <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-            </el-option>
-          </el-select>
+          <el-cascader
+              placeholder="请选择课程分类"
+              :options="categoriesList"
+              :props='categoriesConfig'
+              @change="yesCategories"
+              filterable
+          ></el-cascader>
         </el-form-item>
 
         <el-form-item label="起止时间" required>
@@ -38,48 +37,61 @@
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload">
-            <img v-if="data.courseCover" :src="data.courseCover" class="avatar">
+            <img v-if="Course.courseCover" :src="Course.courseCover" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
 
         <el-form-item label="课程价格" required>
-          <el-radio v-model="data.payMode" label="10">免费</el-radio>
-          <el-radio v-model="data.payMode" label="20">收费</el-radio>
-          <el-input v-model="data.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;" v-show="Number(data.payMode) === 20"></el-input>
-          <span v-show="Number(data.payMode) === 20">元</span>
+          <el-radio v-model="Course.payMode" label="10">免费</el-radio>
+          <el-radio v-model="Course.payMode" label="20">收费</el-radio>
+          <el-input v-model="Course.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;" v-show="Number(Course.payMode) === 20"></el-input>
+          <span v-show="Number(Course.payMode) === 20">元</span>
         </el-form-item>
 
         <el-form-item label="课程标签" required>
-          <el-select v-model="data.courseTagParent" placeholder="请选择">
-            <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-            </el-option>
-          </el-select>
+          <el-cascader
+              placeholder="请选择课程标签"
+              :options="tagsList"
+              :props='tagsConfig'
+              @change="yesTages"
+              filterable
+          ></el-cascader>
         </el-form-item>
 
         <el-form-item label="讲师" required>
-          <el-select v-model="selectValue" placeholder="请选择">
+          <el-select
+              v-model="CourseForm.instructor"
+              multiple
+              filterable
+              allow-create
+              default-first-option
+              @change="yesInstructor"
+              placeholder="请选择讲师">
             <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="item in instructorLists"
+                :key="item.instructorId"
+                :label="item.instructorName"
+                :value="item.instructorId">
             </el-option>
           </el-select>
           <el-button type="primary" round style="margin-left: 20px;" @click="isTeacher = true">创建讲师</el-button>
         </el-form-item>
 
         <el-form-item label="教学老师" required>
-          <el-select v-model="selectValue" placeholder="请选择">
+          <el-select
+              v-model="CourseForm.teacher"
+              multiple
+              filterable
+              allow-create
+              default-first-option
+              @change="yesTeacher"
+              placeholder="请选择讲师">
             <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="item in teachersLists"
+                :key="item.userId"
+                :label="item.teacherName"
+                :value="item.userId">
             </el-option>
           </el-select>
         </el-form-item>
@@ -87,13 +99,13 @@
         <el-form-item label="选课名单" required>
           <el-row>
             <span>开放范围：</span>
-            <el-radio v-model="data.courseMode" label="10">选课名单学员</el-radio>
-            <el-radio v-model="data.courseMode" label="20">本校学员</el-radio>
-            <el-radio v-model="data.courseMode" label="30">全部学员</el-radio>
+            <el-radio v-model="Course.courseMode" label="10">选课名单学员</el-radio>
+            <el-radio v-model="Course.courseMode" label="20">本校学员</el-radio>
+            <el-radio v-model="Course.courseMode" label="30">全部学员</el-radio>
           </el-row>
           <el-row>
             <span>退课权限：</span>
-            <el-checkbox v-model="data.dropCourse">允许退课</el-checkbox>
+            <el-checkbox v-model="Course.dropCourse">允许退课</el-checkbox>
           </el-row>
         </el-form-item>
 
@@ -103,7 +115,7 @@
         </el-form-item>
 
         <el-form-item label="课程代码">
-          <el-input v-model="data.courseCode" style="width: 120px;"></el-input>
+          <el-input v-model="Course.courseCode" style="width: 120px;"></el-input>
         </el-form-item>
 
         <el-form-item label="课程介绍" required>
@@ -231,12 +243,7 @@
             :visible.sync="isTeacher"
             width="50%">
 
-          <addTeachers></addTeachers>
-
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="isTeacher = false">取 消</el-button>
-            <el-button type="primary" @click="isTeacher = false">确 定</el-button>
-          </span>
+          <addTeachers v-on:goAddTeachersData="teachersData"></addTeachers>
         </el-dialog>
   </div>
 </template>
@@ -245,24 +252,34 @@
   import wangEditor from 'wangeditor'
   import echarts from 'echarts'
   import addTeachers from './upCourse/addTeacher.vue'
+  import { categories, tags, instructorList, teachersList } from '../../api/course'
+  import { formatDate } from '../../utils/utils'
   export default {
     components:{
       addTeachers
     },
     data(){
       return{
-        data:{
+        Course:{
           courseName:'',  //课程名称
-          courseCategory:'',  //课程分类
+          courseCategoryParent:'',  //课程分类
+          courseCategory:'',  //课程子分类
+          courseTagParent:'', //课程标签
+          courseTag:'', //课程子标签
           beginTime:'', //开课时间
           endTime:'', //结课时间
           courseCover:'', //课程封面
           payMode:'10',  //课程价格 10授课 20售卖
           coursePrice:0, //课程价格
-          courseTagParent:'', //课程标签
           courseMode:'10',  //10：教师导入 20 本校学生 30 全部学员 ,
           dropCourse:false, //1 允许退课 2 不允许
           courseCode:'',  //课程代码/课程编码
+          teacher:'', //教师id
+        },
+        //给到的教师信息
+        CourseForm:{
+          instructor:[],  //要保存的讲师Id
+          teacher:[], //要保存的教师Id
         },
         //课程完成度
         CourseSetEntity:{
@@ -276,9 +293,9 @@
         },
         //课程相关
         CourseInfoEntity:{
-          courseDescription:'', //课程信息
-          teachingArrangement:'', //教学安排
-          teachingTarget :'', //教学目标
+          courseDescription:null, //课程信息
+          teachingArrangement:null, //教学安排
+          teachingTarget:null, //教学目标
         },
         courseTime:[],  //课程开始 and 结束时间
         isSysTem:false, //弹出设置
@@ -288,22 +305,69 @@
         editor1:null,
         editor2:null,
         editor3:null,
-        //下拉框选择
-        options:[{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }],
-        selectValue:0,
+        //一下是三个的监听方法
+        addEditor1:null,
+        addEditor2:null,
+        addEditor3:null,
+        //课程分类
+        categoriesList:[],
+        //配置二级
+        categoriesConfig:{
+          label:'categoryName',
+          value:'categoryId',
+          children:'children'
+        },
+        //课程标签列表
+        tagsList:[],
+        //配置二级
+        tagsConfig:{
+          label:'tagName',
+          value:'tagId',
+          children:'children'
+        },
+        //讲师列表
+        instructorLists:[],
+        //教师列表
+        teachersLists:[]
+      }
+    },
+    watch:{
+      //监听日期变化
+      courseTime(a){
+        this.Course.beginTime = formatDate(new Date(a[0]).getTime())
+        this.Course.endTime = formatDate(new Date(a[1]).getTime())
       }
     },
     created(){
       this.$emit('floorStatus','course')
+      this.selectList()
     },
     methods:{
+      //创建讲师
+      teachersData (e) {
+        console.log('创建讲师返回数据',e)
+      },
+      //教师
+      yesTeacher (e) {
+        this.CourseForm.teacher = e
+      },
+      //讲师
+      yesInstructor (e) {
+        this.CourseForm.instructor = e
+      },
+      //标签数据赋值
+      yesTages(e){
+        this.Course.courseTagParent = e[0]
+        this.Course.courseTag = e[1]
+      },
+      //分类数据赋值
+      yesCategories(e){
+        this.Course.courseCategoryParent = e[0]
+        this.Course.courseCategory = e[1]
+      },
       goUpCourseResource(){
+        console.log(this.Course)
+        return
         this.$router.push({
           path:'/course/upCourses/resource'
         })
@@ -366,7 +430,78 @@
           this.$message.error('上传头像图片大小不能超过 2MB!');
         }
         return isJPG && isLt2M;
-      }
+      },
+      //获取基础选择列表分类信息
+      selectList () {
+        //课程列表
+        categories().then(res=>{
+          if(Number(res.code) === 200){
+            //数据处理
+            let data = this.electChilder(res.data)
+            this.categoriesList = data
+          }else{
+            this.$message({
+              message:'课程分类数据获取失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+        //课程标签列表
+        tags().then(res=>{
+          if(Number(res.code) === 200){
+            let data = this.electChilder(res.data)
+            this.tagsList = data
+          }else{
+            this.$message({
+              message:'课程列表获取失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+        //讲师列表
+        instructorList().then(res=>{
+          // console.log(res)
+          if(Number(res.code) === 200){
+            this.instructorLists = res.data
+          }else{
+            this.$message({
+              message:'讲师列表获取失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+        //教师列表
+        teachersList().then(res=>{
+          // console.log(res)
+          if(Number(res.code) === 200){
+            this.teachersLists = res.data
+          }else{
+            this.$message({
+              message:'获取教师列表失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
+      //删除空的childer
+      electChilder (data) {
+        data.forEach(item => {
+          if (item.children && !item.children.length) {
+            delete item.children;
+          } else {
+            item.children = this.electChilder(item.children)
+          }
+        });
+        return data;
+      },
     },
     mounted(){
       //课程介绍
@@ -375,6 +510,9 @@
         this.CourseInfoEntity.courseDescription = html
       }
       this.editor1.customConfig.zIndex = 100
+      this.addEditor1 = this.editor1.customConfig.onchange = function (html) {
+        this.CourseInfoEntity.courseDescription = html
+      }
       this.editor1.create()
       //教学目标
       this.editor2 = new wangEditor('#editor2')
@@ -382,6 +520,9 @@
         this.CourseInfoEntity.teachingTarget = html
       }
       this.editor2.customConfig.zIndex = 100
+      this.addEditor2 = this.editor1.customConfig.onchange = function (html) {
+        this.CourseInfoEntity.teachingArrangement = html
+      }
       this.editor2.create()
       //教学安排
       this.editor3 = new wangEditor('#editor3')
@@ -389,6 +530,9 @@
         this.CourseInfoEntity.teachingArrangement  = html
       }
       this.editor3.customConfig.zIndex = 100
+      this.addEditor3 = this.editor1.customConfig.onchange = function (html) {
+        this.CourseInfoEntity.teachingTarget = html
+      }
       this.editor3.create()
     }
   }
