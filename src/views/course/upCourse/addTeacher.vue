@@ -25,6 +25,7 @@
         <el-input type="textarea" v-model="data.instructorInfo"></el-input>
       </el-form-item>
 
+<!--
       <el-form-item label="新浪微博">
         <el-input v-model="data.introduction" style="width: 220px;"></el-input>
       </el-form-item>
@@ -37,10 +38,11 @@
         <el-input v-model="data.introduction" style="width: 220px;"></el-input>
         <div>使用空格间隔标签</div>
       </el-form-item>
+-->
     </el-form>
 
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="isTeacher = false">取 消</el-button>
+    <span slot="footer" style="text-align: right;display:block">
+      <el-button @click="returnFun">取 消</el-button>
       <el-button type="primary" @click="yesGoInstructor">确 定</el-button>
     </span>
   </div>
@@ -56,16 +58,26 @@
           instructorName:'',  //老师姓名
           instructorType:'',  //老师职位
           instructorInfo:'',  //老师介绍
+          status:1
           // introduction:'',  //老师介绍
         }
       }
     },
     methods:{
+      returnFun () {
+        this.$emit('goAddTeachersData')
+      },
       //创建讲师
       yesGoInstructor () {
-        console.log('创建讲师数据',this.data)
         addInstructor(this.data).then(res=>{
-          console.log(res)
+          if(Number(res.code) === 200){
+            this.$emit('goAddTeachersData',res.data)
+          }else{
+            this.$message({
+              message:'创建失败，请检查您输入的内容',
+              type:'error'
+            })
+          }
         }).catch(error=>{
           console.log(error)
         })

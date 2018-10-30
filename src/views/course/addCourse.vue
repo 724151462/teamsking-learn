@@ -252,7 +252,7 @@
   import wangEditor from 'wangeditor'
   import echarts from 'echarts'
   import addTeachers from './upCourse/addTeacher.vue'
-  import { categories, tags, instructorList, teachersList } from '../../api/course'
+  import { categories, tags, instructorList, teachersList, saveCourse, courseInfo } from '../../api/course'
   import { formatDate } from '../../utils/utils'
   export default {
     components:{
@@ -275,6 +275,10 @@
           dropCourse:false, //1 允许退课 2 不允许
           courseCode:'',  //课程代码/课程编码
           teacher:'', //教师id
+          //一下的默认值
+          studyMode:10, //课程学习模式
+          difficultyStatus:10,  //课程难度
+          courseType:10,  //课程类别
         },
         //给到的教师信息
         CourseForm:{
@@ -341,11 +345,27 @@
     created(){
       this.$emit('floorStatus','course')
       this.selectList()
+      // if(this.$route.query.courseId)
+      console.log(this.$route.query)
+      if(this.$route.query.courseId && this.$route.query.courseId !== ''){
+        this.getUpData(this.$route.query.courseId)
+      }
     },
     methods:{
+      //进入查询编辑数据
+      getUpData(e){
+        courseInfo(e).then(res=>{
+          console.log(res)
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
       //创建讲师
       teachersData (e) {
-        console.log('创建讲师返回数据',e)
+        if(e !== ''){
+          this.instructorLists.push(e)
+        }
+        this.isTeacher = false
       },
       //教师
       yesTeacher (e) {
@@ -366,10 +386,28 @@
         this.Course.courseCategory = e[1]
       },
       goUpCourseResource(){
-        console.log(this.Course)
-        return
-        this.$router.push({
-          path:'/course/upCourses/resource'
+        let data = {
+          course:this.Course,
+          info:this.CourseInfoEntity,
+          set:this.CourseSetEntity
+        }
+        data.course.dropCourse = !data.course.dropCourse ? 1 : 2
+        let fun = null
+
+        saveCourse(data).then(res=>{
+          console.log(res)
+          if(Number(res.code) === 200) {
+            this.$router.push({
+              path:'/course/upCourses/resource'
+            })
+          }else if(Number(res.code) === 440){
+            this.$message({
+              message:res.msg,
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
         })
       },
       //弹出设置
@@ -505,33 +543,34 @@
     },
     mounted(){
       //课程介绍
+      let self = this
       this.editor1 = new wangEditor('#editor1')
       this.editor1.customConfig.onblur = function (html) {
-        this.CourseInfoEntity.courseDescription = html
+        self.CourseInfoEntity.courseDescription = html
       }
       this.editor1.customConfig.zIndex = 100
       this.addEditor1 = this.editor1.customConfig.onchange = function (html) {
-        this.CourseInfoEntity.courseDescription = html
+        self.CourseInfoEntity.courseDescription = html
       }
       this.editor1.create()
       //教学目标
       this.editor2 = new wangEditor('#editor2')
       this.editor2.customConfig.onblur = function (html) {
-        this.CourseInfoEntity.teachingTarget = html
+        self.CourseInfoEntity.teachingTarget = html
       }
       this.editor2.customConfig.zIndex = 100
       this.addEditor2 = this.editor1.customConfig.onchange = function (html) {
-        this.CourseInfoEntity.teachingArrangement = html
+        self.CourseInfoEntity.teachingArrangement = html
       }
       this.editor2.create()
       //教学安排
       this.editor3 = new wangEditor('#editor3')
       this.editor3.customConfig.onblur = function (html) {
-        this.CourseInfoEntity.teachingArrangement  = html
+        self.CourseInfoEntity.teachingArrangement  = html
       }
       this.editor3.customConfig.zIndex = 100
       this.addEditor3 = this.editor1.customConfig.onchange = function (html) {
-        this.CourseInfoEntity.teachingTarget = html
+        self.CourseInfoEntity.teachingTarget = html
       }
       this.editor3.create()
     }
