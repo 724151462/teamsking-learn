@@ -118,7 +118,6 @@
         methods:{
             handleSelectionChange(val) {
                 this.multipleSelection = val;
-
                 console.log( this.multipleSelection )
             },
             onSubmit( type,info ) {

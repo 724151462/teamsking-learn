@@ -47,4 +47,11 @@ export function sysTenantTeacher( id ){
  */
 export function sysCollegeEdit(data){
   return commonsAjax('api/v1/sys/college',data,'put')
-}   //PUT /api/v1/sys/college
+}
+
+/****
+ * 获取院列表
+ */
+export function sysCollegeList(){
+  return commonsAjax('api/v1/sys/college/list','pageIndex=1&pageSize=100','get')
+}
