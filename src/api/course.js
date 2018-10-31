@@ -19,7 +19,7 @@ export function publish (data) {
  * 获取课程分类列表
  */
 export function categories (data) {
-  return commonsAjax('/api/v1/common/categories', 'data', 'get')
+  return commonsAjax('/api/v1/common/categories', '', 'get')
 }
 
 /**
@@ -114,4 +114,3 @@ export function chaptersList (data) {
   let url = '/api/v1/course/' + data + '/chapters'
   return commonsAjax(url , '', 'get')
 }
-

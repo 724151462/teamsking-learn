@@ -4,7 +4,9 @@
 
 <script>
   export default {
-    name: "questionnaire"
+    created(){
+      this.$emit('teachingNav','questionnaire')
+    }
   }
 </script>
 

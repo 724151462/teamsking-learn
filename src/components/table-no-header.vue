@@ -18,7 +18,13 @@
           :width="buttonStylus.length * 80"
           align="center">
         <template slot-scope="scope">
-          <el-button v-for="item in buttonStylus" type="text" size="small" @click="returnData(scope.row)">{{ item.name }}</el-button>
+          <el-button v-for="item in buttonStylus" type="text" size="small" @click="returnData(scope.row,item.type)">{{ item.name }}</el-button>
+          <!--
+            buttonStylus：{
+              name：'xx'，
+              type：‘操作类型’
+            }
+          -->
         </template>
       </el-table-column>
     </el-table>
@@ -29,8 +35,12 @@
   export default {
     props:["tables","tableData","buttonStylus"],
     methods:{
-      returnData(e){
-        this.$emit('returnFun',e)
+      returnData(e,type){
+        let data = {
+          date:e,
+          sys:type
+        }
+        this.$emit('returnFun',data)
       }
     }
   }

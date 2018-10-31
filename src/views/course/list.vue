@@ -38,6 +38,14 @@
             <el-button type="primary" @click="goAddCourse(list.courseId)">教学管理</el-button>
           </div>
         </el-row>
+        <div style="text-align:right;">
+          <el-pagination
+              background
+              layout="prev, pager, next"
+              @current-change="goGetList"
+              :total="listQuery.total">
+          </el-pagination>
+        </div>
       </el-row>
 
       <!--弹出框-->
@@ -111,6 +119,10 @@
       this.getList()
     },
     methods: {
+      goGetList (e) {
+        this.listQuery.pageIndex = e
+        this.getList()
+      },
       upData (e) {
         this.$router.push({
           path:'/course/addCourse',

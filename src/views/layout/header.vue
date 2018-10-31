@@ -21,8 +21,8 @@
           },
           {
             name:'学习管理',
-            url:'/school',
-            isNav:'school'
+            url:'/learn',
+            isNav:'learn'
           },
           {
             name:'校管中心',
