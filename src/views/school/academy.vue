@@ -80,8 +80,6 @@
                 <el-button type="primary" @click="save">保 存</el-button>
             </span>
         </el-dialog>
-
-
     </div>
 </template>
 
@@ -100,7 +98,7 @@
         name: "",
         data(){
             return{
-                restaurants: [],
+                academySelectList: [],
                 popError:'',
                 input:'',
                 form: {
@@ -186,6 +184,7 @@
             headerTheAgain
         },
       created:function(){
+        this.$emit('floorStatus','school');
         this.getTableData();
         let academyList = [];
         sysCollegeList().then(
@@ -197,9 +196,9 @@
                 return true;
               }
             )
-            this.restaurants = academyList;
+            this.academySelectList = academyList;
             //console.log('院列表1', academyList);
-            //console.log('restaurants:',this.restaurants);
+            //console.log('academySelectList:',this.academySelectList);
           }
         ).catch(
           error=>{
@@ -410,8 +409,8 @@
             ];
           },
           querySearchAsync(queryString, cb) {
-            let restaurants = this.restaurants;
-            let results = queryString ? restaurants.filter(this.createStateFilter(queryString)) : restaurants;
+            let academySelectList = this.academySelectList;
+            let results = queryString ? academySelectList.filter(this.createStateFilter(queryString)) : academySelectList;
             cb(results);
           },
           createStateFilter(queryString) {

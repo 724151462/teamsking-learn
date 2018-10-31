@@ -51,7 +51,16 @@ export function sysCollegeEdit(data){
 
 /****
  * 获取院列表
+ * 说明  这边是为了做输入选择  所以选择查询所有的院  所以参数写死
  */
 export function sysCollegeList(){
-  return commonsAjax('api/v1/sys/college/list','pageIndex=1&pageSize=100','get')
+  return commonsAjax('api/v1/sys/college/list','','get')
+}
+
+/***
+ * 获取系列表
+ */
+export function sysSpecialityPage(data){ //'collegeId=1&pageIndex=1&pageSize=10&specialityName='''
+  //return commonsAjax('api/v1/sys/speciality/page',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
+  return commonsAjax('api/v1/sys/speciality/page',data,'get')
 }

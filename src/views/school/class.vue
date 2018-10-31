@@ -143,6 +143,9 @@
         components:{
             tableTheAgain
         },
+        created:function(){
+
+        },
         methods:{
             showComponentInfo:function(type,info){
                 console.log( '父组件接收到的类型：' + type + '父组件接收到的信息：' + info );
@@ -184,3 +187,17 @@
         }
 
 </style>
+<!--<template>-->
+
+
+<!--</template>-->
+<!--<script>-->
+<!--export default{-->
+
+<!--}-->
+
+<!--</script>-->
+<!--<style scoped lang="stylus" type="text/stylus">-->
+
+<!--</style>-->
+
