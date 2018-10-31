@@ -62,7 +62,8 @@
           quizTitle:'', //题干
           quizType:'10',  //题型 10 单选 20 多选
           quizOption:[],  //这里是正确答案合集
-          analysis:'' //解析
+          analysis:'', //解析
+          courseId:this.$route.query.courseid
         },
         difficultyList:[
           {

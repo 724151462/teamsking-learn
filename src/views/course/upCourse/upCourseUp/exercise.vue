@@ -36,7 +36,7 @@
         >
           <template slot-scope="scope">
             <a class="preview">下载</a>
-            <a class="preview">删除</a>
+            <a class="preview" @click="deleteQuizs(scope.row.quizId)">删除</a>
           </template>
         </el-table-column>
       </el-table>
@@ -51,7 +51,7 @@
 </template>
 
 <script>
-  import { quizPage } from '../../../../api/course'
+  import { quizPage, deleteQuiz } from '../../../../api/course'
   import addExercises from './addExercise.vue'
   export default {
     components:{
@@ -112,6 +112,24 @@
       }
     },
     methods:{
+      deleteQuizs (e) {
+        deleteQuiz(e).then(res=>{
+          if(Number(res.code) === 200){
+            this.getList()
+            this.$message({
+              message:'删除成功',
+              type:'success'
+            })
+          }else{
+            this.$message({
+              message:'删除失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
       onExercises (e) {
         this.isAddExercise = false
         if (e === 'close') {
@@ -120,7 +138,7 @@
         this.getList()
       },
       getList () {
-        quizPage(this.course,this.listQuery).then(res=>{
+        quizPage(this.courseid,this.listQuery).then(res=>{
           // console.log(res)
           if(Number(res.code) === 200){
             this.data = res.data.pageData

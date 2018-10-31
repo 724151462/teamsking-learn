@@ -99,3 +99,19 @@ export function saveQuiz (data) {
   return commonsAjax('/api/v1/course/quiz', data, 'post')
 }
 
+/**
+ * 删除试题
+ */
+export function deleteQuiz (data) {
+  let url = '/api/v1/course/quiz/' + data
+  return commonsAjax(url, '', 'delete')
+}
+
+/**
+ * 根据课程id获取所有章节信息
+ */
+export function chaptersList (data) {
+  let url = '/api/v1/course/' + data + '/chapters'
+  return commonsAjax(url , '', 'get')
+}
+
