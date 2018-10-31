@@ -21,10 +21,10 @@
           </template>
           <template v-else>
             <el-table-column
-                align="center"
-                :label="list.name"
-                :prop="list.prop"
-                :width="list.width"
+              align="center"
+              :label="list.name"
+              :prop="list.prop"
+              :width="list.width"
             >
             </el-table-column>
           </template>
@@ -36,7 +36,7 @@
         >
           <template slot-scope="scope">
             <a class="preview" @click="alertVideo(scope.row)">预览</a>
-            <a class="down">下载</a>
+            <a class="down" :href="scope.row.resourceUrl" download>下载</a>
           </template>
         </el-table-column>
       </el-table>
@@ -47,7 +47,7 @@
         :visible.sync="isVideo"
         width="70%">
 
-      <videosPays :isMp4="propsMp4"></videosPays>
+      <videosPays :isMp4="propsMp4" :cover="cover"></videosPays>
 
     </el-dialog>
     <!--添加视频-->
@@ -109,8 +109,9 @@
         ],
         data:[],
         isVideo:false,  //是否打开视频弹窗预览视频
-        titleMp4:'预览的视频名称',  //预览的视频名称
-        propsMp4:'http://vjs.zencdn.net/v/oceans.mp4',  //这个是给子组件的视频地址
+        titleMp4:'',  //预览的视频名称
+        cover:'', //封面
+        propsMp4:'',  //这个是给子组件的视频地址
         isAddVideo:false, //是否打开添加视频弹窗
         listQuery:{
           resourceType:10, // 10:video 20:doc 30:audio
@@ -151,8 +152,16 @@
         }
       },
       alertVideo(e){
-        //这里获取到视频地址传送给子组件进行操作
-        // console.log(e)
+        if(JSON.stringify(e.resourceUrl) === ''){
+          this.$message({
+            message:'暂无视频地址，无法播放',
+            type:'error'
+          })
+          return false
+        }
+        this.titleMp4 = e.resourceTitle
+        this.cover = e.coverUrl
+        this.propsMp4 = e.resourceUrl
         this.isVideo = true
       },
     }

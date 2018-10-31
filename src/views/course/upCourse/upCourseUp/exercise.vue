@@ -7,18 +7,36 @@
       <el-table
           :data="data"
           border>
-        <el-table-column
-            v-for="list in tables"
-            :prop="list.prop"
-            :label="list.name"
-            :width="list.width">
-        </el-table-column>
+        <template v-for="list in tables">
+          <template v-if="list.formatter">
+            <el-table-column
+                :label="list.name"
+                align="center">
+              <template scope="scope">
+                <div>
+                  {{list.formatter(scope.row[list.prop],scope.row)}}
+                </div>
+              </template>
+            </el-table-column>
+          </template>
+          <template v-else>
+            <el-table-column
+                align="center"
+                :label="list.name"
+                :prop="list.prop"
+                :width="list.width"
+            >
+            </el-table-column>
+          </template>
+        </template>
         <el-table-column
             label="操作"
             width="120"
+            align="center"
         >
           <template slot-scope="scope">
-            <a class="preview">预览</a>
+            <a class="preview">下载</a>
+            <a class="preview" @click="deleteQuizs(scope.row.quizId)">删除</a>
           </template>
         </el-table-column>
       </el-table>
@@ -26,18 +44,19 @@
     <el-dialog
         title="添加题目"
         :visible.sync="isAddExercise"
-        width="30%">
-      <span>这里是添加题目的题目内容</span>
-      <span slot="footer" class="dialog-footer">
-    <el-button @click="isAddExercise = false">取 消</el-button>
-    <el-button type="primary" @click="isAddExercise = false">确 定</el-button>
-  </span>
+        width="70%">
+      <addExercises v-on:yesExrecises="onExercises"></addExercises>
     </el-dialog>
   </div>
 </template>
 
 <script>
+  import { quizPage, deleteQuiz } from '../../../../api/course'
+  import addExercises from './addExercise.vue'
   export default {
+    components:{
+      addExercises
+    },
     data(){
       return{
         isAddExercise:false,  //打开弹窗
@@ -45,50 +64,95 @@
           {
             name:'题目编号',
             width:120,
-            prop:'id'
+            prop:'quizTitle'
           },
           {
             name:'题目类型',
             width:120,
-            prop:'style'
+            prop:'quizType', //10 单选 20 多选
+            formatter:function(val){
+              if(Number(val) === 10){
+                return '单选'
+              }else if(Number(val) === 20){
+                return '多选'
+              }
+            }
           },
           {
             name:'题干',
             // width:120,
-            prop:'tj'
-          },
-          {
-            name:'答案',
-            width:120,
-            prop:'da'
+            prop:'quizTitle'
           },
           {
             name:'解析',
             width:120,
-            prop:'jj'
+            prop:'quizAnalysis'
           },
           {
             name:'使用次数',
             width:120,
-            prop:'cs'
+            prop:'useCount'
           },
         ],
-        data:[
-          {
-            id:1,   //序号
-            style:'选择题',  //类型
-            tj:'我是提干',  //提干
-            da:'dsan',  //答案
-            jj:'解析',  //解析
-            cs:'11',  //使用次数
-          }
-        ]
+        data:[],
+        courseid:'',
+        listQuery:{
+          resourceType:30, // 10:video 20:doc 30:audio
+          pageIndex:1,
+          pageSize:10
+        },
       }
     },
     created(){
       this.$emit('floorStatus','course')
       this.$emit('resourceNav','exercise')
+      if (this.$route.query.courseid && this.$route.query.courseid !== '') {
+        this.courseid = this.$route.query.courseid
+        this.getList()
+      }
     },
+    methods:{
+      deleteQuizs (e) {
+        deleteQuiz(e).then(res=>{
+          if(Number(res.code) === 200){
+            this.getList()
+            this.$message({
+              message:'删除成功',
+              type:'success'
+            })
+          }else{
+            this.$message({
+              message:'删除失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
+      onExercises (e) {
+        this.isAddExercise = false
+        if (e === 'close') {
+          return false
+        }
+        this.getList()
+      },
+      getList () {
+        quizPage(this.courseid,this.listQuery).then(res=>{
+          // console.log(res)
+          if(Number(res.code) === 200){
+            this.data = res.data.pageData
+          }else{
+            this.$message({
+              message:'获取题目列表出错',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      }
+    }
   }
 </script>
 
