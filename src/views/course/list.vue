@@ -116,7 +116,7 @@
           path:'/course/addCourse',
           query:{
             type:'upData',
-            courseId:e
+            courseid:e
           }
         })
       },

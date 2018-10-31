@@ -39,16 +39,10 @@ export function instructorList (data) {
 /**
  * 获取教师列表
  */
-// <<<<<<< HEAD
-// export function sysCollegePage (data) {
-//   return commonsAjax('http://www.tms.teamsking.com:9008/api/v1/sys/college/page/',data,'get')
-//   //return commonsAjax('/api/v1/course/page', data, 'get')
-// =======
-// export function teachersList (data) {
-//   let url = '/api/v1/tenant/' + 1 + '/teachers'
-//   return commonsAjax(url, '', 'get')
-// >>>>>>> 9dfe0d8c1c3b3dfeab5a3ae9c3eaad64897b7979
-// }
+export function teachersList (data) {
+  let url = '/api/v1/tenant/' + 1 + '/teachers'
+  return commonsAjax(url, '', 'get')
+}
 
 /**
  * 获取教师列表
