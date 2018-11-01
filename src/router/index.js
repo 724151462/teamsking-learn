@@ -60,50 +60,50 @@ export const constantRouterMap = [
         path: 'upCourses',
         component: _import('course/upCourses'),
         name: '编辑课程资源',
-        redirect:'/course/upCourses/resource',
-        children:[
+        redirect: '/course/upCourses/resource',
+        children: [
           {
-            path:'resource',
-            component:_import('course/upCourse/resource'),
-            name:'课程资源',
-            redirect:'/course/upCourses/resource/videos',
-            children:[
+            path: 'resource',
+            component: _import('course/upCourse/resource'),
+            name: '课程资源',
+            redirect: '/course/upCourses/resource/videos',
+            children: [
               {
-                path:'videos',
-                component:_import('course/upCourse/upCourseUp/videos'),
-                name:'视频库'
+                path: 'videos',
+                component: _import('course/upCourse/upCourseUp/videos'),
+                name: '视频库'
               },
               {
-                path:'document',
-                component:_import('course/upCourse/upCourseUp/document'),
-                name:'文档库'
+                path: 'document',
+                component: _import('course/upCourse/upCourseUp/document'),
+                name: '文档库'
               },
               {
-                path:'exercise',
-                component:_import('course/upCourse/upCourseUp/exercise'),
-                name:'习题库'
+                path: 'exercise',
+                component: _import('course/upCourse/upCourseUp/exercise'),
+                name: '习题库'
               },
               {
-                path:'activity',
-                component:_import('course/upCourse/upCourseUp/activity'),
-                name:'活动库'
-              },
+                path: 'activity',
+                component: _import('course/upCourse/upCourseUp/activity'),
+                name: '活动库'
+              }
             ]
           },
           {
-            path:'chapter',
-            component:_import('course/upCourse/chapter'),
-            name:'章节内容'
+            path: 'chapter',
+            component: _import('course/upCourse/chapter'),
+            name: '章节内容'
           },
           {
-            path:'activityUp',
-            component:_import('course/upCourse/activityUp'),
-            name:'活动'
+            path: 'activityUp',
+            component: _import('course/upCourse/activityUp'),
+            name: '活动'
           },
           {
-            path:'member',
-            component:_import('course/upCourse/member'),
-            name:'成员'
+            path: 'member',
+            component: _import('course/upCourse/member'),
+            name: '成员'
           },
           {
             path: 'teaching',
@@ -145,46 +145,46 @@ export const constantRouterMap = [
                 path: 'videos',
                 component: _import('course/upCourse/upTeaching/videos'),
                 name: '视频'
-              },
+              }
             ]
           },
           {
-            path:'notice',
-            component:_import('course/upCourse/notice'),
-            name:'通知管理'
+            path: 'notice',
+            component: _import('course/upCourse/notice'),
+            name: '通知管理'
           },
           {
-            path:'discuss',
-            component:_import('course/upCourse/discuss'),
-            name:'讨论中心'
-          },
+            path: 'discuss',
+            component: _import('course/upCourse/discuss'),
+            name: '讨论中心'
+          }
         ]
       }
     ]
   },
   {
-    path:'/school',
-    component:Layout,
-    name:'校管中心',
-    redirect:'/school/student',
-    meta:{
-      address:'school'
+    path: '/school',
+    component: Layout,
+    name: '校管中心',
+    redirect: '/school/student',
+    meta: {
+      address: 'school'
     },
-    children:[
-      {path:'student',component:_import('school/student'),name:'学生管理'},
-      {path:'teacher',component:_import('school/teacher'),name:'教师管理'},
-      {path:'controller',component:_import('school/controller'),name:'管理员'},
-      {path:'portal',component:_import('school/portal'),name:'门户配置'},
-      {path:'course',component:_import('school/course'),name:'课程管理'},
-      {path:'certificate',component:_import('school/certificate'),name:'证书审核'},
-      {path:'academy',component:_import('school/academy'),name:'院管理'},
-      {path:'department',component:_import('school/department'),name:'系管理'},
-      {path:'specialty',component:_import('school/specialty'),name:'专业管理'},
-      {path:'class',component:_import('school/class'),name:'班级管理'},
+    children: [
+      { path: 'student', component: _import('school/student'), name: '学生管理' },
+      { path: 'teacher', component: _import('school/teacher'), name: '教师管理' },
+      { path: 'controller', component: _import('school/controller'), name: '管理员' },
+      { path: 'portal', component: _import('school/portal'), name: '门户配置' },
+      { path: 'course', component: _import('school/course'), name: '课程管理' },
+      { path: 'certificate', component: _import('school/certificate'), name: '证书审核' },
+      { path: 'academy', component: _import('school/academy'), name: '院管理' },
+      { path: 'department', component: _import('school/department'), name: '系管理' },
+      { path: 'specialty', component: _import('school/specialty'), name: '专业管理' },
+      { path: 'class', component: _import('school/class'), name: '班级管理' }
     ]
   }
 ]
 
 export default new Router({
-  routes:constantRouterMap
+  routes: constantRouterMap
 })

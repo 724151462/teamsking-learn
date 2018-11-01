@@ -48,7 +48,7 @@ export function teachersList (data) {
  * 获取教师列表
  */
 export function addInstructor (data) {
-  console.log('要穿的数据',data)
+  console.log('要穿的数据', data)
   return commonsAjax('/api/v1/course/instructor', data, 'post')
 }
 
@@ -112,5 +112,5 @@ export function deleteQuiz (data) {
  */
 export function chaptersList (data) {
   let url = '/api/v1/course/' + data + '/chapters'
-  return commonsAjax(url , '', 'get')
+  return commonsAjax(url, '', 'get')
 }
