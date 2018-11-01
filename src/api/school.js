@@ -60,6 +60,31 @@ export function sysCollegeList(){
 /***
  * 获取系列表
  */
+export function sysDepartmentPage(data){
+  //return commonsAjax('api/v1/sys/speciality/page',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
+  return commonsAjax('api/v1/sys/department/page',data,'get')
+}
+
+/***
+ *添加系 /  编辑系
+ * Param ( collegedId,departmentName,manager )  /  Param ( collegedId,departmentName,manager )
+ */
+export function sysDepartment(data){
+  //'collegeId=1&pageIndex=1&pageSize=10&specialityName='''  /api/v1/sys/departmen
+  return commonsAjax('api/v1/sys/department',data,'post')
+}
+export function sysDepartmentEdit(data){
+  //'collegeId=1&pageIndex=1&pageSize=10&specialityName='''  /api/v1/sys/departmen
+  return commonsAjax('api/v1/sys/department',data,'put')
+}
+
+
+
+
+
+/***
+ * 获取专业列表
+ */
 export function sysSpecialityPage(data){ //'collegeId=1&pageIndex=1&pageSize=10&specialityName='''
   //return commonsAjax('api/v1/sys/speciality/page',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
   return commonsAjax('api/v1/sys/speciality/page',data,'get')

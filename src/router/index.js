@@ -182,7 +182,11 @@ export const constantRouterMap = [
       {path:'specialty',component:_import('school/specialty'),name:'专业管理'},
       {path:'class',component:_import('school/class'),name:'班级管理'},
     ]
-  }
+  },
+  {
+    path:'/*',
+    redirect:'/login'
+  },
 ]
 
 export default new Router({
