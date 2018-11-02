@@ -31,12 +31,8 @@ export function sysCollegeDelete( data ){
 
 /***
  * 根据workNumber查询名字
- * @param data
+ * @param id
  */
-// export default  /api/v1/sys/teacher/college/manager
-// export function sysTeacherCollegeManager( data ){
-//   return commonsAjax('/api/v1/sys/teacher/college/manager',data,'get')
-// }
 export function sysTenantTeacher( id ){
   let url = '/api/v1/sys/tenant/teacher/'+id;
   return commonsAjax(url,'','get')
@@ -50,8 +46,7 @@ export function sysCollegeEdit(data){
 }
 
 /****
- * 获取院列表
- * 说明  这边是为了做输入选择  所以选择查询所有的院  所以参数写死
+ * 获取院列表s
  */
 export function sysCollegeList(){
   return commonsAjax('api/v1/sys/college/list','','get')
@@ -61,25 +56,31 @@ export function sysCollegeList(){
  * 获取系列表
  */
 export function sysDepartmentPage(data){
-  //return commonsAjax('api/v1/sys/speciality/page',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
   return commonsAjax('api/v1/sys/department/page',data,'get')
 }
 
 /***
- *添加系 /  编辑系
- * Param ( collegedId,departmentName,manager )  /  Param ( collegedId,departmentName,manager )
+ *添加系
+ * @Param ( collegedId,departmentName,manager )
  */
 export function sysDepartment(data){
-  //'collegeId=1&pageIndex=1&pageSize=10&specialityName='''  /api/v1/sys/departmen
   return commonsAjax('api/v1/sys/department',data,'post')
 }
+
+/***
+ * 编辑系
+ * @param data
+ */
 export function sysDepartmentEdit(data){
-  //'collegeId=1&pageIndex=1&pageSize=10&specialityName='''  /api/v1/sys/departmen
   return commonsAjax('api/v1/sys/department',data,'put')
 }
 
-
-
+/***
+ * 删除系
+ */
+export function sysDepartmentDelete(data){
+  return commonsAjax('/api/v1/sys/department',data,'delete');
+}
 
 
 /***

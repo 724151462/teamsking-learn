@@ -1,86 +1,83 @@
 <template>
-    <div class="academy">
-        <!--院管理-->
-      <header-the-again headerTitle="院管理"></header-the-again>
+  <div class="academy">
+    <header-the-again headerTitle="院管理"></header-the-again>
 
-        <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
-            <el-form-item label="输入搜索：">
-                <!--<el-input v-model="form.collegeName" placeholder="院名称"></el-input>-->
-              <el-autocomplete
-                  v-model="form.collegeName"
-                  :fetch-suggestions="querySearchAsync"
-                  placeholder="请输入内容"
-                  @select="handleSelect"
-              ></el-autocomplete>
+    <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
+        <el-form-item label="输入搜索：">
+          <el-autocomplete
+              v-model="form.collegeName"
+              :fetch-suggestions="querySearchAsync"
+              placeholder="请输入内容"
+              @select="handleSelect">
+          </el-autocomplete>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="queryAcademy">查询</el-button>
+        </el-form-item>
+    </el-form>
 
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="queryAcademy">查询</el-button>
-            </el-form-item>
-        </el-form>
+    <table-the-again
+            :tableTitle="tableTitle"
+            :tableOperate="tableOperate"
+            :columnNameList="columnNameList"
+            :tableData="tableData.pageData"
+            :operateList="operateList"
+            @showComponentInfo="showComponentInfo">
+    </table-the-again>
 
-        <table-the-again
-                :tableTitle="tableTitle"
-                :tableOperate="tableOperate"
-                :columnNameList="columnNameList"
-                :tableData="tableData.pageData"
-                :operateList="operateList"
-                @showComponentInfo="showComponentInfo">
-        </table-the-again>
+    <el-pagination
+            background
+            layout="prev, pager, next"
+            :page-size="tableData.pageSize"
+            :page-count="tableData.totalPage"
+            :current-page="tableData.pageIndex"
+            @current-change="handleCurrentChange">
+    </el-pagination>
 
-        <el-pagination
-                background
-                layout="prev, pager, next"
-                :page-size="tableData.pageSize"
-                :page-count="tableData.totalPage"
-                :current-page="tableData.pageIndex"
-                @current-change="handleCurrentChange">
-        </el-pagination>
+    <el-dialog
+            :title="addForm.title"
+            :visible.sync="dialogVisible"
+            width="60%"
+            :before-close="handleClose"
+            style="min-width: 800px">
 
-        <el-dialog
-                :title="addForm.title"
-                :visible.sync="dialogVisible"
-                width="60%"
-                :before-close="handleClose"
-                style="min-width: 800px">
+        <div class="pop-academy">
+          <div class="item-title">
+            <span class="color-red">*</span><span>院：</span>
+          </div>
+          <div class="item-input">
+            <el-input class="input-pop" v-model="addForm.data.collegeName" placeholder="请填写院" clearable></el-input>
+          </div>
+        </div>
 
-            <div class="pop-academy">
-              <div class="item-title">
-                <span class="color-red">*</span><span>院：</span>
-              </div>
-              <div class="item-input">
-                <el-input class="input-pop" v-model="addForm.data.collegeName" placeholder="请填写院" clearable></el-input>
-              </div>
+        <div class="pop-academy">
+          <div class="item-title">
+            <span class="color-red"></span><span>院负责人：</span>
+          </div>
+          <div class="item-input-list">
+            <div class="item-input" v-for="(item,index) in addForm.data.manager">
+              <el-input class="input-pop" v-model="item.workNumber" @blur="blurFunction(item.workNumber,index)"  @change="blurFunction(item.workNumber,index)" placeholder="请输入工号" clearable></el-input>
+              <span>{{item.realName === '' ? '暂无负责人' : item.realName}}</span>
+              <i class="el-icon-remove"
+                 v-if="index !== 0 || addForm.data.manager.length > 1"
+                 @click="deleteInput(index)"
+                 style="font-size: 23px;margin-left: 10px;margin-right: 10px;">
+              </i>
+              <i class="el-icon-circle-plus"
+                 v-if="index === addForm.data.manager.length-1 && index < 4"
+                 @click="addInput"
+                 style="font-size: 23px">
+              </i>
             </div>
+          </div>
+        </div>
 
-            <div class="pop-academy">
-              <div class="item-title">
-                <span class="color-red"></span><span>院负责人：</span>
-              </div>
-              <div class="item-input-list">
-                <div class="item-input" v-for="(item,index) in addForm.data.manager">
-                  <el-input class="input-pop" v-model="item.workNumber" @blur="blurFunction(item.workNumber,index)"  @change="blurFunction(item.workNumber,index)" placeholder="请输入工号" clearable></el-input>
-                  <span>{{item.realName === '' ? '暂无负责人' : item.realName}}</span>
-                  <i class="el-icon-remove"
-                     v-if="index !== 0 || addForm.data.manager.length > 1"
-                     @click="deleteInput(index)"
-                     style="font-size: 23px;margin-left: 10px;margin-right: 10px;">
-                  </i>
-                  <i class="el-icon-circle-plus"
-                     v-if="index === addForm.data.manager.length-1 && index < 4"
-                     @click="addInput"
-                     style="font-size: 23px">
-                  </i>
-                </div>
-              </div>
-            </div>
-
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="save">保 存</el-button>
-            </span>
-        </el-dialog>
-    </div>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="save">保 存</el-button>
+        </span>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -100,7 +97,7 @@
             return{
                 academySelectList: [],
                 popError:'',
-                input:'',
+               // input:'',
                 form: {
                   pageSize:5,
                   pageIndex:1,
@@ -150,21 +147,21 @@
                     {
                         name:'学院负责人',
                         prop:'manager',
-                      formatter:(val)=>{
-                        let str = '';
-                        for( let i = 0; i < val.length; i++ ){
-                          if( val.length === 1 ){
-                            str = val[0].realName;
-                          }else{
-                            if( i === 0 ){
+                        formatter:(val)=>{
+                          let str = '';
+                          for( let i = 0; i < val.length; i++ ){
+                            if( val.length === 1 ){
                               str = val[0].realName;
                             }else{
-                              str += ',' + val[i].realName;
+                              if( i === 0 ){
+                                str = val[0].realName;
+                              }else{
+                                str += ',' + val[i].realName;
+                              }
                             }
                           }
+                            return str
                         }
-                          return str
-                      }
                     },
                 ],
                 operateList:[
@@ -185,7 +182,7 @@
         },
       created:function(){
         this.$emit('floorStatus','school');
-        this.getTableData();
+        this.queryAcademy();
         let academyList = [];
         sysCollegeList().then(
           res=>{
@@ -195,35 +192,21 @@
                 academyList.push({"value": element.collegeName} );
                 return true;
               }
-            )
+            );
             this.academySelectList = academyList;
             //console.log('院列表1', academyList);
             //console.log('academySelectList:',this.academySelectList);
           }
-        ).catch(
-          error=>{
-            //console.log(error);
-          }
-        );
-
+        ).catch( error=>{} );
       },
         methods:{
-          handleClose(done) {
-            this.$confirm('确认关闭？')
-              .then(_ => {
-                done();
-              })
-              .catch(_ => {});
-          },
           showComponentInfo:function(type,info){
               // console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
               switch (type) {
                 case 'edit':
-                  //console.log(info);
                   this.edit(info);
                   break;
                 case 'add':
-                  // console.log("父组件:",type,info)
                   this.appendNewAcademy(info);
                   break;
                 case 'deleteAll':
@@ -234,57 +217,7 @@
                   break;
               }
           },
-          handleCurrentChange:function( number ){
-            // console.log( number );
-            this.form.pageIndex = number;
-            this.getTableData();
-          },
-          getTableData:function() {
-            sysCollegePage( this.form ).then(
-              res => {
-                this.tableData = res.data;
-                 //console.log( this.tableData );
-              }).catch(
-              error=>{
-                //console.log(error);
-              })
-          },
-          onSubmit:function(){
-              // console.log('onSubmit!!');
-          },
-          queryAcademy:function(){ //查询院列表
-            this.getTableData();
-          },
-          addInput:function(){ //添加院负责人输入框
-              this.popError = "";
-              if(this.addForm.data.manager.length < 5){
-                this.addForm.data.manager.push({realName: '', userId: '', workNumber: ''});
-              }else{
-                this.popError = '最多添加五位院负责人';
-              }
-              this.queryWorkNumber();
-          },
-          deleteInput:function(index){ //删减院负责人输入框
-            //console.log(index);
-            this.addForm.data.manager.splice(index,1);
-          },
-          appendNewAcademy:function(){ //添加一个院
-            this.dialogVisible = !this.dialogVisible;
-            this.addForm.title = '添加院';
-            this.addForm.data.collegeId = "";
-            this.addForm.data.tenantId = 1;
-            this.addForm.data.collegeName = '';
-            this.addForm.data.manager = [ {realName: '', userId: 1, workNumber: ''} ];
-          },
-          edit:function(info){  // 编辑一个院
-            this.dialogVisible = !this.dialogVisible;
-            this.addForm.title = "编辑院信息";
-            this.addForm.data.collegeId = info.collegeId;
-            this.addForm.data.tenantId = '';
-            this.addForm.data.collegeName = info.collegeName;
-            this.addForm.data.manager = info.manager.length===0?[ {realName: '', userId: '', workNumber: ''} ]:info.manager;
-          },
-          save:function(){ //保存提交
+          save:function(){
             this.blurFunction(this.addForm.data.manager.length-1);
             if(this.popError !== '') return;
             //检测manager中的信息
@@ -297,33 +230,17 @@
             if( this.addForm.data.collegeId !== "" ){
               this.dialogVisible = false;
               // console.log( "提交信息:", this.addForm.data );
-              sysCollegeEdit( this.addForm.data ).then(
-                res => {
-                  // console.log( '添加后返回的信息：',res);
-                }
-              ).catch(
-                error=> {
-                  //console.log(error)
-                }
-              )
+              sysCollegeEdit( this.addForm.data ).then(  res => { }).catch( error => { } );
             }else{
               this.dialogVisible = false;
-              // console.log( "提交信息:", this.addForm.data );
-              sysCollege( this.addForm.data ).then(
-                res => {
-                  // console.log( '添加后返回的信息：',res);
-                }
-              ).catch(
-                //error=>console.log(error)
-              );
+              sysCollege( this.addForm.data ).then( res => {  } ).catch(  );
             }
             let that = this;
             setTimeout(function(){
-              that.getTableData();
+              that.queryAcademy();
             },500);
-
           },
-          deleteAcademy:function(type,academyList){ //删除院列表
+          deleteAcademy:function(type,academyList){
             // console.log('academyList:',academyList);
             let academyIdList =[];
             if( type === 'list'){
@@ -337,48 +254,63 @@
             if( type === 'one'){
               academyIdList.push( academyList.collegeId );
             }
-
-            sysCollegeDelete( academyIdList ).then(
-              res => {
-                //console.log(res)
-              }
-            ).catch(
-              error => {
-                //console.log(error)
-              }
-            )
-             // console.log('academyIdList:' , academyIdList);
+            sysCollegeDelete( academyIdList ).then( res => {  } ).catch( error => {} );
             let that = this;
-            setTimeout(function(){
-              that.getTableData();
-            },300);
+            setTimeout(function(){ that.queryAcademy(); },300);
           },
-          blurFunction:function(id,index){ //输入框失去焦点时触发 检测输入框内容是否重复
+          queryAcademy:function() {
+            sysCollegePage( this.form ).then(
+              res => {
+                this.tableData = res.data;
+              }).catch(error=>{})
+          },
+          addInput:function(){
+              this.popError = "";
+              if(this.addForm.data.manager.length < 5){
+                this.addForm.data.manager.push({realName: '', userId: '', workNumber: ''});
+              }else{
+                this.popError = '最多添加五位院负责人';
+              }
+              this.queryWorkNumber();
+          },
+          deleteInput:function(index){
+            this.addForm.data.manager.splice(index,1);
+          },
+          appendNewAcademy:function(){
+            this.dialogVisible            = !this.dialogVisible;
+            this.addForm.title            = '添加院';
+            this.addForm.data.collegeId   = "";
+            this.addForm.data.tenantId    = 1;
+            this.addForm.data.collegeName = '';
+            this.addForm.data.manager     = [ {realName: '', userId: 1, workNumber: ''} ];
+          },
+          edit:function(info){  // 编辑一个院
+            this.dialogVisible            = !this.dialogVisible;
+            this.addForm.title            = "编辑院信息";
+            this.addForm.data.collegeId   = info.collegeId;
+            this.addForm.data.tenantId    = '';
+            this.addForm.data.collegeName = info.collegeName;
+            this.addForm.data.manager     = info.manager.length===0?[ {realName: '', userId: '', workNumber: ''} ]:info.manager;
+          },
+          blurFunction:function(id,index){
             this.popError = '';
-            //去重
             let a = this.addForm.data.manager.filter(
               (element,index,arr) => {
                 //this.queryWorkNumber(element.workNumber);
-                if( element.workNumber === "" ) return false
+                if( element.workNumber === "" ) return false;
                 for( let i = index+1; i < arr.length; i++ ){
-                  if( element.workNumber === arr[i].workNumber  && index !== i ) {
-                    return true
-                  }
+                  if( element.workNumber === arr[i].workNumber  && index !== i ) return true;
                 }
                 return false
               });
-
             this.queryWorkNumber(id,index);
-
             if( a.length > 0 ){
-              // console.log( '院负责人不能重复');
               this.popError = '院负责人不能重复';
               this.open4();
             }
           },
           queryWorkNumber:function(id,index){
              //console.log("id:"+id);
-
               sysTenantTeacher(id).then(
                 res => {
                   //console.log( '返回信息:' , res.data.realName,res.data.userId );
@@ -391,23 +323,13 @@
                   this.addForm.data.manager[index].realName = '暂无此负责人'
                 }
               )
-
-
           },
-          open4() { //弹窗提示
-            this.$message.error(this.popError);
+          handleClose(done) { done(); },
+          handleCurrentChange:function( number ){
+            this.form.pageIndex = number;
+            this.queryAcademy();
           },
-
-
-          loadAll() {
-            return [
-              { "value": "三全鲜食（北新泾店）", "address": "长宁区新渔路144号" },
-              { "value": "Hot honey 首尔炸鸡（仙霞路）", "address": "上海市长宁区淞虹路661号" },
-              { "value": "新旺角茶餐厅", "address": "上海市普陀区真北路988号创邑金沙谷6号楼113" },
-              { "value": "泷千家(天山西路店)", "address": "天山西路438号" },
-              { "value": "胖仙女纸杯蛋糕（上海凌空店）", "address": "上海市长宁区金钟路968号1幢18号楼一层商铺18-101" },
-            ];
-          },
+          open4() { this.$message.error(this.popError);},
           querySearchAsync(queryString, cb) {
             let academySelectList = this.academySelectList;
             let results = queryString ? academySelectList.filter(this.createStateFilter(queryString)) : academySelectList;
@@ -422,11 +344,8 @@
             //console.log(item);
           }
         },
-        watch:{
-
-        },
-        mounted:function(){
-        }
+        watch:{  },
+        mounted:function(){  }
     }
 </script>
 
