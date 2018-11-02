@@ -14,10 +14,12 @@ module.exports = {
       .set('@', resolve('src'))
   },
   devServer: {
+/*
     overlay: {
       warnings: true,
       errors: true
     },
+*/
     port: 8080,
     proxy: {
       '/api': {
