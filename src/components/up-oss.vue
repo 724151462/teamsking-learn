@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-button type="primary" @click="goUp">上传</el-button>
+    <div>{{schedule}}</div>
     <input type="file" id="inputs" @change="upInput"/>
   </div>
 </template>
@@ -31,7 +32,10 @@
         document.getElementById('inputs').click()
       },
       upInput (event) {
-        this.fileData = event
+        console.log('1',event)
+        if(event){
+          this.fileData = event
+        }
         //这里加一个获取验签信息的错误处理
         if (Number(this.isError) === 0) {
           this.errors()
@@ -59,7 +63,8 @@
         let self = this
         client.multipartUpload(name, file, {
           progress(p, checkpoint){
-            // console.log('进度返回', p, checkpoint)
+            //反回的 p 是当前进度，大概1s会返回一个进度的样子，下面处理了下百分比，checkpoint 是具体的数据流上传，不做暂停效果可以不考虑用它
+            console.log('进度返回', p, checkpoint)
             self.schedule = (p.toFixed(2) * 100) + '%'
           }
         }).then((results) => {
@@ -73,7 +78,7 @@
           let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
           self.$emit('ossUp', url)
         }).catch(error=>{
-          // console.log(error)
+          console.log(error)
           //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
           self.ossCheck('error')
         })
