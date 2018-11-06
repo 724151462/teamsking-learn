@@ -28,12 +28,10 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   res => {
     console.log('tokens',getToken())
-/*
-    if (Number(res.data.code) === 401) {
-      removeToken()
-      Globe_VM.$router.push({ path: '/login' })
-    }
-*/
+      if (Number(res.data.code) === 401) {
+        removeToken()
+        Globe_VM.$router.push({ path: '/login' })
+      }
     if (res.data) {
       return Promise.reject(res.data)
     }

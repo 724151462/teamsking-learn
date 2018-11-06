@@ -91,7 +91,7 @@
           <el-button type="primary">搜索</el-button>
         </div>
         <div class="all-member">
-          <div class="member-list" v-for="list in tableData">
+          <div class="member-list" v-for="list in tableData" :key="list">
             <el-checkbox v-model="list.isCheck"></el-checkbox>
             <div class="imgs">
               <img :src="list.img">

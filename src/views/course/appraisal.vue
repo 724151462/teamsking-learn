@@ -39,6 +39,7 @@
       <el-table-column label="课程评价列表">
         <el-table-column
           v-for="list in data"
+          :key="list"
           :prop="list.prop"
           :label="list.name"
           :width="list.width">

@@ -4,6 +4,7 @@
       <router-link
         :class="list.isNav === isNav ? 'list yes' : 'list'"
         v-for="list in nav"
+        :key="list"
         :to="list.url">{{list.name}}</router-link>
     </div>
     <div class="buttom">

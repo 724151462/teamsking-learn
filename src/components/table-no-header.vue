@@ -6,6 +6,7 @@
         style="width: 100%">
       <el-table-column
           v-for="list in tables"
+          :key="list"
           :prop="list.prop"
           :label="list.name"
           :width="list.width">
@@ -18,7 +19,7 @@
           :width="buttonStylus.length * 80"
           align="center">
         <template slot-scope="scope">
-          <el-button v-for="item in buttonStylus" type="text" size="small" @click="returnData(scope.row,item.type)">{{ item.name }}</el-button>
+          <el-button v-for="item in buttonStylus" :key="item" type="text" size="small" @click="returnData(scope.row,item.type)">{{ item.name }}</el-button>
           <!--
             buttonStylus：{
               name：'xx'，

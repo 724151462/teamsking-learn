@@ -6,6 +6,7 @@
           style="width: 90%">
         <el-table-column
             v-for="list in tables"
+            :key="list"
             :prop="list.prop"
             :label="list.name"
             :width="list.width">
