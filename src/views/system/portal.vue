@@ -1,14 +1,13 @@
 <template>
-  <div>试题管理</div>
+  <div>门户配置</div>
 </template>
 
-<!--
 <script>
   export default {
+    name: "portal"
   }
 </script>
 
 <style scoped>
 
 </style>
--->

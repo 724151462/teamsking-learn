@@ -1,14 +1,13 @@
 <template>
-  <div>试题管理</div>
+  <div>消息管理</div>
 </template>
 
-<!--
 <script>
   export default {
+    name: "message"
   }
 </script>
 
 <style scoped>
 
 </style>
--->

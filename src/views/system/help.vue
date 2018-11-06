@@ -1,14 +1,13 @@
 <template>
-  <div>试题管理</div>
+  <div>帮助中心</div>
 </template>
 
-<!--
 <script>
   export default {
+    name: "help"
   }
 </script>
 
 <style scoped>
 
 </style>
--->

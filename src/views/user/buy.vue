@@ -1,14 +1,13 @@
 <template>
-  <div>试题管理</div>
+  <div>购买记录</div>
 </template>
 
-<!--
 <script>
   export default {
+    name: "buy"
   }
 </script>
 
 <style scoped>
 
 </style>
--->

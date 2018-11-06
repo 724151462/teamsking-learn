@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <div>123</div>
-    <div>
+  <div class="teaching">
+    <div class="header">
       <router-link
+        :class="list.isNav === isNav ? 'list yes' : 'list'"
         v-for="list in nav"
         :to="list.url">{{list.name}}</router-link>
     </div>
-    <div>
+    <div class="buttom">
       <router-view v-on:teachingNav="teachingNavs"></router-view>
     </div>
   </div>
@@ -67,6 +67,27 @@
   }
 </script>
 
-<style scoped>
+<style scoped lang="stylus" type="text/stylus">
+  .teaching
+    padding-top:10px
 
+    .header
+      background: #f4f4f4
+      display: inline-block
+      padding: 10px 5px 0 10px
+
+      .list
+        width: 120px
+        height: 40px
+        line-height: 40px
+        text-align: center
+        display: inline-block
+
+      .yes
+        background: #ffffff
+
+    .buttom
+      border: 1px solid #f4f4f4
+      width: calc(100% - 20px)
+      padding: 10px
 </style>

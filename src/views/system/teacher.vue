@@ -1,14 +1,13 @@
 <template>
-  <div>试题管理</div>
+  <div>教师管理</div>
 </template>
 
-<!--
 <script>
   export default {
+    name: "teacher"
   }
 </script>
 
 <style scoped>
 
 </style>
--->

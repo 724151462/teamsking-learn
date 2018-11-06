@@ -1,14 +1,13 @@
 <template>
-  <div>试题管理</div>
+  <div>模板管理</div>
 </template>
 
-<!--
 <script>
   export default {
+    name: "templates"
   }
 </script>
 
 <style scoped>
 
 </style>
--->

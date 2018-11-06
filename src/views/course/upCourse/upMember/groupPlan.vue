@@ -33,10 +33,6 @@
           <el-input v-model="addGroup.sx" style="width: 220px;"></el-input>
         </el-form-item>
 
-        <el-form-item label="分组人数上限" required>
-          <el-input v-model="addGroup.rssx" style="width: 220px;"></el-input>
-        </el-form-item>
-
         <div class="groupPlanLint">
           <div>5人为1小组</div>
           <div class="list">
@@ -136,7 +132,6 @@
         addGroup:{
           name:'',  //小组方案名称
           sx:'',    //分组上限
-          rssx:'',  //分组人数上限
           //分组结构
           zulist:[
             {

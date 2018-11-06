@@ -1,14 +1,13 @@
 <template>
-  <div>试题管理</div>
+  <div>申请提现</div>
 </template>
 
-<!--
 <script>
   export default {
+    name: "withdraw"
   }
 </script>
 
 <style scoped>
 
 </style>
--->

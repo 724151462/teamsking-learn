@@ -1,14 +1,13 @@
 <template>
-  <div>试题管理</div>
+  <div>角色管理</div>
 </template>
 
-<!--
 <script>
   export default {
+    name: "character"
   }
 </script>
 
 <style scoped>
 
 </style>
--->

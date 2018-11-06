@@ -13,11 +13,6 @@
       return{
         nav:[
           {
-            name:'课程资源',
-            url:'/course/upCourses',
-            isNav:'resource'
-          },
-          {
             name:'章节内容',
             url:'/course/upCourses/chapter',
             isNav:'chapter'
