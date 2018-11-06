@@ -1,6 +1,6 @@
 <template>
   <div class="replyList">
-    <div class="center" v-for="list in [replyData]">
+    <div class="center" v-for="list in [replyData]" :key="list">
       <div class="top">
         <div class="img">
           <img :src="list.img">
@@ -14,7 +14,7 @@
         </div>
       </div>
 
-      <div class="top two-list" v-for="item in list.replyList">
+      <div class="top two-list" v-for="item in list.replyList" :key="item">
         <div class="img">
           <img :src="item.img">
         </div>

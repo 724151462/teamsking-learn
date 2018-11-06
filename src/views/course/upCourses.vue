@@ -1,7 +1,7 @@
 <template>
   <div class="course-up">
     <div class="nav">
-      <a v-for="list in nav" :class="navs === list.isNav ? 'list yes' : 'list'" @click="goUrl(list.url)">{{list.name}}</a>
+      <a v-for="list in nav" :key="list" :class="navs === list.isNav ? 'list yes' : 'list'" @click="goUrl(list.url)">{{list.name}}</a>
     </div>
     <router-view v-on:upCoursesNav="upCoursesNav"></router-view>
   </div>

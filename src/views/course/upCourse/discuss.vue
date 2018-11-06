@@ -40,7 +40,7 @@
           </div>
         </div>
         <div class="center">
-          <div v-for="list in dialogInfo">
+          <div v-for="list in dialogInfo" :key="list">
             <reply-lists :replyData="list"></reply-lists>
           </div>
         </div>
