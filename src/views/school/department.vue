@@ -12,7 +12,7 @@
               :value="item.collegeId">
           </el-option>
         </el-select>
-        <el-input v-model="form.departmentName" style="width: 200px" placeholder="系名称"></el-input>
+        <el-input v-model="form.departmentName" style="width: 200px;margin-left: 10px;" placeholder="系名称"></el-input>
       </el-form-item>
 
       <el-form-item>
@@ -343,6 +343,20 @@
         this.addForm.data.collegeId      = -1;
         this.addForm.data.departmentName = '';
         this.addForm.data.manager        = [ {realName: '', userId: '', workNumber: ''} ];
+        // this.addForm = {
+        //   title:'添加系',
+        //   data:{
+        //     collegeId:'',
+        //     departmentId:'',
+        //     departmentName:'',
+        //     manager:[
+        //       {
+        //         realName: "",
+        //         userId: '',
+        //         workNumber: ""
+        //       }
+        //     ]
+        //   }
       },
       edit:function(info){
         this.dialogVisible               = !this.dialogVisible;
@@ -394,7 +408,7 @@
           }
         ).catch( () => { /*console.log(error);*/ this.addForm.data.manager[index].realName = '暂无此负责人' } )
       },
-      open4() { //弹窗提示
+      open4() {
         this.$message.error(this.popError);
       },
       querySearchAsync(queryString, cb) {
