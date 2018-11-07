@@ -4,24 +4,35 @@
 
     <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-select v-model="form.collegeId" placeholder="请选择院">
+
+        <el-select v-model="form.collegeId"
+                   @change="checkedCollege($event)"
+                   placeholder="请选择院">
           <el-option
-              v-for="item in departmentSelectList"
+              v-for="item in collegeList"
               :key="item.collegeId"
-              :label="item.value"
+              :label="item.collegeName"
               :value="item.collegeId">
           </el-option>
         </el-select>
-        <el-select v-model="form.collegeId" placeholder="请选择系">
+
+        <el-select v-model="form.departmentId"
+                   @change="checkedDepartment($event)"
+                   placeholder="请选择系"
+                   style="width: 200px;margin-left: 10px;">
           <el-option
-              v-for="item in departmentSelectList"
-              :key="item.collegeId"
-              :label="item.value"
-              :value="item.collegeId">
+              v-for="item in departmentList"
+              :key="item.departmentId"
+              :label="item.departmentName"
+              :value="item.departmentId">
           </el-option>
         </el-select>
+
         <el-input v-model="form.departmentName" style="width: 200px;margin-left: 10px;" placeholder="专业名称"></el-input>
+
       </el-form-item>
+
+
 
       <el-form-item>
         <el-button type="primary" @click="querySpeciality">查询</el-button>
@@ -60,7 +71,7 @@
         <div class="item-input">
           <el-select v-model="addForm.data.collegeId" placeholder="请选择院">
             <el-option
-                v-for="item in departmentSelectList"
+                v-for="item in collegeList"
                 :key="item.collegeId"
                 :label="item.value"
                 :value="item.collegeId">
@@ -118,19 +129,26 @@
   import { sysDepartmentEdit } from '../../api/school'
   import { sysDepartmentDelete } from '../../api/school'
   import { sysSpecialityPage } from '../../api/school'
+  import { sysDepartmentList } from '../../api/school'
 
   export default {
-    name: "",
     data(){
       return{
-        departmentSelectList: [],
+        collegeAndDepartment:'',
+        collegeList: [],
+        departmentList:[],
+
+
+
+
         popError:'',
         input:'',
         form: {
           pageSize:5,
           pageIndex:1,
           departmentName:'',
-          collegeId:-1
+          collegeId:-1,
+          specialityName:'',
         },
         addForm:{
           title:'添加系',
@@ -165,42 +183,39 @@
             type:'selection'
           },
           {
-
             name:'编号',
             prop:'specialityId'
           },
           {
             name:'所属院名称',
-            prop:'collegeId'
+            prop:'collegeName'
           },
           {
             name:'所属系名称',
-            prop:'departmentId'
+            prop:'departmentName'
           },
           {
             name:'专业',
             prop:'specialityName'
           },
           {
-
-
             name:'专业负责人',
             prop:'manager',
-            // formatter:(val)=>{
-            //   let str = '';
-            //   for( let i = 0; i < val.length; i++ ){
-            //     if( val.length === 1 ){
-            //       str = val[0].realName;
-            //     }else{
-            //       if( i === 0 ){
-            //         str = val[0].realName;
-            //       }else{
-            //         str += ',' + val[i].realName;
-            //       }
-            //     }
-            //   }
-            //   return str
-            // }
+            formatter:(val)=>{
+              let str = '';
+              for( let i = 0; i < val.length; i++ ){
+                if( val.length === 1 ){
+                  str = val[0].realName;
+                }else{
+                  if( i === 0 ){
+                    str = val[0].realName;
+                  }else{
+                    str += ',' + val[i].realName;
+                  }
+                }
+              }
+              return str
+            }
           },
         ],
         operateList:[
@@ -222,7 +237,42 @@
     created:function(){
       this.$emit('floorStatus','school');
       this.getCollegeList();
-      this.querySpeciality()
+      this.querySpeciality();
+      sysDepartmentList().then(
+        res => {
+          /**
+           * 组装成级联数据结构    院 + 系 [ {collegeId:'',collegeName:'',department:[ { departmentName:'',departmentId:'' },... ] } ]
+           * */
+          console.log('院列表：',this.collegeList);
+          //console.log('全部系列表：',res.data);
+          let departmentList = res.data;
+          //console.log( '系列表:',departmentList);
+         this.collegeAndDepartment = this.collegeList;
+          for(let a = 0; a < departmentList.length; a++ ){
+            if( departmentList[a].collegeId === null ){
+              departmentList[a].collegeId = -1;
+            }
+          }
+          for( let i = 0; i < this.collegeAndDepartment.length; i++ ){
+            this.collegeAndDepartment[i].department = [];
+            this.collegeAndDepartment[i].collegeName = this.collegeAndDepartment[i].value;
+            this.collegeAndDepartment[i].department.push( { departmentName:'全部',departmentId:-1 } );
+            for( let j = 0; j < departmentList.length; j++){
+              if( this.collegeAndDepartment[i].collegeId === departmentList[j].collegeId  ){
+                this.collegeAndDepartment[i].department.push( departmentList[j] );
+              }
+            }
+          }
+          this.checkedCollege('none');
+
+
+
+
+
+        }
+      ).catch(
+        error => console.log(error)
+      );
     },
     methods:{
       showComponentInfo:function(type,info){
@@ -247,13 +297,13 @@
       getCollegeList:function(){
         sysCollegeList().then(
           res=>{
-            this.departmentSelectList.push({value: "无分院",collegeId:-1 });
+            this.collegeList.push({value: "全部",collegeId:-1 });
             res.data.filter(
               element =>{
-                this.departmentSelectList.push({value: element.collegeName,collegeId:element.collegeId} );
+                this.collegeList.push({value: element.collegeName,collegeId:element.collegeId} );
                 return true;
               });
-            if( this.departmentSelectList.length > 0 ){
+            if( this.collegeList.length > 0 ){
               this.form.collegeId = -1;
               this.querySpeciality();
             }
@@ -263,13 +313,10 @@
         );
       },
       querySpeciality:function() {
-        // let data = JSON.parse(JSON.stringify(this.form))
-        // for(let i = 0; i < data.length; i++){
-        //   if(data[i] === '' || JSON.stringify(data[i]) === '""'){
-        //     delete data[i]
-        //   }
-        // }
-        sysSpecialityPage( { collegeId:1,pageIndex:1,pageSize:10 } ).then(
+
+
+        // sysSpecialityPage( { collegeId:1,pageIndex:1,pageSize:10 } ).then(
+        sysSpecialityPage(this.form).then(
           res => {
             this.tableData = res.data;
             console.log("专业信息",this.tableData);
@@ -341,26 +388,24 @@
       deleteInput:function(index){
         this.addForm.data.manager.splice(index,1);
       },
+      checkedCollege:function(event){
+          this.departmentList = this.collegeList.filter(element => {return element.collegeId === this.form.collegeId;})[0].department;
+          if( this.departmentList.length === 0 ){
+            this.departmentList.push({ departmentName:'全部',departmentId: -1 });
+          }
+          // this.form.departmentId =  this.departmentList[0].departmentId;
+      },
+      checkedDepartment:function(event){
+        //console.log('departmentId:',event)
+        //this.form.departmentId = event;
+        //console.log('this.form.departmentId:',this.form.departmentId)
+      },
       appendNewDepartment:function(){
         this.dialogVisible               = !this.dialogVisible;
         this.addForm.title               = '添加系';
         this.addForm.data.collegeId      = -1;
         this.addForm.data.departmentName = '';
         this.addForm.data.manager        = [ {realName: '', userId: '', workNumber: ''} ];
-        // this.addForm = {
-        //   title:'添加系',
-        //   data:{
-        //     collegeId:'',
-        //     departmentId:'',
-        //     departmentName:'',
-        //     manager:[
-        //       {
-        //         realName: "",
-        //         userId: '',
-        //         workNumber: ""
-        //       }
-        //     ]
-        //   }
       },
       edit:function(info){
         this.dialogVisible               = !this.dialogVisible;
@@ -379,17 +424,16 @@
         let a = this.addForm.data.manager.filter(
           (element,index,arr) => {
             //this.queryWorkNumber(element.workNumber);
-            if( element.workNumber === "" ) return false
+            if( element.workNumber === "" ) return false;
             for( let i = index+1; i < arr.length; i++ ){
               if( element.workNumber === arr[i].workNumber  && index !== i ) {
-                return true
+                return true;
               }
             }
             return false
           });
         this.queryWorkNumber(id,index);
         if( a.length > 0 ){
-          // console.log( '院负责人不能重复');
           this.popError = '院负责人不能重复';
           this.open4();
         }
@@ -416,17 +460,23 @@
         this.$message.error(this.popError);
       },
       querySearchAsync(queryString, cb) {
-        let departmentSelectList = this.departmentSelectList;
-        let results           = queryString ? departmentSelectList.filter(this.createStateFilter(queryString)) : departmentSelectList;
+        let collegeList = this.collegeList;
+        let results     = queryString ? collegeList.filter(this.createStateFilter(queryString)) : collegeList;
         cb(results);
       },
       createStateFilter(queryString) {
         return (state) => { return (state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0); };
       },
-      handleSelect(item) {/*console.log(item);*/}
+      handleSelect(item) {/*console.log(item);*/},
+
+
+
     },
     watch:{  },
-    mounted:function(){  }
+    mounted:function(){
+      // console.log('mounted：',this.collegeList);
+      // this.checkedCollege('none');
+    }
   }
 </script>
 

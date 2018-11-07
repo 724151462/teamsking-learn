@@ -179,14 +179,14 @@ export const constantRouterMap = [
       {path:'certificate',component:_import('school/certificate'),name:'证书审核'},
       {path:'academy',component:_import('school/academy'),name:'院管理'},
       {path:'department',component:_import('school/department'),name:'系管理'},
-      {path:'specialty',component:_import('school/specialty'),name:'专业管理'},
+      {path:'speciality',component:_import('school/speciality'),name:'专业管理'},
       {path:'class',component:_import('school/class'),name:'班级管理'},
     ]
   },
-  {
-    path:'/*',
-    redirect:'/login'
-  },
+  // {
+  //   path:'/*',
+  //   redirect:'/login'
+  // },
 ]
 
 export default new Router({

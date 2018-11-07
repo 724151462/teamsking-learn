@@ -46,7 +46,7 @@ export function sysCollegeEdit(data){
 }
 
 /****
- * 获取院列表s
+ * 获取院列表
  */
 export function sysCollegeList(){
   return commonsAjax('api/v1/sys/college/list','','get')
@@ -58,6 +58,15 @@ export function sysCollegeList(){
 export function sysDepartmentPage(data){
   return commonsAjax('api/v1/sys/department/page',data,'get')
 }
+
+/**
+ * 获取全部的系
+ * /api/v1/sys/department/list
+ * */
+export function sysDepartmentList(){
+  return commonsAjax('/api/v1/sys/department/list',{ collegeId : -1 },'get')
+}
+
 
 /***
  *添加系
@@ -86,7 +95,9 @@ export function sysDepartmentDelete(data){
 /***
  * 获取专业列表
  */
-export function sysSpecialityPage(data){ //'collegeId=1&pageIndex=1&pageSize=10&specialityName='''
+export function sysSpecialityPage(data){
   //return commonsAjax('api/v1/sys/speciality/page',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
   return commonsAjax('api/v1/sys/speciality/page',data,'get')
 }
+
+

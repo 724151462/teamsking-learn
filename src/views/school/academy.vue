@@ -197,7 +197,7 @@
             //console.log('院列表1', academyList);
             //console.log('academySelectList:',this.academySelectList);
           }
-        ).catch( error=>{} );
+        ).catch( error=>{  } );
       },
         methods:{
           showComponentInfo:function(type,info){
