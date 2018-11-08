@@ -6,7 +6,7 @@
       <el-form-item label="输入搜索：">
 
         <el-select v-model="form.collegeId"
-                   @change="checkedCollege($event)"
+                   @change="checkedCollege"
                    placeholder="请选择院">
           <el-option
               v-for="item in collegeList"
@@ -17,7 +17,6 @@
         </el-select>
 
         <el-select v-model="form.departmentId"
-                   @change="checkedDepartment($event)"
                    placeholder="请选择系"
                    style="width: 200px;margin-left: 10px;">
           <el-option
@@ -28,11 +27,9 @@
           </el-option>
         </el-select>
 
-        <el-input v-model="form.departmentName" style="width: 200px;margin-left: 10px;" placeholder="专业名称"></el-input>
+        <el-input v-model="form.specialityName" style="width: 200px;margin-left: 10px;" placeholder="专业名称"></el-input>
 
       </el-form-item>
-
-
 
       <el-form-item>
         <el-button type="primary" @click="querySpeciality">查询</el-button>
@@ -48,15 +45,23 @@
         @showComponentInfo="showComponentInfo">
     </table-the-again>
 
+    <!--<el-pagination-->
+        <!--background-->
+        <!--layout="prev, pager, next"-->
+        <!--:page-size="tableData.pageSize"-->
+        <!--:page-count="tableData.totalPage"-->
+        <!--:current-page="tableData.pageIndex"-->
+        <!--@current-change="handleCurrentChange">-->
+    <!--</el-pagination>-->
     <el-pagination
         background
         layout="prev, pager, next"
-        :page-size="tableData.pageSize"
-        :page-count="tableData.totalPage"
-        :current-page="tableData.pageIndex"
-        @current-change="handleCurrentChange">
+        :total="1000">
     </el-pagination>
-
+    第几页：{{tableData.pageIndex}}
+    页大小：{{tableData.pageSize}}
+    总页数：{{tableData.totalPage}}
+    {{tableData}}
     <el-dialog
         :title="addForm.title"
         :visible.sync="dialogVisible"
@@ -69,7 +74,8 @@
           <span class="color-red">*</span><span>院：</span>
         </div>
         <div class="item-input">
-          <el-select v-model="addForm.data.collegeId" placeholder="请选择院">
+          <el-select v-model="addForm.data.collegeId" placeholder="请选择院"
+                     @change="checkedCollege('pop')">
             <el-option
                 v-for="item in collegeList"
                 :key="item.collegeId"
@@ -85,7 +91,23 @@
           <span class="color-red">*</span><span>系：</span>
         </div>
         <div class="item-input">
-          <el-input class="input-pop" v-model="addForm.data.departmentName" placeholder="请填写系" clearable></el-input>
+          <el-select v-model="addForm.data.departmentId" placeholder="请选择系">
+            <el-option
+                v-for="item in popDepartmentList"
+                :key="item.departmentId"
+                :label="item.departmentName"
+                :value="item.departmentId">
+            </el-option>
+          </el-select>
+        </div>
+      </div>
+
+      <div class="pop-academy">
+        <div class="item-title">
+          <span class="color-red">*</span><span>专业：</span>
+        </div>
+        <div class="item-input">
+          <el-input class="input-pop" v-model="addForm.data.specialityName" placeholder="请填写专业" clearable></el-input>
         </div>
       </div>
 
@@ -95,7 +117,7 @@
         </div>
         <div class="item-input-list">
           <div class="item-input" v-for="(item,index) in addForm.data.manager">
-            <el-input class="input-pop" v-model="item.workNumber" @blur="blurFunction(item.workNumber,index)"  @change="blurFunction(item.workNumber,index)" placeholder="请输入工号" clearable></el-input>
+            <el-input class="input-pop" v-model="item.workNumber" @blur="blurFunction(item.workNumber,index)" placeholder="请输入工号" clearable></el-input>
             <span>{{item.realName === '' ? '暂无此负责人' : item.realName}}</span>
             <i class="el-icon-remove"
                v-if="index !== 0 || addForm.data.manager.length > 1"
@@ -124,12 +146,11 @@
 
   import { sysTenantTeacher } from '../../api/school'
   import { sysCollegeList } from '../../api/school'
- // import { sysDepartmentPage } from '../../api/school'
-  import { sysDepartment } from '../../api/school'
-  import { sysDepartmentEdit } from '../../api/school'
-  import { sysDepartmentDelete } from '../../api/school'
   import { sysSpecialityPage } from '../../api/school'
   import { sysDepartmentList } from '../../api/school'
+  import { sysSpeciality } from '../../api/school'
+  import { sysSpecialityEdit } from '../../api/school'
+  import { sysSpecialityDelete } from '../../api/school'
 
   export default {
     data(){
@@ -137,25 +158,24 @@
         collegeAndDepartment:'',
         collegeList: [],
         departmentList:[],
-
-
-
+        popDepartmentList:[],
 
         popError:'',
-        input:'',
         form: {
           pageSize:5,
           pageIndex:1,
-          departmentName:'',
+          departmentId:-1,
           collegeId:-1,
           specialityName:'',
         },
         addForm:{
-          title:'添加系',
+          title:'添加专业',
           data:{
             collegeId:'',
             departmentId:'',
             departmentName:'',
+            specialityName:'',
+            specialityId:'',
             manager:[
               {
                 realName: "",
@@ -236,65 +256,25 @@
     },
     created:function(){
       this.$emit('floorStatus','school');
-      this.getCollegeList();
-      this.querySpeciality();
-      sysDepartmentList().then(
-        res => {
-          /**
-           * 组装成级联数据结构    院 + 系 [ {collegeId:'',collegeName:'',department:[ { departmentName:'',departmentId:'' },... ] } ]
-           * */
-          console.log('院列表：',this.collegeList);
-          //console.log('全部系列表：',res.data);
-          let departmentList = res.data;
-          //console.log( '系列表:',departmentList);
-         this.collegeAndDepartment = this.collegeList;
-          for(let a = 0; a < departmentList.length; a++ ){
-            if( departmentList[a].collegeId === null ){
-              departmentList[a].collegeId = -1;
-            }
-          }
-          for( let i = 0; i < this.collegeAndDepartment.length; i++ ){
-            this.collegeAndDepartment[i].department = [];
-            this.collegeAndDepartment[i].collegeName = this.collegeAndDepartment[i].value;
-            this.collegeAndDepartment[i].department.push( { departmentName:'全部',departmentId:-1 } );
-            for( let j = 0; j < departmentList.length; j++){
-              if( this.collegeAndDepartment[i].collegeId === departmentList[j].collegeId  ){
-                this.collegeAndDepartment[i].department.push( departmentList[j] );
-              }
-            }
-          }
-          this.checkedCollege('none');
-
-
-
-
-
-        }
-      ).catch(
-        error => console.log(error)
-      );
+      this.getCollegeList();  //获取院列表
+      this.sysDepartmentList();  //获取系列表
+      this.querySpeciality();  //查询专业
     },
     methods:{
       showComponentInfo:function(type,info){
         //console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
         switch (type) {
           case 'edit':
-            //console.log(info);
-            this.edit(info);
-            break;
+            this.edit(info);break;
           case 'add':
-            // console.log("父组件:",type,info)
-            this.appendNewDepartment(info);
-            break;
+            this.appendNewDepartment(info);break;
           case 'deleteAll':
-            this.deleteDepartment('list',info);
-            break;
+            this.delete('list',info);break;
           case 'delete':
-            this.deleteDepartment('one',info);
-            break;
+            this.delete('one',info);break;
         }
       },
-      getCollegeList:function(){
+      getCollegeList:function(){ //查询院列表
         sysCollegeList().then(
           res=>{
             this.collegeList.push({value: "全部",collegeId:-1 });
@@ -305,17 +285,44 @@
               });
             if( this.collegeList.length > 0 ){
               this.form.collegeId = -1;
-              this.querySpeciality();
+              //this.querySpeciality();
             }
           }
         ).catch(
           error=>{ console.log(error) }
         );
       },
-      querySpeciality:function() {
+      sysDepartmentList:function(){ //查询系列表
+        sysDepartmentList().then(
+          res => {
+            let departmentList = res.data;
+            // console.log('departmentList:',departmentList);
 
-
-        // sysSpecialityPage( { collegeId:1,pageIndex:1,pageSize:10 } ).then(
+            this.collegeAndDepartment = this.collegeList;
+            for(let a = 0; a < departmentList.length; a++ ){
+              if( departmentList[a].collegeId === null ){
+                departmentList[a].collegeId = -1;
+              }
+            }
+            for( let i = 0; i < this.collegeAndDepartment.length; i++ ){
+              this.collegeAndDepartment[i].department = [];
+              this.collegeAndDepartment[i].collegeName = this.collegeAndDepartment[i].value;
+              this.collegeAndDepartment[i].department.push( { departmentName:'全部',departmentId:-1 } );
+              for( let j = 0; j < departmentList.length; j++){
+                if( this.collegeAndDepartment[i].collegeId === departmentList[j].collegeId  ){
+                  this.collegeAndDepartment[i].department.push( departmentList[j] );
+                }
+              }
+            }
+            this.checkedCollege();
+            //this.checkedCollege('pop');
+          }
+        ).catch(
+          error => console.log(error)
+        );
+      },
+      querySpeciality:function() { //查询专业信息
+        //console.log('提交的表单信息L:',this.form);
         sysSpecialityPage(this.form).then(
           res => {
             this.tableData = res.data;
@@ -326,101 +333,100 @@
         )
       },
       save:function(){
-        this.blurFunction(this.addForm.data.manager.length-1);
         if(this.popError !== '') return;
         for( let i = this.addForm.data.manager.length-1; i >= 0; i-- ){
           if( this.addForm.data.manager[i].realName === '暂无此负责人' || this.addForm.data.manager[i].realName === "" ){
             this.addForm.data.manager.splice(i,1);
           }
         }
-        //console.log('manager信息:',this.addForm.data.manager);
-        if( this.addForm.data.departmentId !== "" ){
-          this.dialogVisible = false;
-          console.log( "提交信息:", this.addForm.data );
-          sysDepartmentEdit( this.addForm.data ).then(
-            res => {
-              console.log(res)
-            }
-          ).catch(
-            error => console.log(error)
-          );
-        }else{
-          this.dialogVisible = false;
-          if(this.addForm.data.collegeId === -1){
-            this.addForm.data.collegeId = '';
-          }
-          sysDepartment( this.addForm.data ).then(
-            res => {
-              console.log(res)
-            }
-          ).catch(
-            error => console.log(error)
-          );
+        if( this.addForm.title === "添加专业" ){
+          console.log( '添加的专业的信息:',this.addForm.data);
+          sysSpeciality( this.addForm.data ).then(
+            res => { console.log('添加记录的信息：',res) } ).catch(error => console.log(error))
         }
-        let that = this;
-        setTimeout(function(){ that.querySpeciality(); },500);
+        if( this.addForm.title === "编辑专业" ){
+          console.log('编辑专业信息：',this.addForm.data)
+          sysSpecialityEdit(this.addForm.data).then(
+            res => { console.log('编辑记录的信息：',res)}
+          ).catch(error => console.log(error));
+        }
+        setTimeout( ()=>this.querySpeciality() ,300);
+        this.dialogVisible = false;
       },
-      deleteDepartment:function(type,department){
-        //console.log('departmentList:',department);
-        let departmentList =[];
-        if( type === 'list'){
-          department.filter(
-            item => {
-              departmentList.push( parseInt(item.departmentId) );
-              return true
-            });
+      delete:function(type,specialityList){
+        let specialityLists = [];
+        if( type === 'list' ){
+          specialityList.filter(
+            element => {
+              specialityLists.push( element.specialityId);
+              return true;
+            }
+          )
+          console.log('要删除的专业信息(list):',specialityLists);
         }
-        if( type === 'one'){ departmentList.push( department.departmentId ); }
-        sysDepartmentDelete(departmentList).then(/* res => console.log(res.data)*/).catch( error=>console.log(error) );
-        //console.log('departmentList:',departmentList);
-        let that = this;
-        setTimeout(function(){ that.querySpeciality(); },300);
+        if( type === 'one' ){
+          specialityLists.push( specialityList.specialityId);
+          console.log('要删除的专业信息(one):',specialityLists);
+        }
+        sysSpecialityDelete(specialityLists).then(res=>{console.log(res)}).catch(error=>console.log(error));
+        setTimeout( ()=>this.querySpeciality() ,300);
       },
       addInput:function(){
         this.popError = "";
         if(this.addForm.data.manager.length < 5){
           this.addForm.data.manager.push({realName: '', userId: '', workNumber: ''});
         }else{
-          this.popError = '最多添加五位院负责人';
+          this.popError = '最多添加五位专业负责人';
         }
         this.queryWorkNumber();
       },
       deleteInput:function(index){
         this.addForm.data.manager.splice(index,1);
       },
-      checkedCollege:function(event){
+      checkedCollege:function(type){ //选中院触发事件
+        if( type === 'pop' ){
+          console.log('pop', this.addForm.data.collegeId);
+          this.popDepartmentList = this.collegeList.filter(element => {return element.collegeId === this.addForm.data.collegeId;})[0].department;
+          if( this.popDepartmentList.length === 0 ){
+            this.popDepartmentList.push({ departmentName:'全部',departmentId: -1 });
+          }
+          //this.addForm.data.departmentId = -1;
+        }else{
           this.departmentList = this.collegeList.filter(element => {return element.collegeId === this.form.collegeId;})[0].department;
           if( this.departmentList.length === 0 ){
             this.departmentList.push({ departmentName:'全部',departmentId: -1 });
           }
+          this.form.departmentId = -1;
+        }
           // this.form.departmentId =  this.departmentList[0].departmentId;
       },
-      checkedDepartment:function(event){
-        //console.log('departmentId:',event)
-        //this.form.departmentId = event;
-        //console.log('this.form.departmentId:',this.form.departmentId)
-      },
       appendNewDepartment:function(){
-        this.dialogVisible               = !this.dialogVisible;
-        this.addForm.title               = '添加系';
-        this.addForm.data.collegeId      = -1;
-        this.addForm.data.departmentName = '';
-        this.addForm.data.manager        = [ {realName: '', userId: '', workNumber: ''} ];
+        this.dialogVisible = !this.dialogVisible;
+        this.addForm.data  = {
+                               collegeId:'',
+                               departmentId:'',
+                               specialityName:'',
+                               manager:[
+                                 {
+                                   realName: '',
+                                   userId: '',
+                                   workNumber: ''
+                                 }
+                               ]
+                             }
       },
       edit:function(info){
-        this.dialogVisible               = !this.dialogVisible;
-        this.addForm.title               = "编辑系信息";
-        this.addForm.data.collegeId      = info.collegeId;
-        this.addForm.data.departmentId   = info.departmentId;
-        this.addForm.data.departmentName = info.departmentName;
-        this.addForm.data.manager        = info.manager.length === 0 ? [{realName: '', userId: '', workNumber: ''}] : info.manager;
-        if( info.collegeId === null){
-          this.addForm.data.collegeId = -1;
+        this.dialogVisible = true;
+        console.log("编辑专业",info);
+        this.addForm.title = '编辑专业';
+        this.addForm.data = info;
+        if( this.addForm.data.manager.length ===0 ){
+          this.addForm.data.manager = [{realName: '', userId: '', workNumber: ''}];
         }
+        this.checkedCollege('pop');
       },
       blurFunction:function(id,index){ //输入框失去焦点时触发 检测输入框内容是否重复
         this.popError = '';
-        //去重
         let a = this.addForm.data.manager.filter(
           (element,index,arr) => {
             //this.queryWorkNumber(element.workNumber);
@@ -434,7 +440,7 @@
           });
         this.queryWorkNumber(id,index);
         if( a.length > 0 ){
-          this.popError = '院负责人不能重复';
+          this.popError = '专业负责人不能重复';
           this.open4();
         }
       },
@@ -447,14 +453,12 @@
         this.querySpeciality();
       },
       queryWorkNumber:function(id,index){
-        //console.log("id:"+id);
         sysTenantTeacher(id).then(
           res => {
-            //console.log( '返回信息:' , res.data.realName,res.data.userId );
             this.addForm.data.manager[index].realName = res.data.realName;
             this.addForm.data.manager[index].userId   = res.data.userId;
           }
-        ).catch( () => { /*console.log(error);*/ this.addForm.data.manager[index].realName = '暂无此负责人' } )
+        ).catch( () => { this.addForm.data.manager[index].realName = '暂无此负责人' } )
       },
       open4() {
         this.$message.error(this.popError);
@@ -467,16 +471,10 @@
       createStateFilter(queryString) {
         return (state) => { return (state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0); };
       },
-      handleSelect(item) {/*console.log(item);*/},
-
-
-
+      handleSelect(item) { },
     },
     watch:{  },
-    mounted:function(){
-      // console.log('mounted：',this.collegeList);
-      // this.checkedCollege('none');
-    }
+    mounted:function(){  }
   }
 </script>
 

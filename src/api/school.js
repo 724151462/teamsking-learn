@@ -99,5 +99,23 @@ export function sysSpecialityPage(data){
   //return commonsAjax('api/v1/sys/speciality/page',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
   return commonsAjax('api/v1/sys/speciality/page',data,'get')
 }
+/**
+ * 添加专业 /api/v1/sys/speciality
+ * */
+export function sysSpeciality(data){
+  return commonsAjax('api/v1/sys/speciality',data,'post')
+}
+/**
+ * 修改专业
+ * */
+export function sysSpecialityEdit(data){
+  return commonsAjax('api/v1/sys/speciality',data,'put')
+}
 
+/***
+ *  删除专业  /api/v1/sys/speciality
+ */
+export function sysSpecialityDelete(data){
+  return commonsAjax('api/v1/sys/speciality',data,'delete')
+}
 
