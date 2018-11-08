@@ -101,3 +101,46 @@ export function sysSpecialityPage(data){
 }
 
 
+/***
+ * 获取学生列表
+ */
+export function sysStudentPage(data){
+  //return commonsAjax('api/v1/sys/student/page',{ studentId:1,pageIndex:1,pageSize:10  },'get')
+  return commonsAjax('api/v1/sys/student/page',data,'get')
+}
+
+
+/***
+* 学生启用/禁用
+*/
+export function sysStudentSwitch(data){
+  let url = `api/v1/sys/student/${data.id}/${data.status}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/***
+ * 获取专业列表
+ */
+export function sysSpecialityList(data){
+  //return commonsAjax('api/v1/sys/speciality/list',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
+  return commonsAjax('api/v1/sys/speciality/list', data, 'get')
+}
+
+
+/***
+ * 获取班级列表
+ */
+export function sysClassList(data){
+  //return commonsAjax('api/v1/sys/speciality/list',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
+  return commonsAjax('/api/v1/sys/class/list', data, 'get')
+}
+
+
+/***
+ * 添加新学生
+ */
+export function sysStudentAdd(data){
+  //return commonsAjax('api/v1/sys/student',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
+  return commonsAjax('/api/v1/sys/student', data, 'post')
+}

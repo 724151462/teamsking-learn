@@ -43,9 +43,77 @@
                 :columnNameList="columnNameList"
                 :tableData="tableData3"
                 :operateList="operateList"
-                @showComponentInfo="showComponentInfo">
+                @showComponentInfo="showComponentInfo"
+                switchColumn='open'>
         </table-the-again>
-
+        <el-dialog
+            title="添加学生"
+            :visible.sync="dialogVisible"
+            width="50%"
+            >
+            <el-form ref="form" :model="form" label-width="80px">
+                <el-form-item label="学号">
+                    <el-input v-model="form.studentNo"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名">
+                    <el-input v-model="form.realName"></el-input>
+                </el-form-item>
+                <el-form-item label="手机">
+                    <el-input v-model="form.mobile"></el-input>
+                </el-form-item>
+                <el-form-item label="性别">
+                    <el-radio-group v-model="form.sex">
+                        <el-radio label="男"></el-radio>
+                        <el-radio label="女"></el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="院名称">
+                    <el-select v-model="form.collegeId" placeholder="院名称" @change="collegeChange">
+                    <el-option 
+                        v-for="item in collegeList" 
+                        :key="item.collegeId" 
+                        :label="item.collegeName"
+                        :value="item.collegeId"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="系名称">
+                    <el-select v-model="form.departmentId" placeholder="系名称">
+                    <el-option 
+                        v-for="item in departmentList" 
+                        :key="item.departmentId" 
+                        :label="item.departmentName"
+                        :value="item.departmentId"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="专业">
+                    <el-select v-model="form.specialityId" placeholder="专业">
+                    <el-option 
+                        v-for="item in specialityList" 
+                        :key="item.specialityId" 
+                        :label="item.specialityName"
+                        :value="item.specialityId"></el-option>
+                    </el-select>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="班级">
+                    <el-select v-model="form.classId" placeholder="班级">
+                    <el-option 
+                        v-for="item in classList" 
+                        :key="item.classId" 
+                        :label="item.className"
+                        :value="item.classId"></el-option>
+                    </el-select>
+                </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="addNewStudent">立即创建</el-button>
+                <el-button>取消</el-button>
+            </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
         <el-pagination
                 background
                 layout="prev, pager, next"
@@ -56,7 +124,17 @@
 </template>
 
 <script>
-    import tableTheAgain from '../../components/table-theAgain'
+import tableTheAgain from '../../components/table-theAgain'
+import {
+    sysCollegeList,
+    sysStudentPage,
+    sysStudentSwitch,
+    sysDepartmentList,
+    sysSpecialityList, 
+    sysSpecialityPage, 
+    sysClassList,
+    sysStudentAdd
+} from '../../api/school';
     export default{
         name:'',
         data(){
@@ -66,12 +144,11 @@
                     catagory: '',
                     teacher: ''
                 },
-                dialogVisible: false,
                 tableTitle:'学生列表',
                 tableOperate:[
                     {
                         content:'添加学生',
-                        type:'addTeacher'
+                        type:'addStudent'
                     },
                     {
                         content:'批量删除',
@@ -84,32 +161,32 @@
                     },
                     {
                         name:'姓名',
-                        prop:'id'
+                        prop:'realName'
                     },
                     {
                         name:'学号',
-                        prop:'userType'
+                        prop:'studentNo'
                     },
                     {
                         name:'手机号',
-                        prop:'userName'
+                        prop:'mobile'
                     },
                     {
                         name:'系',
-                        prop:'createdTime',
+                        prop:'departmentName',
                         fit:true
                     },
                     {
                         name:'专业',
-                        prop:'status'
+                        prop:'specialityName'
                     },
                     {
                      name:'班级',
-                     prop:'status'
+                     prop:'className'
                     },
                   {
                     name:'创建时间',
-                    prop:'status'
+                    prop:'createTime'
                   }
                 ],
                 operateList:[
@@ -127,41 +204,73 @@
                     }
                 ],
                 tableData3: [
-                    {
-                        id:'20180900',
-                        userType:'管理员',
-                        userName:'10',
-                        createdTime:'2017-06-15 14:35:51',
-                        status:'启用'
-                    },
-                    {
-                        id:'20180900',
-                        userType:'管理员',
-                        userName:'10',
-                        createdTime:'2017-06-15 14:35:51',
-                        status:'启用'
-                    },
-                    {
-                        id:'20180900',
-                        userType:'管理员',
-                        userName:'10',
-                        createdTime:'2017-06-15 14:35:51',
-                        status:'启用'
-                    },
-                    {
-                        id:'20180900',
-                        userType:'管理员',
-                        userName:'10',
-                        createdTime:'2017-06-15 14:35:51',
-                        status:'启用'
-                    }
                 ],
+                selectOptions: [],
+                dialogVisible: false,
+                // 院列表
+                collegeList:[],
+                // 系列表
+                departmentList:[],
+                // 专业列表
+                specialityList:[],
+                // 班级列表
+                classList:[],
+                // 表单信息
+                form: {
+                    studentNo: '',
+                    realName: '',
+                    sex: '',
+                    mobile: '',
+                    collegeId: '',
+                    departmentId: '',
+                    specialityId: '',
+                    classId: '',
+                    
+                }
             }
         },
         components:{
             tableTheAgain
         },
-        mounted:function(){ },
+        mounted(){
+            sysStudentPage()
+            .then((response)=>{
+                console.log(response.data.pageData.status)
+                let dataArr = []
+                response.data.pageData.forEach(element => {
+                    element.status = String(element.status)
+                    console.log(typeof(element.status))
+                    dataArr.push(element)
+                });
+                this.tableData3 = dataArr
+            })
+            sysCollegeList()
+            .then((response)=>{
+                if (response.code === 200){
+                    this.collegeList = response.data
+                }
+            })
+            sysDepartmentList()
+            .then((response)=>{
+                if (response.code === 200){
+                    this.departmentList = response.data
+                }
+            })
+            sysSpecialityPage({ collegeId:-1,departmentId:-1  })
+            .then((response)=>{
+                console.log(response)
+                if (response.code === 200){
+                    this.specialityList = response.data.pageData
+                }
+            })
+            sysClassList()
+            .then((response)=>{
+                console.log(response.data)
+                if (response.code === 200){
+                    this.classList = response.data
+                }
+            })
+        },
         methods:{
             showComponentInfo:function(type,info){
                 console.log( '父组件接收到的类型：' + type + '父组件接收到的信息：' + info );
@@ -170,6 +279,17 @@
                         //console.log(info);
                         this.check(info);
                         break;
+                    case 'switch': 
+                        let switchInfo = {id: info.studentId,status: info.status} 
+                        sysStudentSwitch(switchInfo)
+                            .then((response)=>{
+                                console.log(response)
+                            })
+                    case 'deleteAll':
+                        console.log(info)
+                    case 'addStudent':
+                        this.dialogVisible = true
+                        
                 }
             },
             check:function(){
@@ -177,6 +297,26 @@
             },
             onSubmit:function(){
                 console.log('onSubmit!!');
+            },
+            // 添加新学生
+            addNewStudent:function(){
+                console.log(123,this.form.classId)
+                let sex = this.form.sex == "男" ? 1:2
+                let formData = {
+                    "classId": this.form.classId,
+                    "collegeId": this.form.collegeId,
+                    "realName": this.form.realName,
+                    "specialityId": this.form.specialityId,
+                    "gender": sex,
+                    "mobile": this.form.mobile,
+                    "studentNo": this.form.studentNo,
+                    "departmentId": this.form.departmentId
+                }
+                sysStudentAdd(formData).then((response)=>{
+                    
+                })
+            },
+            collegeChange:function(value){
             }
         }
     }

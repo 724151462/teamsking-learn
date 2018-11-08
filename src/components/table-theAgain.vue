@@ -95,7 +95,9 @@
                     v-if="switchColumn == 'open'">
                   <template slot-scope="scope">
                     <el-switch
-                        v-model="value2"
+                        v-model="scope.row.status"
+                        active-value=1
+                        inactive-value=2
                         active-color="#13ce66"
                         inactive-color="#ff4949"
                         @change="onSubmit('switch',scope.row)">
@@ -113,7 +115,7 @@
         data(){
             return {
                 multipleSelection: [],
-              value2: true
+              //value2: true
             }
         },
         methods:{
@@ -128,6 +130,7 @@
         },
       mounted:function(){
           //console.log('是否开启',this.switchColumn,'类型',typeof(this.switchColumn ) )
+          console.log(this.tableData)
       }
 
     }

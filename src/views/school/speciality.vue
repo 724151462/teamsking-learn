@@ -45,6 +45,7 @@
         :columnNameList="columnNameList"
         :tableData="tableData.pageData"
         :operateList="operateList"
+        switchColumn="open"
         @showComponentInfo="showComponentInfo">
     </table-the-again>
 
