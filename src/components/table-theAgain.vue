@@ -51,11 +51,12 @@
                 style="width: 95%;margin-left:2.5%;position: relative"
                 @selection-change="handleSelectionChange">
 
-            <el-table-column :label="tableTitle" class="addButton">
-              <template v-for="list in columnNameList">
+            <el-table-column :label="tableTitle" class="addButton" >
+              <template v-for="(list,index) in columnNameList">
                 <template v-if="list.formatter">
                   <el-table-column :label="list.name"
-                                   align="center">
+                                   align="center"
+                                    :key="index">
                     <template scope="scope">
                       <div>
                         {{ list.formatter(scope.row[list.prop],scope.row) }}
@@ -63,27 +64,17 @@
                     </template>
                   </el-table-column>
                 </template>
-                <!--<template v-else-if="list.name === 'switch'">-->
-                  <!--<el-table-column :label="list.name"-->
-                                   <!--align="center">-->
-                    <!--<template scope="scope">-->
-                      <!--<div>-->
-                        <!--switch-->
-                      <!--</div>-->
-                    <!--</template>-->
-                  <!--</el-table-column>-->
-                <!--</template>-->
                 <template v-else>
                   <el-table-column
                                    :prop="list.prop"
                                    :label="list.name"
                                    :width="list.width"
                                    :type="list.type"
-                                   align="center">
+                                   align="center"
+                                   :key="index">
                   </el-table-column>
                 </template>
               </template>
-
 
                 <el-table-column
                         fixed="right"
@@ -136,7 +127,7 @@
             }
         },
       mounted:function(){
-          console.log('是否开启',this.switchColumn,'类型',typeof(this.switchColumn ) )
+          //console.log('是否开启',this.switchColumn,'类型',typeof(this.switchColumn ) )
       }
 
     }
