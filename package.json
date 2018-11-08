@@ -9,6 +9,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "ali-oss": "^6.0.1",
     "axios": "^0.18.0",
     "echarts": "^4.2.0-rc.2",
     "element-ui": "^2.3.6",
@@ -30,9 +31,13 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.0.1",
     "stylus": "^0.54.5",
+    "axios": "^0.18.0",
+    "qs": "^6.5.2",
     "stylus-loader": "^3.0.2",
     "vue-video-player": "^5.0.2",
     "vue-cli-plugin-element-ui": "^1.1.4",
-    "vue-template-compiler": "^2.5.17"
+    "vue-template-compiler": "^2.5.17",
+    "ali-oss": "^6.0.1",
+    "wangeditor": "^3.1.1"
   }
 }

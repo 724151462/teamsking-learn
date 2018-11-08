@@ -14,7 +14,7 @@
 
       <el-row>
         <el-row style="background:#F3F3F3;padding:10px 0 10px 10px;margin-top: 20px;">课程列表</el-row>
-        <el-row class="course-table" v-for="list in data">
+        <el-row class="course-table" v-for="list in data" :key="list">
           <div class="img">
             <span class="tib">{{courseStatus(list.courseStatus)}}</span>
             <img :src="list.courseCover">
@@ -38,6 +38,14 @@
             <el-button type="primary" @click="goAddCourse(list.courseId)">教学管理</el-button>
           </div>
         </el-row>
+        <div style="text-align:right;">
+          <el-pagination
+              background
+              layout="prev, pager, next"
+              @current-change="goGetList"
+              :total="listQuery.total">
+          </el-pagination>
+        </div>
       </el-row>
 
       <!--弹出框-->
@@ -81,116 +89,110 @@
 </template>
 
 <script>
-  import { coursePage, publish } from '../../api/course'
-  export default {
-    data (){
-      return {
-        data:[],
-        //选择框的数据
-        selectValue:'',
-        //日期选择器
-        sellTime: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-        //下拉选项
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }],
-        isDialog:false,   //弹出框
-        listQuery:{
-          pageIndex:1,  //页码
-          pageSize:10, //显示条数
-          courseName:'' //课程名称
-        }
-      }
-    },
-    created(){
-      this.$emit('floorStatus','course')
-      this.getList()
-    },
-    methods: {
-      upData (e) {
-        this.$router.push({
-          path:'/course/addCourse',
-          query:{
-            type:'upData',
-            courseId:e
-          }
-        })
-      },
-      courseStatus(val){
-        let vals = Number(val)
-        //10 待发布 20 预发布 30 已发布 40 关闭 50 已归档 ,
-        if(vals === 10){
-          return '待发布'
-        }else if(vals === 20){
-          return '预发布'
-        }else if(vals === 30){
-          return '已发布'
-        }else if(vals === 40){
-          return '关闭'
-        }else if(vals === 50){
-          return '已归档'
-        }else{
-          return vals
-        }
-      },
-      yesTimeSell (e) {
-        console.log('确定了',e)
-      },
-      sell () {
-        this.isDialog = true
-      },
-      goAddCourse (e) {
-        this.$router.push({
-          path:'/course/upCourses',
-          query:{
-            courseid:e
-          }
-        })
-/*
-        this.$router.push({
-          path:'/course/addCourse'
-        })
-*/
-      },
-      //发布课程
-      release (val) {
-        publish(val).then(res=>{
-          if(res.code === 200){
-            this.$message({
-              message:'发布成功',
-              type:'success'
-            })
-          }else{
-            this.$message({
-              message:'发布失败',
-              type:'error'
-            })
-          }
-        }).catch(error=>{
-          console.log(error)
-        })
-      },
-      getList () {
-        coursePage(this.listQuery).then(res => {
-          if (res.code === 200) {
-            this.data = res.data.pageData
-            this.listQuery.total = res.data.totalCount
-          }else{
-            this.$message({
-              message:res.msg,
-              type:'error'
-            })
-          }
-        }).catch(error => {
-          console.log(error)
-        })
+import { coursePage, publish } from '../../api/course'
+export default {
+  data () {
+    return {
+      data: [],
+      selectValue: '',
+      sellTime: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
+      options: [{
+        value: '选项1',
+        label: '黄金糕'
+      }, {
+        value: '选项2',
+        label: '双皮奶'
+      }],
+      isDialog: false,
+      listQuery: {
+        pageIndex: 1,
+        pageSize: 10,
+        courseName: ''
       }
     }
+  },
+  created () {
+    this.$emit('floorStatus', 'course')
+    this.getList()
+  },
+  methods: {
+    goGetList (e) {
+      this.listQuery.pageIndex = e
+      this.getList()
+    },
+    upData (e) {
+      this.$router.push({
+        path: '/course/addCourse',
+        query: {
+          type: 'upData',
+          courseId: e
+        }
+      })
+    },
+    courseStatus (val) {
+      let vals = Number(val)
+      if (vals === 10) {
+        return '待发布'
+      } else if (vals === 20) {
+        return '预发布'
+      } else if (vals === 30) {
+        return '已发布'
+      } else if (vals === 40) {
+        return '关闭'
+      } else if (vals === 50) {
+        return '已归档'
+      } else {
+        return vals
+      }
+    },
+    yesTimeSell (e) {
+      console.log('确定了', e)
+    },
+    sell () {
+      this.isDialog = true
+    },
+    goAddCourse (e) {
+      this.$router.push({
+        path: '/course/addCourse',
+        query: {
+          courseid: e
+        }
+      })
+    },
+    release (val) {
+      publish(val).then(res => {
+        if (res.code === 200) {
+          this.$message({
+            message: '发布成功',
+            type: 'success'
+          })
+        } else {
+          this.$message({
+            message: '发布失败',
+            type: 'error'
+          })
+        }
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    getList () {
+      coursePage(this.listQuery).then(res => {
+        if (res.code === 200) {
+          this.data = res.data.pageData
+          this.listQuery.total = res.data.totalCount
+        } else {
+          this.$message({
+            message: res.msg,
+            type: 'error'
+          })
+        }
+      }).catch(error => {
+        console.log(error)
+      })
+    }
   }
+}
 </script>
 
 <style scoped lang="stylus" type="text/stylus">

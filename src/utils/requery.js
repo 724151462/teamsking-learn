@@ -1,7 +1,8 @@
 import axios from 'axios'
 import qs from 'qs'
-import { GlobeVM } from '../main'
+import Globe_VM from '../main'
 import { getToken, removeToken } from './auth'
+
 
 if (getToken()) {
   axios.defaults.headers.token = getToken()
@@ -31,10 +32,11 @@ axios.interceptors.request.use(
  */
 axios.interceptors.response.use(
   res => {
-    if (res.data.code === 500 && res.msg === '登录超时') {
-      removeToken()
-      GlobeVM.$router.push({ path: '/login' })
-    }
+    console.log('tokens',getToken())
+      if (Number(res.data.code) === 401) {
+        removeToken()
+        Globe_VM.$router.push({ path: '/login' })
+      }
     if (res.data) {
       return Promise.reject(res.data)
     }
@@ -51,10 +53,13 @@ export function commonsAjax (url, data, method, headers) {
       url: url,
       method: method
     }
+    if (getToken()) {
+      date.headers = {token: getToken()}
+    }
     if (data !== '' && method === 'get') {
       date.url += '?' + qs.stringify(data)
     }
-    if(data !== '' && method === 'post'){
+    if (data !== '' && method === 'post') {
       date.data = data
     }
     if( data !== '' && method === 'delete'){

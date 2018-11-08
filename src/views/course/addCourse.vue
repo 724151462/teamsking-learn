@@ -346,7 +346,6 @@
       this.$emit('floorStatus','course')
       this.selectList()
       // if(this.$route.query.courseId)
-      console.log(this.$route.query)
       if(this.$route.query.courseId && this.$route.query.courseId !== ''){
         this.getUpData(this.$route.query.courseId)
       }
@@ -401,8 +400,9 @@
               path:'/course/upCourses/resource'
             })
           }else if(Number(res.code) === 440){
+            let msgs = JSON.parse(res.msg)
             this.$message({
-              message:res.msg,
+              message:msgs[0].message,
               type:'error'
             })
           }

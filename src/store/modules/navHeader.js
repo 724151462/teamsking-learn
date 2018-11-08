@@ -1,16 +1,16 @@
 const navHeader = {
   state: {
-    nav:'/course'
+    nav: '/course'
   },
   mutations: {
     TOGGLE_SIDEBAR: state => {
       state.nav = !state.sidebar
-    },
+    }
   },
   actions: {
-    ToggleSideBar({ commit }) {
+    ToggleSideBar ({ commit }) {
       commit('TOGGLE_SIDEBAR')
-    },
+    }
   }
 }
 
