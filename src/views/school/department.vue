@@ -37,7 +37,6 @@
         :current-page="tableData.pageIndex"
         @current-change="handleCurrentChange">
     </el-pagination>
-    {{tableData}}
 
     <el-dialog
         :title="addForm.title"

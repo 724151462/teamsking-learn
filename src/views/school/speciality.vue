@@ -45,23 +45,16 @@
         @showComponentInfo="showComponentInfo">
     </table-the-again>
 
-    <!--<el-pagination-->
-        <!--background-->
-        <!--layout="prev, pager, next"-->
-        <!--:page-size="tableData.pageSize"-->
-        <!--:page-count="tableData.totalPage"-->
-        <!--:current-page="tableData.pageIndex"-->
-        <!--@current-change="handleCurrentChange">-->
-    <!--</el-pagination>-->
+
     <el-pagination
         background
         layout="prev, pager, next"
-        :total="1000">
+        :page-size="tableData.pageSize"
+        :page-count="tableData.totalPage"
+        :current-page="tableData.pageIndex"
+        @current-change="handleCurrentChange">
     </el-pagination>
-    第几页：{{tableData.pageIndex}}
-    页大小：{{tableData.pageSize}}
-    总页数：{{tableData.totalPage}}
-    {{tableData}}
+
     <el-dialog
         :title="addForm.title"
         :visible.sync="dialogVisible"
@@ -332,6 +325,10 @@
           error=>{ console.log(error); }
         )
       },
+      //查询专业列表
+    querySpecialityList:function(){
+
+    },
       save:function(){
         if(this.popError !== '') return;
         for( let i = this.addForm.data.manager.length-1; i >= 0; i-- ){

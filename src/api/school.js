@@ -119,3 +119,11 @@ export function sysSpecialityDelete(data){
   return commonsAjax('api/v1/sys/speciality',data,'delete')
 }
 
+/**
+ * 查询专业列表   /api/v1/sys/speciality/list
+ * */
+export function sysSpecialityList(data){
+  return commonsAjax('api/v1/sys/speciality/list',data,'get')
+}
+
+
