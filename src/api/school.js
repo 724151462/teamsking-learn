@@ -127,3 +127,31 @@ export function sysSpecialityList(data){
 }
 
 
+/***
+ * 分页查询班级列表 /api/v1/sys/class/page
+ */
+export function sysClassPage(data){
+  return commonsAjax('api/v1/sys/class/page',data,'get')
+}
+
+/**
+ * 添加班级 api/v1/sys/class
+ * */
+export function sysClass(data){
+  return commonsAjax('api/v1/sys/class',data,'post')
+}
+
+/**
+ *  修改班级 api/v1/sys/class
+ */
+export function sysClassUpdate(data){
+  return commonsAjax('api/v1/sys/class',data,'put')
+}
+
+/**
+ * 删除班级  api/v1/sys/class
+ */
+export function sysClassDelete(data){
+  return commonsAjax('api/v1/sys/class',data,'delete')
+}
+

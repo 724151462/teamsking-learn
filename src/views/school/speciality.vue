@@ -319,7 +319,7 @@
         sysSpecialityPage(this.form).then(
           res => {
             this.tableData = res.data;
-            console.log("专业信息",this.tableData);
+            console.log("分页查询专业信息",this.tableData);
           }
         ).catch(
           error=>{ console.log(error); }
