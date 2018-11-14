@@ -7,7 +7,7 @@ import { getToken, removeToken } from './auth'
 if (getToken()) {
   axios.defaults.headers.token = getToken()
 }
-axios.defaults.headers.token = '6cfb9e0bf738242106acfdc2b5141975'
+axios.defaults.headers.token = 'a0e8dfc91dde92f85c9b9ee31fe17252'
 axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 axios.defaults.responseType = 'json'

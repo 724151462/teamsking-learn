@@ -111,8 +111,10 @@ export function sysSpecialityPage(data){
  * 获取学生列表
  */
 export function sysStudentPage(data){
+  console.log(data.pageIndex)
   //return commonsAjax('api/v1/sys/student/page',{ studentId:1,pageIndex:1,pageSize:10  },'get')
-  return commonsAjax('api/v1/sys/student/page',data,'get')
+  let url = `api/v1/sys/student/page?collegeId=-1&departmentId=-1&classId=-1&specialityId=-1&pageSize=10&pageIndex=${data.pageIndex}`
+  return commonsAjax(url,'','get')
 }
 
 
@@ -149,4 +151,21 @@ export function sysClassList(data){
 export function sysStudentAdd(data){
   //return commonsAjax('api/v1/sys/student',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
   return commonsAjax('/api/v1/sys/student', data, 'post')
+}
+
+
+/***
+ * 修改学生信息
+ */
+export function sysStudentModify(data){
+  let url = '/api/v1/sys/student'
+  return commonsAjax(url,data,'put')
+}
+
+/***
+ * 删除学生信息
+ */
+export function sysStudentDelete(data){
+  let url = '/api/v1/sys/student'
+  return commonsAjax(url,data,'delete')
 }

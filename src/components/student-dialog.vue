@@ -74,7 +74,10 @@
     <el-dialog
   :title="formData.title"
   :visible.sync="dialogShow"
-  width="30%">
+  @close="$emit('update:show', false)"
+  :show="show"
+  width="30%"
+  :before-close="modalClose">
   <el-form ref="form" :model="formData" label-width="80px">
             <el-form-item label="学号">
                 <el-input v-model="formData.studentNo"></el-input>
@@ -142,12 +145,18 @@ export default {
         console.log(this.show)
     },
     data(){
-        dialogShow: false
+        return {
+            visible: this.show
+        };
+
     },
     methods: {
         submit(eventType,info){
             this.$emit('dialogEventListen','edit',info)
-        }
+        },
+        modalClose(){
+            this.modalShow = false;
+        },
     },
     watch:{
         collegeId: function(val){
@@ -175,6 +184,9 @@ export default {
             }
             this.listData.classId = this.listData.classList.length>0 ? this.listData.classList[0].classId : "";
         },
+        modalShow : function (val) {
+            this.$emit('update:modalShow', val);
+        }
     }
 }
 </script>
