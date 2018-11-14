@@ -6,6 +6,7 @@
       <el-form-item label="输入搜索：">
 
         <el-input v-model="form.className"  style="width: 200px;margin-left: 10px;" placeholder="班级名称"></el-input>
+
         <el-autocomplete
             style="width: 200px;margin-left: 10px;"
             v-model="form.specialityName"
