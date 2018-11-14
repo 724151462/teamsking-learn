@@ -111,9 +111,15 @@ export function sysSpecialityPage(data){
  * 获取学生列表
  */
 export function sysStudentPage(data){
-  console.log(data.pageIndex)
+  console.log('ewq',data)
+  let college = data.college || -1
+  let department = data.department || -1
+  let speciality = data.speciality || -1
+  let studentClass = data.studentClass || -1
+  let studentInfo = data.studentInfo || ''
+
   //return commonsAjax('api/v1/sys/student/page',{ studentId:1,pageIndex:1,pageSize:10  },'get')
-  let url = `api/v1/sys/student/page?collegeId=-1&departmentId=-1&classId=-1&specialityId=-1&pageSize=10&pageIndex=${data.pageIndex}`
+  let url = `api/v1/sys/student/page?collegeId=${college}&departmentId=${department}&classId=${studentClass}&specialityId=${speciality}&pageSize=10&pageIndex=${data.pageIndex}`
   return commonsAjax(url,'','get')
 }
 
