@@ -13,4 +13,8 @@
   #app
     width: 100%
     height:100%
+
+  #app .courseCategory .el-table__expanded-cell
+    padding:0 0 0 48px
+
 </style>

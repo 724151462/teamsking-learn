@@ -3,6 +3,8 @@ import { commonsAjax } from '../utils/requery'
 /**
  * 学院页面
  */
+
+
 /***
  * 获取学院信息
  * @param data

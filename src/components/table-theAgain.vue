@@ -23,6 +23,9 @@
             ]
             columnNameList:[
                 {
+                  type:'selection'   //多选框
+                }
+                {
                     name:'工号',
                     prop:'id'
                 }

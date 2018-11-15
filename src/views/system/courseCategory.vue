@@ -56,12 +56,14 @@
 
         <el-table
             :data="tableData5"
-            style="width: 100%">
+            style="width: 100%"
+            @expand-change="expandChange()">
           <el-table-column type="expand">
             <template slot-scope="props">
 
               <el-table
                   :data="tableData"
+                  style="width: 100%"
                   :show-header="showHeader" >
                 <el-table-column
                     prop="date"
@@ -216,7 +218,33 @@
         }
         //this.showTab1 = !this.showTab1;
         console.log(this.showTab1)
-      }
+      },
+      expandChange:function(row,expandedRows){
+        let el = event.currentTarget;
+        console.log('执行expand-change');
+        console.log("el:",el);
+        //console.log("props:",props);
+        // document.getElementsByTagName('style')[0] += `
+        //     .el-table__expanded-cell[class*=cell]{
+        //       padding:0 !important;
+        //     }
+        // `;
+
+        let trNoClass = document.getElementsByTagName('tr').filter;
+
+
+
+        //console.log('样式:', document.getElementsByTagName('style')[0] );
+
+
+        console.log('节点:',document.getElementsByTagName('tr') );
+        console.log('trNoClass:',trNoClass );
+
+           //'.el-table__expanded-cell[class*=cell]{\n' +
+        //   '    padding:0 !important;\n' +
+        //   '  }';
+  }
+
     }
   }
 </script>
@@ -267,6 +295,7 @@
 
   .demo-table-expand {
     font-size: 0;
+    padding:0;
   }
   .demo-table-expand label {
     width: 90px;
@@ -277,7 +306,11 @@
     margin-bottom: 0;
     width: 50%;
   }
-  #courseCategory .el-table__expanded-cell {
-    padding: 20px 50px;
+
+  .el-table__expanded-cell[class*=cell]{
+    padding:0 !important;
+  }
+  .courseCategory .el-table__expanded-cell{
+    padding:0 !important;
   }
 </style>
