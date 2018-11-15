@@ -175,3 +175,42 @@ export function sysStudentDelete(data){
   let url = '/api/v1/sys/student'
   return commonsAjax(url,data,'delete')
 }
+
+/***
+ * 查询老师信息
+ */
+export function sysTeacherPage(data){
+  let college = data.college || -1
+  let department = data.department || -1
+  let teacherInfo = data.teacherInfo || ''
+  //return commonsAjax('api/v1/sys/student/page',{ studentId:1,pageIndex:1,pageSize:10  },'get')
+  let url = `api/v1/sys/teacher/page?collegeId=${college}&departmentId=${department}&search=${teacherInfo}&pageSize=2&pageIndex=${data.pageIndex}`
+  return commonsAjax(url,'','get')
+}
+
+
+/***
+* 教师启用/禁用
+*/
+export function sysTeacherSwitch(data){
+  console.log('aaaa', data)
+  let url = `api/v1/sys/teacher/${data.id}/${data.status}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/***
+* 添加教师
+*/
+export function sysTeacherAdd(data){
+  return commonsAjax('api/v1/sys/teacher', data, 'post')
+}
+
+
+/***
+ * 重置教师密码
+ */
+export function sysTeacherReset(data){
+  let url = '/api/v1/sys/teacher/passwd'
+  return commonsAjax(url,data,'post')
+}

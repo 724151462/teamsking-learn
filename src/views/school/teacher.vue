@@ -2,26 +2,41 @@
   <div class="teacher">
 
     <header-the-again headerTitle="教师管理"></header-the-again>
-
-
-    <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
+    <el-form ref="form" :model="searchForm" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.appraisal" placeholder="老师名称/工号"></el-input>
-      </el-form-item>
-      <el-form-item label="输入搜索：">
-        <el-input v-model="form.phone" placeholder="手机号"></el-input>
+        <el-input v-model="searchForm.teacherInfo" placeholder="老师名称/工号/手机号"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+        <el-select v-model="searchForm.college" :readonly="true" placeholder="院" @change="collegeChange">
+            <el-option 
+            v-for="(item, index) in searchCollegeList" 
+            :key="index" 
+            :label="item.collegeName"
+            :value="item.collegeId">
+            </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="searchForm.department" :readonly="true" placeholder="系" @change="departmentChange">
+            <el-option 
+            v-for="(item, index) in searchDepartmentList" 
+            :key="index" 
+            :label="item.departmentName"
+            :value="item.departmentId">
+            </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="teacherSearch">查询</el-button>
       </el-form-item>
     </el-form>
-
     <table-the-again
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
       :columnNameList="columnNameList"
       :tableData="tableData3"
       :operateList="operateList"
+      switchColumn='open'
       @showComponentInfo="showComponentInfo">
     </table-the-again>
 
@@ -55,9 +70,11 @@
     </el-dialog>
 
     <el-pagination
-      background
-      layout="prev, pager, next"
-      :total="1000">
+            background
+            layout="prev, pager, next"
+            :total="totalCount"
+            :page-size="2"
+            @current-change="pageChange">
     </el-pagination>
   </div>
 </template>
@@ -66,15 +83,18 @@
   import tableTheAgain from '../../components/table-theAgain'
   import headerTheAgain from '../../components/header-theAgain'
 
+  import {
+    sysCollegeList,
+    sysDepartmentList,
+    sysTeacherPage,
+    sysTeacherSwitch,
+    sysTeacherReset
+  } from '../../api/school';
+
   export default{
     name:'',
     data(){
       return{
-        form: {
-          appraisal: '',
-          catagory: '',
-          teacher: ''
-        },
         dialogVisible: false,
         tableOperate:[
           {
@@ -82,8 +102,8 @@
             type:'addTeacher'
           },
           {
-            content:'批量删除',
-            type:'deleteAll'
+            content:'批量重置密码',
+            type:'resetAll'
           },
         ],
         tableTitle:'教师管理列表',
@@ -93,29 +113,29 @@
           },
           {
             name:'姓名',
-            prop:'id'
+            prop:'teacherName'
           },
           {
             name:'工号',
-            prop:'id'
+            prop:'teacherNumber'
           },
           {
             name:'手机号',
-            prop:'userType'
+            prop:'mobile'
+          },
+          {
+            name:'院',
+            prop:'collegeName'
+          },
+          {
+            name:'系',
+            prop:'departmentName'
           },
           {
             name:'创建课程',
-            prop:'userName'
+            prop:'courseCount'
           },
-          {
-            name:'开课数量',
-            prop:'createdTime',
-            fit:true
-          },
-          {
-            name:'创建时间',
-            prop:'status'
-          }
+
         ],
         operateList:[
           {
@@ -125,10 +145,6 @@
           {
             content:'重置密码',
             type:'resetPassword'
-          },
-          {
-            content:'删除',
-            type:'delete'
           }
         ],
         tableData3: [
@@ -163,14 +179,124 @@
         ],
         popContentItem:[],
         textarea:'',
+        searchForm: {
+            college: '',
+            department: '',
+            teacherInfo: ''
+        },
+        searchCollegeList: [],
+        searchDepartmentList: [],
+        departmentRows: [],
+        collegeList: [],
+        totalCount: 0,
+        pageIndex: 1,
       }
     },
     components:{
         tableTheAgain,
         headerTheAgain
     },
-    mounted:function(){ },
+    computed:{
+      testList() {
+        return this.$store.state.collegeList
+      }
+    },
+    mounted(){
+      this.$store.commit('getCollegeList')
+      // 教师列表
+      sysTeacherPage({"pageIndex": this.pageIndex})
+      .then((response)=>{
+          let dataArr = []
+          response.data.pageData.forEach(element => {
+              element.status = String(element.status)
+              console.log(typeof(element.status))
+              dataArr.push(element)
+          });
+          this.totalCount = Number(response.data.totalCount)
+          console.log(this.totalCount)
+          this.tableData3 = dataArr
+      })
+      // 院列表
+      sysCollegeList()
+      .then((response)=>{
+          if (response.code === 200){
+              this.collegeList = response.data
+              this.searchCollegeList = response.data
+              let all = {"collegeId": -1, "collegeName": "全部"}
+            // this.collegeList.unshift(all)
+              this.searchCollegeList.unshift(all)
+              console.log(this.collegeList)
+          }
+      })
+      // 系列表
+      sysDepartmentList()
+      .then((response)=>{
+          if (response.code === 200){
+              this.departmentRows = response.data
+              this.searchDepartmentList = response.data
+              let all = {"departmentId": -1, "departmentName": "全部"}
+              // this.searchDepartmentList.unshift(all)
+            this.departmentRows.unshift(all)
+              console.log(this.departmentRows)
+          }
+      })
+    },
     methods:{
+      // 院搜索值变化
+      collegeChange(value) {
+          // console.log(value)
+          // console.log('a',this.departmentRows)
+          if(value === -1){
+              this.searchDepartmentList = this.departmentRows
+              this.searchForm.department = -1
+          }else{
+              this.searchDepartmentList = this.departmentRows.filter((item,index)=>{
+                  return (item.collegeId == value || item.collegeId == -1 || index == 0)
+              })
+
+              console.log('121', this.searchDepartmentList)
+              this.searchForm.department = -1   
+          }         
+      },
+      // 系搜索值变化
+      departmentChange(value) {
+        console.log('dep', value)
+        // if(value === -1){
+        //     return this.specialityRows
+        // }
+        // this.searchForm.speciality = -1
+        // this.searchSpecialityList = this.specialityRows.filter((item)=>{
+        //     return item.departmentId == value || item.departmentId == -1
+        // })
+      },
+      teacherSearch(){
+        this.searchForm.pageIndex = 1
+        sysTeacherPage(this.searchForm)
+          .then((response)=>{
+            console.log(response)
+            let dataArr = []
+            response.data.pageData.forEach(element => {
+                element.status = String(element.status)
+                console.log(typeof(element.status))
+                dataArr.push(element)
+            });
+            this.tableData3 = dataArr
+            this.totalCount = Number(response.data.totalCount)
+          })
+      },
+      pageChange(pageNum) {
+        this.searchForm.pageIndex = pageNum
+        sysTeacherPage(this.searchForm).then((response)=>{
+            console.log(response)
+            let dataArr = []
+            response.data.pageData.forEach(element => {
+                element.status = String(element.status)
+                console.log(typeof(element.status))
+                dataArr.push(element)
+            });
+            this.tableData3 = dataArr
+        })
+      },
       showComponentInfo:function(type,info){
         console.log( '父组件接收到的类型：' + type + '父组件接收到的信息：' + info );
         switch (type) {
@@ -179,10 +305,56 @@
             this.popContentItem = this.info;
             this.check(info);
             break;
+          case 'switch': 
+            let switchInfo = {id: info.teacherId,status: info.status} 
+            sysTeacherSwitch(switchInfo)
+                .then((response)=>{
+                    console.log(response)
+                })
+            break;
+          case 'addTeacher':
+            this.$router.push('addteacher')
+            break;
+          case 'resetPassword':
+            this.resetPassword(info)
+          case 'resetAll':
+            this.resetPassword(info)
         }
       },
       check:function(){
         this.dialogVisible = !this.dialogVisible;
+      },
+      resetPassword(teacher) {
+          console.log(teacher.length)
+          let resetArr = []
+          if(teacher.length == undefined){
+              resetArr.push(teacher.teacherId)
+          }else{
+              teacher.forEach(element => {
+                  resetArr.push(element.teacherId)
+              });
+          }
+          
+          this.$confirm('是否重置密码？', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+          }).then(() => {
+              sysTeacherReset(resetArr).then((response)=>{
+                  if(response.code === 200) {
+                      this.$message({
+                          type: 'success',
+                          message: '重置成功!'
+                      });
+                  }
+              })
+          })
+          .catch(() => {
+          this.$message({
+              type: 'info',
+              message: '已取消重置'
+          });          
+          });
       },
       handleClose(done) {
         this.$confirm('确认关闭？')
@@ -193,7 +365,7 @@
       },
       onSubmit:function(){
         console.log('onSubmit!!');
-      }
+      },
     }
   }
 </script>
