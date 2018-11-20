@@ -24,12 +24,12 @@ export const constantRouterMap = [
     redirect: '/course/list',
     children: [
       {
-        path: 'list',
+        path: 'list',/**/
         component: _import('course/list'),
         name: '课程列表'
       },
       {
-        path: 'appraisal',
+        path: 'appraisal',/**/
         component: _import('course/appraisal'),
         name: '课程评价'
       },
@@ -49,7 +49,7 @@ export const constantRouterMap = [
         name: '试题管理'
       },
       {
-        path: 'addCourse',
+        path: 'addCourse',/**/
         component: _import('course/addCourse'),
         name: '课程编辑'
       }
@@ -156,6 +156,27 @@ export const constantRouterMap = [
       {path:'class',component:_import('school/class'),name:'班级管理'},
     ]
   },
+  {
+    path:'/system',
+    component:Layout,
+    name:'系统管理',
+    redirect:'/system/menu',
+    meta:{
+      address:'system'
+    },
+    children:[
+      {path:'tenantManage',component:_import('system/tenantManage'),name:'租户管理'},
+      {path:'tenantAccountManager',component:_import('system/tenantAccountManager'),name:'租户账号管理'},
+      {path:'menu',component:_import('system/menu'),name:'菜单管理'},
+      {path:'role',component:_import('system/role'),name:'角色管理'},
+      {path:'school',component:_import('system/school'),name:'学校管理员'},
+      {path:'student',component:_import('system/student'),name:'系统学生管理'},
+      {path:'system',component:_import('system/system'),name:'系统管理员'},
+      {path:'tag',component:_import('system/tag'),name:'标签管理'},
+      {path:'courseCategory',component:_import('system/courseCategory'),name:'课程分类'},
+
+      ]
+  }
   // {
   //   path:'/*',
   //   redirect:'/login'

@@ -23,6 +23,9 @@
             ]
             columnNameList:[
                 {
+                  type:'selection'   //多选框
+                }
+                {
                     name:'工号',
                     prop:'id'
                 }
@@ -105,9 +108,6 @@
                                    v-if="item.type !== 'delete' && item.type !== 'edit'"
                                    type="primary"
                                    size="small">{{ item.content }}</el-button>
-                        
-                        
-                        <!-- <el-button v-for="item in operateList" @click="onSubmit(item.type,scope.row)" type="text" size="small">{{ item.content }}</el-button> -->
                     </template>
                 </el-table-column>
                 

@@ -1,10 +1,10 @@
 <template>
   <div class="role">
-    <header-the-again headerTitle="菜单管理"></header-the-again>
+    <header-the-again headerTitle="角色管理"></header-the-again>
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="菜单名称"></el-input>
+        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="角色名称"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="queryRoleList">查询</el-button>
@@ -12,12 +12,12 @@
     </el-form>
 
     <table-the-again
-        :tableTitle="tableTitle"
-        :tableOperate="tableOperate"
-        :columnNameList="columnNameList"
-        :tableData="tableData.data"
-        :operateList="operateList"
-        @showComponentInfo="showComponentInfo">
+         :tableTitle="tableTitle"
+         :tableOperate="tableOperate"
+         :columnNameList="columnNameList"
+         :tableData="tableData.pageData"
+         :operateList="operateList"
+         @showComponentInfo="showComponentInfo">
     </table-the-again>
 
     <el-pagination
@@ -51,6 +51,36 @@
       </span>
     </el-dialog>
 
+    <el-dialog
+        :title="addForm.title"
+        :visible.sync="menuDialogVisible"
+        width="60%"
+        :before-close="handleClose"
+        style="min-width: 800px">
+
+      <div class="pop-academy">
+
+        权限菜单列表: <br /><br /><br />
+
+        <el-tree
+            :data="data2"
+            show-checkbox
+            node-key="id"
+            :default-expanded-keys="[2, 3]"
+            :default-checked-keys="[5]"
+            :props="defaultProps">
+        </el-tree>
+
+
+        <!--{{ addForm.data.menuList }}-->
+
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="menuDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="menuDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
 
 
   </div>
@@ -89,7 +119,7 @@
         tableTitle:'角色管理列表',
         tableOperate:[
           {
-            content:'创建菜单',
+            content:'创建角色',
             type:'created'
           },
           {
@@ -102,20 +132,12 @@
             type:'selection'
           },
           {
-            name:'菜单编号',
-            prop:'menuId'
-          },
-          {
-            name:'菜单名',
-            prop:'name'
-          },
-          {
-            name:'父级菜单',
-            prop:'parentName'
+            name:'角色名',
+            prop:'roleName'
           },
           {
             name:'创建时间',
-            prop:'createName'
+            prop:'createTime'
           },
           {
             name:'创建人',
@@ -130,25 +152,65 @@
           {
             content:'编辑',
             type:'edit'
+          },
+          {
+            content:'设置权限',
+            type:'set'
           }
         ],
         tableData:'',
 
 
 
+        data2: [{
+          id: 1,
+          label: '一级 1',
+          children: [{
+            id: 4,
+            label: '二级 1-1',
+            children: [{
+              id: 9,
+              label: '三级 1-1-1'
+            }, {
+              id: 10,
+              label: '三级 1-1-2'
+            }]
+          }]
+        }, {
+          id: 2,
+          label: '一级 2',
+          children: [{
+            id: 5,
+            label: '二级 2-1'
+          }, {
+            id: 6,
+            label: '二级 2-2'
+          }]
+        }, {
+          id: 3,
+          label: '一级 3',
+          children: [{
+            id: 7,
+            label: '二级 3-1'
+          }, {
+            id: 8,
+            label: '二级 3-2'
+          }]
+        }],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        }
+
+
+
       }
     },
     created:function(){
-     // this.queryRoleList();
-      sysUserMenuList().then(
-        res => {
-          this.tableData = res;
-          console.log('this.tableData',this.tableData);
-        }
-      ).catch()
+      this.queryRoleList();
     },
     mounted:function(){
-     /* sysUserMenuList().then(
+      sysUserMenuList().then(
         res => {
           console.log("权限菜单:",res);
 
@@ -168,15 +230,15 @@
           }
 
 
-          console.log( 'menuTree' , menuTree );*\
+          console.log( 'menuTree' , menuTree );
 
         }
-      ).catch()*/
+      ).catch()
 
     },
     methods:{
       showComponentInfo:function(type,info){
-       /* console.log('type',type,'info',info);
+        console.log('type',type,'info',info);
         switch(type){
           case 'created':
             console.log('here is created');
@@ -195,10 +257,10 @@
           case 'set':
             this.editMenu(info);
             break;
-        }*/
+        }
       },
       queryRoleList:function () {
-       /* console.log('this.form',this.form);
+        console.log('this.form',this.form);
         sysRolePage(this.form).then(
           res => {
             this.tableData=res.data;
@@ -206,27 +268,27 @@
           }
         ).catch(
           error => console.log('error',error)
-        )*/
+        )
       },
       appendRole:function(){
-       /* this.dialogVisible = true;
+        this.dialogVisible = true;
         this.addForm.title = '添加角色';
-        this.addForm.data={ roleName:'' }*/
+        this.addForm.data={ roleName:'' }
       },
       editRole:function(roleInfo){
-        /*this.dialogVisible = true;
+        this.dialogVisible = true;
         this.addForm.title = '编辑角色';
         this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data' , this.addForm.data );*/
+        console.log( 'this.addForm.data' , this.addForm.data );
       },
       editMenu:function(roleInfo){
-        /*this.menuDialogVisible = true;
+        this.menuDialogVisible = true;
         this.addForm.title = '设置权限';
         this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );*/
+        console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );
       },
       save:function(){
-       /* if( this.addForm.title === '添加角色'){
+        if( this.addForm.title === '添加角色'){
           console.log( '添加角色的信息:', this.addForm.data);
           sysRoleAdd( this.addForm.data).then(
             res => {
@@ -248,10 +310,10 @@
           );
         }
         this.dialogVisible = false;
-        setTimeout( ()=>{ this.queryRoleList() },300);*/
+        setTimeout( ()=>{ this.queryRoleList() },300);
       },
       delete:function(type,list){
-       /* let roleIdList = [];
+        let roleIdList = [];
         switch (type) {
           case 'one':
             roleIdList.push(list.roleId);
@@ -274,7 +336,7 @@
             console.log("删除失败:",error);
           }
         )
-        setTimeout( () => { this.queryRoleList() },300 );*/
+        setTimeout( () => { this.queryRoleList() },300 );
       },
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;

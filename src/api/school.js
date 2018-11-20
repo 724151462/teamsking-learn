@@ -3,6 +3,8 @@ import { commonsAjax } from '../utils/requery'
 /**
  * 学院页面
  */
+
+
 /***
  * 获取学院信息
  * @param data
@@ -105,7 +107,25 @@ export function sysSpecialityPage(data){
   //return commonsAjax('api/v1/sys/speciality/page',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
   return commonsAjax('api/v1/sys/speciality/page',data,'get')
 }
+/**
+ * 添加专业 /api/v1/sys/speciality
+ * */
+export function sysSpeciality(data){
+  return commonsAjax('api/v1/sys/speciality',data,'post')
+}
+/**
+ * 修改专业
+ * */
+export function sysSpecialityEdit(data){
+  return commonsAjax('api/v1/sys/speciality',data,'put')
+}
 
+/***
+ *  删除专业  /api/v1/sys/speciality
+ */
+export function sysSpecialityDelete(data){
+  return commonsAjax('api/v1/sys/speciality',data,'delete')
+}
 
 /***
  * 获取学生列表
@@ -285,3 +305,34 @@ export function sysCoursePage(data){
 export function sysCourseId(data){
   return commonsAjax(`/api/v1/course/${data}`,'','get')
 }
+
+/***
+ * 分页查询班级列表 /api/v1/sys/class/page
+ */
+
+
+export function sysClassPage(data){
+  return commonsAjax('api/v1/sys/class/page',data,'get')
+}
+
+/**
+ * 添加班级 api/v1/sys/class
+ * */
+export function sysClass(data){
+  return commonsAjax('api/v1/sys/class',data,'post')
+}
+
+/**
+ *  修改班级 api/v1/sys/class
+ */
+export function sysClassUpdate(data){
+  return commonsAjax('api/v1/sys/class',data,'put')
+}
+
+/**
+ * 删除班级  api/v1/sys/class
+ */
+export function sysClassDelete(data){
+  return commonsAjax('api/v1/sys/class',data,'delete')
+}
+

@@ -262,6 +262,7 @@
             sysCollegePage( this.form ).then(
               res => {
                 this.tableData = res.data;
+                console.log('分页查询院信息:',res.data);
               }).catch(error=>{})
           },
           addInput:function(){

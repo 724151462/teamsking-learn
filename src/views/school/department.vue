@@ -248,15 +248,15 @@
         );
       },
       queryDepartment:function() {
-        let data = JSON.parse(JSON.stringify(this.form))
-        for(let i = 0; i < data.length; i++){
-          if(data[i] === '' || JSON.stringify(data[i]) === '""'){
-            delete data[i]
-          }
-        }
+        // let data = JSON.parse(JSON.stringify(this.form))
+        // for(let i = 0; i < data.length; i++){
+        //   if(data[i] === '' || JSON.stringify(data[i]) === '""'){
+        //     delete data[i]
+        //   }
+        // }
         sysDepartmentPage( this.form ).then(
           res => {
-            //console.log('系信息',res.data)
+            console.log('系信息',res.data)
             this.tableData = res.data;
             if( this.tableData.pageData.length > 0 ){
               //

@@ -1,10 +1,10 @@
 <template>
-  <div>教师管理</div>
+
 </template>
 
 <script>
   export default {
-    name: "teacher"
+    name: "system"
   }
 </script>
 
