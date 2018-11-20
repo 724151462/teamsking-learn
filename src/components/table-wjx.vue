@@ -83,7 +83,23 @@
                                    :width="list.width"
                                    :type="list.type"
                                    align="center"
-                                   :key="index">
+                                   :key="index"
+                                    v-if="list.other">
+                                   <template slot-scope="scope">
+                                        <p>{{ scope.row.status }}</p>
+                                        <div slot="reference" class="name-wrapper">
+                                            <el-button @click="onSubmit(list.other.type,scope.row)" size="small">{{list.other.name}}</el-button>
+                                        </div>
+                                    </template>
+                  </el-table-column>
+                  <el-table-column
+                                   :prop="list.prop"
+                                   :label="list.name"
+                                   :width="list.width"
+                                   :type="list.type"
+                                   align="center"
+                                   :key="index"
+                                    v-else>
                   </el-table-column>
                 </template>
               </template>

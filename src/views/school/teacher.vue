@@ -40,35 +40,6 @@
       @showComponentInfo="showComponentInfo">
     </table-the-again>
 
-    <el-dialog
-      title="添加专业"
-      :visible.sync="dialogVisible"
-      width="60%"
-      :before-close="handleClose">
-
-      <div class="pop-user-info">
-        <div></div>
-        <span>windir</span>
-      </div>
-      <div class="pop-content-item" v-for="item in popContentItem">
-        <span class="title"> {{ item.title }} </span>
-        <span class="content"> {{ item.content }} </span>
-      </div>
-      <div class="pop-content-item">
-        <span class="title"> 评价内容 </span>
-        <el-input
-          type="textarea"
-          :rows="4"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">保 存</el-button>
-      </span>
-    </el-dialog>
-
     <el-pagination
             background
             layout="prev, pager, next"
@@ -317,8 +288,16 @@
             break;
           case 'resetPassword':
             this.resetPassword(info)
+            break;
           case 'resetAll':
+            break;
             this.resetPassword(info)
+          case 'edit':
+            this.$router.push({
+              name:'修改教师', 
+              params:{"id": info.teacherId}
+            })
+            break;
         }
       },
       check:function(){

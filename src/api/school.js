@@ -193,7 +193,6 @@ export function sysTeacherPage(data){
 * 教师启用/禁用
 */
 export function sysTeacherSwitch(data){
-  console.log('aaaa', data)
   let url = `api/v1/sys/teacher/${data.id}/${data.status}`
   return commonsAjax(url, '', 'get')
 }
@@ -213,4 +212,76 @@ export function sysTeacherAdd(data){
 export function sysTeacherReset(data){
   let url = '/api/v1/sys/teacher/passwd'
   return commonsAjax(url,data,'post')
+}
+
+
+/***
+* 教师id查询
+*/
+export function sysTeacherId(data){
+  let url = `api/v1/sys/teacher/${data.id}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/***
+* 教师id查询
+*/
+export function sysTeacherModify(data){
+  let url = `api/v1/sys/teacher`
+  return commonsAjax(url, data, 'put')
+}
+
+
+// ===============证书===============
+//
+
+/***
+ * 获取证书列表
+ */
+export function sysCertificatePage(data){
+  return commonsAjax('api/v1/sys/certificate/page',data,'get')
+}
+
+
+/***
+ * 查看证书
+ */
+export function sysCertificateId(data){
+  return commonsAjax(`api/v1/sys/certificate/${data.id}`, '' ,'get')
+}
+
+
+/***
+ * 审核
+ */
+export function sysCertificateAudit(data){
+  return commonsAjax(`api/v1/sys/certificate`, data ,'put')
+}
+
+
+/***
+ * 审核详情
+ */
+export function sysCertificateDetail(data){
+  return commonsAjax(`/api/v1/sys/certificate/${data}/audit`, '' ,'get')
+}
+
+
+// ===============课程===============
+//
+
+/***
+ * 获取课程列表
+ */
+export function sysCoursePage(data){
+  return commonsAjax('/api/v1/course/page',data,'get')
+}
+
+
+/***
+ * 获取课程id
+ */
+export function sysCourseId(data){
+  return commonsAjax(`/api/v1/course/info/${data}`,'','get')
 }

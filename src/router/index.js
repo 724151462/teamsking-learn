@@ -64,6 +64,7 @@ export const constantRouterMap = [
       { path: 'student', component: _import('school/student'), name: '学生管理' },
       { path: 'teacher', component: _import('school/teacher'), name: '教师管理' },
       { path: 'teacher/addteacher', component: _import('school/addTeacher'), name: '添加教师' },
+      { path: 'teacher/modifyteacher/:id', component: _import('school/modifyTeacher'), name: '修改教师' },
       { path: 'controller', component: _import('school/controller'), name: '管理员' },
       { path: 'portal', component: _import('school/portal'), name: '门户配置' },
       { path: 'course', component: _import('school/course'), name: '课程管理' },
