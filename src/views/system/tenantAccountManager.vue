@@ -1,13 +1,23 @@
 <template>
   <div class="role">
-    <header-the-again headerTitle="菜单管理"></header-the-again>
+    <header-the-again headerTitle="租户账号管理"></header-the-again>
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="菜单名称"></el-input>
+        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="用户名/姓名"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="queryRoleList">查询</el-button>
+        <el-select v-model="value" placeholder="请选择">
+          <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="queryTenantList">查询</el-button>
       </el-form-item>
     </el-form>
 
@@ -15,7 +25,7 @@
         :tableTitle="tableTitle"
         :tableOperate="tableOperate"
         :columnNameList="columnNameList"
-        :tableData="tableData.data"
+        :tableData="tableData.pageData"
         :operateList="operateList"
         @showComponentInfo="showComponentInfo">
     </table-the-again>
@@ -66,6 +76,7 @@
   import { sysRoleEdit } from '../../api/system'
   import { sysRoleDelete } from '../../api/system'
   import { sysUserMenuList } from '../../api/system'
+  import { sysTenantManagerPage } from '../../api/system'
 
   export default {
     name: "role",
@@ -75,6 +86,23 @@
     },
     data(){
       return {
+        options: [{
+          value: '选项1',
+          label: '黄金糕'
+        }, {
+          value: '选项2',
+          label: '双皮奶'
+        }, {
+          value: '选项3',
+          label: '蚵仔煎'
+        }, {
+          value: '选项4',
+          label: '龙须面'
+        }, {
+          value: '选项5',
+          label: '北京烤鸭'
+        }],
+        value: '',
         addForm:{
           title:'添加角色',
           data:{
@@ -89,11 +117,11 @@
         tableTitle:'角色管理列表',
         tableOperate:[
           {
-            content:'创建菜单',
+            content:'删除',
             type:'created'
           },
           {
-            content:'批量删除',
+            content:'创建租户',
             type:'deleteList'
           }
         ],
@@ -102,103 +130,106 @@
             type:'selection'
           },
           {
-            name:'菜单编号',
-            prop:'menuId'
+            name:'学校名称',
+            prop:'tenantName'
           },
           {
-            name:'菜单名',
-            prop:'name'
+            name:'学生数',
+            prop:'createTime'
           },
           {
-            name:'父级菜单',
-            prop:'parentName'
-          },
-          {
-            name:'创建时间',
+            name:'教师数',
             prop:'createName'
           },
           {
-            name:'创建人',
+            name:'课程数',
+            prop:'createName'
+          },
+          {
+            name:'课程包数',
             prop:'createName'
           },
         ],
         operateList:[
           {
-            content:'删除',
+            content:'修改',
             type:'delete'
           },
           {
-            content:'编辑',
+            content:'添加管理员',
             type:'edit'
-          }
+          },
+
         ],
         tableData:'',
+
 
 
 
       }
     },
     created:function(){
-     // this.queryRoleList();
-      sysUserMenuList().then(
-        res => {
-          this.tableData = res;
-          console.log('this.tableData',this.tableData);
-        }
-      ).catch()
+      this.queryTenantList();
+      // this.queryRoleList();
     },
     mounted:function(){
-     /* sysUserMenuList().then(
-        res => {
-          console.log("权限菜单:",res);
+      /* sysUserMenuList().then(
+         res => {
+           console.log("权限菜单:",res);
 
-          let menuTree = res.data.filter(
-            element => {
-              return element.parentId === 0
-            }
-          );
+           let menuTree = res.data.filter(
+             element => {
+               return element.parentId === 0
+             }
+           );
 
-          for( let i = 0; i < menuTree.length; i++  ){
-            menuTree[i].children = [];
-            menuTree[i].children.push( res.data.filter(
-              element => {
-                return element.parentId === menuTree[i].menuId
-              }
-            ) )
-          }
+           for( let i = 0; i < menuTree.length; i++  ){
+             menuTree[i].children = [];
+             menuTree[i].children.push( res.data.filter(
+               element => {
+                 return element.parentId === menuTree[i].menuId
+               }
+             ) )
+           }
 
 
-          console.log( 'menuTree' , menuTree );*\
+           console.log( 'menuTree' , menuTree );
 
-        }
-      ).catch()*/
+         }
+       ).catch()*/
 
     },
     methods:{
       showComponentInfo:function(type,info){
-       /* console.log('type',type,'info',info);
-        switch(type){
-          case 'created':
-            console.log('here is created');
-            this.appendRole();
-            break;
-          case 'edit':
-            console.log('here is edit');
-            this.editRole(info);
-            break;
-          case 'delete':
-            this.delete('one',info);
-            break;
-          case 'deleteList':
-            this.delete('list',info);
-            break;
-          case 'set':
-            this.editMenu(info);
-            break;
-        }*/
+        /*console.log('type',type,'info',info);
+         switch(type){
+           case 'created':
+             console.log('here is created');
+             this.appendRole();
+             break;
+           case 'edit':
+             console.log('here is edit');
+             this.editRole(info);
+             break;
+           case 'delete':
+             this.delete('one',info);
+             break;
+           case 'deleteList':
+             this.delete('list',info);
+             break;
+           case 'set':
+             this.editMenu(info);
+             break;
+         }*/
       },
-      queryRoleList:function () {
-       /* console.log('this.form',this.form);
+      queryTenantList:function () {
+        sysTenantManagerPage().then(
+          res => {
+            this.tableData = res.data;
+            console.log('租户管理员列表:', this.tableData );
+          }
+        ).catch()
+        /*console.log('this.form',this.form);
         sysRolePage(this.form).then(
           res => {
             this.tableData=res.data;
@@ -209,7 +240,7 @@
         )*/
       },
       appendRole:function(){
-       /* this.dialogVisible = true;
+        /*this.dialogVisible = true;
         this.addForm.title = '添加角色';
         this.addForm.data={ roleName:'' }*/
       },
@@ -226,7 +257,7 @@
         console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );*/
       },
       save:function(){
-       /* if( this.addForm.title === '添加角色'){
+        /*if( this.addForm.title === '添加角色'){
           console.log( '添加角色的信息:', this.addForm.data);
           sysRoleAdd( this.addForm.data).then(
             res => {
@@ -249,36 +280,37 @@
         }
         this.dialogVisible = false;
         setTimeout( ()=>{ this.queryRoleList() },300);*/
+        this.dialogVisible = false;
       },
       delete:function(type,list){
-       /* let roleIdList = [];
-        switch (type) {
-          case 'one':
-            roleIdList.push(list.roleId);
-            break;
-          case 'list':
-            list.filter(
-              element => {
-                roleIdList.push( element.roleId );
-                return true;
-              }
-            );
-            break;
-        }
-        sysRoleDelete(roleIdList).then(
-          res => {
-            console.log('删除成功的信息:',res);
-          }
-        ).catch(
-          error => {
-            console.log("删除失败:",error);
-          }
-        )
-        setTimeout( () => { this.queryRoleList() },300 );*/
+        /* let roleIdList = [];
+         switch (type) {
+           case 'one':
+             roleIdList.push(list.roleId);
+             break;
+           case 'list':
+             list.filter(
+               element => {
+                 roleIdList.push( element.roleId );
+                 return true;
+               }
+             );
+             break;
+         }
+         sysRoleDelete(roleIdList).then(
+           res => {
+             console.log('删除成功的信息:',res);
+           }
+         ).catch(
+           error => {
+             console.log("删除失败:",error);
+           }
+         )
+         setTimeout( () => { this.queryRoleList() },300 );*/
       },
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;
-        this.queryRoleList();
+        // this.queryRoleList();
       },
       handleClose(done) {
         done();

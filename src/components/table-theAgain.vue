@@ -82,10 +82,27 @@
                 <el-table-column
                         fixed="right"
                         label="操作"
-                        fit="true"
+                        :width="operateList.length * 100"
                         align="center">
                     <template slot-scope="scope">
-                        <el-button v-for="item in operateList" @click="onSubmit(item.type,scope.row)" type="text" size="small">{{ item.content }}</el-button>
+
+                        <!--<el-button v-for="item in operateList"-->
+                                   <!--@click="onSubmit(item.type,scope.row)"-->
+                                   <!--type="text"-->
+                                   <!--size="small">-->
+                          <!--{{ item.content }}-->
+                        <!--</el-button>-->
+                        <el-button  v-for="item in operateList"  @click="onSubmit(item.type,scope.row)"
+                                   v-if="item.type === 'edit'"
+                                   size="small">{{ item.content }}</el-button>
+                        <el-button v-for="item in operateList" @click="onSubmit(item.type,scope.row)"
+                                   v-if="item.type === 'delete'"
+                                   type="danger"
+                                   size="small">{{ item.content }}</el-button>
+                        <el-button v-for="item in operateList" @click="onSubmit(item.type,scope.row)"
+                                   v-if="item.type !== 'delete' && item.type !== 'edit'"
+                                   type="primary"
+                                   size="small">{{ item.content }}</el-button>
                     </template>
                 </el-table-column>
 
