@@ -283,5 +283,5 @@ export function sysCoursePage(data){
  * 获取课程id
  */
 export function sysCourseId(data){
-  return commonsAjax(`/api/v1/course/info/${data}`,'','get')
+  return commonsAjax(`/api/v1/course/${data}`,'','get')
 }

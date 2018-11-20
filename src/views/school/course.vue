@@ -168,7 +168,7 @@ export default {
                 },
                 {
                     name:'课程分类',
-                    prop:'courseRank'
+                    prop:'courseCategory'
                 },
                 {
                     name:'开课时间',
@@ -221,7 +221,8 @@ export default {
         // 列表请求
         getCoursePage() {
             sysCoursePage(this.searchForm).then((response)=>{
-                this.tableData3 = response.data.pageData
+                this.tableData3 = this.handleData(response.data.pageData)
+                console.log('t3', this.tableData3)
                 this.totalCount = Number(response.data.totalCount)
             })
         },
@@ -235,12 +236,7 @@ export default {
                         title: '查看课程'
                     }
                     sysCourseId(info.courseId).then((response)=> {
-                        if(response.data.courseCategoryParent) {
-                            response.data.courseCategory = "二级分类"
-                        }else{
-                            response.data.courseCategory = "一级分类"
-                        }
-                        this.dataObj = response.data
+                        this.dataObj = this.handleData(response.data)
                         this.dataObj.courseSchool = '字段未知'
                         console.log(response)
                     })
@@ -250,6 +246,29 @@ export default {
                     
             }
 
+        },
+        handleData(data) {
+            if(data.length === undefined){
+                if(data.courseCategoryParent) {
+                    data.courseCategory = "二级分类"
+                }else{
+                    data.courseCategory = "一级分类"
+                }
+                return data
+            }else{
+                let dataArr = []
+                console.log('ddd', data)
+                data.forEach(element => {
+                    if(element.courseCategoryParent) {
+                        console.log('ppp', element)
+                        element.courseCategory = "二级分类"
+                    }else{
+                        element.courseCategory = "一级分类"
+                    }
+                    dataArr.push(element)
+                });
+                return dataArr
+            }
         },
         check:function(){
             this.dialogVisible = !this.dialogVisible;

@@ -66,7 +66,26 @@ export const constantRouterMap = [
       { path: 'teacher/addteacher', component: _import('school/addTeacher'), name: '添加教师' },
       { path: 'teacher/modifyteacher/:id', component: _import('school/modifyTeacher'), name: '修改教师' },
       { path: 'controller', component: _import('school/controller'), name: '管理员' },
-      { path: 'portal', component: _import('school/portal'), name: '门户配置' },
+      { path: 'portal', component: _import('school/portal'), name: '门户配置', 
+        redirect: '/school/portal/mould',
+        children:[
+          {
+            path: 'mould', component: _import('school/portalMould'), name: '模板配置'
+          },
+          {
+            path: 'platform', component: _import('school/portalPlatform'), name: '平台信息'
+          },
+          {
+            path: 'banner', component: _import('school/portalBanner'), name: '轮播图'
+          },
+          {
+            path: 'recommend', component: _import('school/portalRecommend'), name: '课程推荐'
+          },
+          {
+            path: 'teacher', component: _import('school/portalTeacher'), name: '名师风采'
+          }
+        ]
+      },
       { path: 'course', component: _import('school/course'), name: '课程管理' },
       { path: 'certificate', component: _import('school/certificate'), name: '证书审核' },
       { path: 'academy', component: _import('school/academy'), name: '院管理' },
