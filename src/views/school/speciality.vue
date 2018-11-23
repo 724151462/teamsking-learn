@@ -109,7 +109,7 @@
           <span class="color-red"></span><span>系负责人：</span>
         </div>
         <div class="item-input-list">
-          <div class="item-input" v-for="(item,index) in addForm.data.manager">
+          <div class="item-input" v-for="(item,index) in addForm.data.manager" :key="index">
             <el-input class="input-pop" v-model="item.workNumber" @blur="blurFunction(item.workNumber,index)" placeholder="请输入工号" clearable></el-input>
             <span>{{item.realName === '' ? '暂无此负责人' : item.realName}}</span>
             <i class="el-icon-remove"
@@ -318,11 +318,19 @@
         //console.log('提交的表单信息L:',this.form);
         sysSpecialityPage(this.form).then(
           res => {
-            this.tableData = res.data;
-            console.log("分页查询专业信息",this.tableData);
+            if( res.code === 200 ){
+              this.tableData = res.data;
+              console.log("分页查询专业信息",this.tableData);
+            }else{
+              this.popError = "查询失败：" + res.msg;
+              this.open4();
+            }
           }
         ).catch(
-          error=>{ console.log(error); }
+          error=>{ 
+            this.popError = "查询失败：" + error;
+            this.open4();
+          }
         )
       },
       //查询专业列表
@@ -330,25 +338,55 @@
 
     },
       save:function(){
-        if(this.popError !== '') return;
-        for( let i = this.addForm.data.manager.length-1; i >= 0; i-- ){
-          if( this.addForm.data.manager[i].realName === '暂无此负责人' || this.addForm.data.manager[i].realName === "" ){
-            this.addForm.data.manager.splice(i,1);
+        // if(this.popError !== '') return;
+        if( this.blurFunction() ){
+          for( let i = this.addForm.data.manager.length-1; i >= 0; i-- ){
+            if( this.addForm.data.manager[i].realName === '暂无此负责人' || this.addForm.data.manager[i].realName === "" ){
+              this.addForm.data.manager.splice(i,1);
+            }
+          }
+          if( this.addForm.title === "添加专业" ){
+            console.log( '添加的专业的信息:',this.addForm.data);
+            sysSpeciality( this.addForm.data ).then(
+              res => { 
+                console.log('添加记录的信息：',res) 
+                if( res.code === 200 ){
+                  this.open2("添加成功");
+                  this.dialogVisible = false;
+                  this.querySpeciality();
+                }else{
+                  this.popError = "添加失败：" + res.msg;
+                  this.open4();
+                }
+              }).catch(
+                error => {
+                  this.popError = "添加失败：" + error;
+                  this.open4();
+                }
+              )
+          }
+          if( this.addForm.title === "编辑专业" ){
+            // console.log('编辑专业信息：',this.addForm.data)
+            sysSpecialityEdit(this.addForm.data).then(
+              res => {
+                console.log('编辑记录的信息：',res)
+                if( res.code === 200 ){
+                  this.open2("修改成功");
+                  this.dialogVisible = false;
+                  this.querySpeciality()
+                }else{
+                  this.popError = "修改失败" + res.msg;
+                  this.open4();
+                }
+              }
+            ).catch(
+              error => {
+                this.popError = "修改失败" + error;
+                this.open4();
+              }
+            );
           }
         }
-        if( this.addForm.title === "添加专业" ){
-          console.log( '添加的专业的信息:',this.addForm.data);
-          sysSpeciality( this.addForm.data ).then(
-            res => { console.log('添加记录的信息：',res) } ).catch(error => console.log(error))
-        }
-        if( this.addForm.title === "编辑专业" ){
-          console.log('编辑专业信息：',this.addForm.data)
-          sysSpecialityEdit(this.addForm.data).then(
-            res => { console.log('编辑记录的信息：',res)}
-          ).catch(error => console.log(error));
-        }
-        setTimeout( ()=>this.querySpeciality() ,300);
-        this.dialogVisible = false;
       },
       delete:function(type,specialityList){
         let specialityLists = [];
@@ -365,8 +403,24 @@
           specialityLists.push( specialityList.specialityId);
           console.log('要删除的专业信息(one):',specialityLists);
         }
-        sysSpecialityDelete(specialityLists).then(res=>{console.log(res)}).catch(error=>console.log(error));
-        setTimeout( ()=>this.querySpeciality() ,300);
+        sysSpecialityDelete(specialityLists).then(
+          res=>{
+            console.log(res)
+              if( res.code === 200 ){
+                  this.open2('删除成功');
+                  this.querySpeciality();
+              }else{
+                this.popError = "删除失败:" + res.msg;
+                this.open4();
+              }
+          }
+          ).catch(
+            error => {
+              this.popError = "删除失败:" + error;
+              this.open4();
+            } 
+          );
+        //setTimeout( ()=>this.querySpeciality() ,300);
       },
       addInput:function(){
         this.popError = "";
@@ -382,7 +436,7 @@
       },
       checkedCollege:function(type){ //选中院触发事件
         if( type === 'pop' ){
-          console.log('pop', this.addForm.data.collegeId);
+          //console.log('pop', this.addForm.data.collegeId);
           this.popDepartmentList = this.collegeList.filter(element => {return element.collegeId === this.addForm.data.collegeId;})[0].department;
           if( this.popDepartmentList.length === 0 ){
             this.popDepartmentList.push({ departmentName:'全部',departmentId: -1 });
@@ -439,7 +493,9 @@
         if( a.length > 0 ){
           this.popError = '专业负责人不能重复';
           this.open4();
+          return false;
         }
+        return true;
       },
       handleClose(done) {
         done();
@@ -456,6 +512,12 @@
             this.addForm.data.manager[index].userId   = res.data.userId;
           }
         ).catch( () => { this.addForm.data.manager[index].realName = '暂无此负责人' } )
+      },
+      open2(msg) {
+        this.$message({
+          message: msg,
+          type: 'success'
+        });
       },
       open4() {
         this.$message.error(this.popError);

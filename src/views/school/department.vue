@@ -75,8 +75,8 @@
           <span class="color-red"></span><span>系负责人：</span>
         </div>
         <div class="item-input-list">
-          <div class="item-input" v-for="(item,index) in addForm.data.manager">
-            <el-input class="input-pop" v-model="item.workNumber" @blur="blurFunction(item.workNumber,index)"  @change="blurFunction(item.workNumber,index)" placeholder="请输入工号" clearable></el-input>
+          <div class="item-input" v-for="(item,index) in addForm.data.manager" :key="index">
+            <el-input class="input-pop" v-model="item.workNumber" @blur="blurFunction(item.workNumber,index)" placeholder="请输入工号" clearable></el-input>
             <span>{{item.realName === '' ? '暂无此负责人' : item.realName}}</span>
             <i class="el-icon-remove"
                v-if="index !== 0 || addForm.data.manager.length > 1"
@@ -232,7 +232,7 @@
       getCollegeList:function(){
         sysCollegeList().then(
           res=>{
-            this.departmentSelectList.push({value: "无分院",collegeId:-1 });
+            this.departmentSelectList.push({value: "全部",collegeId:-1 });
             res.data.filter(
               element =>{
                 this.departmentSelectList.push({value: element.collegeName,collegeId:element.collegeId} );
@@ -257,25 +257,36 @@
         sysDepartmentPage( this.form ).then(
           res => {
             console.log('系信息',res.data)
-            this.tableData = res.data;
-            if( this.tableData.pageData.length > 0 ){
-              //
-              for( let i = 0; i < this.tableData.pageData.length; i++){
-                let college = this.departmentSelectList.filter(
-                  item => {
-                    return item.collegeId === this.tableData.pageData[i].collegeId;
-                  });
-                this.tableData.pageData[i].collegeName = college.length > 0 ? college[0].value : '无分院';
+            if( res.code === 200 ){
+              this.tableData = res.data;
+              if( this.tableData.pageData.length > 0 ){
+                //
+                for( let i = 0; i < this.tableData.pageData.length; i++){
+                  let college = this.departmentSelectList.filter(
+                    item => {
+                      return item.collegeId === this.tableData.pageData[i].collegeId;
+                    });
+                    //给没有院的记录的院名称设为无分院
+                  this.tableData.pageData[i].collegeName = college.length > 0 ? college[0].value : '无分院';
+                }
+                // console.log('改造之后',this.tableData.pageData);
               }
-              // console.log('改造之后',this.tableData.pageData);
+            }else{
+              this.error = "查询失败" + res.msg;
+              this.open4();
             }
+           
           }
         ).catch(
-          error=>{ console.log(error); }
+          error=>{ 
+            this.popError = "查询失败" + error;
+            this.open4();
+          }
         )
       },
       save:function(){
-        this.blurFunction(this.addForm.data.manager.length-1);
+        // this.blurFunction(this.addForm.data.manager.length-1);
+        if( this.blurFunction() ){
         if(this.popError !== '') return;
         for( let i = this.addForm.data.manager.length-1; i >= 0; i-- ){
           if( this.addForm.data.manager[i].realName === '暂无此负责人' || this.addForm.data.manager[i].realName === "" ){
@@ -283,31 +294,54 @@
           }
         }
         //console.log('manager信息:',this.addForm.data.manager);
-        if( this.addForm.data.departmentId !== "" ){
-          this.dialogVisible = false;
+        if( this.addForm.data.departmentId !== "" ){ //编辑状态下
+          // this.dialogVisible = false;
           console.log( "提交信息:", this.addForm.data );
           sysDepartmentEdit( this.addForm.data ).then(
             res => {
-              console.log(res)
+              if( res.code === 200 ){
+                this.dialogVisible = false;
+                this.open2( '修改成功' );
+                this.queryDepartment()
+              }else{
+                this.popError = "修改失败:" +res.msg;
+                this.open4();
+              }
+              console.log( 'sysDepartmentEdit',res );
             }
           ).catch(
-            error => console.log(error)
+            error => {
+              this.popError = "修改失败:" + error;
+              this.open4();
+            }
           );
-        }else{
-          this.dialogVisible = false;
+        }else{ //添加状态下
+         // this.dialogVisible = false;
           if(this.addForm.data.collegeId === -1){
             this.addForm.data.collegeId = '';
           }
           sysDepartment( this.addForm.data ).then(
             res => {
-              console.log(res)
+              console.log('添加',res)
+              if( res.code === 200 ){
+                this.dialogVisible = false;
+                this.open2( '添加成功' );
+                this.queryDepartment()
+              }else{
+                this.popError = "添加失败:" +res.msg;
+                this.open4();
+              }
             }
           ).catch(
-            error => console.log(error)
+            error => {
+              this.popError = "添加失败:" + error;
+              this.open4();
+            }
           );
         }
-        let that = this;
-        setTimeout(function(){ that.queryDepartment(); },500);
+      }
+      //  let that = this;
+       // setTimeout(function(){ that.queryDepartment(); },500);
       },
       deleteDepartment:function(type,department){
         //console.log('departmentList:',department);
@@ -320,7 +354,24 @@
             });
         }
         if( type === 'one'){ departmentList.push( department.departmentId ); }
-        sysDepartmentDelete(departmentList).then(/* res => console.log(res.data)*/).catch( error=>console.log(error) );
+        sysDepartmentDelete(departmentList).then(
+          /* res => console.log(res.data)*/
+          res => {
+            console.log('删除：',res);
+            if( res.code === 200 ){
+                this.open2( '删除成功' );
+                this.queryDepartment()
+              }else{
+                this.popError = "删除失败:" +res.msg;
+                this.open4();
+              }
+          }
+          ).catch( 
+            error => {
+              this.popError = "删除失败:" + error;
+              this.open4();
+            }
+           );
         //console.log('departmentList:',departmentList);
         let that = this;
         setTimeout(function(){ that.queryDepartment(); },300);
@@ -342,6 +393,7 @@
         this.addForm.title               = '添加系';
         this.addForm.data.collegeId      = -1;
         this.addForm.data.departmentName = '';
+        this.addForm.data.departmentId   = '';
         this.addForm.data.manager        = [ {realName: '', userId: '', workNumber: ''} ];
         // this.addForm = {
         //   title:'添加系',
@@ -388,7 +440,9 @@
           // console.log( '院负责人不能重复');
           this.popError = '院负责人不能重复';
           this.open4();
+          return false;
         }
+        return true;
       },
       handleClose(done) {
         done();
@@ -407,6 +461,12 @@
             this.addForm.data.manager[index].userId   = res.data.userId;
           }
         ).catch( () => { /*console.log(error);*/ this.addForm.data.manager[index].realName = '暂无此负责人' } )
+      },
+      open2(msg) {
+        this.$message({
+          message: msg,
+          type: 'success'
+        });
       },
       open4() {
         this.$message.error(this.popError);

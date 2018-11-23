@@ -44,7 +44,7 @@
     -->
     <div class="table-theAgain">
         <div class="tableOperate">
-            <el-button v-for="item in tableOperate" type="primary" class="" @click="onSubmit(item.type,multipleSelection)" >{{ item.content }}</el-button>
+            <el-button v-for="(item,index) in tableOperate" :key="index"  type="primary" class="" @click="onSubmit(item.type,multipleSelection)" >{{ item.content }}</el-button>
         </div>
 
         <el-table
@@ -90,29 +90,8 @@
                   </el-table-column>
                 </template>
               </template>
-                <el-table-column
-                        fixed="right"
-                        label="操作"
-                        :width="operateList.length * 100"
-                        align="center">
-                    <template slot-scope="scope">
-                        
-                         <el-button  v-for="item in operateList"  @click="onSubmit(item.type,scope.row)"
-                                   v-if="item.type === 'edit'"
-                                   size="small">{{ item.content }}</el-button>
-                        <el-button v-for="item in operateList" @click="onSubmit(item.type,scope.row)"
-                                   v-if="item.type === 'delete'"
-                                   type="danger"
-                                   size="small">{{ item.content }}</el-button>
-                        <el-button v-for="item in operateList" @click="onSubmit(item.type,scope.row)"
-                                   v-if="item.type !== 'delete' && item.type !== 'edit'"
-                                   type="primary"
-                                   size="small">{{ item.content }}</el-button>
-                    </template>
-                </el-table-column>
                 
                 <el-table-column
-                    fixed="right"
                     label="是否启用"
                     fit="true"
                     align="center"
@@ -128,6 +107,31 @@
                     </el-switch>
                   </template>
                 </el-table-column>
+
+                <el-table-column
+                        fixed="right"
+                        label="操作"
+                        :width="operateList.length * 100"
+                        align="center">
+                    <template slot-scope="scope">
+                        
+                         <el-button  v-for="(item,index) in operateList"  @click="onSubmit(item.type,scope.row)"
+                                    :key="index"
+                                   v-if="item.type === 'edit'"
+                                   size="small">{{ item.content }}</el-button>
+                        <el-button v-for="(item,index) in operateList" @click="onSubmit(item.type,scope.row)"
+                                    :key="index"
+                                   v-if="item.type === 'delete'"
+                                   type="danger"
+                                   size="small">{{ item.content }}</el-button>
+                        <el-button v-for="(item,index) in operateList" @click="onSubmit(item.type,scope.row)"
+                                    :key="index"
+                                   v-if="item.type !== 'delete' && item.type !== 'edit'"
+                                   type="primary"
+                                   size="small">{{ item.content }}</el-button>
+                    </template>
+                </el-table-column>
+
             </el-table-column>
         </el-table>
     </div>
@@ -153,7 +157,7 @@
         },
       created:function(){
           //console.log('是否开启',this.switchColumn,'类型',typeof(this.switchColumn ) )
-          console.log('fff', this.tableData)
+          //console.log('fff', this.tableData)
       }
 
     }
