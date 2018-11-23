@@ -1,5 +1,5 @@
 <template>
-  <div>活动管理</div>
+  <div>互动</div>
 </template>
 <!--
 

@@ -24,6 +24,46 @@ export const constantRouterMap = [
     redirect: '/course/list',
     children: [
       {
+        path: 'list/:id',
+        component: _import('course/courseMain'),
+        name: '课程父页面',
+        redirect: 'list/:id/chapter',
+        children: [
+          {
+            path: 'chapter',
+            component: _import('course/chapter'),
+            name: '章节内容',
+            
+          },
+          {
+            path: 'interact',
+            component: _import('course/interact'),
+            name: '互动',
+          },
+          {
+            path: 'member',
+            component: _import('course/member'),
+            name: '成员',
+          },
+          {
+            path: 'teach',
+            component: _import('course/teach'),
+            name: '教学管理',
+          },
+          {
+            path: 'notice',
+            component: _import('course/notice'),
+            name: '通知管理',
+          },
+          {
+            path: 'discuss',
+            component: _import('course/discuss'),
+            name: '讨论中心',
+          }
+        ],
+          
+      },
+      {
         path: 'list',
         component: _import('course/list'),
         name: '课程列表'
@@ -32,11 +72,6 @@ export const constantRouterMap = [
         path: 'appraisal',
         component: _import('course/appraisal'),
         name: '课程评价'
-      },
-      {
-        path: 'activity',
-        component: _import('course/activity'),
-        name: '活动管理'
       },
       {
         path: 'resource',

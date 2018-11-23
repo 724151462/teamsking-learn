@@ -114,3 +114,23 @@ export function chaptersList (data) {
   let url = '/api/v1/course/' + data + '/chapters'
   return commonsAjax(url, '', 'get')
 }
+
+
+/**
+ * 添加章
+ */
+
+export function chaptersAdd (data) {
+  let url = '/api/v1/course/chapter'
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 添加节
+ */
+
+export function sectionAdd (data) {
+  let url = '/api/v1/course/chapter/section'
+  return commonsAjax(url, data, 'post')
+}

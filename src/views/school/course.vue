@@ -81,7 +81,8 @@ export default {
                 title: '',
                 width: '60',
                 labelWidth: '120',
-                inputWidth: '70'
+                inputWidth: '70',
+                top: '10'
             }, 
             formData:[{
                 key: '课程id：',

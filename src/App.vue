@@ -13,4 +13,9 @@
   #app
     width: 100%
     height:100%
+
+    .course-tab-container .el-collapse-item__header
+      border-bottom:none;
+    .course-tab-container .el-collapse
+      border: none;
 </style>
