@@ -66,7 +66,7 @@ export const constantRouterMap = [
       { path: 'teacher/addteacher', component: _import('school/addTeacher'), name: 'school添加教师' },
       { path: 'teacher/modifyteacher/:id', component: _import('school/modifyTeacher'), name: 'school修改教师' },
       { path: 'controller', component: _import('school/controller'), name: 'school管理员' },
-      { path: 'portal', component: _import('school/portal'), name: 'school门户配置', 
+      { path: 'portal', component: _import('school/portal'), name: 'school门户配置',
         redirect: '/school/portal/mould',
         children:[
           {
@@ -157,6 +157,26 @@ export const constantRouterMap = [
       {path:'tag',component:_import('system/tag'),name:'system标签管理'},
       {path:'menu',component:_import('system/menu'),name:'system菜单管理'},
       {path:'role',component:_import('system/role'),name:'system角色管理'},
+      {path: 'portal', component: _import('system/portal'), name: 'system门户配置',
+        redirect: '/system/portal/mould',
+        children:[
+          {
+            path: 'mould', component: _import('school/portalMould'), name: 'system模板配置'
+          },
+          {
+            path: 'platform', component: _import('school/portalPlatform'), name: 'system平台信息'
+          },
+          {
+            path: 'banner', component: _import('school/portalBanner'), name: 'system轮播图'
+          },
+          {
+            path: 'recommend', component: _import('school/portalRecommend'), name: 'system课程推荐'
+          },
+          {
+            path: 'teacher', component: _import('school/portalTeacher'), name: 'system名师风采'
+          }
+        ]
+      },
       ]
   }
   // {

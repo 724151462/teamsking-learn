@@ -213,25 +213,24 @@
       sysUserMenuList().then(
         res => {
           console.log("权限菜单:",res);
-
-          let menuTree = res.data.filter(
-            element => {
-              return element.parentId === 0
-            }
-          );
-
-          for( let i = 0; i < menuTree.length; i++  ){
-            menuTree[i].children = [];
-            menuTree[i].children.push( res.data.filter(
+          if( res.code === 200 ){
+            let menuTree = res.data.filter(
               element => {
-                return element.parentId === menuTree[i].menuId
+                return element.parentId === 0
               }
-            ) )
+            );
+            for( let i = 0; i < menuTree.length; i++  ){
+              menuTree[i].children = [];
+              menuTree[i].children.push( res.data.filter(
+                element => {
+                  return element.parentId === menuTree[i].menuId
+                }
+              ) )
+            }
+          }else{
+            // this.open4( '查询失败:' + res.msg );
           }
-
-
-          console.log( 'menuTree' , menuTree );
-
+          // console.log( 'menuTree' , menuTree );
         }
       ).catch()
 
@@ -263,11 +262,18 @@
         console.log('this.form',this.form);
         sysRolePage(this.form).then(
           res => {
-            this.tableData=res.data;
-            console.log("tableData",this.tableData)
+            if( res.code === 200 ){
+              this.tableData=res.data;
+            }else{
+              this.open4('查询失败:' + res.msg);
+            }
+            // this.tableData=res.data;
+            // console.log("tableData",this.tableData)
           }
         ).catch(
-          error => console.log('error',error)
+          error => {
+            this.open4( "查询失败:" + error );
+          }
         )
       },
       appendRole:function(){
@@ -283,8 +289,8 @@
       },
       editMenu:function(roleInfo){
         this.menuDialogVisible = true;
-        this.addForm.title = '设置权限';
-        this.addForm.data  = roleInfo;
+        this.addForm.title     = '设置权限';
+        this.addForm.data      = roleInfo;
         console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );
       },
       save:function(){
@@ -292,25 +298,41 @@
           console.log( '添加角色的信息:', this.addForm.data);
           sysRoleAdd( this.addForm.data).then(
             res => {
-              console.log('添加角色:',res);
+              if(res.code === 200){
+                this.open2('添加成功');
+                this.dialogVisible = false;
+                this.queryRoleList();
+              }else{
+                this.open4('添加失败:'+res.msg);
+              }
+              // console.log('添加角色:',res);
             }
           ).catch(
-            error => console.log('添加角色出错',error)
+            error => {
+              this.open4('添加失败:'+error);
+            }
           )
         }else if( this.addForm.title === '编辑角色' ){
           console.log('编辑提交的信息:',this.addForm.data);
           sysRoleEdit( this.addForm.data ).then(
             res =>{
-              console.log( '编辑的信息返回：',res);
+              if(res.code === 200){
+                this.open2("编辑成功");
+                this.dialogVisible = false;
+                this.queryRoleList();
+              }else{
+                this.open4("编辑失败:"+res.msg);
+              }
+              // console.log( '编辑的信息返回：',res);
             }
           ).catch(
             error => {
-              console.log(error)
+              this.open4('编辑失败:'+error)
             }
           );
         }
-        this.dialogVisible = false;
-        setTimeout( ()=>{ this.queryRoleList() },300);
+        // this.dialogVisible = false;
+        // setTimeout( ()=>{ this.queryRoleList() },300);
       },
       delete:function(type,list){
         let roleIdList = [];
@@ -329,14 +351,30 @@
         }
         sysRoleDelete(roleIdList).then(
           res => {
-            console.log('删除成功的信息:',res);
+            // console.log('删除成功的信息:',res);
+            if(res.code === 200) {
+              this.open2("删除成功");
+              this.queryRoleList();
+            }else{
+              this.open4("删除失败" + res.msg);
+            }
           }
         ).catch(
           error => {
-            console.log("删除失败:",error);
+            // console.log("删除失败:",error);
+            this.open4("删除失败" + error);
           }
         )
-        setTimeout( () => { this.queryRoleList() },300 );
+        // setTimeout( () => { this.queryRoleList() },300 );
+      },
+      open2( successInfo) {
+        this.$message({
+          message: successInfo,
+          type: 'success'
+        });
+      },
+      open4(errorInfo) {
+        this.$message.error( errorInfo );
       },
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;
