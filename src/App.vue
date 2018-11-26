@@ -18,4 +18,10 @@
       border-bottom:none;
     .course-tab-container .el-collapse
       border: none;
+    .interact .el-collapse-item__header
+      background-color rgb(237,241,244)
+    .interact .el-collapse-item__content
+      padding-bottom: 0px;
+    .interact .el-tooltip__popper
+      cursor pointer
 </style>
