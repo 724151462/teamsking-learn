@@ -169,7 +169,7 @@
         },
       created:function(){
           //console.log('是否开启',this.switchColumn,'类型',typeof(this.switchColumn ) )
-          console.log('fff', this.tableData)
+          // console.log('fff', this.tableData)
       }
 
     }

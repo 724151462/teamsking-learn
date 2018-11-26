@@ -336,3 +336,10 @@ export function sysClassDelete(data){
   return commonsAjax('api/v1/sys/class',data,'delete')
 }
 
+
+/**
+ * 获取名师风采列表 api/v1/sys/recommend/teacher/page
+ * */
+export function sysRecommenTeacherPage(){
+  return commonsAjax('api/v1/sys/recommend/teacher/page',{ },'delete')
+}
