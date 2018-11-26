@@ -94,7 +94,7 @@ export function deletedResource (id, data) {
 /**
  * 获取试题列表2
  */
-export function quizPage (data) {
+export function quizPage2 (data) {
   let url = '/api/v1/library/quiz/page'
   return commonsAjax(url, '', 'get')
 }

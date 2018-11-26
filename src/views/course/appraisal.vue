@@ -55,28 +55,25 @@
     </el-table>
 
     <el-dialog
-      title="课程评价详情"
+      title=""
       :visible.sync="dialogVisible"
       width="60%"
       :before-close="handleClose">
 
-      <div class="pop-user-info">
-        <div></div>
-        <span>windir</span>
-      </div>
-      <div class="pop-content-item" v-for="item in popContentItem">
-        <span class="title"> {{ item.title }} </span>
-        <span class="content"> {{ item.content }} </span>
-      </div>
-      <div class="pop-content-item">
-        <span class="title"> 评价内容 </span>
-        <el-input
-          type="textarea"
-          :rows="4"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
-      </div>
+      <el-row>
+        <div class="appraisal-warp">
+          <div class="appraisal-left">
+            <div class="appraisal-img"></div>
+            <!--<img src="" alt="" class="appraisal-img">-->
+          </div>
+          <div class="appraisal-body">
+            <p>fff</p>
+          </div>
+          <div class="appraisal-right">
+            删除
+          </div>
+        </div>
+      </el-row>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -94,34 +91,24 @@
       return {
         data:[
           {
-            name:'用户昵称',
-            width:120,
-            prop:'username'
-          },
-          {
             name:'课程名称',
             width:120,
             prop:'courseName'
           },
           {
-            name:'评价',
+            name:'所属分类',
             width:120,
-            prop:'evaluate'
+            prop:'classify'
           },
           {
-            name:'所属以及分类',
+            name:'分数',
             width:120,
-            prop:'evaluate'
+            prop:'score'
           },
           {
-            name:'教学老师',
+            name:'评价条数',
             width:120,
             prop:'evaluate'
-          },
-          {
-            name:'评价时间',
-            width:120,
-            prop:'time'
           },
         ],
         dialogVisible: false,
@@ -159,16 +146,16 @@
         },
         tableData3: [
           {
-            username:'windir',
-            courseName:'高等数学',
-            evaluate:"5",
-            time:'2018'
+            courseName:'色彩构成',    //课程名称
+            classify:"计算机-设计",   //所属分类
+            evaluate:"35",           // 评价条数
+            score:'5'                //分数
           },
           {
-            username:'windir',
-            courseName:'高等数学',
-            evaluate:"5",
-            time:'2018'
+            courseName:'搜索引擎技术',
+            classify:"计算机-程序",
+            evaluate:"50",
+            score:'3.5'
           }
         ],
         multipleSelection: []
@@ -232,7 +219,22 @@
 <style scoped lang="stylus" type="text/stylus">
   .appraisal
       -webkit-font-smoothing:antialiased
-
+  .appraisal-warp
+    height 60px
+    display flex
+    .appraisal-left
+      height 100%
+      width 50px
+      border 1px soild blue
+      padding-right 10px
+      .appraisal-img
+        height 100%
+        width 100%
+    .appraisal-body
+      height 100%
+      flex 1
+    .appraisal-right
+      height 100%
     .grid-content
       box-sizing: border-box
       padding: 10px 0 10px 10px
