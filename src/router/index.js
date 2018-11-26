@@ -161,19 +161,19 @@ export const constantRouterMap = [
         redirect: '/system/portal/mould',
         children:[
           {
-            path: 'mould', component: _import('school/portalMould'), name: 'system模板配置'
+            path: 'mould', component: _import('system/portalMould'), name: 'system模板配置'
           },
           {
-            path: 'platform', component: _import('school/portalPlatform'), name: 'system平台信息'
+            path: 'platform', component: _import('system/portalPlatform'), name: 'system平台信息'
           },
           {
-            path: 'banner', component: _import('school/portalBanner'), name: 'system轮播图'
+            path: 'banner', component: _import('system/portalBanner'), name: 'system轮播图'
           },
           {
-            path: 'recommend', component: _import('school/portalRecommend'), name: 'system课程推荐'
+            path: 'recommend', component: _import('system/portalRecommend'), name: 'system课程推荐'
           },
           {
-            path: 'teacher', component: _import('school/portalTeacher'), name: 'system名师风采'
+            path: 'teacher', component: _import('system/portalTeacher'), name: 'system名师风采'
           }
         ]
       },
