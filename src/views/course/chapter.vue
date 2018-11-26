@@ -42,11 +42,17 @@
                             <div style="padding: 5px 10px;">
                                 <div class="itemTitleContainer">
                                     <div style="display: flex;align-items: center;margin-right: 10px">
-                                        <img :src="typeIcon" width="40" alt="" style="margin-right: 10px">
+                                        <img :src="typeIcon(content)" width="40" alt="" style="margin-right: 10px">
                                         <span>{{content.itemName}}</span>
-                                        <span style="margin-left: 15px">时长：01:00:00</span>
-                                        <span style="margin-left: 5px">字幕</span>
-                                        <span style="margin-left: 5px">转码</span>
+                                        <div class="vedio-info" v-if="content.resourceType === 10 || content.resourceType === 30">
+                                            <span style="margin-left: 15px">时长：{{content.resourceLength | timeTransfer}}</span>
+                                            <el-tooltip class="item" effect="dark" :content="strUrl(content)" placement="top-start">
+                                                <img :src="require('../../assets/images/cc.png')" style="margin-left: 5px" height="18px"/>
+                                            </el-tooltip>
+                                           <el-tooltip class="item" effect="dark" :content="transProgress(content)" placement="top-start">
+                                                <img :src="require('../../assets/images/tcode.png')" style="margin-left: 5px" height="18px"/>
+                                            </el-tooltip>
+                                        </div>
                                         </div>
                                     <div class="operate">
                                         <span @click="addSubjectBtn(content)">+题目</span>
@@ -153,7 +159,9 @@
         :visible.sync="subjectVisible"
         width="65%">
         <div class="subject-container">
-            <div class="subject-left">img</div>
+            <div class="subject-left">
+                <video :src="vedioUrl"></video>
+            </div>
             <div class="subject-right">
                 <div class="row-container">
                     <span>视频内测验时间点（共{{subjectList.length}}处）</span>
@@ -217,8 +225,6 @@ export default {
         chapterFold: false,
         jieFold: false,
         pattern: [{label: '开放学习', value: 1}, {label: '顺序学习', value: 2}],
-        // 资源类型图标
-        typeIcon: '',
         patternId: '开放学习',
         // 对话框
         show: false,
@@ -412,6 +418,8 @@ export default {
             time: '',
             title: ''
         }],
+        // 题目弹窗的视频地址
+        vedioUrl: '',
         // 添加题目的时间
         addTimeInput: '',
         editSubjectVisible: false,
@@ -434,11 +442,11 @@ export default {
                 element.catalogSection.forEach(ele => {
                     ele.catalogItem.forEach(elem => {
                         console.log(elem.contentType)
-                        if(elem.contentType === 40){
-                            this.typeIcon = require('../../assets/images/vedio.png')
-                        }else{
-                            this.typeIcon = require('../../assets/images/word.png')
-                        }
+                        // if(elem.contentType === 40){
+                        //     this.typeIcon = require('../../assets/images/vedio.png')
+                        // }else{
+                        //     this.typeIcon = require('../../assets/images/word.png')
+                        // }
                         
                     });
                 });
@@ -514,8 +522,45 @@ export default {
         handleClick(tab, event) {
             console.log(tab, event);
         },
+        // 资源类型图标
+        typeIcon(info) {
+            console.log('aaa', info.contentType)
+            if (info.contentType === 10) {
+                return require('../../assets/images/vedio.png')
+            }else{
+                return require('../../assets/images/word.png')
+            }
+            
+        },
+        // 字幕信息
+        strUrl(info) {
+            if(info.strUrl) {
+                return '有字幕'
+            }else{
+                return '无字幕'
+            }
+        },
+        // 转码信息过滤
+        transProgress(info) {
+            console.log('转码值', info)
+            switch (info) {
+                case 10:
+                    return '正在转码'
+                    break;
+                case 20:
+                    return '已转码'
+                    break;
+                case 30:
+                    return '转码失败'
+                    break;
+                default:
+                    return '暂无信息'
+                    break;
+            }
+        },
         addSubjectBtn(subject) {
             console.log('题目所在的内容', subject)
+            this.vedioUrl = subject.resourceUrl
             this.subjectList = []
             this.subjectVisible = true
         },
@@ -560,17 +605,25 @@ export default {
         }
     },
     filters: {
-        timeTransfer(value) {
-            if(value<60) {
-                return '00:00'+value
-            }else if(value >= 60 && value<3600) {
-                return '00:'+Math.round(value/60,2)+':00'
-            }else{
-                // return Math.floor(value/3600)+Math.round(value-Math.floor(value/3600)/60,2)+Math.round(Math.round(value-(Math.floor(value/3600))),2)
-                return 123
+        timeTransfer(s) {
+            var t;
+            if(s > -1){
+                var hour = Math.floor(s/3600);
+                var min = Math.floor(s/60) % 60;
+                var sec = s % 60;
+                if(hour < 10) {
+                    t = '0'+ hour + ":";
+                } else {
+                    t = hour + ":";
+                }
+
+                if(min < 10){t += "0";}
+                t += min + ":";
+                if(sec < 10){t += "0";}
+                t += sec;
             }
-            // return value/60
-        }
+            return t;
+        },
     },
     components:{
         adialog
@@ -607,6 +660,11 @@ export default {
         display: inline-block; width: 90%; heitght: 40px; line-height: 40px; border: 1px solid rgb(230,230,230);padding: 0 10px;border-radius:5px
     .itemTitleContainer
         display: flex;align-items: center;justify-content: space-between; padding: 5px 10px; border: 1px solid rgb(230,230,230);border-radius: 20px
+        .vedio-info
+            display flex
+            align-item center
+            img
+                cursor pointer
     .chapter-content
         display flex
         align-items center
