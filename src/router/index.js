@@ -41,6 +41,11 @@ export const constantRouterMap = [
             name: '互动',
           },
           {
+            path: 'interact/vote',
+            component: _import('course/interactContent/vote'),
+            name: '发布投票',
+          },
+          {
             path: 'member',
             component: _import('course/member'),
             name: '成员',
