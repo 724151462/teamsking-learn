@@ -4,10 +4,10 @@
       <div class="start-item">
         <span style="margin-right:30px">发起：</span>
         <div class="icon-group">
-          <div><router-link to="interact/vote"><img :src="require('../../assets/images/vote.png')"/>投票</router-link></div>
-          <div><img :src="require('../../assets/images/brainStorme.png')"/>头脑风暴</div>
-          <div><img :src="require('../../assets/images/homeWork.png')"/>作业/小组任务</div>
-          <div><img :src="require('../../assets/images/test.png')"/>测试</div>
+          <div><img :src="require('../../assets/images/vote.png')"/><router-link to="interact/vote">投票</router-link></div>
+          <div><img :src="require('../../assets/images/brainStorme.png')"/><span>头脑风暴</span></div>
+          <div><img :src="require('../../assets/images/homeWork.png')"/><span>作业/小组任务</span></div>
+          <div><img :src="require('../../assets/images/test.png')"/><span>测试</span></div>
         </div>
       </div>
       <div><el-button>签到</el-button></div>
@@ -115,7 +115,7 @@ div
           align-items center
           cursor pointer
           img 
-            margin-right 20px
+            margin-right 10px
             width 25px
   .interact-radio
     margin 20px auto

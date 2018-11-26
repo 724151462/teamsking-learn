@@ -16,16 +16,29 @@
                     v-for="item in voteContentArr"
                     :key="item.name"
                     :label="item.title"
-                    :name="item.name"
+
                 >
                     <el-input type="textarea" v-model="item.voteTitle" placeholder="请输入题目" style="width:600px;" autofocus="autofocus"/>
                 <div>
-                    <el-radio v-model="typeCheck" label="单选"></el-radio>
-                    <el-radio v-model="typeCheck" label="多选"></el-radio>
+                    <el-radio v-model="item.typeCheck" label="1">单选</el-radio>
+                    <el-radio v-model="item.typeCheck" label="2">多选</el-radio>
                 </div>
                 <el-button @click="addAnswer(item)">添加答案</el-button>
-                <div v-for="(item, index) in item.answer" :key="index">
-                    A<el-input v-model="item.content" style="width:300px"></el-input>
+                <div v-for="(answer, index) in item.answer" :key="index">
+                    {{index|character}}<el-input v-model="answer.content" style="width:300px"></el-input>
+                </div>
+                <div>
+                    <span>标题</span>
+                    <el-input v-model="item.belongTitle"></el-input>
+                </div>
+                <div>
+                    <span>所属章节</span>
+                    <el-select v-model="item.chapter">
+                        <el-option value="1">第一章</el-option>
+                    </el-select>
+                    <el-select v-model="item.section">
+                        <el-option value="1.1">第一节</el-option>
+                    </el-select>
                 </div>
                 </el-tab-pane>
                 </el-tabs>
@@ -44,17 +57,33 @@ export default {
             voteContentArr: [
                 {
                     title: `第1题`,
-                    name: '',
+                    name: '1',
                     voteTitle: '',
+                    typeCheck: '',
                     answer: [
                         {
-                            content: '123'
+                            content: '123',
                         },
                         {
-                            content: 'bbb'
+                            content: 'bbb',
                         }
                     ]
-                }
+                },
+                // {
+                //     title: `第2题`,
+                //     name: '2',
+                //     voteTitle: '',
+                //     answer: [
+                //         {
+                //             content: '444',
+                //             id: '2.1'
+                //         },
+                //         {
+                //             content: '555',
+                //             id: '2.2'
+                //         }
+                //     ]
+                // }
             ],
             typeCheck: '单选',
             tabIndex: 2,
@@ -100,8 +129,35 @@ export default {
             
         },
         // 添加答案
-        addAnswer(value) {
-            console.log('答案', value)
+        addAnswer(subject) {
+            console.log('答案', subject)
+            subject.answer.push(
+                {
+                    content: '',
+                }
+            )
+        }
+    },
+    filters:{
+        character(key) {
+            console.log(key)
+            // return key
+            switch (key) {
+                case 0:
+                    return 'A'
+                    break;
+                case 1:
+                    return 'B'
+                    break;
+                case 2:
+                    return 'C'
+                    break;
+                case 3:
+                    return 'D'
+                case 4:
+                    return 'E'
+                    break;
+            }
         }
     }
 }
