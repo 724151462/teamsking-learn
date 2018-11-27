@@ -232,7 +232,7 @@
             if( this.addForm.data.collegeId !== "" ){
              // this.dialogVisible = false;
               // console.log( "提交信息:", this.addForm.data );
-              sysCollegeEdit( this.addForm.data ).then(  
+              sysCollegeEdit( this.addForm.data ).then(
                 res => {
                   if(res.code===200){
                     this.open2('编辑成功');
@@ -248,7 +248,7 @@
                 });
             }else{
              // this.dialogVisible = false;
-              sysCollege( this.addForm.data ).then( res => { 
+              sysCollege( this.addForm.data ).then( res => {
                 if( res.code === 200 ){
                   this.open2('添加成功');
                   closePop();
@@ -256,7 +256,7 @@
                   this.popError = "添加失败：" + res.msg;
                   this.open4();
                 }
-               } ).catch( 
+               } ).catch(
                  error => {
                    this.popError = "添加失败："+error;
                    this.open4();
@@ -264,7 +264,7 @@
                 );
             }
 
-            var that = this;
+            let that = this;
             function closePop(){
               that.dialogVisible = false;
               that.queryAcademy();
@@ -286,8 +286,8 @@
             if( type === 'one'){
               academyIdList.push( academyList.collegeId );
             }
-            sysCollegeDelete( academyIdList ).then( 
-              res => { 
+            sysCollegeDelete( academyIdList ).then(
+              res => {
                 if( res.code === 200 ){
                   this.open2('删除成功');
                   this.queryAcademy();
@@ -297,11 +297,11 @@
                 }
                 // console.log('删除的信息',res);
               }
-             ).catch( 
+             ).catch(
                error => {
                 this.popError = "删除失败:" + error;
                 this.open4();
-               } 
+               }
               );
           },
           queryAcademy:function() {
@@ -315,7 +315,7 @@
                   this.open4();
                 }
               }).catch(error=>{
-                this.popError = "查询失败!!请联系管理员";
+                this.popError = "查询失败!!" + error;
                 this.open4();
               })
           },
@@ -339,7 +339,7 @@
             this.addForm.data.collegeName = '';
             this.addForm.data.manager     = [ {realName: '', userId: 1, workNumber: ''} ];
           },
-          edit:function(info){ 
+          edit:function(info){
             this.dialogVisible            = !this.dialogVisible;
             this.addForm.title            = "编辑院信息";
             this.addForm.data.collegeId   = info.collegeId;

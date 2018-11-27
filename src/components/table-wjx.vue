@@ -193,4 +193,9 @@
             display:inline-block
             margin-right:5px
 
+    img
+      width :35px
+      height :35px
+      background-size:100% 100%
+
 </style>

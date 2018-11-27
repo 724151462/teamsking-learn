@@ -242,6 +242,12 @@
               this.form.collegeId = -1;
               this.queryDepartment();
             }
+            // this.departmentSelectList = [];
+            if(this.departmentSelectList.length <= 1){
+              this.departmentSelectList[0] = {value: '无分院',collegeId:-2}
+              this.form.collegeId = -2;
+            }
+            // console.log('所有院列表',this.departmentSelectList);
           }
         ).catch(
           error=>{ console.log(error) }
@@ -267,7 +273,9 @@
                       return item.collegeId === this.tableData.pageData[i].collegeId;
                     });
                     //给没有院的记录的院名称设为无分院
+                  // console.log('college', college );
                   this.tableData.pageData[i].collegeName = college.length > 0 ? college[0].value : '无分院';
+                  this.tableData.pageData[i].collegeId = college.length > 0 ? college[0].collegeId : -2;
                 }
                 // console.log('改造之后',this.tableData.pageData);
               }
@@ -275,73 +283,85 @@
               this.error = "查询失败" + res.msg;
               this.open4();
             }
-           
+
           }
         ).catch(
-          error=>{ 
+          error=>{
             this.popError = "查询失败" + error;
             this.open4();
           }
         )
       },
-      save:function(){
-        // this.blurFunction(this.addForm.data.manager.length-1);
+      save:function() {
+        if (this.addForm.data.collegeId === -1) {
+          this.popError = "请选择一个院";
+          this.open4();
+          return;
+        }
         if( this.blurFunction() ){
-        if(this.popError !== '') return;
-        for( let i = this.addForm.data.manager.length-1; i >= 0; i-- ){
-          if( this.addForm.data.manager[i].realName === '暂无此负责人' || this.addForm.data.manager[i].realName === "" ){
-            this.addForm.data.manager.splice(i,1);
+        // this.blurFunction(this.addForm.data.manager.length-1);
+        if (this.blurFunction()) {
+          if (this.popError !== '') return;
+          for (let i = this.addForm.data.manager.length - 1; i >= 0; i--) {
+            if (this.addForm.data.manager[i].realName === '暂无此负责人' || this.addForm.data.manager[i].realName === "") {
+              this.addForm.data.manager.splice(i, 1);
+            }
           }
-        }
-        //console.log('manager信息:',this.addForm.data.manager);
-        if( this.addForm.data.departmentId !== "" ){ //编辑状态下
-          // this.dialogVisible = false;
-          console.log( "提交信息:", this.addForm.data );
-          sysDepartmentEdit( this.addForm.data ).then(
-            res => {
-              if( res.code === 200 ){
-                this.dialogVisible = false;
-                this.open2( '修改成功' );
-                this.queryDepartment()
-              }else{
-                this.popError = "修改失败:" +res.msg;
+
+          //console.log('manager信息:',this.addForm.data.manager);
+          if (this.addForm.data.departmentId !== "") { //编辑状态下
+            // this.dialogVisible = false;
+            console.log("提交信息:", this.addForm.data);
+            sysDepartmentEdit(this.addForm.data).then(
+              res => {
+                if (res.code === 200) {
+                  this.dialogVisible = false;
+                  this.open2('修改成功');
+                  this.queryDepartment()
+                } else {
+                  this.popError = "修改失败:" + res.msg;
+                  if (this.addForm.data.manager.length === 0) {
+                    this.addForm.data.manager = [{realName: '', userId: '', workNumber: ''}];
+                  }
+                  this.open4();
+                }
+                console.log('sysDepartmentEdit', res);
+              }
+            ).catch(
+              error => {
+                this.popError = "修改失败:" + error;
                 this.open4();
               }
-              console.log( 'sysDepartmentEdit',res );
+            );
+          } else { //添加状态下
+            // this.dialogVisible = false;
+            if (this.addForm.data.collegeId === -1) {
+              this.addForm.data.collegeId = '';
             }
-          ).catch(
-            error => {
-              this.popError = "修改失败:" + error;
-              this.open4();
-            }
-          );
-        }else{ //添加状态下
-         // this.dialogVisible = false;
-          if(this.addForm.data.collegeId === -1){
-            this.addForm.data.collegeId = '';
-          }
-          sysDepartment( this.addForm.data ).then(
-            res => {
-              console.log('添加',res)
-              if( res.code === 200 ){
-                this.dialogVisible = false;
-                this.open2( '添加成功' );
-                this.queryDepartment()
-              }else{
-                this.popError = "添加失败:" +res.msg;
+            sysDepartment(this.addForm.data).then(
+              res => {
+                console.log('添加', res)
+                if (res.code === 200) {
+                  this.dialogVisible = false;
+                  this.open2('添加成功');
+                  this.queryDepartment()
+                } else {
+                  this.popError = "添加失败:" + res.msg;
+                  this.open4();
+                  this.addForm.data.manager = [{realName: '', userId: '', workNumber: ''}];
+                }
+              }
+            ).catch(
+              error => {
+                this.popError = "添加失败:" + error;
                 this.open4();
               }
-            }
-          ).catch(
-            error => {
-              this.popError = "添加失败:" + error;
-              this.open4();
-            }
-          );
+            );
+          }
         }
+        //  let that = this;
+        // setTimeout(function(){ that.queryDepartment(); },500);
       }
-      //  let that = this;
-       // setTimeout(function(){ that.queryDepartment(); },500);
       },
       deleteDepartment:function(type,department){
         //console.log('departmentList:',department);
@@ -366,7 +386,7 @@
                 this.open4();
               }
           }
-          ).catch( 
+          ).catch(
             error => {
               this.popError = "删除失败:" + error;
               this.open4();
@@ -392,6 +412,9 @@
         this.dialogVisible               = !this.dialogVisible;
         this.addForm.title               = '添加系';
         this.addForm.data.collegeId      = -1;
+        if(this.departmentSelectList.length <= 1){
+          this.addForm.data.collegeId    = -2;
+        }
         this.addForm.data.departmentName = '';
         this.addForm.data.departmentId   = '';
         this.addForm.data.manager        = [ {realName: '', userId: '', workNumber: ''} ];

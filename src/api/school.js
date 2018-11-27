@@ -208,7 +208,6 @@ export function sysTeacherPage(data){
   return commonsAjax(url,'','get')
 }
 
-
 /***
 * 教师启用/禁用
 */
@@ -341,5 +340,12 @@ export function sysClassDelete(data){
  * 获取名师风采列表 api/v1/sys/recommend/teacher/page
  * */
 export function sysRecommenTeacherPage(){
-  return commonsAjax('api/v1/sys/recommend/teacher/page',{ },'delete')
+  return commonsAjax('api/v1/sys/recommend/teacher/page',{},'get')
+}
+
+/***
+ * 获取名师列表   /api/v1/sys/recommend/tenant/teacher/page
+ */
+export function sysRecommenTenantTeacherPage(){
+  return commonsAjax('api/v1/sys/recommend/tenant/teacher/page',{},'get')
 }

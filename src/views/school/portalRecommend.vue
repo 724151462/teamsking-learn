@@ -2,11 +2,7 @@
   <div class="portalTeacher">
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="标题名称：">
-        <!--<el-autocomplete-->
-        <!--:fetch-suggestions="querySearchAsync"-->
-        <!--placeholder="名师风采"-->
-        <!--@select="handleSelect">-->
-        <!--</el-autocomplete>-->
+        <el-input  placeholder="请输入课程名称"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" >查询</el-button>
