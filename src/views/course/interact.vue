@@ -4,10 +4,10 @@
       <div class="start-item">
         <span style="margin-right:30px">发起：</span>
         <div class="icon-group">
-          <div><img :src="require('../../assets/images/vote.png')"/><router-link to="interact/vote">投票</router-link></div>
-          <div><img :src="require('../../assets/images/brainStorme.png')"/><span>头脑风暴</span></div>
-          <div><img :src="require('../../assets/images/homeWork.png')"/><span>作业/小组任务</span></div>
-          <div><img :src="require('../../assets/images/test.png')"/><span>测试</span></div>
+          <div><img :src="require('../../assets/images/vote.png')"/><router-link :to="{name: '发布投票'}">投票</router-link></div>
+          <div><img :src="require('../../assets/images/brainStorme.png')"/><router-link :to="{name: '发布头脑风暴'}">头脑风暴</router-link></div>
+          <div><img :src="require('../../assets/images/homeWork.png')"/><router-link :to="{name: '作业/小组任务'}">作业/小组任务</router-link></div>
+          <div><img :src="require('../../assets/images/test.png')"/><router-link :to="{name: '发布测试'}">测试</router-link></div>
         </div>
       </div>
       <div><el-button>签到</el-button></div>

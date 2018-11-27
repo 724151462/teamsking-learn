@@ -49,22 +49,22 @@
         console.log(key, keyPath);
         switch(key) {
             case '1':
-            this.$router.push('chapter')
+            this.$router.push({name: '章节内容'})
             break;
             case '2':
-            this.$router.push('interact')
+            this.$router.push({name: '互动'})
             break;
             case '3':
-            this.$router.push('member')
+            this.$router.push({name: '成员'})
             break;
             case '4':
-            this.$router.push('teach')
+            this.$router.push({name: '教学管理'})
             break;
             case '5':
-            this.$router.push('notice')
+            this.$router.push({name: '通知管理'})
             break;
             case '6':
-            this.$router.push('discuss')
+            this.$router.push({name: '讨论中心'})
             break;
         }
       }
@@ -74,5 +74,21 @@
 
 <style lang="stylus">
 .course-tab-container
-    margin-top: 20px
+  margin-top: 20px
+.margin-sides
+  margin 10px 20px 10px 0
+.delBtn
+  font-size 12px
+  color #fff
+  background-color rgb(255,94,0)
+  padding 3px 6px
+  cursor pointer
+  border-radius 3px
+  margin-left 10px
+.small-input
+  width 60px !important
+.tip
+  margin-left: 10px
+  font-size: 12px
+  color gray
 </style>

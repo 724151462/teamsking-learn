@@ -46,6 +46,21 @@ export const constantRouterMap = [
             name: '发布投票',
           },
           {
+            path: 'interact/brainstorm',
+            component: _import('course/interactContent/brainStorm'),
+            name: '发布头脑风暴',
+          },
+          {
+            path: 'interact/homework',
+            component: _import('course/interactContent/homeWork'),
+            name: '作业/小组任务',
+          },
+          {
+            path: 'interact/test',
+            component: _import('course/interactContent/test'),
+            name: '发布测试',
+          },
+          {
             path: 'member',
             component: _import('course/member'),
             name: '成员',

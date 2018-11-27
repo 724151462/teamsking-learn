@@ -50,10 +50,10 @@
     },
     methods: {
       onPlayerPlay(player) {
-        alert("play");
+        // alert("play");
       },
       onPlayerPause(player){
-        alert("pause");
+        // alert("pause");
       },
     },
     computed: {

@@ -134,3 +134,12 @@ export function sectionAdd (data) {
   let url = '/api/v1/course/chapter/section'
   return commonsAjax(url, data, 'post')
 }
+
+
+/**
+ * 根据课程id获取成员
+ */
+export function memberList (data) {
+  let url = `/api/v1/course/${data.courseId}/user/page`
+  return commonsAjax(url, data, 'get')
+}

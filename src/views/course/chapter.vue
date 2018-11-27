@@ -160,7 +160,13 @@
         width="65%">
         <div class="subject-container">
             <div class="subject-left">
-                <video :src="vedioUrl"></video>
+                <!-- <video :src="vedioUrl"></video> -->
+                <videoPlayer
+                    :isMp4="vedioUrl"
+                    :poster="coverUrl"
+                >
+
+                </videoPlayer>
             </div>
             <div class="subject-right">
                 <div class="row-container">
@@ -213,6 +219,7 @@
 
 <script>
 import adialog from '@/components/dialog'
+import videoPlayer from '@/components/video-pay'
 import {
     chaptersList,
     chaptersAdd,
@@ -420,6 +427,8 @@ export default {
         }],
         // 题目弹窗的视频地址
         vedioUrl: '',
+        // 题目弹窗的视频封面
+        coverUrl: '',
         // 添加题目的时间
         addTimeInput: '',
         editSubjectVisible: false,
@@ -561,6 +570,7 @@ export default {
         addSubjectBtn(subject) {
             console.log('题目所在的内容', subject)
             this.vedioUrl = subject.resourceUrl
+            this.coverUrl = subject.coverUrl
             this.subjectList = []
             this.subjectVisible = true
         },
@@ -626,7 +636,8 @@ export default {
         },
     },
     components:{
-        adialog
+        adialog,
+        videoPlayer
     }
 }
 </script>
