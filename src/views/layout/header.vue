@@ -4,7 +4,7 @@
             <span>天擎智教</span>
             <span class="sizes">后台管理</span>
         </router-link>
-        <router-link :to="list.url" v-for="list in nav" :class="navs === list.isNav ? 'list yes-list' : 'list'" :key="list">{{list.name}}</router-link>
+        <router-link :to="list.url" v-for="(list, index) in nav" :class="navs === list.isNav ? 'list yes-list' : 'list'" :key="index">{{list.name}}</router-link>
     </div>
 </template>
 

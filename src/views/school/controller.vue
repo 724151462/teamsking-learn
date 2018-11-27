@@ -24,6 +24,7 @@
                 :columnNameList="columnNameList"
                 :tableData="tableData3"
                 :operateList="operateList"
+                switchColumn="open"
                 @showComponentInfo="showComponentInfo">
         </table-the-again>
 
@@ -65,6 +66,7 @@
 </template>
 
 <script>
+    import headerTheAgain from '@/components/header-theAgain'
     import tableTheAgain from '../../components/table-theAgain'
     export default{
         name:'',
@@ -126,10 +128,10 @@
                         content:'编辑',
                         type:'edit'
                     },
-                    {
-                        content:'停用',
-                        type:'edit'
-                    },
+                    // {
+                    //     content:'停用',
+                    //     type:'edit'
+                    // },
                 ],
                 tableData3: [
                     {
@@ -166,7 +168,9 @@
             }
         },
         components:{
-            tableTheAgain
+            tableTheAgain,
+            headerTheAgain
+
         },
         mounted:function(){ },
         methods:{

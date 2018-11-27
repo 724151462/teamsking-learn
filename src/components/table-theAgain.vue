@@ -23,6 +23,9 @@
             ]
             columnNameList:[
                 {
+                  type:'selection'   //多选框
+                }
+                {
                     name:'工号',
                     prop:'id'
                 }
@@ -41,7 +44,7 @@
     -->
     <div class="table-theAgain">
         <div class="tableOperate">
-            <el-button v-for="item in tableOperate" type="primary" class="" @click="onSubmit(item.type,multipleSelection)" >{{ item.content }}</el-button>
+            <el-button v-for="(item,index) in tableOperate" :key="index"  type="primary" class="" @click="onSubmit(item.type,multipleSelection)" >{{ item.content }}</el-button>
         </div>
 
         <el-table
@@ -51,68 +54,95 @@
                 style="width: 95%;margin-left:2.5%;position: relative"
                 @selection-change="handleSelectionChange">
 
-            <el-table-column :label="tableTitle" class="addButton">
-                <!--<el-table-column v-for="item in columnNameList"-->
-                                 <!--:prop="item.prop"-->
-                                 <!--:label="item.name"-->
-                                 <!--:width="item.width"-->
-                                 <!--:type="item.type"-->
-                                 <!--align="center">-->
-                <!--</el-table-column>-->
-
-              <!--<el-table-column v-if=""-->
-                               <!--:prop="item.prop"-->
-                               <!--:label="item.name"-->
-                               <!--:width="item.width"-->
-                               <!--:type="item.type"-->
-                               <!--align="center">-->
-                <!--<template slot-scope="scope">-->
-                  <!---->
-                <!--</template>-->
-              <!--</el-table-column>-->
-              <template v-for="list in columnNameList">
+            <el-table-column :label="tableTitle" class="addButton" >
+              <template v-for="(list,index) in columnNameList">
                 <template v-if="list.formatter">
                   <el-table-column :label="list.name"
-                                   align="center">
+                                   align="center"
+                                    :key="index">
                     <template scope="scope">
                       <div>
                         {{ list.formatter(scope.row[list.prop],scope.row) }}
                       </div>
                     </template>
                   </el-table-column>
-
+                </template>
+                <template v-else-if="list.imgList">
+                  <el-table-column :label="list.name"
+                                   align="center"
+                                    :key="index">
+                    <template scope="scope">
+                      <div>
+                        <img v-for="(item, index) in scope.row[list.prop]" :src="item.imgUrl" :key="index"/>
+                      </div>
+                    </template>
+                  </el-table-column>
                 </template>
                 <template v-else>
+                    
                   <el-table-column
                                    :prop="list.prop"
                                    :label="list.name"
                                    :width="list.width"
                                    :type="list.type"
-                                   align="center">
+                                   align="center"
+                                   :key="index">
                   </el-table-column>
                 </template>
-
               </template>
+                
+                <el-table-column
+                    label="是否启用"
+                    fit="true"
+                    align="center"
+                    v-if="switchColumn == 'open'">
+                  <template slot-scope="scope">
+                    <el-switch
+                        v-model="scope.row.status"
+                        active-value=1
+                        inactive-value=2
+                        active-color="#13ce66"
+                        inactive-color="#ff4949"
+                        @change="onSubmit('switch',scope.row)">
+                    </el-switch>
+                  </template>
+                </el-table-column>
+
                 <el-table-column
                         fixed="right"
                         label="操作"
-                        fit="true"
+                        :width="operateList.length * 100"
                         align="center">
                     <template slot-scope="scope">
-                        <el-button v-for="item in operateList" @click="onSubmit(item.type,scope.row)" type="text" size="small">{{ item.content }}</el-button>
+                        
+                         <el-button  v-for="(item,index) in operateList"  @click="onSubmit(item.type,scope.row)"
+                                    :key="index"
+                                   v-if="item.type === 'edit'"
+                                   size="small">{{ item.content }}</el-button>
+                        <el-button v-for="(item,index) in operateList" @click="onSubmit(item.type,scope.row)"
+                                    :key="index"
+                                   v-if="item.type === 'delete'"
+                                   type="danger"
+                                   size="small">{{ item.content }}</el-button>
+                        <el-button v-for="(item,index) in operateList" @click="onSubmit(item.type,scope.row)"
+                                    :key="index"
+                                   v-if="item.type !== 'delete' && item.type !== 'edit'"
+                                   type="primary"
+                                   size="small">{{ item.content }}</el-button>
                     </template>
                 </el-table-column>
+
             </el-table-column>
         </el-table>
     </div>
 </template>
 <script>
     export default{
-
-        props:[ 'tableTitle','tableOperate','columnNameList','tableData','operateList' ],
+        props:[ 'tableTitle','tableOperate','columnNameList','tableData','operateList','switchColumn' ],
         data(){
             return {
                 multipleSelection: [],
+              //value2: true
             }
         },
         methods:{
@@ -121,10 +151,14 @@
                 console.log( this.multipleSelection )
             },
             onSubmit( type,info ) {
-                console.log( '子组件类型：' + type + '\n子组件信息:' + info );
+                console.log( '子组件类型：' , type , '\n子组件信息:' , info );
                 this.$emit('showComponentInfo',type,info);
             }
-        }
+        },
+      created:function(){
+          //console.log('是否开启',this.switchColumn,'类型',typeof(this.switchColumn ) )
+          //console.log('fff', this.tableData)
+      }
 
     }
 

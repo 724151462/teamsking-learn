@@ -120,3 +120,14 @@ export function chaptersList (data) {
   let url = '/api/v1/course/' + data + '/chapters'
   return commonsAjax(url, '', 'get')
 }
+
+// ===============资源管理===============
+//
+
+/**
+ * 获取所有资源列表
+ */
+export function getResourceList (data) {
+  let url = '/api/v1/resource/page'
+  return commonsAjax(url, '', 'get')
+}

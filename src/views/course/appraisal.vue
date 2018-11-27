@@ -10,22 +10,10 @@
 
     <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.appraisal" ></el-input>
-      </el-form-item>
-      <el-form-item label="课程分类：">
-        <el-select v-model="form.catagory" placeholder="请选择课程分类">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="教学老师：">
-        <el-select v-model="form.teacher" placeholder="请选择教师">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-        </el-select>
+        <el-input v-model="form.appraisal"  placeholder="课程名称"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+        <el-button type="primary" @click="onSubmit" size="small">查询</el-button>
       </el-form-item>
     </el-form>
 
@@ -39,16 +27,15 @@
       <el-table-column label="课程评价列表">
         <el-table-column
           v-for="list in data"
-          :key="list"
+          :key="list.id"
           :prop="list.prop"
-          :label="list.name"
-          :width="list.width">
+          :label="list.name">
         </el-table-column>
         <el-table-column
           label="操作"
           width="120">
           <template slot-scope="scope">
-            <a @click="dialogVisible = true">查看</a>
+            <el-button type="text" @click="dialogVisible = true">查看</el-button>
           </template>
         </el-table-column>
       </el-table-column>
@@ -57,23 +44,27 @@
     <el-dialog
       title=""
       :visible.sync="dialogVisible"
-      width="60%"
+      width="70%"
       :before-close="handleClose">
 
-      <el-row>
-        <div class="appraisal-warp">
-          <div class="appraisal-left">
-            <div class="appraisal-img"></div>
-            <!--<img src="" alt="" class="appraisal-img">-->
-          </div>
-          <div class="appraisal-body">
-            <p>fff</p>
-          </div>
-          <div class="appraisal-right">
-            删除
+      <div class="appraisal-warp">
+        <div class="appraisal-left">
+          <div class="appraisal-img">
+            <img src="" alt="" class="">
           </div>
         </div>
-      </el-row>
+        <div class="appraisal-body">
+          <div>
+            <div>张三</div>
+            <div><el-rate v-model="rateValue" disabled></el-rate></div>
+            <div>-2018-12-25 10:46:30</div>
+          </div>
+          <p>很有帮助的课程，谢谢老师</p>
+        </div>
+        <div class="appraisal-right">
+          <el-button type="text" style="color: #999999;">删除</el-button>
+        </div>
+      </div>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -92,22 +83,18 @@
         data:[
           {
             name:'课程名称',
-            width:120,
             prop:'courseName'
           },
           {
             name:'所属分类',
-            width:120,
             prop:'classify'
           },
           {
             name:'分数',
-            width:120,
             prop:'score'
           },
           {
             name:'评价条数',
-            width:120,
             prop:'evaluate'
           },
         ],
@@ -158,7 +145,8 @@
             score:'3.5'
           }
         ],
-        multipleSelection: []
+        multipleSelection: [],
+        rateValue: 5 //评分
       }
     },
     created(){
@@ -222,19 +210,26 @@
   .appraisal-warp
     height 60px
     display flex
+    align-items center
     .appraisal-left
       height 100%
       width 50px
       border 1px soild blue
       padding-right 10px
       .appraisal-img
+        background-color yellow
         height 100%
         width 100%
     .appraisal-body
       height 100%
+      background-color #FAFAFA
       flex 1
+      & div
+        display flex
     .appraisal-right
       height 100%
+      line-height 60px
+      background-color: #FAFAFA
     .grid-content
       box-sizing: border-box
       padding: 10px 0 10px 10px

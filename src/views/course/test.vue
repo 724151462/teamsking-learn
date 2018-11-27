@@ -12,7 +12,6 @@
       :data="tableData3"
       height="85%"
       border
-      :fit="false"
       style="width: 100%">
       <el-table-column
         prop="date"
@@ -25,16 +24,17 @@
         width="180">
       </el-table-column>
       <el-table-column
-        prop="address"
+        prop="name"
         label="难度"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="name"
-        label="章节类型">
+        prop="address"
+        min-width="180"
+        label="题干">
       </el-table-column>
       <el-table-column
-        prop="address"
+        prop="name"
         label="题目类型"
         width="180">
       </el-table-column>
@@ -64,15 +64,15 @@
           {
           date: '2016-05-03',
           name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          address: '上海市普陀区18 弄题干祭祀的计算机就iiii 计就就 计就i  cpu金沙江路 1518 弄'
         }, {
           date: '2016-05-02',
           name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          address: '上海市普18 弄题干祭祀的计算机就iiii 计就就 计就i  cpu陀区金沙江路 1518 弄'
         }, {
           date: '2016-05-07',
           name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
+          address: '上海市普陀区金沙江路 1518 弄题干祭祀的计算机就iiii 计就就 计就i  cpu'
         }],
         testList:[
           {
@@ -93,6 +93,8 @@
       padding-bottom 10px
     .btn-warp
       padding-right 50px
+
+
 
 </style>
 

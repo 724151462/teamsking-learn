@@ -461,7 +461,7 @@
     },
     created(){
       this.$emit('floorStatus','course')
-      this.selectList()
+      this.selectListselectList()
       // if(this.$route.query.courseId)
       if(this.$route.query.courseId && this.$route.query.courseId !== ''){
         this.getUpData(this.$route.query.courseId)
