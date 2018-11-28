@@ -45,4 +45,8 @@
   .activity .el-collapse-item__wrap{
     border-bottom: 0
   }
+  /*资源管理---->试题管理*/
+  .test .el-dialog__header, .test .el-dialog__footer{
+    background-color #ebeef5
+  }
 </style>

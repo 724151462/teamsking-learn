@@ -49,6 +49,11 @@ export const constantRouterMap = [
         name: '试题管理'
       },
       {
+        path: 'addtest',
+        component: _import('course/addTest'),
+        name: '试题添加'
+      },
+      {
         path: 'addCourse',
         component: _import('course/addCourse'),
         name: '课程编辑'

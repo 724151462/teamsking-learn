@@ -264,11 +264,12 @@
         data.activity.forEach((item)=>{
           item.selected = e
         })
+        // 状态检查
+        this.checkChapterInd(courseIndex)
       },
       //四级活动选中
       CheckActivity(courseIndex,chapterIndex,activityIndex, e){
         let data = this.activityData[courseIndex].chapter[chapterIndex].activity[activityIndex]
-        console.log(e)
       },
       //检查选中状态
       checkIndeterminate(courseIndex){
@@ -311,14 +312,23 @@
         checkedCourse === courseLength ? this.isCheckAll= true : this.isCheckAll= false
       },
       //章节全选状态检查
-      checkChapterInd(chapterIndex){
-        let checkedChapter = 0, chapterLength = this.activityData.length
-        this.activityData.forEach((item)=>{
+      checkChapterInd(courseIndex){
+        let checkedChapter = 0, chapterLength = this.activityData[courseIndex].chapter.length
+        this.activityData[courseIndex].chapter.forEach((item)=>{
           if(item.selected === true){
-            checkedCourse++
+            checkedChapter++
           }
         })
-        checkedCourse === courseLength ? this.isCheckAll= true : this.isCheckAll= false
+        if(checkedChapter === chapterLength){
+          this.activityData[courseIndex].indeterminate = false
+          this.activityData[courseIndex].selected = true
+        }else if(checkedChapter === 0){
+          this.activityData[courseIndex].indeterminate = true
+          this.activityData[courseIndex].selected = false
+        }else{
+          this.activityData[courseIndex].indeterminate = true
+          this.activityData[courseIndex].selected = false
+        }
       },
       //活动全选状态检查
       checkActivityInd(){

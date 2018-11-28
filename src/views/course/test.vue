@@ -12,31 +12,30 @@
       :data="tableData3"
       height="85%"
       border
-      style="width: 100%">
+      tooltip-effect="dark"
+      class="test-table">
       <el-table-column
         prop="date"
-        label="所属课程"
-        width="180">
+        min-width="120px"
+        label="所属课程">
       </el-table-column>
       <el-table-column
         prop="name"
-        label="所属章节"
-        width="180">
+        label="所属章节">
       </el-table-column>
       <el-table-column
         prop="name"
-        label="难度"
-        width="180">
+        label="难度">
       </el-table-column>
       <el-table-column
         prop="address"
-        min-width="180"
+        width="200"
         label="题干">
       </el-table-column>
       <el-table-column
         prop="name"
         label="题目类型"
-        width="180">
+        min-width="120">
       </el-table-column>
       <el-table-column
         prop="name"
@@ -47,12 +46,45 @@
         label="操作"
         width="150">
         <template slot-scope="scope">
-          <el-button type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
-          <el-button type="text" size="small">删除</el-button>
+          <el-button type="text" size="small" @click="testView = true">查看</el-button>
+          <el-button type="text" size="small" @click="toAddTest">编辑</el-button>
+          <el-button type="text" size="small" @click="testDelete = true">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+
+    <!--试题查看弹窗-->
+    <el-dialog
+      title="试题查看"
+      :visible.sync="testView"
+      width="50%">
+       <div class="test-body">
+         <p><span style="margin-right: 20px"><b>(单选题)</b></span>1、在下列设备中，不能作为危机输入设备的是?</p>
+         <br>
+         <div class="options">
+           <span>A、扫描仪</span>
+           <span>B、扫描仪</span>
+           <span>C、扫描仪</span>
+           <span>D、扫描仪</span>
+         </div>
+       </div>
+      <span slot="footer" class="dialog-footer" style="text-align: left">
+        <p>正确答案:<span>C</span></p>
+        <p>解析:<span>鼠标是一种常用的输入设备</span></p>
+      </span>
+    </el-dialog>
+    <!--删除确认框-->
+    <el-dialog
+      title="删除试题"
+      :visible.sync="testDelete"
+      width="40%">
+      <span style="font-size: 16px">确认删除该试题？</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="testDelete = false">取 消</el-button>
+    <el-button type="primary">确 定</el-button>
+    </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -78,7 +110,14 @@
           {
 
           }
-        ]
+        ],
+        testView: false , //试题查看弹窗
+        testDelete: false, //删除试题
+      }
+    },
+    methods:{
+      toAddTest () {
+        this.$router.push('/course/addtest');
       }
     }
   }
@@ -93,8 +132,24 @@
       padding-bottom 10px
     .btn-warp
       padding-right 50px
-
-
-
+    .test-table
+      width 100%
+      margin 0 auto
+      margin-top 40px
+    .test-body
+      padding 40px
+      font-size 15px
+      .options
+        & span
+          margin-right 30px
+        & span:last-chid
+          margin-right 0
+    .dialog-footer
+      & p
+        color red
+        padding-right 40px
+        padding-left 20px
+        & span
+          color black
 </style>
 
