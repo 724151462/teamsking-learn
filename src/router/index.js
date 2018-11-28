@@ -65,10 +65,44 @@ export const constantRouterMap = [
             component: _import('course/member'),
             name: '成员',
           },
+          
           {
             path: 'teach',
             component: _import('course/teach'),
             name: '教学管理',
+            redirect: 'teach/grade',
+            children: [
+              {
+                path: 'grade',
+                component: _import('course/teachContent/grade'),
+                name: '成绩管理',
+              },
+              {
+                path: 'notes',
+                component: _import('course/teachContent/notes'),
+                name: '笔记管理',
+              },
+              {
+                path: 'homework',
+                component: _import('course/teachContent/operation'),
+                name: '作业管理',
+              },
+              {
+                path: 'storm',
+                component: _import('course/teachContent/storm'),
+                name: '头脑风暴',
+              },
+              {
+                path: 'questionnaire',
+                component: _import('course/teachContent/questionnaire'),
+                name: '投票问卷',
+              },
+              {
+                path: 'test',
+                component: _import('course/teachContent/test'),
+                name: '测试管理',
+              },
+            ]
           },
           {
             path: 'notice',

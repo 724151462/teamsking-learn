@@ -1,9 +1,9 @@
 <template>
   <div class="member">
     <div class="navs">
-      <el-input v-model="input" placeholder="请输入内容" style="width: 200px;"></el-input>
-      <el-button type="primary">搜索</el-button>
-      <el-button type="primary" @click="isFa = true">成员小组方案管理</el-button>
+      <el-input v-model="pageParmas.searchKey" placeholder="请输入内容" style="width: 200px;"></el-input>
+      <el-button type="primary" @click="searchMember">搜索</el-button>
+      <el-button type="primary"><router-link :to="{name: '成员方案管理'}">成员小组方案管理</router-link></el-button>
       <el-button type="primary">导入成员</el-button>
     </div>
     <item-table :tables="tables" :tableData="tableData" @showComponentInfo="showComponentInfo" :buttonStylus="buttonType"></item-table>
@@ -11,7 +11,7 @@
             background
             layout="prev, pager, next"
             :page-size="tableData.pageSize"
-            :page-count="tableData.totalCount"
+            :total="tableData.totalCount"
             :current-page="tableData.pageIndex"
             @current-change="handleCurrentChange">
     </el-pagination>
@@ -30,8 +30,13 @@
 <script>
 
 import itemTable from '@/components/table-no-header.vue'
-import groupPlans from './interactContent/groupPlan.vue'
-import {memberList} from '@/api/course'
+import groupPlans from './memberContent/groupPlan.vue'
+import {
+  memberList,
+  setAssistant,
+  unsetAssistant,
+  deleteUser  
+} from '@/api/course'
 export default {
   components:{
     itemTable,
@@ -41,7 +46,9 @@ export default {
     return{
       courseId: '0608367675f54267aa6960fd0557cc1b',
       input:'',
-      pageParmas: {},
+      pageParmas: {
+        searchKey: ''
+      },
       tables:[
         {
           name:'序号',
@@ -87,11 +94,34 @@ export default {
       buttonType:[
         {
           name:'设为助教',
-          type:'sys'
+          type:'setSys',
+          show: (item)=>{
+            console.log(item)
+            if(item.assistantStatus === 2){
+              return true
+            }else{
+              return false
+            }
+          }
+        },
+        {
+          name:'取消助教',
+          type:'unsetSys',
+          show: (item)=>{
+            console.log(item)
+            if(item.assistantStatus === 1){
+              return true
+            }else{
+              return false
+            }
+          }
         },
         {
           name:'移出班级群',
-          type:'delete'
+          type:'delete',
+          show: (item)=>{
+            return true
+          }
         }
       ],
       isFa:false
@@ -104,8 +134,44 @@ export default {
     this.getPage()
   },
   methods: {
-    showComponentInfo(type, info) {
-      console.log(type, info)
+    btnShow() {
+      return false
+    },
+    showComponentInfo(type, info, index) {
+      console.log(type, info,index )
+      var sysInfo = {
+        courseId: this.courseId,
+        userId: info.userId
+      }
+      switch (type) {
+        case 'setSys':
+          console.log(sysInfo)
+          setAssistant(sysInfo)
+          .then((response)=> {
+            if(response.code === 200) {
+              info.assistantStatus = 1
+            }
+          })
+          break;
+        case 'unsetSys':
+          unsetAssistant(sysInfo)
+          .then((response)=> {
+            if(response.code === 200) {
+              info.assistantStatus = 2
+            }
+          })
+          break;
+        case 'delete':
+          console.log(index)
+          deleteUser(sysInfo)
+          .then((response)=> {
+            if(response.code === 200) {
+              tableData.splice(index, 1)
+            }
+          })
+        default:
+          break;
+      }
     },
     handleCurrentChange(index) {
       this.pageParmas.pageIndex = index
@@ -119,6 +185,10 @@ export default {
         this.tableData.totalCount = response.data.totalCount
         this.tableData.pageSize = response.data.pageSize
       })
+    },
+    searchMember() {
+      console.log(this.pageParmas)
+      this.getPage(this.pageParmas)
     }
   }
 }

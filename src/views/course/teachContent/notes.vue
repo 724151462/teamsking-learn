@@ -31,7 +31,7 @@
 
 <script>
   import wangEditors from 'wangeditor'
-  import tableNoHeader from '../../../../components/table-no-header.vue'
+  import tableNoHeader from '@/components/table-no-header.vue'
   export default {
     components:{
       tableNoHeader
@@ -91,7 +91,7 @@
         sysButton:[
           {
             name:'查看',
-            type:'get'
+            type:'get',
           },
           {
             name:'删除',

@@ -143,3 +143,39 @@ export function memberList (data) {
   let url = `/api/v1/course/${data.courseId}/user/page`
   return commonsAjax(url, data, 'get')
 }
+
+
+/**
+ * 根据课程id获取未分配和已分配的组员
+ */
+export function memberScheme (data) {
+  let url = `/api/v1/course/{courseId}/scheme/{schemeId}/team/user`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 设置为助教
+ */
+export function setAssistant (data) {
+  let url = `/api/v1/course/${data.courseId}/user/${data.userId}/assistant`
+  return commonsAjax(url, '', 'post')
+}
+
+
+/**
+ * 取消助教
+ */
+export function unsetAssistant (data) {
+  let url = `/api/v1/course/${data.courseId}/user/${data.userId}/assistant`
+  return commonsAjax(url, '', 'delete')
+}
+
+
+/**
+ * 取消助教
+ */
+export function deleteUser (data) {
+  let url = `/api/v1/course/${data.courseId}/user/${data.userId}`
+  return commonsAjax(url, '', 'delete')
+}

@@ -1,7 +1,11 @@
 <template>
   <div class="groupPlan">
+    <span style="display:inline-block;margin: 10px 0">
+        <router-link :to="{name: '成员'}">成员</router-link> > 成员小组方案
+    </span>
     <div class="nav">
-      <el-button type="primary" @click="isAddFa = true">+ 添加成员小组方案</el-button>
+      <el-button type="primary" @click="isAddFa = true">+ 手动分组</el-button>
+      <el-button type="primary" @click="isAddFa = true">+ 随机分组</el-button>
     </div>
     <div class="center">
       <div class="list">
@@ -91,17 +95,17 @@
           <el-button type="primary">搜索</el-button>
         </div>
         <div class="all-member">
-          <div class="member-list" v-for="list in tableData" :key="list">
+          <div class="member-list" v-for="(list, index) in tableData" :key="index">
             <el-checkbox v-model="list.isCheck"></el-checkbox>
             <div class="imgs">
               <img :src="list.img">
             </div>
             <div class="right">
               <div>
-                <span class="name">{{list.name}}</span>
-                <span class="sys" v-if="Number(list.role) === 1">助教</span>
+                <span class="name">{{list.realName}}</span>
+                <span class="sys" v-if="Number(list.assistantStatus) === 1">助教</span>
               </div>
-              <div class="student">{{list.xh}}</div>
+              <div class="student">{{list.studentNo}}</div>
             </div>
           </div>
         </div>
@@ -114,72 +118,93 @@
 </template>
 
 <script>
-  export default {
-    data(){
-      return{
-        data:[
-          {
-            title:'小组方案1',
-            folk:12, //人数
-            group:1,  //组数
-          },
-          {
-            title:'小组方案1',
-            folk:12, //人数
-            group:1,  //组数
-          },
-        ],
-        addGroup:{
-          name:'',  //小组方案名称
-          sx:'',    //分组上限
-          //分组结构
-          zulist:[
-            {
-              name:'我是组名称',
-              //这里是组成员
-              list:[
-                {
-                  id:'1',
-                  img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-                },
-                {
-                  id:'1',
-                  img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-                },
-              ]
-            }
-          ]
+import {memberList} from '@/api/course'
+export default {
+  data(){
+    return{
+      courseId: '0608367675f54267aa6960fd0557cc1b',
+      pageParmas: {
+        pageSize:100
+      },
+      data:[
+        {
+          title:'小组方案1',
+          folk:12, //人数
+          group:1,  //组数
         },
-        group:'1',  // 1 全部成员 2 未分配小组的成员
-        isAddFa:false,
-        isUpGrouplan:false,
-        isAddGrouplan:false,
-        tableData: [
+        {
+          title:'小组方案1',
+          folk:12, //人数
+          group:1,  //组数
+        },
+      ],
+      addGroup:{
+        name:'',  //小组方案名称
+        sx:'',    //分组上限
+        //分组结构
+        zulist:[
           {
-            isCheck:false,
-            img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-            name:'小三',
-            xh:'123123',  //这个是学号
-            role:'1', //角色 1 学生 2 助教
-          },
-          {
-            isCheck:false,
-            img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-            name:'小三',
-            xh:'123123',  //这个是学号
-            role:'2', //角色 1 学生 2 助教
-          },
-          {
-            isCheck:false,
-            img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-            name:'小三',
-            xh:'123123',  //这个是学号
-            role:'1', //角色 1 学生 2 助教
-          },
+            name:'我是组名称',
+            //这里是组成员
+            list:[
+              {
+                id:'1',
+                img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
+              },
+              {
+                id:'1',
+                img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
+              },
+            ]
+          }
         ]
-      }
+      },
+      group:'1',  // 1 全部成员 2 未分配小组的成员
+      isAddFa:false,
+      isUpGrouplan:false,
+      isAddGrouplan:false,
+      tableData: [
+        {
+          isCheck:false,
+          img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
+          name:'小三',
+          xh:'123123',  //这个是学号
+          role:'1', //角色 1 学生 2 助教
+        },
+        {
+          isCheck:false,
+          img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
+          name:'小三',
+          xh:'123123',  //这个是学号
+          role:'2', //角色 1 学生 2 助教
+        },
+        {
+          isCheck:false,
+          img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
+          name:'小三',
+          xh:'123123',  //这个是学号
+          role:'1', //角色 1 学生 2 助教
+        },
+      ]
+    }
+  },
+  created() {
+    this.getPage(this.pageParmas)
+  },
+  methods: {
+    getPage() {
+      this.pageParmas.courseId = this.courseId
+      memberList(this.pageParmas)
+      .then((response)=> {
+        this.tableData = response.data.pageData
+        this.tableData.totalCount = response.data.totalCount
+        this.tableData.pageSize = response.data.pageSize
+        this.tableData.img = 'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg'
+        console.log(this.tableData)
+      })
     }
   }
+}
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
@@ -192,7 +217,7 @@
       padding-top:10px
 
       .list
-        width:70%
+        width:50%
         display: inline-block
         background:#F8F8F8
         padding:10px 5px
@@ -269,6 +294,8 @@
 
     .all-member
       padding-bottom:10px
+      height: 600px
+      overflow scroll
 
       .member-list
         border-bottom:1px solid #CCCCCC
@@ -277,7 +304,7 @@
         display:flex
         flex-direction:row
         align-items:center
-
+        
         .imgs
           width:50px
           height:50px

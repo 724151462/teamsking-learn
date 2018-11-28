@@ -5,8 +5,8 @@
         border
         style="width: 100%">
       <el-table-column
-          v-for="(list, index) in tables"
-          :key="index"
+          v-for="(list, tableIndex) in tables"
+          :key="tableIndex"
           :prop="list.prop"
           :label="list.name"
           :width="list.width">
@@ -19,7 +19,13 @@
           :width="buttonStylus.length * 80"
           align="center">
         <template slot-scope="scope">
-          <el-button v-for="(item, index) in buttonStylus" :key="index" type="text" size="small" @click="returnData(scope.row,item.type)">{{ item.name }}</el-button>
+          <!-- <el-button v-for="(item, buttonIndex) in buttonStylus" v-if="item.show(scope.row)" :key="buttonIndex" type="text" size="small" @click="returnData(scope.row,item.type, scope.$index)">{{ item.name }}</el-button> -->
+          <div v-for="(item, buttonIndex) in buttonStylus"  v-if="item.show" :key="buttonIndex">
+            <el-button v-if="item.show(scope.row)" :key="buttonIndex" type="text" size="small" @click="returnData(scope.row,item.type, scope.$index)">{{ item.name }}</el-button>
+          </div>
+          <div v-else>
+            <el-button  v-for="(item, buttonIndex) in buttonStylus"  v-if="item.show" :key="buttonIndex" type="text" size="small" @click="returnData(scope.row,item.type, scope.$index)">{{ item.name }}</el-button>
+          </div>
           <!--
             buttonStylus：{
               name：'xx'，
@@ -36,13 +42,13 @@
   export default {
     props:["tables","tableData","buttonStylus"],
     methods:{
-      returnData(e,type){
+      returnData(e,type,buttonIndex){
         // let data = {
         //   date:e,
         //   sys:type
         // }
         // console.log(data)
-        this.$emit('showComponentInfo',type,e)
+        this.$emit('showComponentInfo',type,e,buttonIndex)
       }
     }
   }

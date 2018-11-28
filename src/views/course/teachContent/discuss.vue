@@ -53,7 +53,7 @@
 </template>
 
 <script>
-  import replyLists from './upDiscuss/replyList.vue'
+  import replyLists from './replyList.vue'
   export default {
     components:{
       replyLists
