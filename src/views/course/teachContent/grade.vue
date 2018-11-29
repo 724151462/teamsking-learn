@@ -144,6 +144,9 @@ export default {
       }]
     }
   },
+  created(){
+    this.$emit('teachingNav','grade')
+  },
   methods: {
     studentSearch() {
 

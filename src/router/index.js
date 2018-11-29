@@ -65,6 +65,11 @@ export const constantRouterMap = [
             component: _import('course/member'),
             name: '成员',
           },
+          {
+            path: 'member/manage',
+            component: _import('course/memberContent/groupPlan'),
+            name: '成员方案管理',
+          },
           
           {
             path: 'teach',
@@ -101,6 +106,11 @@ export const constantRouterMap = [
                 path: 'test',
                 component: _import('course/teachContent/test'),
                 name: '测试管理',
+              },
+              {
+                path: 'test/:id',
+                component: _import('course/teachContent/testMark'),
+                name: '测试成绩',
               },
             ]
           },

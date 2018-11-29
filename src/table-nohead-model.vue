@@ -19,20 +19,24 @@
       return {
         tables:[
           {
-            name:'测验名称',
+            name:'作业名称',
             prop:'notesTitle',
           },
           {
-            name:'状态',
+            name:'学生名称',
             prop:'notesContent',
           },
           {
-            name:'已提交/应提交',
+            name:'状态',
             prop:'zyname',
           },
           {
-            name:'提交截止时间',
+            name:'所属组',
             prop:'fbr',
+          },
+          {
+            name:'提交时间',
+            prop:'fbsj',
           },
         ],
         tableData:[
@@ -42,6 +46,7 @@
             notesContent:'<p>笔记内容</p>',
             fbr:'发布人',
             fbsj:'2018-1-1',
+            popover: 'dsawf'
           },
           {
             zyname:'资源名',
@@ -49,19 +54,20 @@
             notesContent:'笔记内容',
             fbr:'发布人',
             fbsj:'2018-1-1',
+            popover: 'twqfwq'
           },
         ],
         sysButton:[
           {
-            name:'学生测验成绩',
-            type:'testMark',
+            name:'评分',
+            type:'mark',
           },
         ],
 
       }
     },
     created(){
-      this.$emit('teachingNav','test')
+      this.$emit('teachingNav','operation')
     },
     components: {
       tableNoHeader,
@@ -69,11 +75,10 @@
     methods: {
       showComponentInfo(...params) {
         let type = params[0]
-        let groupId = '3'
         console.log(type)
         switch (type) {
-          case 'testMark':
-            this.$router.push({name: "测试成绩", params: {id:groupId}})
+          case 'mark':
+            this.show = true
             break;
         
           default:

@@ -8,18 +8,27 @@
         @showComponentInfo="showComponentInfo"
       ></tableNoHeader>
     </div>
+    <el-dialog
+      :visible.sync="show"
+      title="作答记录">
+      <template v-for="item in subject">
+        <p class="margin-sides" :key="item.id">{{item.title}}</p>
+        <el-radio v-for="(option, i) in item.option" :key="i" :label="optionFilter(i)+option.label"></el-radio>
+      </template>
+      </el-dialog>
   </div>
   
 </template>
 
 <script>
   import tableNoHeader from '@/components/table-no-header.vue'
+  import adialog from '@/components/dialog'
   export default {
     data() {
       return {
         tables:[
           {
-            name:'测验名称',
+            name:'学生',
             prop:'notesTitle',
           },
           {
@@ -27,11 +36,11 @@
             prop:'notesContent',
           },
           {
-            name:'已提交/应提交',
+            name:'提交时间',
             prop:'zyname',
           },
           {
-            name:'提交截止时间',
+            name:'测试得分',
             prop:'fbr',
           },
         ],
@@ -53,11 +62,19 @@
         ],
         sysButton:[
           {
-            name:'学生测验成绩',
-            type:'testMark',
+            name:'查看成绩',
+            type:'view',
           },
         ],
 
+        // 对话框
+        show: false,
+        subject: [{
+          title: '第一题', id:'a', option: [{name: '123', label: '12312'}, {name: '456', label: "214215"}]  
+        },
+        {
+          title: '第二题', id:'b', option: [{name: '123', label: '12312'}, {name: '456', label: "214215"}]  
+        }], 
       }
     },
     created(){
@@ -65,17 +82,32 @@
     },
     components: {
       tableNoHeader,
+      adialog
     },
     methods: {
       showComponentInfo(...params) {
         let type = params[0]
-        let groupId = '3'
         console.log(type)
         switch (type) {
-          case 'testMark':
-            this.$router.push({name: "测试成绩", params: {id:groupId}})
+          case 'view':
+            this.show = true
             break;
         
+          default:
+            break;
+        }
+      },
+      optionFilter(i) {
+        switch (i) {
+          case 0:
+            return 'A '
+            break;
+          case 1:
+            return 'B '
+          case 2:
+            return 'C '
+          case 3:
+            return 'D '
           default:
             break;
         }
