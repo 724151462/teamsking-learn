@@ -1,28 +1,52 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {sysCollegeList} from '@/api/school'
+import navHeader from './modules/navHeader'
+import { stat } from 'fs';
 
 Vue.use(Vuex)
-
 const state = {
-  collegeList: []
+  navHeader: navHeader.state.nav,
+  allMenu: [],
+  filterMenu: [],
+}
+
+const mutations = {
+  setNav: (state,target)=> {
+    state.navHeader = target
+  },
+  setAllMenu: (state, list)=> {
+    console.log('rwq', list)
+    list.forEach(element => {
+      state.allMenu.push(element)
+    });
+  }
+}
+
+const getters = {
+  currentMenu: (state)=> {
+    for (let index = 0; index < state.allMenu.length; index++) {
+      // console.log(132, state.allMenu[index].list)
+      if(state.allMenu[index].list){
+        for (let i = 0; i < state.allMenu[index].list.length; i++) {
+          // console.log(444, state.allMenu[index].list[i].name)
+          // console.log(state.navHeader)
+          if(state.allMenu[index].list[i].name === state.navHeader) {
+            console.log('filterlist', state.allMenu[index].list)
+            return state.allMenu[index].list
+          }
+        }
+      }
+    }
+    // state.filterMenu = state.allMenu.filter(element => {
+    //   element.list
+    // });
+  }
 }
 
 export default new Vuex.Store({
   state,
-  mutations: {
-    getCollegeList(state) {
-      sysCollegeList()
-      .then((response)=>{
-          if (response.code === 200){
-              let all = {"collegeId": -1, "collegeName": "全部"}
-            // this.collegeList.unshift(all)
-              state.collegeList = response.data
-              state.collegeList.unshift(all)
-          }
-      })
-    }
-  },
+  mutations,
+  getters,
   actions: {
 
   }

@@ -15,7 +15,9 @@ Vue.config.productionTip = false
 var routeList = []
 
 router.beforeEach((to, from, next) => {
+  console.log('to', to)
   var index = routeList.indexOf(to.name)
+  console.log('index', index)
   if (index !== -1) {
     //如果存在路由列表，则把之后的路由都删掉
     routeList.splice(index + 1, routeList.length - index - 1)
@@ -23,6 +25,8 @@ router.beforeEach((to, from, next) => {
     routeList.push(to.name)
   }
   to.meta.routeList = routeList
+  store.commit('setNav', to.name)
+  // console.log('allmenu', store.state.allMenu)
   next()
 })
 
