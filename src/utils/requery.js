@@ -3,10 +3,9 @@ import qs from 'qs'
 import Globe_VM from '../main'
 import { getToken, removeToken } from './auth'
 
-
-// if (getToken()) {
-//   axios.defaults.headers.token = getToken()
-// }
+if (getToken()) {
+  axios.defaults.headers.token = getToken()
+}
 axios.defaults.headers.token = '1f128063aae4ac84abedfa7befd1e0db'
 axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000

@@ -1,10 +1,10 @@
 <template>
-  <div class="school">
-    <header-the-again headerTitle="学校管理员"></header-the-again>
+  <div class="role">
+    <header-the-again headerTitle="角色管理"></header-the-again>
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="姓名/昵称"></el-input>
+        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="角色名称"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="queryRoleList">查询</el-button>
@@ -41,7 +41,7 @@
           <span class="color-red">*</span><span>请输入角色名：</span>
         </div>
         <div class="item-input">
-          <el-input class="input-pop"  v-model="addForm.data.roleName"  placeholder="学生名称" clearable></el-input>
+          <el-input class="input-pop"  v-model="addForm.data.roleName"  placeholder="角色名称" clearable></el-input>
         </div>
       </div>
 
@@ -114,57 +114,48 @@
         menuDialogVisible:false,
         dialogVisible:false,
         form:{
-          title:'添加学生',
+          title:'添加角色',
         },
-        tableTitle:'学生管理列表',
+        tableTitle:'角色管理列表',
         tableOperate:[
           {
-            content:'导出学生',
+            content:'创建角色',
             type:'created'
           },
-         
+          {
+            content:'批量删除',
+            type:'deleteList'
+          }
         ],
         columnNameList:[
           {
             type:'selection'
           },
           {
-            name:'工号',
+            name:'角色名',
             prop:'roleName'
-          },
-          {
-            name:'学校',
-            prop:'roleName'
-          },
-          {
-            name:'用户名',
-            prop:'createTime'
-          },
-          {
-            name:'用户昵称',
-            prop:'createName'
           },
           {
             name:'创建时间',
-            prop:'createName'
+            prop:'createTime'
           },
           {
-            name:'状态',
+            name:'创建人',
             prop:'createName'
           },
         ],
         operateList:[
-          {
-            content:'重置密码',
-            type:'delete'
-          },
           {
             content:'删除',
             type:'delete'
           },
           {
             content:'编辑',
-            type:'delete'
+            type:'edit'
+          },
+          {
+            content:'设置权限',
+            type:'set'
           }
         ],
         tableData:'',
@@ -222,25 +213,24 @@
       sysUserMenuList().then(
         res => {
           console.log("权限菜单:",res);
-
-          let menuTree = res.data.filter(
-            element => {
-              return element.parentId === 0
-            }
-          );
-
-          for( let i = 0; i < menuTree.length; i++  ){
-            menuTree[i].children = [];
-            menuTree[i].children.push( res.data.filter(
+          if( res.code === 200 ){
+            let menuTree = res.data.filter(
               element => {
-                return element.parentId === menuTree[i].menuId
+                return element.parentId === 0
               }
-            ) )
+            );
+            for( let i = 0; i < menuTree.length; i++  ){
+              menuTree[i].children = [];
+              menuTree[i].children.push( res.data.filter(
+                element => {
+                  return element.parentId === menuTree[i].menuId
+                }
+              ) )
+            }
+          }else{
+            // this.open4( '查询失败:' + res.msg );
           }
-
-
-          console.log( 'menuTree' , menuTree );
-
+          // console.log( 'menuTree' , menuTree );
         }
       ).catch()
 
@@ -272,11 +262,18 @@
         console.log('this.form',this.form);
         sysRolePage(this.form).then(
           res => {
-            this.tableData=res.data;
-            console.log("tableData",this.tableData)
+            if( res.code === 200 ){
+              this.tableData=res.data;
+            }else{
+              this.open4('查询失败:' + res.msg);
+            }
+            // this.tableData=res.data;
+            // console.log("tableData",this.tableData)
           }
         ).catch(
-          error => console.log('error',error)
+          error => {
+            this.open4( "查询失败:" + error );
+          }
         )
       },
       appendRole:function(){
@@ -292,8 +289,8 @@
       },
       editMenu:function(roleInfo){
         this.menuDialogVisible = true;
-        this.addForm.title = '设置权限';
-        this.addForm.data  = roleInfo;
+        this.addForm.title     = '设置权限';
+        this.addForm.data      = roleInfo;
         console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );
       },
       save:function(){
@@ -301,25 +298,41 @@
           console.log( '添加角色的信息:', this.addForm.data);
           sysRoleAdd( this.addForm.data).then(
             res => {
-              console.log('添加角色:',res);
+              if(res.code === 200){
+                this.open2('添加成功');
+                this.dialogVisible = false;
+                this.queryRoleList();
+              }else{
+                this.open4('添加失败:'+res.msg);
+              }
+              // console.log('添加角色:',res);
             }
           ).catch(
-            error => console.log('添加角色出错',error)
+            error => {
+              this.open4('添加失败:'+error);
+            }
           )
         }else if( this.addForm.title === '编辑角色' ){
           console.log('编辑提交的信息:',this.addForm.data);
           sysRoleEdit( this.addForm.data ).then(
             res =>{
-              console.log( '编辑的信息返回：',res);
+              if(res.code === 200){
+                this.open2("编辑成功");
+                this.dialogVisible = false;
+                this.queryRoleList();
+              }else{
+                this.open4("编辑失败:"+res.msg);
+              }
+              // console.log( '编辑的信息返回：',res);
             }
           ).catch(
             error => {
-              console.log(error)
+              this.open4('编辑失败:'+error)
             }
           );
         }
-        this.dialogVisible = false;
-        setTimeout( ()=>{ this.queryRoleList() },300);
+        // this.dialogVisible = false;
+        // setTimeout( ()=>{ this.queryRoleList() },300);
       },
       delete:function(type,list){
         let roleIdList = [];
@@ -338,14 +351,30 @@
         }
         sysRoleDelete(roleIdList).then(
           res => {
-            console.log('删除成功的信息:',res);
+            // console.log('删除成功的信息:',res);
+            if(res.code === 200) {
+              this.open2("删除成功");
+              this.queryRoleList();
+            }else{
+              this.open4("删除失败" + res.msg);
+            }
           }
         ).catch(
           error => {
-            console.log("删除失败:",error);
+            // console.log("删除失败:",error);
+            this.open4("删除失败" + error);
           }
         )
-        setTimeout( () => { this.queryRoleList() },300 );
+        // setTimeout( () => { this.queryRoleList() },300 );
+      },
+      open2( successInfo) {
+        this.$message({
+          message: successInfo,
+          type: 'success'
+        });
+      },
+      open4(errorInfo) {
+        this.$message.error( errorInfo );
       },
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;
@@ -359,7 +388,7 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
-  .school
+  .role
     .el-pagination
       margin:20px 2.5% 0 0
       display:flex

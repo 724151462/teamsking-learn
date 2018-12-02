@@ -1,6 +1,6 @@
 <template>
-  <div class="school">
-    <header-the-again headerTitle="学校管理员"></header-the-again>
+  <div class="system">
+    <header-the-again headerTitle="系统管理员"></header-the-again>
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
@@ -118,8 +118,16 @@
         },
         tableTitle:'学生管理列表',
         tableOperate:[
+           {
+            content:'重置',
+            type:'created'
+          },
           {
-            content:'导出学生',
+            content:'删除',
+            type:'created'
+          },
+           {
+            content:'创建管理员',
             type:'created'
           },
          
@@ -130,10 +138,6 @@
           },
           {
             name:'工号',
-            prop:'roleName'
-          },
-          {
-            name:'学校',
             prop:'roleName'
           },
           {
@@ -359,7 +363,7 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
-  .school
+  .system
     .el-pagination
       margin:20px 2.5% 0 0
       display:flex

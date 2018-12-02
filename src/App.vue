@@ -25,3 +25,7 @@
     .interact .el-tooltip__popper
       cursor pointer
 </style>
+  #app .courseCategory .el-table__expanded-cell
+    padding:0 0 0 48px
+
+</style>

@@ -13,14 +13,14 @@
       </el-form-item>
     </el-form>
 
-    <table-wjx
+    <table-the-again
         :tableTitle="tableTitle"
         :tableOperate="tableOperate"
         :columnNameList="columnNameList"
         :tableData="tableData3"
         :operateList="operateList"
         @showComponentInfo="showComponentInfo">
-    </table-wjx>
+    </table-the-again>
 
 
   </div>
@@ -28,52 +28,45 @@
 
 <script>
 
-  import tableWjx from '../../components/table-wjx'
+  import tableTheAgain from '../../components/table-theAgain'
 
   import { sysRecommenTeacherPage } from '../../api/school'
 
 
   export default {
     components:{
-      tableWjx
+      tableTheAgain
     },
     data() {
       return {
         activeIndex: '2',
-        tableTitle:'轮播图',
+        tableTitle:'课程列表',
         tableData3:[],
         columnNameList:[
           {
             type:"index"
           },
           {
-            name:'图片名称',
+            name:'课程ID',
             prop:'teacherImg'
           },
           {
-            name:'缩略图',
+            name:'课程名称',
             prop:'teacherName'
           },
           {
-            name:'PC跳转',
-            prop:"jianshu"
-          },
-          {
-            name:'小程序跳转',
+            name:'讲师',
             prop:"jianshu"
           }
         ],
         operateList:[
           {
-            content:'编辑',
-            type:'edit',
+            content:'重新选择',
+            type:'choose',
           },
           {
-            content:'编辑',
-            type:'edit',
-          },{
-            content:'删除',
-            type:'delete',
+            content:'操作',
+            type:'operate',
           },
         ],
         tableOperate:[]

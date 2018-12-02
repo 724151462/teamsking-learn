@@ -1,17 +1,11 @@
 <template>
     <div class="controller">
 
-        <el-row>
-            <el-col :span="24">
-                <div class="grid-content bg-purple-dark">
-                    管理员
-                </div>
-            </el-col>
-        </el-row>
+        <header-the-again headerTitle="模板管理"></header-the-again>
 
         <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
             <el-form-item label="输入搜索：">
-                <el-input v-model="form.appraisal" placeholder="名称/工号昵称"></el-input>
+                <el-input v-model="form.appraisal" placeholder="课程包名称"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="onSubmit">查询</el-button>
@@ -24,7 +18,6 @@
                 :columnNameList="columnNameList"
                 :tableData="tableData3"
                 :operateList="operateList"
-                switchColumn="open"
                 @showComponentInfo="showComponentInfo">
         </table-the-again>
 
@@ -37,7 +30,7 @@
                 <div></div>
                 <span>windir</span>
             </div>
-            <div class="pop-content-item" v-for="item in popContentItem">
+            <div class="pop-content-item" v-for="(item,index) in popContentItem" :key="index">
                 <span class="title"> {{ item.title }} </span>
                 <span class="content"> {{ item.content }} </span>
             </div>
@@ -68,6 +61,7 @@
 <script>
     import headerTheAgain from '@/components/header-theAgain'
     import tableTheAgain from '../../components/table-theAgain'
+
     export default{
         name:'',
         data(){
@@ -81,11 +75,11 @@
                 tableTitle:'管理员列表',
                 tableOperate:[
                     {
-                        content:'添加管理员',
+                        content:'批量通过',
                         type:'addManager'
                     },
                     {
-                        content:'批量删除',
+                        content:'批量拒绝',
                         type:'deleteAll'
                     },
                 ],
@@ -94,44 +88,36 @@
                         type: "selection"
                     },
                     {
-                        name:'工号',
+                        name:'课程包审核',
                         prop:'id'
                     },
                     {
-                        name:'用户名',
+                        name:'发布方',
                         prop:'userType'
                     },
                     {
-                        name:'用户昵称',
+                        name:'来源个数',
                         prop:'userName'
                     },
                     {
-                        name:'创建时间',
+                        name:'活动个数',
                         prop:'createdTime',
                         fit:true
                     },
-                    {
-                        name:'状态',
-                        prop:'status'
-                    }
                 ],
                 operateList:[
                     {
-                        content:'重置密码',
+                        content:'通过',
                         type:'resetPassword'
                     },
                     {
-                        content:'删除',
+                        content:'不通过',
                         type:'delete'
                     },
                     {
-                        content:'编辑',
+                        content:'查看',
                         type:'edit'
                     },
-                    // {
-                    //     content:'停用',
-                    //     type:'edit'
-                    // },
                 ],
                 tableData3: [
                     {
@@ -170,7 +156,6 @@
         components:{
             tableTheAgain,
             headerTheAgain
-
         },
         mounted:function(){ },
         methods:{
