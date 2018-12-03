@@ -55,8 +55,8 @@
             <span class="color-red"></span><span>院负责人：</span>
           </div>
           <div class="item-input-list">
-            <div class="item-input" v-for="(item,index) in addForm.data.manager">
-              <el-input class="input-pop" v-model="item.workNumber" @blur="blurFunction(item.workNumber,index)"  @change="blurFunction(item.workNumber,index)" placeholder="请输入工号" clearable></el-input>
+            <div class="item-input" v-for="(item,index) in addForm.data.manager" :key='index'>
+              <el-input class="input-pop" v-model="item.workNumber" @blur="blurFunction(item.workNumber,index)" placeholder="请输入工号" clearable></el-input>
               <span>{{item.realName === '' ? '暂无负责人' : item.realName}}</span>
               <i class="el-icon-remove"
                  v-if="index !== 0 || addForm.data.manager.length > 1"
@@ -97,7 +97,6 @@
             return{
                 academySelectList: [],
                 popError:'',
-               // input:'',
                 form: {
                   pageSize:5,
                   pageIndex:1,
@@ -197,7 +196,7 @@
             //console.log('院列表1', academyList);
             //console.log('academySelectList:',this.academySelectList);
           }
-        ).catch( error=>{} );
+        ).catch( error=>{  } );
       },
         methods:{
           showComponentInfo:function(type,info){
@@ -218,7 +217,10 @@
               }
           },
           save:function(){
-            this.blurFunction(this.addForm.data.manager.length-1);
+            this.popError = "";
+          //  this.blurFunction(this.addForm.data.manager.length-1);
+            // this.blurFunction()?"":reuturn;
+          if( this.blurFunction() ){
             if(this.popError !== '') return;
             //检测manager中的信息
             for( let i = this.addForm.data.manager.length-1; i >= 0; i-- ){
@@ -228,17 +230,47 @@
             }
             //console.log('manager信息:',this.addForm.data.manager);
             if( this.addForm.data.collegeId !== "" ){
-              this.dialogVisible = false;
+             // this.dialogVisible = false;
               // console.log( "提交信息:", this.addForm.data );
-              sysCollegeEdit( this.addForm.data ).then(  res => { }).catch( error => { } );
+              sysCollegeEdit( this.addForm.data ).then(  
+                res => {
+                  if(res.code===200){
+                    this.open2('编辑成功');
+                    closePop();
+                  }else{
+                    this.popError = "编辑失败：" + res.msg;
+                    this.open4();
+                  }
+                console.log('编辑成功与否',res);
+               }).catch( error => {
+                 this.popError = "编辑失败：" + error;
+                 this.open4();
+                });
             }else{
-              this.dialogVisible = false;
-              sysCollege( this.addForm.data ).then( res => {  } ).catch(  );
+             // this.dialogVisible = false;
+              sysCollege( this.addForm.data ).then( res => { 
+                if( res.code === 200 ){
+                  this.open2('添加成功');
+                  closePop();
+                }else{
+                  this.popError = "添加失败：" + res.msg;
+                  this.open4();
+                }
+               } ).catch( 
+                 error => {
+                   this.popError = "添加失败："+error;
+                   this.open4();
+                 }
+                );
             }
-            let that = this;
-            setTimeout(function(){
+
+            var that = this;
+            function closePop(){
+              that.dialogVisible = false;
               that.queryAcademy();
-            },500);
+            };
+           }
+
           },
           deleteAcademy:function(type,academyList){
             // console.log('academyList:',academyList);
@@ -254,15 +286,38 @@
             if( type === 'one'){
               academyIdList.push( academyList.collegeId );
             }
-            sysCollegeDelete( academyIdList ).then( res => {  } ).catch( error => {} );
-            let that = this;
-            setTimeout(function(){ that.queryAcademy(); },300);
+            sysCollegeDelete( academyIdList ).then( 
+              res => { 
+                if( res.code === 200 ){
+                  this.open2('删除成功');
+                  this.queryAcademy();
+                }else{
+                  this.popError = "删除失败:" + res.msg;
+                  this.open4();
+                }
+                // console.log('删除的信息',res);
+              }
+             ).catch( 
+               error => {
+                this.popError = "删除失败:" + error;
+                this.open4();
+               } 
+              );
           },
           queryAcademy:function() {
             sysCollegePage( this.form ).then(
               res => {
-                this.tableData = res.data;
-              }).catch(error=>{})
+                if( res.code === 200 ){
+                  this.tableData = res.data;
+                  // console.log('分页查询院信息:',res);
+                }else{
+                  this.popError = "查询失败!!" + res.msg;
+                  this.open4();
+                }
+              }).catch(error=>{
+                this.popError = "查询失败!!请联系管理员";
+                this.open4();
+              })
           },
           addInput:function(){
               this.popError = "";
@@ -284,7 +339,7 @@
             this.addForm.data.collegeName = '';
             this.addForm.data.manager     = [ {realName: '', userId: 1, workNumber: ''} ];
           },
-          edit:function(info){  // 编辑一个院
+          edit:function(info){ 
             this.dialogVisible            = !this.dialogVisible;
             this.addForm.title            = "编辑院信息";
             this.addForm.data.collegeId   = info.collegeId;
@@ -293,6 +348,7 @@
             this.addForm.data.manager     = info.manager.length===0?[ {realName: '', userId: '', workNumber: ''} ]:info.manager;
           },
           blurFunction:function(id,index){
+            //console.log("失去焦点执行函数");
             this.popError = '';
             let a = this.addForm.data.manager.filter(
               (element,index,arr) => {
@@ -307,7 +363,9 @@
             if( a.length > 0 ){
               this.popError = '院负责人不能重复';
               this.open4();
+              return false;
             }
+            return true;
           },
           queryWorkNumber:function(id,index){
              //console.log("id:"+id);
@@ -328,6 +386,12 @@
           handleCurrentChange:function( number ){
             this.form.pageIndex = number;
             this.queryAcademy();
+          },
+          open2(msg) {
+           this.$message({
+              message: msg,
+              type: 'success'
+            });
           },
           open4() { this.$message.error(this.popError);},
           querySearchAsync(queryString, cb) {

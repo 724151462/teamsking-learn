@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>webscoket例子</title>
+</head>
+<body>
+</body>
+<script>
+  let url = 'wss://echo.websocket.org'
+  //链接上
+  let ws = new WebSocket(url)
+  ws.onopen = function (evt) {
+    console.log('打开链接')
+    //发送消息
+    ws.send('这里是我要发送的消息')
+  }
+  ws.onmessage = function (evt) {
+    console.log('这里是接收到的消息', evt)
+    //关闭链接
+    ws.close()
+  }
+  ws.onclose = function (evt) {
+    console.log('关闭链接成功')
+  }
+  //以上方法是一个webscoket的监听流程，在vue中使用只需要把ws存起来就行了，数据在data里面进行管理
+</script>
+</html>

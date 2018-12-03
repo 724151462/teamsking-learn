@@ -87,11 +87,17 @@ export function deletedResource (id, data) {
 /**
  * 获取试题列表
  */
-export function quizPage (id, data) {
-  let url = '/api/v1/course/' + id + '/quiz/page'
-  return commonsAjax(url, data, 'get')
+// export function quizPage (id, data) {
+//   let url = '/api/v1/course/' + id + '/quiz/page'
+//   return commonsAjax(url, data, 'get')
+// }
+/**
+ * 获取试题列表2
+ */
+export function quizPage (data) {
+  let url = '/api/v1/library/quiz/page'
+  return commonsAjax(url, '', 'get')
 }
-
 /**
  * 保存试题
  */
@@ -112,5 +118,16 @@ export function deleteQuiz (data) {
  */
 export function chaptersList (data) {
   let url = '/api/v1/course/' + data + '/chapters'
+  return commonsAjax(url, '', 'get')
+}
+
+// ===============资源管理===============
+//
+
+/**
+ * 获取所有资源列表
+ */
+export function getResourceList (data) {
+  let url = '/api/v1/resource/page'
   return commonsAjax(url, '', 'get')
 }
