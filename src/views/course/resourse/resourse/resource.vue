@@ -11,12 +11,14 @@
         <el-radio v-model="radio" label="文档">文档</el-radio>
         <el-radio v-model="radio" label="音频">音频</el-radio>
       </div>
-      <div>
+      <div style="display: flex">
         <el-input
-          placeholder="请选择日期"
-          suffix-icon="el-icon-date"
+          placeholder="输入课程名称查询资源"
           v-model="input">
         </el-input>
+        <div>
+          <el-button icon="el-icon-search" class="search-btn"></el-button>
+        </div>
       </div>
     </div>
     <div class="resource-warp">
@@ -89,18 +91,18 @@
 </template>
 
 <script>
-  import {getResourceList} from "../../api/course";
+  import {getResourceList} from "../../../../api/course";
 
   export default {
     name: "resource",
     data() {
       return {
         imgSrc: {
-          folder: require("../../assets/images/folder.png"),
-          pdf: require("../../assets/images/pdf.png"),
-          mp4: require("../../assets/images/mp4.png"),
-          word: require("../../assets/images/word.png"),
-          txt: require("../../assets/images/txt.png")
+          folder: require("../../../../assets/images/folder.png"),
+          pdf: require("../../../../assets/images/pdf.png"),
+          mp4: require("../../../../assets/images/mp4.png"),
+          word: require("../../../../assets/images/word.png"),
+          txt: require("../../../../assets/images/txt.png")
         },
         radio: '全部文件',
         input: '',
@@ -144,7 +146,7 @@
     methods: {
       //获取数据
       getResource(data) {
-        getResourceList(data).then(res => {
+        getResourceList().then(res => {
           if (Number(res.code) === 200) {
             // console.log('资源列表数据:'+JSON.stringify(res.pageData))
             //数据处理
@@ -269,6 +271,10 @@
     .radio-group
       display flex
       padding 20px 0
+      .search-btn
+        border-left 0
+        background-color #f4f4f4
+        border-radius 4px
     .resource-warp
       .img-span
         display inline-block

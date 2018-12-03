@@ -139,28 +139,33 @@ export const constantRouterMap = [
       },
       {
         path: 'resource',
-        component: _import('course/resource'),
+        component: _import('course/resourse/resourse/resource'),
         name: '资源管理'
       },
       {
         path: 'test',
-        component: _import('course/test'),
+        component: _import('course/resourse/test/test'),
         name: '试题管理'
       },
       {
         path: 'addtest',
-        component: _import('course/addTest'),
+        component: _import('course/resourse/test/addTest'),
         name: '试题添加'
       },
       {
         path: 'edittest',
-        component: _import('course/editTest'),
+        component: _import('course/resourse/test/editTest'),
         name: '试题编辑'
       },
       {
         path: 'addCourse',
         component: _import('course/addCourse'),
         name: '课程编辑'
+      },
+      {
+        path: 'activity',
+        component: _import('course/resourse/activity/activity'),
+        name: '活动管理'
       }
     ]
   },
