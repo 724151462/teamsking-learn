@@ -3,6 +3,7 @@ import qs from 'qs'
 import Globe_VM from '../main'
 import { getToken, removeToken } from './auth'
 
+
 if (getToken()) {
   axios.defaults.headers.token = getToken()
 }
@@ -31,7 +32,8 @@ axios.interceptors.request.use(
  */
 axios.interceptors.response.use(
   res => {
-   // console.log('tokens',getToken())
+    console.log('tokens',getToken())
+
       if (Number(res.data.code) === 401) {
         removeToken()
         Globe_VM.$router.push({ path: '/login' })

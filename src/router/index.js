@@ -148,6 +148,16 @@ export const constantRouterMap = [
         name: '试题管理'
       },
       {
+        path: 'addtest',
+        component: _import('course/addTest'),
+        name: '试题添加'
+      },
+      {
+        path: 'edittest',
+        component: _import('course/editTest'),
+        name: '试题编辑'
+      },
+      {
         path: 'addCourse',
         component: _import('course/addCourse'),
         name: '课程编辑'
@@ -209,12 +219,14 @@ export const constantRouterMap = [
     name: '个人中心',
     redirect: '/user/index',
     children: [
-      { path: 'index', component: _import('user/index'), name: 'user个人设置中心' },
-      { path: 'message', component: _import('user/message'), name: 'user消息管理' },
-      { path: 'buy', component: _import('user/buy'), name: 'user购买记录' },
-      { path: 'income', component: _import('user/income'), name: 'user收入记录' },
-      { path: 'withdraw', component: _import('user/withdraw'), name: 'user申请提现' },
-      { path: 'feedback', component: _import('user/feedback'), name: 'user意见反馈' }],
+      {path: 'index', component: _import('user/index'), name: 'user个人设置中心'},
+      {path: 'message', component: _import('user/message'), name: 'user消息管理'},
+      {path: 'buy', component: _import('user/buy'), name: 'user购买记录'},
+      {path: 'income', component: _import('user/income'), name: 'user收入记录'},
+      {path: 'withdraw', component: _import('user/withdraw'), name: 'user申请提现'},
+      {path: 'feedback', component: _import('user/feedback'), name: 'user意见反馈'}],
+  },
+  {
     path:'/school',
     component:Layout,
     name:'个人中心',

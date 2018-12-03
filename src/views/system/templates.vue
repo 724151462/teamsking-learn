@@ -85,16 +85,16 @@
   import headerTheAgain from '@/components/header-theAgain'
 
   export default {
-    data(){    
-      return{
-         value2: true
+    data() {
+      return {
+        value2: true
       }
     },
-    components:{
+    components: {
       headerTheAgain
-    }
-
+    },
   }
+
 </script>
 
 <style scoped>
@@ -132,8 +132,6 @@
     background: orange;
     border-radius: 50% 50%;
   }
-  
-
 
 
 </style>
