@@ -43,10 +43,16 @@ export function sysUserMenuList () {
 /**
  * 分页查询租户管理员  /api/v1/sys/tenant/manager/page
  * */
-export function sysTenantManagerPage () {
-  return commonsAjax('api/v1/sys/tenant/manager/page',{},'get')
+export function sysTenantManagerPage (data) {
+  return commonsAjax('api/v1/sys/tenant/manager/page',data,'get')
 }
 
+/**
+ * 创建租户 api/v1/sys/tenant/manager
+ **/
+export function sysTenantManager (data) {
+  return commonsAjax('api/v1/sys/tenant/manager',data,'post')
+}
 
 
 

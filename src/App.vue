@@ -13,6 +13,21 @@
   #app
     width: 100%
     height:100%
+
+    .course-tab-container .el-collapse-item__header
+      border-bottom:none;
+    .course-tab-container .el-collapse
+      border: none;
+    .interact .el-collapse-item__header
+      background-color rgb(237,241,244)
+    .interact .el-collapse-item__content
+      padding-bottom: 0px;
+    .interact .el-tooltip__popper
+      cursor pointer
+</style>
+  #app .courseCategory .el-table__expanded-cell
+    padding:0 0 0 48px
+
   /*创建课程-->添加授课老师*/
   .addTeacher .type-warp input{
     padding-right: 38px;

@@ -70,7 +70,7 @@
                 <template v-else-if="list.imgList">
                   <el-table-column :label="list.name"
                                    align="center"
-                                    :key="index">
+                                   :key="index">
                     <template scope="scope">
                       <div>
                         <img v-for="(item, index) in scope.row[list.prop]" :src="item.imgUrl" :key="index"/>
@@ -79,7 +79,7 @@
                   </el-table-column>
                 </template>
                 <template v-else>
-                    
+
                   <el-table-column
                                    :prop="list.prop"
                                    :label="list.name"
@@ -90,7 +90,7 @@
                   </el-table-column>
                 </template>
               </template>
-                
+
                 <el-table-column
                     label="是否启用"
                     fit="true"
@@ -114,7 +114,7 @@
                         :width="operateList.length * 100"
                         align="center">
                     <template slot-scope="scope">
-                        
+
                          <el-button  v-for="(item,index) in operateList"  @click="onSubmit(item.type,scope.row)"
                                     :key="index"
                                    v-if="item.type === 'edit'"

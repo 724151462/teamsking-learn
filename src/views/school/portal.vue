@@ -43,11 +43,6 @@
     methods: {
       handleSelect(key, keyPath) {
         console.log(key, keyPath);
-        if(key === '1') {
-          this.$router.push('mould')
-        }else if(key === '2') {
-          this.$router.push('platform')
-        }
         switch(key) {
           case '1':
             this.$router.push('mould')
