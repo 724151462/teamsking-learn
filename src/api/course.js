@@ -184,6 +184,8 @@ export function unsetAssistant (data) {
 export function deleteUser (data) {
   let url = `/api/v1/course/${data.courseId}/user/${data.userId}`
   return commonsAjax(url, '', 'delete')
+}
+
 // ===============资源管理===============
 //
 

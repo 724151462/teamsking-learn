@@ -8,6 +8,8 @@ const state = {
   navHeader: navHeader.state.nav,
   allMenu: [],
   filterMenu: [],
+  topNavState: 'courseCenter',
+  leftNavState: '课程列表'
 }
 
 const mutations = {
