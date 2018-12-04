@@ -19,35 +19,31 @@
         activeIndex: '1',
       };
     },
-    mounted() {
-      console.log(this.$route)
-      switch(this.$route.name) {
-        case '选择模板':
-          this.activeIndex = '1'
-          break;
-        case '平台信息':
-          this.activeIndex = '2'
-          break;
-        case '轮播图':
-          this.activeIndex = '3'
-          break;
-        case '课程推荐':
-          this.activeIndex = '4'
-          break;
-        case '名师风采':
-          this.activeIndex = '5'
-          break;
+    watch: {
+      '$route'(){
+        switch(this.$route.path) {
+          case '/system/portal/mould':
+            this.activeIndex = '1'
+            break;
+          case '/system/portal/platform':
+            this.activeIndex = '2'
+            break;
+          case '/system/portal/banner':
+            this.activeIndex = '3'
+            break;
+          case '/system/portal/recommend':
+            this.activeIndex = '4'
+            break;
+          case '/system/portal/teacher':
+            this.activeIndex = '5'
+            break;
+        }
       }
-
+      
+        
     },
     methods: {
       handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-        if(key === '1') {
-          this.$router.push('mould')
-        }else if(key === '2') {
-          this.$router.push('platform')
-        }
         switch(key) {
           case '1':
             this.$router.push('mould')
@@ -66,6 +62,6 @@
             break;
         }
       }
-    }
+      }
   }
 </script>

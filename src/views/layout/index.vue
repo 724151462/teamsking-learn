@@ -15,19 +15,19 @@
           style="
             height:100%;
             border-right:1px solid #D7D7D7;">
-              <el-menu router>
+              <el-menu router @select="handleSelect">
         <template v-for="(issue,index) in $router.options.routes">
           <template v-if="issue.name === $store.state.leftNavState"><!-- 注意：这里就是leftNavState状态作用之处，当该值与router的根路由的name相等时加载相应菜单组 -->
             <template v-for="(item,index) in issue.children">
               <el-submenu v-if="!item.leaf" :index="index+''">
                 <template slot="title"><i :class="item.iconCls"></i><span slot="title">{{item.name}}</span></template>
                 <el-menu-item v-for="term in item.children" :key="term.path" :index="term.path"
-                              :class="$route.path==term.path?'is-active':''" v-if="term.menuShow">
+                              :class="$store.state.navHeader==term.path?'is-active':''" v-if="term.menuShow" ref="menu">
                   <i :class="term.iconCls"></i><span slot="title">{{term.name}}</span>
                 </el-menu-item>
               </el-submenu>
-              <el-menu-item v-else-if="item.leaf&&item.children&&item.children.length&&item.menuShow" :index="item.children[0].path"
-                            :class="$route.path==item.children[0].path?'is-active':''">
+              <el-menu-item v-else-if="item.leaf&&item.children&&item.children.length&&item.menuShow" ref="menu" :index="item.children[0].path"
+                            :class="$store.state.navHeader==item.children[0].path?'is-active':''">
                 <i :class="item.iconCls"></i><span slot="title">{{item.children[0].name}}</span>
               </el-menu-item>
             </template>
@@ -72,7 +72,7 @@
         this.nav = e
       },
       handleSelect(key, keyPath) {
-        console.log(key,keyPath)
+        console.log('rwq rqw',this.$store.state.navHeader)
       }
     },
     watch: {

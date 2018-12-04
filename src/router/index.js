@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Layout from '@/views/layout/index.vue'
+import Home from '@/views/layout/home.vue'
 
 const _import = require('./_import_' + process.env.NODE_ENV)
 
@@ -18,13 +19,14 @@ export const constantRouterMap = [{
   },
   {
     path: '/course',
-    component: Layout,
+    component: Home,
     name: '课程列表',
+    menuShow: true,
     type: 'courseCenter',
     redirect: '/course/list',
     children: [{
         path: '/course/list',
-        component: _import('course/list'),
+        component: Layout,
         name: '课程列表',
         leaf: true,
         menuShow: true,
@@ -32,7 +34,109 @@ export const constantRouterMap = [{
           path: '/course/list',
           component: _import('course/list'),
           name: '课程列表'
-        }, ]
+        }, 
+        {
+          path: '/course/list/:id',
+          component: _import('course/courseMain'),
+          name: '课程列表',
+          leaf: true,
+          redirect: '/course/list/chapter',
+          children: [{
+              path: '/course/list/chapter',
+              component: _import('course/chapter'),
+              name: '章节内容',
+            },
+            {
+              path: 'interact',
+              component: _import('course/interact'),
+              name: '互动',
+            },
+            {
+              path: 'interact/vote',
+              component: _import('course/interactContent/vote'),
+              name: '发布投票',
+            },
+            {
+              path: 'interact/brainstorm',
+              component: _import('course/interactContent/brainStorm'),
+              name: '发布头脑风暴',
+            },
+            {
+              path: 'interact/homework',
+              component: _import('course/interactContent/homeWork'),
+              name: '作业/小组任务',
+            },
+            {
+              path: 'interact/test',
+              component: _import('course/interactContent/test'),
+              name: '发布测试',
+            },
+            {
+              path: 'member',
+              component: _import('course/member'),
+              name: '成员',
+            },
+            {
+              path: 'member/manage',
+              component: _import('course/memberContent/groupPlan'),
+              name: '成员方案管理',
+            },
+  
+            {
+              path: 'teach',
+              component: _import('course/teach'),
+              name: '教学管理',
+              redirect: '/teach/grade',
+              children: [{
+                  path: '/teach/grade',
+                  component: _import('course/teachContent/grade'),
+                  name: '成绩管理',
+                },
+                {
+                  path: '/teach/notes',
+                  component: _import('course/teachContent/notes'),
+                  name: '笔记管理',
+                },
+                {
+                  path: '/teach/homework',
+                  component: _import('course/teachContent/operation'),
+                  name: '作业管理',
+                },
+                {
+                  path: '/teach/storm',
+                  component: _import('course/teachContent/storm'),
+                  name: '头脑风暴',
+                },
+                {
+                  path: '/teach/questionnaire',
+                  component: _import('course/teachContent/questionnaire'),
+                  name: '投票问卷',
+                },
+                {
+                  path: '/teach/test',
+                  component: _import('course/teachContent/test'),
+                  name: '测试管理',
+                },
+                {
+                  path: '/teach/test/:id',
+                  component: _import('course/teachContent/testMark'),
+                  name: '测试成绩',
+                },
+              ]
+            },
+            {
+              path: 'notice',
+              component: _import('course/notice'),
+              name: '通知管理',
+            },
+            {
+              path: 'discuss',
+              component: _import('course/discuss'),
+              name: '讨论中心',
+            }
+          ]
+        },
+      ]
       },
       {
         path: 'appraisal',
@@ -44,7 +148,7 @@ export const constantRouterMap = [{
       },
       {
         path: 'resource',
-        component: _import('course/resource'),
+        component: Layout,
         name: '资源管理',
         children: [{
             path: '/course/resource/test',
@@ -69,144 +173,45 @@ export const constantRouterMap = [{
         component: _import('course/addCourse'),
         name: '课程编辑'
       },
-      {
-        path: '/course/list/:id',
-        component: _import('course/courseMain'),
-        name: '课程列表',
-        leaf: true,
-        redirect: '/course/list/chapter',
-        children: [{
-            path: '/course/list/chapter',
-            component: _import('course/chapter'),
-            name: '章节内容',
-          },
-          {
-            path: 'interact',
-            component: _import('course/interact'),
-            name: '互动',
-          },
-          {
-            path: 'interact/vote',
-            component: _import('course/interactContent/vote'),
-            name: '发布投票',
-          },
-          {
-            path: 'interact/brainstorm',
-            component: _import('course/interactContent/brainStorm'),
-            name: '发布头脑风暴',
-          },
-          {
-            path: 'interact/homework',
-            component: _import('course/interactContent/homeWork'),
-            name: '作业/小组任务',
-          },
-          {
-            path: 'interact/test',
-            component: _import('course/interactContent/test'),
-            name: '发布测试',
-          },
-          {
-            path: 'member',
-            component: _import('course/member'),
-            name: '成员',
-          },
-          {
-            path: 'member/manage',
-            component: _import('course/memberContent/groupPlan'),
-            name: '成员方案管理',
-          },
-
-          {
-            path: 'teach',
-            component: _import('course/teach'),
-            name: '教学管理',
-            redirect: 'teach/grade',
-            children: [{
-                path: 'grade',
-                component: _import('course/teachContent/grade'),
-                name: '成绩管理',
-              },
-              {
-                path: 'notes',
-                component: _import('course/teachContent/notes'),
-                name: '笔记管理',
-              },
-              {
-                path: 'homework',
-                component: _import('course/teachContent/operation'),
-                name: '作业管理',
-              },
-              {
-                path: 'storm',
-                component: _import('course/teachContent/storm'),
-                name: '头脑风暴',
-              },
-              {
-                path: 'questionnaire',
-                component: _import('course/teachContent/questionnaire'),
-                name: '投票问卷',
-              },
-              {
-                path: 'test',
-                component: _import('course/teachContent/test'),
-                name: '测试管理',
-              },
-              {
-                path: 'test/:id',
-                component: _import('course/teachContent/testMark'),
-                name: '测试成绩',
-              },
-            ]
-          },
-          {
-            path: 'notice',
-            component: _import('course/notice'),
-            name: '通知管理',
-          },
-          {
-            path: 'discuss',
-            component: _import('course/discuss'),
-            name: '讨论中心',
-          }
-        ]
-      },
     ],
 
   },
 
   {
     path: '/school',
-    component: Layout,
-    name: 'school学生管理',
+    component: Home,
+    name: '校管中心',
     type: 'schoolManageCenter',
+    menuShow: true,
+    redirect: '/school/student',
     children: [{
         path: '/school/student',
         menuShow: true,
-        component: _import('school/student'),
-        name: 'school学生管理',
+        component: Layout,
+        name: '用户管理',
         children: [{
-          path: '/school',
-          component: _import('school/student'),
-          name: 'school学生管理',
-          menuShow: true
-        },
-        {
-          path: '/school/teacher',
-          component: _import('school/teacher'),
-          name: 'school教师管理',
-          menuShow: true,
-          leaf: true
-        }],
-      },
-      {
-        path: '/school/teacher/addteacher',
-        component: _import('school/addTeacher'),
-        name: 'school添加教师1'
-      },
-      {
-        path: 'teacher/modifyteacher/:id',
-        component: _import('school/modifyTeacher'),
-        name: 'school修改教师'
+            path: '/school/student',
+            component: _import('school/student'),
+            name: '学生管理',
+            menuShow: true
+          },
+          {
+            path: '/school/teacher',
+            component: _import('school/teacher'),
+            name: '教师管理',
+            menuShow: true,
+          },
+          {
+            path: '/school/teacher/addteacher',
+            component: _import('school/addTeacher'),
+            name: '添加教师',
+          },
+          {
+            path: '/school/teacher/modifyteacher',
+            component: _import('school/modifyTeacher'),
+            name: '修改教师'
+          },
+        ],
       },
       {
         path: 'controller',
@@ -215,70 +220,128 @@ export const constantRouterMap = [{
       },
       {
         path: 'portal',
-        component: _import('school/portal'),
+        component: Layout,
         name: 'school门户配置',
         redirect: '/school/portal/mould',
         children: [{
             path: '/school/portal/mould',
-            component: _import('school/portalMould'),
-            name: 'school模板配置'
+            component: _import('school/portal'),
+            name: 'school模板配置',
+            menuShow: true,
+            children: [{
+                path: '/school/portal/mould',
+                component: _import('school/portalMould'),
+                name: 'school模板配置',
+                menuShow: true,
+              },
+              {
+                path: '/school/portal/platform',
+                component: _import('school/portalPlatform'),
+                name: 'school平台信息',
+                menuShow: true,
+              },
+              {
+                path: '/school/portal/banner',
+                component: _import('school/portalBanner'),
+                name: 'school轮播图',
+                menuShow: true,
+              },
+              {
+                path: '/school/portal/recommend',
+                component: _import('school/portalRecommend'),
+                name: 'school课程推荐',
+                menuShow: true,
+              },
+              {
+                path: '/school/portal/teacher',
+                component: _import('school/portalTeacher'),
+                name: 'school名师风采',
+                menuShow: true,
+              }
+            ]
           },
           {
             path: '/school/portal/platform',
             component: _import('school/portalPlatform'),
-            name: 'school平台信息'
+            name: 'school平台信息',
+            menuShow: true,
           },
           {
             path: '/school/portal/banner',
             component: _import('school/portalBanner'),
-            name: 'school轮播图'
+            name: 'school轮播图',
+            menuShow: true,
           },
           {
             path: '/school/portal/recommend',
             component: _import('school/portalRecommend'),
-            name: 'school课程推荐'
+            name: 'school课程推荐',
+            menuShow: true,
           },
           {
             path: '/school/portal/teacher',
             component: _import('school/portalTeacher'),
-            name: 'school名师风采'
+            name: 'school名师风采',
+            menuShow: true,
           }
         ]
       },
       {
         path: 'course',
-        component: _import('school/course'),
-        name: 'school课程管理'
+        component: Layout,
+        name: 'school课程管理1',
+        redirect: "/school/course/course",
+        children: [{
+            path: '/school/course/course',
+            component: _import('school/course'),
+            name: 'school课程管理',
+            menuShow: true,
+          },
+          {
+            path: '/school/course/certificate',
+            component: _import('school/certificate'),
+            name: 'school证书审核',
+            menuShow: true,
+          },
+          {
+            path: '/school/course/courseReview',
+            component: _import('school/courseReview'),
+            name: 'school课程包审核',
+            menuShow: true,
+          },
+        ]
       },
+
       {
-        path: 'certificate',
-        component: _import('school/certificate'),
-        name: 'school证书审核'
-      },
-      {
-        path: 'courseReview',
-        component: _import('school/courseReview'),
-        name: 'school课程包审核'
-      },
-      {
-        path: '',
-        component: _import('school/academy'),
-        name: 'school院管理'
-      },
-      {
-        path: 'department',
-        component: _import('school/department'),
-        name: 'school系管理'
-      },
-      {
-        path: 'speciality',
-        component: _import('school/speciality'),
-        name: 'school专业管理'
-      },
-      {
-        path: 'class',
-        component: _import('school/class'),
-        name: 'school班级管理'
+        path: 'structure',
+        component: Layout,
+        name: '组织架构',
+        redirect: "/school/structure/academy",
+        children: [{
+            path: '/school/structure/academy',
+            component: _import('school/academy'),
+            name: 'school院管理',
+            menuShow: true,
+          },
+          {
+            path: '/school/structure/department',
+            component: _import('school/department'),
+            name: 'school系管理',
+            menuShow: true,
+          },
+          {
+            path: '/school/structure/speciality',
+            component: _import('school/speciality'),
+            name: 'school专业管理',
+            menuShow: true,
+          },
+          {
+            path: '/school/structure/class',
+            component: _import('school/class'),
+            name: 'school班级管理',
+            menuShow: true,
+          }
+        ]
       }
     ]
   },
@@ -287,6 +350,7 @@ export const constantRouterMap = [{
     component: Layout,
     name: '学习管理',
     type: 'studyManage',
+    menuShow: true,
     redirect: '/learn/index',
     children: [{
       path: '/learn/index',
@@ -356,104 +420,239 @@ export const constantRouterMap = [{
   // },
   {
     path: '/system',
-    component: Layout,
+    component: Home,
     name: '系统管理',
-    redirect: '/system/menu',
+    menuShow: true,
+    type: 'systemManage',
+    redirect: '/system/tenantManager',
     meta: {
       address: 'system'
     },
     children: [{
-        path: 'tenantManager',
-        component: _import('system/tenantManager'),
-        name: 'system租户管理'
+        path: '/system/tenantManager',
+        component: Layout,
+        name: '租户管理',
+        children: [{
+            path: '/system/tenantManager',
+            component: _import('system/tenantManager'),
+            name: 'system租户管理',
+            menuShow: true
+          },
+          {
+            path: '/system/tenantAccountManager',
+            component: _import('system/tenantAccountManager'),
+            name: 'system租户账号管理',
+            menuShow: true
+          },
+        ]
       },
       {
-        path: 'tenantAccountManager',
-        component: _import('system/tenantAccountManager'),
-        name: 'system租户账号管理'
+        path: '/system/system',
+        component: Layout,
+        name: '系统管理',
+        children: [{
+            path: '/system/courseCategory',
+            component: _import('system/courseCategory'),
+            name: '课程分类',
+            menuShow: true
+          },
+          {
+            path: '/system/help',
+            component: _import('system/help'),
+            name: '帮助中心管理',
+            menuShow: true
+          },
+          {
+            path: '/system/templates',
+            component: _import('system/templates'),
+            name: '模板管理',
+            menuShow: true
+          },
+        ]
       },
       {
-        path: 'courseCategory',
-        component: _import('system/courseCategory'),
-        name: 'system课程分类'
+        path: '/system/student',
+        component: Layout,
+        name: '用户中心',
+        children: [{
+            path: '/system/student',
+            component: _import('system/student'),
+            name: 'system学生管理',
+            menuShow: true
+          },
+          {
+            path: '/system/teacher',
+            component: _import('system/teacher'),
+            name: 'system教师管理',
+            menuShow: true
+          },
+          {
+            path: '/system/school',
+            component: _import('system/school'),
+            name: 'system学校管理员',
+            menuShow: true
+          },
+          {
+            path: '/system/system',
+            component: _import('system/system'),
+            name: 'system系统管理员',
+            menuShow: true
+          },
+          {
+            path: '/system/tag',
+            component: _import('system/tag'),
+            name: 'system标签管理',
+            menuShow: true
+          },
+        ]
       },
       {
-        path: 'help',
-        component: _import('system/help'),
-        name: 'system帮助中心管理'
-      },
-      {
-        path: 'templates',
-        component: _import('system/templates'),
-        name: 'system模板管理'
-      },
-      {
-        path: 'student',
-        component: _import('system/student'),
-        name: 'system学生管理'
-      },
-      {
-        path: 'teacher',
-        component: _import('system/teacher'),
-        name: 'system教师管理'
-      },
-      {
-        path: 'school',
-        component: _import('system/school'),
-        name: 'system学校管理员'
-      },
-      {
-        path: 'system',
-        component: _import('system/system'),
-        name: 'system系统管理员'
-      },
-      {
-        path: 'tag',
-        component: _import('system/tag'),
-        name: 'system标签管理'
-      },
-      {
-        path: 'menu',
-        component: _import('system/menu'),
-        name: 'system菜单管理'
-      },
-      {
-        path: 'role',
-        component: _import('system/role'),
-        name: 'system角色管理'
+        path: '/system/power',
+        component: Layout,
+        name: '权限管理',
+        children: [{
+            path: '/system/menu',
+            component: _import('system/menu'),
+            name: 'system菜单管理',
+            menuShow: true
+          },
+          {
+            path: '/system/role',
+            component: _import('system/role'),
+            name: 'system角色管理',
+            menuShow: true
+          },
+        ]
       },
       {
         path: 'portal',
-        component: _import('system/portal'),
+        component: Layout,
         name: 'system门户配置',
         redirect: '/system/portal/mould',
         children: [{
-            path: 'mould',
-            component: _import('system/portalMould'),
-            name: 'system模板配置'
+            path: '/system/portal/mould',
+            component: _import('system/portal'),
+            name: 'system模板配置',
+            menuShow: true,
+            children: [{
+                path: '/system/portal/mould',
+                component: _import('system/portalMould'),
+                name: 'system模板配置',
+                menuShow: true,
+              },
+              {
+                path: '/system/portal/platform',
+                component: _import('system/portalPlatform'),
+                name: 'system平台信息',
+                menuShow: true,
+              },
+              {
+                path: '/system/portal/banner',
+                component: _import('system/portalBanner'),
+                name: 'system轮播图',
+                menuShow: true,
+              },
+              {
+                path: '/system/portal/recommend',
+                component: _import('system/portalRecommend'),
+                name: 'system课程推荐',
+                menuShow: true,
+              },
+              {
+                path: '/system/portal/teacher',
+                component: _import('system/portalTeacher'),
+                name: 'system名师风采',
+                menuShow: true,
+              }
+            ]
           },
           {
-            path: 'platform',
+            path: '/system/portal/platform',
             component: _import('system/portalPlatform'),
-            name: 'system平台信息'
+            name: 'system平台信息',
+            menuShow: true,
           },
           {
-            path: 'banner',
+            path: '/system/portal/banner',
             component: _import('system/portalBanner'),
-            name: 'system轮播图'
+            name: 'system轮播图',
+            menuShow: true,
           },
           {
-            path: 'recommend',
+            path: '/system/portal/recommend',
             component: _import('system/portalRecommend'),
-            name: 'system课程推荐'
+            name: 'system课程推荐',
+            menuShow: true,
           },
           {
-            path: 'teacher',
+            path: '/system/portal/teacher',
             component: _import('system/portalTeacher'),
-            name: 'system名师风采'
+            name: 'system名师风采',
+            menuShow: true,
           }
         ]
       },
+      // {
+      //   path: 'tenantManager',
+      //   component: _import('system/tenantManager'),
+      //   name: 'system租户管理'
+      // },
+      // {
+      //   path: 'tenantAccountManager',
+      //   component: _import('system/tenantAccountManager'),
+      //   name: 'system租户账号管理'
+      // },
+
+
+      // {
+      //   path: 'courseCategory',
+      //   component: _import('system/courseCategory'),
+      //   name: 'system课程分类'
+      // },
+      // {
+      //   path: 'help',
+      //   component: _import('system/help'),
+      //   name: 'system帮助中心管理'
+      // },
+      // {
+      //   path: 'templates',
+      //   component: _import('system/templates'),
+      //   name: 'system模板管理'
+      // },
+
+
+      // {
+      //   path: 'portal',
+      //   component: _import('system/portal'),
+      //   name: 'system门户配置',
+      //   redirect: '/system/portal/mould',
+      //   children: [{
+      //       path: 'mould',
+      //       component: _import('system/portalMould'),
+      //       name: 'system模板配置'
+      //     },
+      //     {
+      //       path: 'platform',
+      //       component: _import('system/portalPlatform'),
+      //       name: 'system平台信息'
+      //     },
+      //     {
+      //       path: 'banner',
+      //       component: _import('system/portalBanner'),
+      //       name: 'system轮播图'
+      //     },
+      //     {
+      //       path: 'recommend',
+      //       component: _import('system/portalRecommend'),
+      //       name: 'system课程推荐'
+      //     },
+      //     {
+      //       path: 'teacher',
+      //       component: _import('system/portalTeacher'),
+      //       name: 'system名师风采'
+      //     }
+      //   ]
+      // },
     ]
   }
   // {

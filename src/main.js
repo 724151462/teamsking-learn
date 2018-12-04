@@ -25,7 +25,7 @@ router.beforeEach((to, from, next) => {
     routeList.push(to.name)
   }
   to.meta.routeList = routeList
-  store.commit('setNav', to.name)
+  store.commit('setNav', to.path)
   // console.log('allmenu', store.state.allMenu)
   next()
 })

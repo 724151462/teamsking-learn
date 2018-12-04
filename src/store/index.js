@@ -17,7 +17,7 @@ const mutations = {
     state.navHeader = target
   },
   setAllMenu: (state, list)=> {
-    console.log('rwq', list)
+    // console.log('rwq', list)
     list.forEach(element => {
       state.allMenu.push(element)
     });
