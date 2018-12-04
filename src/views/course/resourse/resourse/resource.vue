@@ -42,11 +42,15 @@
                 v-model="course.selected"
                 style="padding-left: 25px"
                 @change="checkCourseAll(courseIndex, $event)"></el-checkbox>
-              <span style="display: inline-block"><img :src="imgSrc.folder" style="width: 20px;margin: 0 10px;"/></span>
-              <span style="display: inline-block">{{course.courseName}}</span>
-              <div style="float: right">
-                <el-button type="primary" icon="el-icon-upload2" size="small" @click.stop="fileUpload">上传</el-button>
+              <div style="display: inline-flex;width: calc(100% - 100px)">
+                <div style="display: inline-block"><img :src="imgSrc.folder" style="width: 20px;margin: 0 10px;"/></div>
+                <div style="display: inline-block">{{course.courseName}}</div>
+                <div style="flex: 1">1</div>
+                <div>
+                  <el-button type="primary" icon="el-icon-upload2" size="small" @click.stop="fileUpload">上传</el-button>
+                </div>
               </div>
+
             </template>
             <div>
               <div class="resource-list" v-for="resource in course.resources" :key="resource.id">

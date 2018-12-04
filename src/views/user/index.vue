@@ -1,7 +1,7 @@
 <template>
   <div class="userIndex">
     <el-tabs v-model="activeName" @tab-click="toMessage">
-      <el-tab-pane label="个人设置" name="first" class="tab-name">
+      <el-tab-pane label="个人设置" name="first" class="tab-name" style="border-right: 1px solid rgb(215, 215, 215);">
         <div>
           <p>头像</p>
           <div  style="padding-left: 100px;width: 100px;margin: 25px 0;">
@@ -97,7 +97,13 @@
     color: red
   .red-text
     color red
+  .el-main
+    padding 0!important
+  .el-tabs__header
+    marging-bottm 0!important
   .userIndex
+    padding 20px;
+    padding-right 200px;
     .user-avatar
       width 100px
       height 100px

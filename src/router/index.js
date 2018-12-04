@@ -123,6 +123,11 @@ export const constantRouterMap = [
             path: 'discuss',
             component: _import('course/discuss'),
             name: '讨论中心',
+          },
+          {
+            path: 'disinfo',
+            component: _import('course/discussDialog'),
+            name: '讨论详情',
           }
         ],
           
@@ -226,6 +231,7 @@ export const constantRouterMap = [
     children: [
       {path: 'index', component: _import('user/index'), name: 'user个人设置中心'},
       {path: 'message', component: _import('user/message'), name: 'user消息管理'},
+      {path: 'operation', component: _import('user/operation'), name: 'user操作记录'},
       {path: 'buy', component: _import('user/buy'), name: 'user购买记录'},
       {path: 'income', component: _import('user/income'), name: 'user收入记录'},
       {path: 'withdraw', component: _import('user/withdraw'), name: 'user申请提现'},
