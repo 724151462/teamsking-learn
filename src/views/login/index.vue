@@ -17,7 +17,7 @@
 </template>
 
 <script>
-  import { logins } from '@/api/login'
+  import { logins, loginDebug } from '@/api/login'
   import { setToken, getToken } from '@/utils/auth'
   export default {
     data () {
@@ -50,7 +50,7 @@
           }
         }
 */
-        logins(this.data).then(res => {
+        loginDebug(this.data).then(res => {
           console.log(res)
           if (res.code === 200) {
             setToken(res.data.token)

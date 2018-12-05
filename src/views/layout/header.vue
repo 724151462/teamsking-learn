@@ -2,7 +2,7 @@
     <div class="header">
       <router-link to="/course" class="login">
           <span>天擎智教</span>
-          <span class="sizes">后台管理{{$store.state.topNavState}}</span>
+          <span class="sizes">后台管理</span>
       </router-link>
       <el-menu :default-active="defaultActiveIndex" background-color="rgb(70,76,92)"
       text-color="#fff"
@@ -11,14 +11,14 @@
       mode="horizontal" 
       @select="handleSelect" 
       :router="true">
-			<!-- <el-menu-item index="/course">课程中心</el-menu-item>
-			<el-menu-item index="/learn/index">学习管理</el-menu-item>
+			<el-menu-item index="/course">课程中心</el-menu-item>
+			<el-menu-item index="/learn">学习管理</el-menu-item>
 			<el-menu-item index="/school">校管中心</el-menu-item>
-			<el-menu-item index="/system">系统管理</el-menu-item> -->
-      <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" 
-                            :class="$store.state.topNavState==item.type?'is-active':''">
+			<el-menu-item index="/system">系统管理</el-menu-item>
+      <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" 
+                            >
                 <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
-              </el-menu-item>
+              </el-menu-item> -->
 		</el-menu>
     </div>
 </template>
@@ -30,7 +30,7 @@
     props:['navs'],
     data(){
       return{
-		  // defaultActiveIndex: '/course',
+		  defaultActiveIndex: '/course',
         nav:[
           {
             name:'课程中心',
@@ -75,9 +75,11 @@
 		handleSelect(index){
 			this.defaultActiveIndex = index;
 		},
-		fetchNavData () { // 初始化菜单激活项
-			var cur_path = this.$route.path; //获取当前路由
-			console.log('curpath',cur_path)
+    fetchNavData () { // 初始化菜单激活项
+      var n=(this.$route.path.split('/')).length-1;
+      var cur_path = n > 3 ? this.$store.state.leftNavState : this.$route.path; //获取当前路由
+      console.log('curpath',cur_path)
+      console.log('cookiepath',this.$store.state.leftNavState)
 			var routers = this.$router.options.routes; // 获取路由对象
 			var nav_type = "courseCenter", nav_name = "课程列表";
 			// console.log('routers', routers)
@@ -91,24 +93,22 @@
 					for (var k = 0; k < grand_children.length; k++) {
 					// console.log('grand_children',grand_children[k].path)
 					if (grand_children[k].path === cur_path) {
-            // console.log('topNavState', routers[i].type)
+            console.log('topNavState', routers[i])
 						nav_type = routers[i].type;
-						nav_name = routers[i].name;
+            nav_name = routers[i].name;
 						break;
 					}
 					}
 				}
 				}
 			}
-			}
-			this.$store.state.topNavState = nav_type;  // 改变topNavState状态的值	
-			this.$store.state.leftNavState = nav_name;  // 改变leftNavState状态的值
+      }
+      this.$store.state.topNavState = nav_type;  // 改变topNavState状态的值	
+      if(n <=  3) {
+        this.$store.state.leftNavState = nav_name;  // 改变leftNavState状态的值
+      }
 			console.log('nav_type',nav_type,'nav_name', nav_name)
-			if(nav_type == "courseCenter"){
-			this.defaultActiveIndex = "/course/list";
-			} else {
 			this.defaultActiveIndex = "/" + nav_name;
-			}
 		},
 	},
 	watch: {

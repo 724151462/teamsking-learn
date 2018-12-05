@@ -77,7 +77,8 @@
     },
     watch: {
       '$route': function(to, from){ // 路由改变时执行
-        console.info("enterpriseNav to.path:" + to.path);
+        console.info("$store.state.leftNavState:" + this.$store.state.leftNavState);
+        var n=(this.$route.path.split('/')).length-1;
       }
     }
   }

@@ -2,14 +2,15 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import navHeader from './modules/navHeader'
 import { stat } from 'fs';
+import Cookie from 'js-cookie'
 
 Vue.use(Vuex)
 const state = {
   navHeader: navHeader.state.nav,
   allMenu: [],
   filterMenu: [],
-  topNavState: 'courseCenter',
-  leftNavState: '课程列表'
+  topNavState: 'course',
+  leftNavState: '课程列表' ,
 }
 
 const mutations = {

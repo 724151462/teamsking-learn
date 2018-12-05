@@ -7,6 +7,13 @@ export function logins (data) {
   return commonsAjax('/api/v1/sys/login', data, 'post')
 }
 
+/**
+ * 登陆
+ * */
+export function loginDebug (data) {
+  return commonsAjax('/api/v1/sys/login/debug', data, 'post')
+}
+
 
 /**
  * 菜单
