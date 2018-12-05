@@ -11,7 +11,7 @@
     </div>
     <div style="padding: 0 100px;">
       <p>讨论中心</p>
-      <h4 class="topic"><b>全部主题</b></h4>
+      <h4  class="topic"><b>全部主题</b></h4>
       <div class="content-warp">
         <div>
           <p>请问我来迟了，怎么办？</p>
@@ -50,7 +50,7 @@
     data() {
       return {
         activeIndex: '1',
-        input1: '',
+        input1: ''
       };
     },
     methods: {

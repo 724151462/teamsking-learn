@@ -130,7 +130,6 @@ export const constantRouterMap = [
             name: '讨论详情',
           }
         ],
-          
       },
       {
         path: 'list',
