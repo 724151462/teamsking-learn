@@ -26,14 +26,12 @@
       cursor pointer
 
     /*试题管理*/
-    .test .el-tooltip__popper
-      max-width 300px!important
-    /*.test .cell*/
-/*      text-align center
+    .test .cell
+      text-align center
     .test .cell span div
       overflow: hidden!important;
       white-space: nowrap!important;
-      text-overflow: ellipsis!important;*/
+      text-overflow: ellipsis!important;
 </style>
   #app .courseCategory .el-table__expanded-cell
     padding:0 0 0 48px
