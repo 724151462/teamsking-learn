@@ -5,7 +5,7 @@
       <div style="float: right;display: inline-block" class="btn-warp">
         <el-button type="success">下载模板</el-button>
         <el-button >导入</el-button>
-        <el-button type="primary">添加</el-button>
+        <el-button type="primary" @click="toAddTest()">添加</el-button>
       </div>
     </div>
     <el-table
@@ -39,15 +39,6 @@
         class="tigan"
         show-overflow-tooltip
         label="题干">
-        <!--<template slot-scope="scope">-->
-          <!--<el-popover trigger="hover" placement="bottom">-->
-            <!--<p>姓名: {{ scope.row.name }}</p>-->
-            <!--<p>住址: {{ scope.row.address }}</p>-->
-            <!--<div slot="reference" class="name-wrapper">-->
-                <!--{{ scope.row.address }}-->
-            <!--</div>-->
-          <!--</el-popover>-->
-        <!--</template>-->
       </el-table-column>
       <el-table-column
         prop="name"
@@ -64,7 +55,7 @@
         width="150">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="testView = true">查看</el-button>
-          <el-button type="text" size="small" @click="toAddTest">编辑</el-button>
+          <el-button type="text" size="small" @click="toEditTest">编辑</el-button>
           <el-button type="text" size="small" @click="testDelete = true">删除</el-button>
         </template>
       </el-table-column>
@@ -140,8 +131,11 @@
       }
     },
     methods:{
+      toEditTest () {
+        this.$router.push('/course/resource/edittest');
+      },
       toAddTest () {
-        this.$router.push('/course/addtest');
+        this.$router.push('/course/resource/addtest');
       },
       handleCurrentChange (val) {
         console.log(val)
