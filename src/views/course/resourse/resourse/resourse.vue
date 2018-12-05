@@ -60,20 +60,20 @@
                 </div>
                 <div>
                   <!--三级单个资源选择-->
-                  <el-checkbox
-                    v-model="resource.selected"
-                    @change="checkResource(courseIndex)"></el-checkbox>
+                  <el-checkbox v-model="resource.selected" @change="checkResource(courseIndex)"></el-checkbox>
                 </div>
                 <div>
                   <span class="img-span">
-                      <img :src="getImgSrc(resource.contentType)" class="img-icon"/>
+                    <img :src="getImgSrc(resource.contentType)" class="img-icon">
                   </span>
                 </div>
                 <div>
                   <span style="display: inline-block">{{resource.resourceTitle}}</span>
                 </div>
                 <div style="flex: 1">
-                  <el-tag type="danger" size="mini" style="margin: 0 5px"><i class="el-icon-loading"></i>转码中</el-tag>
+                  <el-tag type="danger" size="mini" style="margin: 0 5px">
+                    <i class="el-icon-loading"></i>转码中
+                  </el-tag>
                   <el-tag type="success" size="mini" style="margin: 0 5px">字幕</el-tag>
                 </div>
                 <div style="min-width: 200px" class="resource-info-box">
@@ -82,8 +82,14 @@
                   <div>2018-06-13 14:02</div>
                 </div>
                 <div>
-                  <el-button type="text"><a :href="resource.coverUrl">预览</a></el-button>&nbsp;| &nbsp;
-                  <el-button type="text" style="margin-left: -10px" @click="fileDownload(resource.resourceUrl)">下载</el-button>
+                  <el-button type="text">
+                    <a :href="resource.coverUrl">预览</a>
+                  </el-button>&nbsp;| &nbsp;
+                  <el-button
+                    type="text"
+                    style="margin-left: -10px"
+                    @click="fileDownload(resource.resourceUrl)"
+                  >下载</el-button>
                 </div>
               </div>
             </div>
@@ -120,28 +126,30 @@
           courseName: '',
           resources: [
             {
-              courseId: '',
-              courseName: '',
-              resources: [{
-                contentType: '',
-                courseId: '',
-                courseName: '',
-                coverUrl: '',
-                createTime: '',
-                creatorId: '',
-                creatorRealName: '',
-                resourceId: '',
-                resourceLength: '',
-                resourceSize: '',
-                resourceTitle: '',
-                resourceType: '',
-                resourceUrl: '',
-                srtSize: '',
-                srtUrl: '',
-                tenantId: '',
-                transProgress: '',
-                userId: '',
-              }],
+              courseId: "",
+              courseName: "",
+              resources: [
+                {
+                  contentType: "",
+                  courseId: "",
+                  courseName: "",
+                  coverUrl: "",
+                  createTime: "",
+                  creatorId: "",
+                  creatorRealName: "",
+                  resourceId: "",
+                  resourceLength: "",
+                  resourceSize: "",
+                  resourceTitle: "",
+                  resourceType: "",
+                  resourceUrl: "",
+                  srtSize: "",
+                  srtUrl: "",
+                  tenantId: "",
+                  transProgress: "",
+                  userId: ""
+                }
+              ]
             }
           ]
         }]
@@ -156,114 +164,116 @@
             //数据处理
             // this.resourceData = res.data.pageData
 
-            let data = this.dataChange(res.data.pageData)
-            this.resourceData = res.data.pageData
+            let data = this.dataChange(res.data.pageData);
+            this.resourceData = res.data.pageData;
             // console.log(this.resourceData)
           } else {
             this.$message({
-              message: '资源列表数据获取失败',
-              type: 'error'
-            })
-          }
-        }).catch(error => {
-          console.log(error)
-        })
-      },
-      //一级全选
-      checkAll(e) {
-        this.isCheckAll = e
-        this.indeterminate = false
-        //二级全选反选
-        this.resourceData.forEach((item) => {
-          item.selected = e
-          item.indeterminate = false  //去掉二级不确定状态
-          // 三级全选反选
-          item.resources.forEach((list) => {
-            list.selected = e
-           //  将所有数据加入被选数据
-            if(e){
-              list.requestId
-            }else{}
-          })
-        })
-      },
-      //二级课程全选
-      checkCourseAll(index, e) {
-        this.resourceData[index].selected = e
-        this.resourceData[index].indeterminate = false //去掉二级状态
-        let isChildren = this.resourceData[index].resources
-        if (isChildren) {
-          isChildren.forEach((item) => {
-            item.selected = e
-          })
-        }
-
-        this.checkIndeterminate(index)
-      },
-      //三级资源选择
-      checkResource(courseIndex) {
-        this.checkIndeterminate(courseIndex)
-      },
-      //检查选中状态
-      checkIndeterminate(courseIndex) {
-        let courceChecked = 0,
-            resourcChecked = 0,
-            courceLength = this.resourceData.length,
-            resourceLength = this.resourceData[courseIndex].resources.length;
-
-        //三级资源全选判断
-        this.resourceData[courseIndex].resources.forEach((item) => {
-          if (item.selected === true) {
-            resourcChecked++
+              message: "资源列表数据获取失败",
+              type: "error"
+            });
           }
         })
-        if (resourcChecked === resourceLength) { //所有资源被选中时，该课程为全选状态
-          this.resourceData[courseIndex].indeterminate = false
-          this.resourceData[courseIndex].selected = true
-        } else {
-          this.resourceData[courseIndex].selected = false
-          this.resourceData[courseIndex].indeterminate = true
-        }
-        if (resourcChecked === 0) {
-          this.resourceData[courseIndex].indeterminate = false
-        }
-        //二级课程全选判断
-        this.resourceData.forEach((item) => {
-          if (item.selected === true) {
-            courceChecked++
-          }
-        })
-        this.isCheckAll = courceChecked === courceLength //所有课程被选中时，改变全选状态
-        // courceChecked === courceLength ? this.isCheckAll = true : this.isCheckAll = false
-      },
-      // 数据临时加工
-      dataChange(data) {
-        data.forEach(function (item) {
-          item.selected = false     //判定是否选中
-          item.indeterminate = false //显示不确定状态、符号
-          item.resources.forEach(function (item) {
-            item.selected = false    //判定是否选中
-            item.indeterminate = false //显示不确定状态、符号
-          })
-          console.log(item)
-        })
-        return data
-      },
-      //  文件下载
-      fileDownload(url) {
-      },
-      fileUpload(){
-        alert('上传')
-      },
-      //获取图片路径
-      getImgSrc(type) {
-        return this.imgSrc[type]
-      }
+        .catch(error => {
+          console.log(error);
+        });
     },
-    created() {
-      this.getResource()
+    //一级全选
+    checkAll(e) {
+      this.isCheckAll = e;
+      this.indeterminate = false;
+      //二级全选反选
+      this.resourceData.forEach(item => {
+        item.selected = e;
+        item.indeterminate = false; //去掉二级不确定状态
+        // 三级全选反选
+        item.resources.forEach(list => {
+          list.selected = e;
+          //  将所有数据加入被选数据
+          if (e) {
+            list.requestId;
+          } else {
+          }
+        });
+      });
+    },
+    //二级课程全选
+    checkCourseAll(index, e) {
+      this.resourceData[index].selected = e;
+      this.resourceData[index].indeterminate = false; //去掉二级状态
+      let isChildren = this.resourceData[index].resources;
+      if (isChildren) {
+        isChildren.forEach(item => {
+          item.selected = e;
+        });
+      }
+
+      this.checkIndeterminate(index);
+    },
+    //三级资源选择
+    checkResource(courseIndex) {
+      this.checkIndeterminate(courseIndex);
+    },
+    //检查选中状态
+    checkIndeterminate(courseIndex) {
+      let courceChecked = 0,
+        resourcChecked = 0,
+        courceLength = this.resourceData.length,
+        resourceLength = this.resourceData[courseIndex].resources.length;
+
+      //三级资源全选判断
+      this.resourceData[courseIndex].resources.forEach(item => {
+        if (item.selected === true) {
+          resourcChecked++;
+        }
+      });
+      if (resourcChecked === resourceLength) {
+        //所有资源被选中时，该课程为全选状态
+        this.resourceData[courseIndex].indeterminate = false;
+        this.resourceData[courseIndex].selected = true;
+      } else {
+        this.resourceData[courseIndex].selected = false;
+        this.resourceData[courseIndex].indeterminate = true;
+      }
+      if (resourcChecked === 0) {
+        this.resourceData[courseIndex].indeterminate = false;
+      }
+      //二级课程全选判断
+      this.resourceData.forEach(item => {
+        if (item.selected === true) {
+          courceChecked++;
+        }
+      });
+      this.isCheckAll = courceChecked === courceLength; //所有课程被选中时，改变全选状态
+      // courceChecked === courceLength ? this.isCheckAll = true : this.isCheckAll = false
+    },
+    // 数据临时加工
+    dataChange(data) {
+      data.forEach(function(item) {
+        item.selected = false; //判定是否选中
+        item.indeterminate = false; //显示不确定状态、符号
+        item.resources.forEach(function(item) {
+          item.selected = false; //判定是否选中
+          item.indeterminate = false; //显示不确定状态、符号
+        });
+        console.log(item);
+      });
+      return data;
+    },
+    //  文件下载
+    fileDownload(url) {},
+    fileUpload() {
+      alert("上传");
+    },
+    //获取图片路径
+    getImgSrc(type) {
+      return this.imgSrc[type];
     }
+  },
+  created() {
+    this.getResource();
   }
+};
 </script>
 
 <style scoped lang="stylus" type="text/stylus">

@@ -6,7 +6,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'vue-video-player/src/custom-theme.css'
 import 'video.js/dist/video-js.css'
-
+import Cookie from 'js-cookie'
 
 Vue.use(ElementUI)
 
@@ -15,9 +15,7 @@ Vue.config.productionTip = false
 var routeList = []
 
 router.beforeEach((to, from, next) => {
-  console.log('to', to)
   var index = routeList.indexOf(to.name)
-  console.log('index', index)
   if (index !== -1) {
     //如果存在路由列表，则把之后的路由都删掉
     routeList.splice(index + 1, routeList.length - index - 1)
@@ -25,8 +23,12 @@ router.beforeEach((to, from, next) => {
     routeList.push(to.name)
   }
   to.meta.routeList = routeList
-  store.commit('setNav', to.name)
-  // console.log('allmenu', store.state.allMenu)
+  store.commit('setNav', to.path)
+  var n=(to.path.split('/')).length-1;
+  console.log('timess', n)
+  if(n <= 3) {
+    Cookie.set('path', to.path)
+  }
   next()
 })
 

@@ -2,12 +2,15 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import navHeader from './modules/navHeader'
 import { stat } from 'fs';
+import Cookie from 'js-cookie'
 
 Vue.use(Vuex)
 const state = {
   navHeader: navHeader.state.nav,
   allMenu: [],
   filterMenu: [],
+  topNavState: 'course',
+  leftNavState: '课程列表' ,
 }
 
 const mutations = {
@@ -15,7 +18,7 @@ const mutations = {
     state.navHeader = target
   },
   setAllMenu: (state, list)=> {
-    console.log('rwq', list)
+    // console.log('rwq', list)
     list.forEach(element => {
       state.allMenu.push(element)
     });

@@ -15,28 +15,25 @@
           style="
             height:100%;
             border-right:1px solid #D7D7D7;">
-              <el-menu
-                :default-active="$route.path"
-                class="el-menu-vertical-demo"
-                @select="handleSelect"
-                router
-                >
-                <template  v-for="(item, index) in currentMenu">
-                  <el-submenu v-if="item.list" :key="index"  :index="String(index)">
-                    <template slot="title">
-                      <i class="el-icon-location"></i>
-                      <span>{{String(index) + item.name}}</span>
-                    </template>
-                    <el-menu-item-group v-for="(subItem,i) in item.list" v-if="subItem.name" :key="i">
-                      <el-menu-item :index="item.url">{{subItem.name}}</el-menu-item>
-                    </el-menu-item-group>
-                  </el-submenu>
-                  <el-menu-item v-else :key="index" :index="item.url">
-                    <i class="el-icon-setting"></i>
-                    <span>{{String(index) + item.name}}</span>
-                  </el-menu-item>
-                </template>
-            </el-menu>
+              <el-menu router @select="handleSelect">
+        <template v-for="(issue,index) in $router.options.routes">
+          <template v-if="issue.name === $store.state.leftNavState"><!-- 注意：这里就是leftNavState状态作用之处，当该值与router的根路由的name相等时加载相应菜单组 -->
+            <template v-for="(item,index) in issue.children">
+              <el-submenu v-if="!item.leaf" :index="index+''">
+                <template slot="title"><i :class="item.iconCls"></i><span slot="title">{{item.name}}</span></template>
+                <el-menu-item v-for="term in item.children" :key="term.path" :index="term.path"
+                              :class="$store.state.navHeader==term.path?'is-active':''" v-if="term.menuShow" ref="menu">
+                  <i :class="term.iconCls"></i><span slot="title">{{term.name}}</span>
+                </el-menu-item>
+              </el-submenu>
+              <el-menu-item v-else-if="item.leaf&&item.children&&item.children.length&&item.menuShow" ref="menu" :index="item.children[0].path"
+                            :class="$store.state.navHeader==item.children[0].path?'is-active':''">
+                <i :class="item.iconCls"></i><span slot="title">{{item.children[0].name}}</span>
+              </el-menu-item>
+            </template>
+          </template>
+        </template>
+      </el-menu>
         </el-aside>
         <el-main>
           <router-view v-on:floorStatus="floorStatus"></router-view>
@@ -65,16 +62,23 @@
     },
     mounted() {
       this.nav = this.$store.state.navHeader
-      console.log('state.navHeader',this.$store.state.navHeader)
-      console.log('allmenu', this.$store.state.allMenu)
-      console.log('router', this.$route)
+      // console.log('state.navHeader',this.$store.state.navHeader)
+      // console.log('allmenu', this.$store.state.allMenu)
+      console.log('router', this.$router.options.routes)
+      console.log('$store.state.leftNavState', this.$store.state.leftNavState)
     },
     methods:{
       floorStatus (e) {
         this.nav = e
       },
       handleSelect(key, keyPath) {
-        console.log(key,keyPath)
+        console.log('rwq rqw',this.$store.state.navHeader)
+      }
+    },
+    watch: {
+      '$route': function(to, from){ // 路由改变时执行
+        console.info("$store.state.leftNavState:" + this.$store.state.leftNavState);
+        var n=(this.$route.path.split('/')).length-1;
       }
     }
   }

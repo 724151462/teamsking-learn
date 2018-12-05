@@ -33,7 +33,7 @@ axios.interceptors.request.use(
  */
 axios.interceptors.response.use(
   res => {
-    console.log('tokens',getToken())
+    // console.log('tokens',getToken())
 
       if (Number(res.data.code) === 401) {
         removeToken()

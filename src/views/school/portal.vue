@@ -19,30 +19,34 @@
         activeIndex: '1',
       };
     },
-    mounted() {
-      console.log(this.$route)
-      switch(this.$route.name) {
-        case '选择模板':
-          this.activeIndex = '1'
-          break;
-        case '平台信息':
-          this.activeIndex = '2'
-          break;
-        case '轮播图':
-          this.activeIndex = '3'
-          break;
-        case '课程推荐':
-          this.activeIndex = '4'
-          break;
-        case '名师风采':
-          this.activeIndex = '5'
-          break;
+    watch: {
+      '$route'(){
+        console.log('fdas',this.$route)
+        switch(this.$route.path) {
+          case '/school/portal/mould':
+            this.activeIndex = '1'
+            break;
+          case '/school/portal/platform':
+            this.activeIndex = '2'
+            break;
+          case '/school/portal/banner':
+            this.activeIndex = '3'
+            break;
+          case '/school/portal/recommend':
+            this.activeIndex = '4'
+            break;
+          case '/school/portal/teacher':
+            this.activeIndex = '5'
+            break;
+        }
       }
+      
         
     },
     methods: {
       handleSelect(key, keyPath) {
-        console.log(key, keyPath);
+        console.log(123,key, keyPath);
+        this.fetchNavData()
         switch(key) {
           case '1':
             this.$router.push('mould')
@@ -60,7 +64,41 @@
             this.$router.push('teacher')
             break;
         }
+      },
+      fetchNavData () { // 初始化菜单激活项
+          var cur_path = this.$route.path; //获取当前路由
+          console.log('curpath',cur_path)
+          var routers = this.$router.options.routes; // 获取路由对象
+          var nav_type = "courseCenter", nav_name = "课程列表";
+          console.log('routers', routers)
+          for (var i = 0; i < routers.length; i++) {
+          var children = routers[i].children;
+          if(children){
+            for (var j = 0; j < children.length; j++) {
+            var grand_children = children[j].children;
+            
+            if(grand_children){
+              for (var k = 0; k < grand_children.length; k++) {
+              console.log('grand_children',grand_children[k].path)
+              if (grand_children[k].path === cur_path) {
+                nav_type = routers[i].type;
+                nav_name = routers[i].name;
+                break;
+              }
+              }
+            }
+            }
+          }
+          }
+          this.$store.state.topNavState = nav_type;  // 改变topNavState状态的值	
+          this.$store.state.leftNavState = nav_name;  // 改变leftNavState状态的值
+          console.log('nav_type',nav_type,'nav_name', nav_name)
+          if(nav_type == "courseCenter"){
+          this.defaultActiveIndex = "/course/list";
+          } else {
+          this.defaultActiveIndex = "/" + nav_name;
+          }
+        },
       }
-    }
   }
 </script>

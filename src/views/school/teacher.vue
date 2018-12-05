@@ -287,7 +287,7 @@
                 })
             break;
           case 'addTeacher':
-            this.$router.push('addteacher')
+            this.$router.push({path: '/school/teacher/addteacher'})
             break;
           case 'resetPassword':
             this.resetPassword(info)
@@ -296,10 +296,7 @@
             break;
             this.resetPassword(info)
           case 'edit':
-            this.$router.push({
-              name:'修改教师', 
-              params:{"id": info.teacherId}
-            })
+            this.$router.push({path: '/school/teacher/modifyteacher', query: {id: 1} })
             break;
         }
       },

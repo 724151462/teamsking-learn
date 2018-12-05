@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="note">
     <tableNoHeader :tableData="tableData" :tables="tables" :buttonStylus="sysButton" @showComponentInfo="showComponentInfo"></tableNoHeader>
     <adialog :dialogConfig="dialogConfig"
       :dataObj="dataObj"
