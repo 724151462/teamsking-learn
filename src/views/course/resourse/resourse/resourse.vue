@@ -11,8 +11,14 @@
         <el-radio v-model="radio" label="文档">文档</el-radio>
         <el-radio v-model="radio" label="音频">音频</el-radio>
       </div>
-      <div>
-        <el-input placeholder="请选择日期" suffix-icon="el-icon-date" v-model="input"></el-input>
+      <div style="display: flex">
+        <el-input
+          placeholder="输入课程名称查询资源"
+          v-model="input">
+        </el-input>
+        <div>
+          <el-button icon="el-icon-search" class="search-btn"></el-button>
+        </div>
       </div>
     </div>
     <div class="resource-warp">
@@ -35,23 +41,16 @@
                 :indeterminate="course.indeterminate"
                 v-model="course.selected"
                 style="padding-left: 25px"
-                @change="checkCourseAll(courseIndex, $event)"
-              ></el-checkbox>
+                @change="checkCourseAll(courseIndex, $event)"></el-checkbox>
               <div style="display: inline-flex;width: calc(100% - 100px)">
-                <div style="display: inline-block">
-                  <img :src="imgSrc.folder" style="width: 20px;margin: 0 10px;">
-                </div>
+                <div style="display: inline-block"><img :src="imgSrc.folder" style="width: 20px;margin: 0 10px;"/></div>
                 <div style="display: inline-block">{{course.courseName}}</div>
                 <div style="flex: 1">1</div>
                 <div>
-                  <el-button
-                    type="primary"
-                    icon="el-icon-upload2"
-                    size="small"
-                    @click.stop="fileUpload"
-                  >上传</el-button>
+                  <el-button type="primary" icon="el-icon-upload2" size="small" @click.stop="fileUpload">上传</el-button>
                 </div>
               </div>
+
             </template>
             <div>
               <div class="resource-list" v-for="resource in course.resources" :key="resource.id">
@@ -102,31 +101,29 @@
 </template>
 
 <script>
-import { getResourceList } from "../../api/course";
+  import {getResourceList} from "../../../../api/course";
 
-export default {
-  name: "resource",
-  data() {
-    return {
-      imgSrc: {
-        folder: require("../../assets/images/folder.png"),
-        pdf: require("../../assets/images/pdf.png"),
-        mp4: require("../../assets/images/mp4.png"),
-        word: require("../../assets/images/word.png"),
-        txt: require("../../assets/images/txt.png")
-      },
-      radio: "全部文件",
-      input: "",
-      //多选框验证
-      isCheckAll: false, // 是否全选(一级)
-      checked: [], //存放被选择数据的数组
-      indeterminate: false, //选中，但非全选状态样式状态切换
-      //数据
-      resourceData: [
-        {
-          //课程资源数据列表
-          courseId: "",
-          courseName: "",
+  export default {
+    name: "resource",
+    data() {
+      return {
+        imgSrc: {
+          folder: require("../../../../assets/images/folder.png"),
+          pdf: require("../../../../assets/images/pdf.png"),
+          mp4: require("../../../../assets/images/mp4.png"),
+          word: require("../../../../assets/images/word.png"),
+          txt: require("../../../../assets/images/txt.png")
+        },
+        radio: '全部文件',
+        input: '',
+        //多选框验证
+        isCheckAll: false, // 是否全选(一级)
+        checked: [],      //存放被选择数据的数组
+        indeterminate: false, //选中，但非全选状态样式状态切换
+        //数据
+        resourceData: [{ //课程资源数据列表
+          courseId: '',
+          courseName: '',
           resources: [
             {
               courseId: "",
@@ -155,15 +152,13 @@ export default {
               ]
             }
           ]
-        }
-      ]
-    };
-  },
-  methods: {
-    //获取数据
-    getResource(data) {
-      getResourceList(data)
-        .then(res => {
+        }]
+      };
+    },
+    methods: {
+      //获取数据
+      getResource(data) {
+        getResourceList().then(res => {
           if (Number(res.code) === 200) {
             // console.log('资源列表数据:'+JSON.stringify(res.pageData))
             //数据处理
@@ -282,71 +277,49 @@ export default {
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
-.resource {
-  padding: 0 5% 20px 50px;
-
-  .title {
-    border-bottom: 2px solid gray;
-    padding-bottom: 20px;
-  }
-
-  .radio-group {
-    display: flex;
-    padding: 20px 0;
-  }
-
-  .resource-warp {
-    .img-span {
-      display: inline-block;
-
-      .img-icon {
-        width: 48px;
-        height: 48px;
-        margin: 0 10px;
-      }
-    }
-
-    .resource-title {
-      display: flex;
-      height: 50px;
-      align-items: center;
-      background-color: #f4f4f4;
-
-      & div:first-child {
-        flex: 1;
-        padding-left: 25px;
-      }
-
-      & div:last-child {
-        padding-right: 40px;
-      }
-    }
-
-    .resource-list {
-      padding-left: 32px;
-      display: flex;
-      align-items: center;
-
-      .padding-box {
-        width: 50px;
-        height: 45px;
-
-        & div {
-          height: 50%;
-          width: 100%;
-          border-left: 1px solid #ccc;
-          border-bottom: 1px solid #ccc;
-        }
-      }
-
-      .resource-info-box {
-        display: flex;
-
-        & div {
-          margin: 0 10px;
-        }
-      }
-    }
-  }
-}
+  .resource
+    padding: 0 5% 20px 50px
+    .title
+      border-bottom 2px solid gray
+      padding-bottom 20px
+    .radio-group
+      display flex
+      padding 20px 0
+      .search-btn
+        border-left 0
+        background-color #f4f4f4
+        border-radius 4px
+    .resource-warp
+      .img-span
+        display inline-block
+        .img-icon
+          width 48px
+          height 48px
+          margin 0 10px
+      .resource-title
+        display flex
+        height 50px
+        align-items center
+        background-color #f4f4f4
+        & div:first-child
+          flex 1
+          padding-left 25px
+        & div:last-child
+          padding-right 40px
+      .resource-list
+        padding-left: 32px
+        display flex
+        align-items center
+        .padding-box
+          width 50px
+          height 45px
+          & div
+            height 50%
+            width 100%
+            border-left 1px solid #ccc
+            border-bottom 1px solid #ccc
+        .resource-info-box
+          display flex
+          & div
+            margin 0 10px
 </style>

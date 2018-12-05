@@ -10,10 +10,16 @@
     </div>
     <el-table
       :data="tableData3"
+      :header-cell-style="{'background-color': '#fafafa',}"
       height="85%"
       border
-      tooltip-effect="dark"
+      highlight-current-row
+      @current-change="handleCurrentChange"
       class="test-table">
+      <el-table-column
+        type="index"
+        width="50">
+      </el-table-column>
       <el-table-column
         prop="date"
         min-width="120px"
@@ -30,7 +36,18 @@
       <el-table-column
         prop="address"
         width="200"
+        class="tigan"
+        show-overflow-tooltip
         label="题干">
+        <!--<template slot-scope="scope">-->
+          <!--<el-popover trigger="hover" placement="bottom">-->
+            <!--<p>姓名: {{ scope.row.name }}</p>-->
+            <!--<p>住址: {{ scope.row.address }}</p>-->
+            <!--<div slot="reference" class="name-wrapper">-->
+                <!--{{ scope.row.address }}-->
+            <!--</div>-->
+          <!--</el-popover>-->
+        <!--</template>-->
       </el-table-column>
       <el-table-column
         prop="name"
@@ -52,8 +69,6 @@
         </template>
       </el-table-column>
     </el-table>
-
-
     <!--试题查看弹窗-->
     <el-dialog
       title="试题查看"
@@ -92,6 +107,15 @@
   export default {
     data() {
       return {
+        tableLabel:[
+          {label:'序号', prop: '', width: ''},
+          {label:'课程名称', prop: '', width: ''},
+          {label:'所属章节', prop: '', width: ''},
+          {label:'题干', prop: '', width: '200'},
+          {label:'难度', prop: '', width: ''},
+          {label:'题目类型', prop: '', width: ''},
+          {label:'答案', prop: '', width: ''},
+        ],
         tableData3: [
           {
           date: '2016-05-03',
@@ -118,12 +142,19 @@
     methods:{
       toAddTest () {
         this.$router.push('/course/addtest');
+      },
+      handleCurrentChange (val) {
+        console.log(val)
       }
     }
   }
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+  .el-table .cell
+    overflow: hidden
+    white-space: nowrap
+    text-overflow:ellipsis
   .test
     padding:0 5% 20px 50px
     .title

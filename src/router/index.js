@@ -168,6 +168,11 @@ export const constantRouterMap = [{
             name: '讨论中心',
           },
           {
+            path: '/course/list/discuss/disinfo',
+            component: _import('course/discussDialog'),
+            name: '讨论详情',
+          },
+          {
             path: '/course/list/interact/vote',
             component: _import('course/interactContent/vote'),
             name: '发布投票',
@@ -188,24 +193,48 @@ export const constantRouterMap = [{
         ]
       },
       {
-        path: 'resource',
+        path: 'test',
         component: Layout,
-        name: '资源管理',
+        name: '试题管理',
         children: [{
             path: '/course/resource/test',
-            component: _import('course/test'),
+            component: _import('course/resourse/test/test'),
             name: '试题管理',
             menuShow: true
           },
           {
             path: '/course/resource/addtest',
-            component: _import('course/addTest'),
+            component: _import('course/resourse/test/addTest'),
             name: '试题添加',
           },
           {
             path: '/course/resource/edittest',
-            component: _import('course/editTest'),
+            component: _import('course/resourse/test/editTest'),
             name: '试题编辑',
+          }
+        ]
+      },
+      {
+        path: 'resource',
+        component: Layout,
+        name: '资源管理',
+        children: [{
+            path: '/course/resource/resource',
+            component: _import('course/resourse/resourse/resourse'),
+            name: '资源管理',
+            menuShow: true
+          }
+        ]
+      },
+      {
+        path: 'activity',
+        component: Layout,
+        name: '活动管理',
+        children: [{
+            path: '/course/activity/activity',
+            component: _import('course/resourse/activity/activity'),
+            name: '活动管理',
+            menuShow: true
           }
         ]
       },
@@ -410,37 +439,35 @@ export const constantRouterMap = [{
     name: '个人中心',
     type: 'userCenter',
     redirect: '/user/index',
-    children: [{
-        path: 'index',
-        component: _import('user/index'),
-        name: 'user个人设置中心'
-      },
-      {
-        path: 'message',
-        component: _import('user/message'),
-        name: 'user消息管理'
-      },
-      {
-        path: 'buy',
-        component: _import('user/buy'),
-        name: 'user购买记录'
-      },
-      {
-        path: 'income',
-        component: _import('user/income'),
-        name: 'user收入记录'
-      },
-      {
-        path: 'withdraw',
-        component: _import('user/withdraw'),
-        name: 'user申请提现'
-      },
-      {
-        path: 'feedback',
-        component: _import('user/feedback'),
-        name: 'user意见反馈'
-      }
-    ],
+    children: [
+      {path: 'index', component: _import('user/index'), name: 'user个人设置中心'},
+      {path: 'message', component: _import('user/message'), name: 'user消息管理'},
+      {path: 'operation', component: _import('user/operation'), name: 'user操作记录'},
+      {path: 'buy', component: _import('user/buy'), name: 'user购买记录'},
+      {path: 'income', component: _import('user/income'), name: 'user收入记录'},
+      {path: 'withdraw', component: _import('user/withdraw'), name: 'user申请提现'},
+      {path: 'feedback', component: _import('user/feedback'), name: 'user意见反馈'}],
+  },
+  {
+    path:'/school',
+    component:Layout,
+    name:'个人中心',
+    redirect:'/school/student',
+    meta:{
+      address:'school'
+    },
+    children:[
+      {path:'student',component:_import('school/student'),name:'user学生管理'},
+      {path:'teacher',component:_import('school/teacher'),name:'user教师管理'},
+      {path:'controller',component:_import('school/controller'),name:'user管理员'},
+      {path:'portal',component:_import('school/portal'),name:'user门户配置'},
+      {path:'course',component:_import('school/course'),name:'user课程管理'},
+      {path:'certificate',component:_import('school/certificate'),name:'user证书审核'},
+      {path:'academy',component:_import('school/academy'),name:'user院管理'},
+      {path:'department',component:_import('school/department'),name:'user系管理'},
+      {path:'speciality',component:_import('school/speciality'),name:'user专业管理'},
+      {path:'class',component:_import('school/class'),name:'user班级管理'},
+    ]
   },
   // {
   //   path:'/school',
