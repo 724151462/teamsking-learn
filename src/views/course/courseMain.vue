@@ -21,7 +21,7 @@
       };
     },
     mounted() {
-      console.log(this.$route)
+      console.log(this.$route.query.id)
       switch(this.$route.name) {
         case '章节内容':
           this.activeIndex = '1'

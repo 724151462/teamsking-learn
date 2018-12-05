@@ -154,7 +154,7 @@ export default {
     goAddCourse (e) {
       this.$router.push({
         path: '/course/list/chapter',
-        query: {id: 123}
+        query: {id: e}
       })
     },
     release (val) {

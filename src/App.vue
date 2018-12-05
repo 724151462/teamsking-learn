@@ -9,8 +9,8 @@
 </script>
 <style lang="stylus" type="text/stylus">
   @import "assets/css/reset.styl"
-  body .el-tooltip__popper
-    max-width 200px
+    body .el-tooltip__popper
+      max-width 200px
     #app
       width: 100%
       height:100%

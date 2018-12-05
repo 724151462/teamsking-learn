@@ -228,7 +228,8 @@ import {
 export default {
     data() {
       return {
-        courseId: '0608367675f54267aa6960fd0557cc1b',
+        // courseId: '0608367675f54267aa6960fd0557cc1b',
+        courseId: this.$route.query.id,
         chapterFold: false,
         jieFold: false,
         pattern: [{label: '开放学习', value: 1}, {label: '顺序学习', value: 2}],

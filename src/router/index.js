@@ -288,6 +288,8 @@ export const constantRouterMap = [{
         path: 'portal',
         component: Layout,
         name: 'school门户配置',
+        leaf: true,
+        menuShow: true,
         redirect: '/school/portal/mould',
         children: [{
             path: '/school/portal/mould',

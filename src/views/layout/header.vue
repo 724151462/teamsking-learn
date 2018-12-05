@@ -1,31 +1,47 @@
 <template>
     <div class="header">
-      <router-link to="/course" class="login">
-          <span>天擎智教</span>
-          <span class="sizes">后台管理</span>
-      </router-link>
-      <el-menu :default-active="defaultActiveIndex" background-color="rgb(70,76,92)"
-      text-color="#fff"
-      active-text-color="#ffd04b" 
-      class="el-menu-demo" 
-      mode="horizontal" 
-      @select="handleSelect" 
-      :router="true">
-			<el-menu-item index="/course">课程中心</el-menu-item>
-			<el-menu-item index="/learn">学习管理</el-menu-item>
-			<el-menu-item index="/school">校管中心</el-menu-item>
-			<el-menu-item index="/system">系统管理</el-menu-item>
-      <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" 
-                            >
-                <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
-              </el-menu-item> -->
-		</el-menu>
+      <div style="display: flex">
+        <router-link to="/course" class="login">
+            <span>天擎智教</span>
+            <span class="sizes">后台管理</span>
+        </router-link>
+        <el-menu :default-active="defaultActiveIndex" background-color="rgb(70,76,92)"
+          text-color="#fff"
+          active-text-color="#ffd04b" 
+          class="el-menu-demo" 
+          mode="horizontal" 
+          @select="handleSelect" 
+          :router="true">
+          <el-menu-item index="/course">课程中心</el-menu-item>
+          <el-menu-item index="/learn">学习管理</el-menu-item>
+          <el-menu-item index="/school">校管中心</el-menu-item>
+          <el-menu-item index="/system">系统管理</el-menu-item>
+          <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" 
+                                >
+                    <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
+                  </el-menu-item> -->
+        </el-menu>
+      </div>
+        <el-dropdown class="avator">
+          <span class="el-dropdown-link userinfo-inner">
+            <img :src="require('../../assets/images/user.png')" alt=""> <span>123</span>   <i class="el-icon-caret-bottom"></i></span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>
+              <div @click="jumpTo('/user/profile')"><span style="color: #555;font-size: 14px;">个人信息</span></div>
+            </el-dropdown-item>
+            <el-dropdown-item>
+              <div @click="jumpTo('/user/changepwd')"><span style="color: #555;font-size: 14px;">修改密码</span></div>
+            </el-dropdown-item>
+            <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
     </div>
 </template>
 
 <script>
   import {menuList} from '@/api/login'
   import {constantRouterMap} from '@/router/index'
+  import { removeToken } from '@/utils/auth'
   export default {
     props:['navs'],
     data(){
@@ -71,7 +87,10 @@
     methods:{
 		navChange() {
 			this.storeNav = this.$store.state.navHeader
-		},
+    },
+    logout() {
+      removeToken()
+    },
 		handleSelect(index){
 			this.defaultActiveIndex = index;
 		},
@@ -126,7 +145,7 @@
         height:60px
         background: #464C5C
         display: flex
-
+        justify-content space-between
         .login
             color: #ffffff
             font-size:30px
@@ -153,4 +172,14 @@
 
         .yes-list
             background: #697583
+    .avator 
+      display flex
+      align-items center
+      color #fff
+      margin-right 3%
+      cursor pointer
+      .userinfo-inner
+        display flex
+        align-items center
+        color #fff
 </style>
