@@ -196,3 +196,12 @@ export function getResourceList (data) {
   let url = '/api/v1/resource/page'
   return commonsAjax(url, '', 'get')
 }
+
+// ===============试题管理===============
+//
+/**
+ * 上传试题模板
+ */
+export function upTest() {
+
+}

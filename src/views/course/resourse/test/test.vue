@@ -1,11 +1,21 @@
 <template>
   <div class="test">
     <div class="title">
-      <div style="display: inline-block;float: left">试题管理</div>
-      <div style="float: right;display: inline-block" class="btn-warp">
-        <el-button type="success">下载模板</el-button>
-        <el-button >导入</el-button>
-        <el-button type="primary" @click="toAddTest()">添加</el-button>
+      <div>试题管理</div>
+      <div style="" class="btn-warp">
+        <div>
+          <el-button type="success">下载模板</el-button>
+        </div>
+        <div>
+          <el-upload
+            :action="uploadURL"
+            :limit="1">
+              <el-button >导入</el-button>
+          </el-upload>
+        </div>
+        <div>
+          <el-button type="primary" @click="toAddTest()">添加</el-button>
+        </div>
       </div>
     </div>
     <el-table
@@ -95,6 +105,8 @@
 </template>
 
 <script>
+  import {upTest} from "../../../../api/course";
+
   export default {
     data() {
       return {
@@ -128,6 +140,8 @@
         ],
         testView: false , //试题查看弹窗
         testDelete: false, //删除试题
+        courseId:'',//如果指定课程的话，课程ID
+        uploadURL: '' //模板文件保存的URL地址
       }
     },
     methods:{
@@ -139,6 +153,29 @@
       },
       handleCurrentChange (val) {
         console.log(val)
+      },
+      // 导入试题模板
+      upTestFile () {
+        fileFormData = new FormData();
+        fileFormData.append('file', this.files, this.fileName);
+      },
+      //文件上传验证
+      beforTestUpload(file){
+        console.log(file,'文件');
+        this.files = file;
+        const extension = file.name.split('.')[1] === 'xls'
+        const extension2 = file.name.split('.')[1] === 'xlsx'
+        const isLt2M = file.size / 1024 / 1024 < 5
+        if (!extension && !extension2) {
+          this.$message.warning('上传模板只能是 xls、xlsx格式!')
+          return
+        }
+        if (!isLt2M) {
+          this.$message.warning('上传模板大小不能超过 5MB!')
+          return
+        }
+        this.fileName = file.name;
+        return false // 返回false不会自动上传
       }
     }
   }
@@ -152,11 +189,22 @@
   .test
     padding:0 5% 20px 50px
     .title
-      overflow hidden
+      width 100%
+      display flex
+      align-items center
       border-bottom 2px solid gray
       padding-bottom 10px
+      & div:first-chilf
+        height 45px;
+        width 100px;
     .btn-warp
-      padding-right 50px
+      flex 1
+      display flex
+      justify-content flex-end
+      & div
+        margin 0 10px
+      & div:last-child
+        margin-right 0
     .test-table
       width 100%
       margin 0 auto
