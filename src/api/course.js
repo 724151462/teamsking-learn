@@ -63,8 +63,9 @@ export function saveCourse (data) {
  * 查询课程信息
  */
 export function courseInfo (data) {
+  console.log(data)
   let url = '/api/v1/course/info/' + data
-  return commonsAjax(url, '', 'post')
+  return commonsAjax(url, '', 'get')
 }
 
 /**
@@ -194,5 +195,33 @@ export function deleteUser (data) {
  */
 export function getResourceList (data) {
   let url = '/api/v1/resource/page'
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 添加小项
+ */
+export function itemAdd (data) {
+  let url = '/api/v1/course/chapter/section/item'
+  return commonsAjax(url, data, 'post')
+}
+
+
+
+/**
+ * 添加成员方案名称
+ */
+export function schemeAdd (data) {
+  let url = '/api/v1/course/scheme'
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 根据课程id获取方案列表
+ */
+export function schemeList (data) {
+  let url = `/api/v1/course/${data}/schemes`
   return commonsAjax(url, '', 'get')
 }

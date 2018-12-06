@@ -4,7 +4,7 @@
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="学校名称"></el-input>
+        <el-input v-model="form.search"  style="width: 200px;margin-left: 10px;" placeholder="学校名称"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="queryTenantList">查询</el-button>
@@ -85,17 +85,16 @@
         menuDialogVisible:false,
         dialogVisible:false,
         form:{
-          title:'添加角色',
         },
         tableTitle:'角色管理列表',
         tableOperate:[
           {
             content:'删除',
-            type:'created'
+            type:'delete'
           },
           {
             content:'创建租户',
-            type:'deleteList'
+            type:'created'
           }
         ],
         columnNameList:[
@@ -174,7 +173,7 @@
     },
     methods:{
       showComponentInfo:function(type,info){
-       /*console.log('type',type,'info',info);
+       console.log('type',type,'info',info);
         switch(type){
           case 'created':
             console.log('here is created');
@@ -193,10 +192,10 @@
           case 'set':
             this.editMenu(info);
             break;
-        }*/
+        }
       },
       queryTenantList:function () {
-        sysTenantManagerPage().then(
+        sysTenantManagerPage(this.form).then(
           res => {
             this.tableData = res.data;
             console.log('租户管理员列表:', this.tableData );
@@ -213,9 +212,9 @@
         )*/
       },
       appendRole:function(){
-        /*this.dialogVisible = true;
+        this.dialogVisible = true;
         this.addForm.title = '添加角色';
-        this.addForm.data={ roleName:'' }*/
+        this.addForm.data={ roleName:'' }
       },
       editRole:function(roleInfo){
         /*this.dialogVisible = true;

@@ -461,7 +461,7 @@
     },
     created(){
       this.$emit('floorStatus','course')
-      this.selectListselectList()
+      // this.selectListselectList()
       // if(this.$route.query.courseId)
       if(this.$route.query.courseId && this.$route.query.courseId !== ''){
         this.getUpData(this.$route.query.courseId)
@@ -686,6 +686,9 @@
       }
     },
     mounted(){
+      if(this.$route.query.type === 'upData') {
+        
+      }
       //课程介绍
       let self = this
       this.editor1 = new wangEditor('#editor1')

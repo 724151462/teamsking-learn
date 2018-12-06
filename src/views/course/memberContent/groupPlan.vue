@@ -4,24 +4,37 @@
         <router-link :to="{name: '成员'}">成员</router-link> > 成员小组方案
     </span>
     <div class="nav">
-      <el-button type="primary" @click="isAddFa = true">+ 手动分组</el-button>
+      <el-button type="primary" @click="addPlan = true">+ 手动分组</el-button>
       <el-button type="primary" @click="isAddFa = true">+ 随机分组</el-button>
     </div>
     <div class="center">
-      <div class="list">
-        <div class="title">成员小组方案1</div>
+      <div class="list" v-for="item in schemeList" :key="item.schemeId">
+        <div class="title">{{item.schemeName}}</div>
         <div class="bottom">
-          <span class="left">2人已被划分为小组，划分为1个小组</span>
+          <span class="left">{{item.userCount | coutFilter}}人已被划分为小组，划分为{{item.teamCount | coutFilter}}个小组</span>
           <span class="right">
             <i class="el-icon-tickets">详情</i>
             <i class="el-icon-document">复制</i>
-            <i class="el-icon-edit">编辑</i>
+            <i class="el-icon-edit" @click="editPlan">编辑</i>
             <i class="el-icon-delete">删除</i>
           </span>
         </div>
       </div>
     </div>
-
+    <el-dialog 
+      width="40%"
+      title="添加方案"
+      :visible.sync="addPlan">
+      <el-form>
+        <el-form-item label="小组方案名称" required>
+          <el-input v-model="groupPlan.schemeName"></el-input>
+        </el-form-item>
+      </el-form>
+      <div style="text-align: right;">
+        <el-button @click="addPlan = false">取消</el-button>
+        <el-button type="primary" @click="ensureAddPlan">确定</el-button>
+      </div>
+    </el-dialog>
     <el-dialog
         width="60%"
         title="添加成员小组方案"
@@ -39,7 +52,7 @@
 
         <div class="groupPlanLint">
           <div>5人为1小组</div>
-          <div class="list">
+          <div class="list" v-for="(item, index) in addGroup.zuList" :key="index">
             <div class="title">
               <span class="left">组1</span>
               <span class="right">
@@ -118,7 +131,7 @@
 </template>
 
 <script>
-import {memberList} from '@/api/course'
+import {memberList, schemeAdd, schemeList} from '@/api/course'
 export default {
   data(){
     return{
@@ -159,6 +172,14 @@ export default {
           }
         ]
       },
+      schemeList: [],
+      addPlan: false,
+      groupPlan: {
+        courseId: '0608367675f54267aa6960fd0557cc1b',
+        schemeName: "",
+        schemeType: 10
+      },
+
       group:'1',  // 1 全部成员 2 未分配小组的成员
       isAddFa:false,
       isUpGrouplan:false,
@@ -190,6 +211,10 @@ export default {
   },
   created() {
     this.getPage(this.pageParmas)
+    schemeList(this.courseId)
+    .then((response)=> {
+      this.schemeList = response.data
+    })
   },
   methods: {
     getPage() {
@@ -202,6 +227,27 @@ export default {
         this.tableData.img = 'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg'
         console.log(this.tableData)
       })
+    },
+    // 添加方案名称
+    ensureAddPlan() {
+      schemeAdd(this.groupPlan)
+      .then((response)=> {
+        alert('添加成功')
+      })
+      this.addPlan = false
+    },
+    // 点击编辑弹窗
+    editPlan() {
+      this.isAddFa = true
+    }
+  },
+  filters: {
+    coutFilter(value) {
+      if(value === null) {
+        return 0
+      } else {
+        return value
+      }
     }
   }
 }

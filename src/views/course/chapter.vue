@@ -84,7 +84,7 @@
                 <el-tab-pane label="视频" name="first">
                     <el-form v-model="videoForm">
                         <el-form-item label="视频标题" required>
-                            <el-input v-model="videoForm.title" style="width: 220px;"></el-input>
+                            <el-input v-model="videoForm.itemName" style="width: 220px;"></el-input>
                         </el-form-item>
                         <el-form-item label="视频" required>
                             <el-input v-model="videoForm.video" style="width: 220px;display: none"></el-input>
@@ -95,7 +95,7 @@
                 <el-tab-pane label="文档" name="second">
                     <el-form v-model="docForm">
                         <el-form-item label="文档标题" required>
-                            <el-input v-model="docForm.title" style="width: 220px;"></el-input>
+                            <el-input v-model="docForm.itemName" style="width: 220px;"></el-input>
                         </el-form-item>
                         <el-form-item label="视频" required>
                             <el-input v-model="docForm.document" style="width: 220px;display: none"></el-input>
@@ -106,7 +106,7 @@
             </el-tabs>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+                <el-button type="primary" @click="addItem">确 定</el-button>
             </span>
         </el-dialog>
 
@@ -223,7 +223,8 @@ import videoPlayer from '@/components/video-pay'
 import {
     chaptersList,
     chaptersAdd,
-    sectionAdd
+    sectionAdd,
+    itemAdd,
 } from '@/api/course'
 export default {
     data() {
@@ -409,15 +410,23 @@ export default {
         addTitle: '',
         // 添加视频
         videoForm: {
-            title: '',
-            video: ''
+            itemName: '',
+            itemType: 10,
+            video: '',
+            contentType: 10,
+            courseId: this.$route.query.id
         },
         radio: '1.2',
+        // 添加内容类型tab
+        contentType: '视频',
         // 添加文档
         // 添加视频
         docForm: {
-            title: '',
-            document: ''
+            itemName: '',
+            itemType: 10,
+            document: '',
+            contentType: 20,
+            courseId: this.$route.query.id
         },
         vedioDialog: false,
         // 添加题目对话框
@@ -517,8 +526,29 @@ export default {
             this.dialogConfig.title = '添加节'
             this.show = true
         },
-        addContentBtn() {
-             this.dialogVisible = true
+        // 添加内容弹窗
+        addContentBtn(data) {
+            console.log(data)
+            this.videoForm.chapterId = data.chapterId
+            this.videoForm.sectionId = data.sectionId
+            this.docForm.chapterId = data.chapterId
+            this.docForm.sectionId = data.sectionId
+            this.dialogVisible = true
+        },
+        // 添加内容对话框确认按钮
+        addItem() {
+            console.log(this.contentType)
+            let formType = ''
+            if(this.contentType === '视频') {
+                formType = this.videoForm
+            }else{
+                formType = this.docForm
+            }
+            console.log('ft', formType)
+            itemAdd(formType)
+            .then((response)=> {
+                console.log(response.data)
+            })
         },
         addJie(jieName) {
             console.log('jiename', jieName)
@@ -530,7 +560,8 @@ export default {
             // this.sourceData.push({chapter: chapterName})
         },
         handleClick(tab, event) {
-            console.log(tab, event);
+            console.log(tab.label);
+            this.contentType = tab.label
         },
         // 资源类型图标
         typeIcon(info) {

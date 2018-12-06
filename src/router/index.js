@@ -567,7 +567,7 @@ export const constantRouterMap = [{
             menuShow: true
           },
           {
-            path: '/system/system',
+            path: '/system/manager',
             component: _import('system/system'),
             name: 'system系统管理员',
             menuShow: true
