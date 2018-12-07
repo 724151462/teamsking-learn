@@ -225,3 +225,31 @@ export function schemeList (data) {
   let url = `/api/v1/course/${data}/schemes`
   return commonsAjax(url, '', 'get')
 }
+
+
+
+/**
+ * 根据方案id获取方案成员列表
+ */
+export function memberEditList (data) {
+  let url = `/api/v1/course/scheme/${data}/teams`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 根据方案id获取方案成员分配/未分配列表
+ */
+export function memberMatchList (data) {
+  let url = `/api/v1/course/${data.courseId}/scheme/${data.schemeId}/team/user`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 根据方案id提交小组分配方案
+ */
+export function memberMatch (data) {
+  let url = `/api/v1/course/scheme/${data.schemeId}/team`
+  return commonsAjax(url, data, 'post')
+}

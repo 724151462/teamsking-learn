@@ -1,7 +1,7 @@
 <template>
   <div class="groupPlan">
     <span style="display:inline-block;margin: 10px 0">
-        <router-link :to="{name: '成员'}">成员</router-link> > 成员小组方案
+      <router-link :to="{name: '成员'}">成员</router-link>> 成员小组方案
     </span>
     <div class="nav">
       <el-button type="primary" @click="addPlan = true">+ 手动分组</el-button>
@@ -11,20 +11,19 @@
       <div class="list" v-for="item in schemeList" :key="item.schemeId">
         <div class="title">{{item.schemeName}}</div>
         <div class="bottom">
-          <span class="left">{{item.userCount | coutFilter}}人已被划分为小组，划分为{{item.teamCount | coutFilter}}个小组</span>
+          <span
+            class="left"
+          >{{item.userCount | coutFilter}}人已被划分为小组，划分为{{item.teamCount | coutFilter}}个小组</span>
           <span class="right">
             <i class="el-icon-tickets">详情</i>
             <i class="el-icon-document">复制</i>
-            <i class="el-icon-edit" @click="editPlan">编辑</i>
+            <i class="el-icon-edit" @click="editPlan(item)">编辑</i>
             <i class="el-icon-delete">删除</i>
           </span>
         </div>
       </div>
     </div>
-    <el-dialog 
-      width="40%"
-      title="添加方案"
-      :visible.sync="addPlan">
+    <el-dialog width="40%" title="添加方案" :visible.sync="addPlan">
       <el-form>
         <el-form-item label="小组方案名称" required>
           <el-input v-model="groupPlan.schemeName"></el-input>
@@ -35,41 +34,35 @@
         <el-button type="primary" @click="ensureAddPlan">确定</el-button>
       </div>
     </el-dialog>
-    <el-dialog
-        width="60%"
-        title="添加成员小组方案"
-        :visible.sync="isAddFa"
-        append-to-body>
-
-      <el-form :model="addGroup" ref="ruleForm" label-width="150px" class="demo-ruleForm">
+    <el-dialog width="60%" title="添加成员小组方案" :visible.sync="isAddFa" append-to-body>
+      <el-form :model="groupInfo" ref="ruleForm" label-width="150px" class="demo-ruleForm">
         <el-form-item label="小组方案名称" required>
-          <el-input v-model="addGroup.name" style="width: 220px;"></el-input>
+          <el-input v-model="groupInfo.schemeName" style="width: 220px;"></el-input>
         </el-form-item>
 
-        <el-form-item label="分组上限" required>
+        <!-- <el-form-item label="分组上限" required>
           <el-input v-model="addGroup.sx" style="width: 220px;"></el-input>
-        </el-form-item>
-
-        <div class="groupPlanLint">
+        </el-form-item>-->
+        <div class="groupPlanLint" v-for="(item, index) in addGroup" :key="index">
           <div>5人为1小组</div>
-          <div class="list" v-for="(item, index) in addGroup.zuList" :key="index">
+          <div class="list">
             <div class="title">
-              <span class="left">组1</span>
+              <span class="left">{{item.teamName}}</span>
               <span class="right">
                 <i class="el-icon-edit" @click="isUpGrouplan = true">改名</i>
                 <i class="el-icon-delete">删除</i>
               </span>
             </div>
             <div class="all-img-list">
-              <div class="img-list">
-                <img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg" class="img">
+              <div class="img-list" v-for="(member,i) in item.userList" :key="i">
+                <img :src="member.avatar" class="img">
               </div>
-              <div class="add-img" @click="isAddGrouplan = true">+</div>
+              <div class="add-img" @click="addMember(item)">+</div>
             </div>
           </div>
-          <div class="add">
-            <el-button type="primary">添加组</el-button>
-          </div>
+        </div>
+        <div class="add">
+          <el-button type="primary" @click="addGroupBtn">添加组</el-button>
         </div>
         <div style="text-align: right;">
           <el-button @click="isAddFa = false">取消</el-button>
@@ -78,14 +71,10 @@
       </el-form>
 
       <!--修改组名-->
-      <el-dialog
-          title="修改组名"
-          :visible.sync="isUpGrouplan"
-          width="40%"
-          append-to-body>
+      <el-dialog title="修改组名" :visible.sync="isUpGrouplan" width="40%" append-to-body>
         <el-form>
           <el-form-item label="修改组名">
-            <el-input v-model="addGroup.rssx" style="width: 220px;"></el-input>
+            <el-input style="width: 220px;"></el-input>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -100,16 +89,21 @@
         :visible.sync="isAddGrouplan"
         width="50%"
         custom-class="select-member"
-        append-to-body>
+        append-to-body
+      >
         <div class="search">
-          <el-radio v-model="group" label="1">全部成员</el-radio>
-          <el-radio v-model="group" label="2" class="right">未分配小组成员</el-radio>
+          <el-radio v-model="matchType" label="1" @change="memberType">全部成员</el-radio>
+          <el-radio v-model="matchType" label="2" class="right" @change="memberType">未分配小组成员</el-radio>
           <el-input placeholder="请输入成员名称" style="width:220px"></el-input>
           <el-button type="primary">搜索</el-button>
         </div>
         <div class="all-member">
-          <div class="member-list" v-for="(list, index) in tableData" :key="index">
-            <el-checkbox v-model="list.isCheck"></el-checkbox>
+          <div class="member-list" v-for="(list, index) in showData" :key="index">
+            <el-checkbox
+              v-model="list.isCheck"
+              :disabled="list.teamName === null ? false : true"
+              @change="check(list)"
+            >{{list.teamName}}</el-checkbox>
             <div class="imgs">
               <img :src="list.img">
             </div>
@@ -123,7 +117,7 @@
           </div>
         </div>
         <div style="text-align: right">
-          <el-button type="primary">已选择2人，确认选择</el-button>
+          <el-button type="primary" @click="ensureMatch">已选择{{matchedList.length}}人，确认选择</el-button>
         </div>
       </el-dialog>
     </el-dialog>
@@ -131,7 +125,14 @@
 </template>
 
 <script>
-import {memberList, schemeAdd, schemeList} from '@/api/course'
+import {
+  memberList, 
+  schemeAdd, 
+  schemeList, 
+  memberEditList,
+  memberMatchList,
+  memberMatch
+} from '@/api/course'
 export default {
   data(){
     return{
@@ -151,82 +152,52 @@ export default {
           group:1,  //组数
         },
       ],
-      addGroup:{
+      groupInfo:{
         name:'',  //小组方案名称
         sx:'',    //分组上限
-        //分组结构
-        zulist:[
-          {
-            name:'我是组名称',
-            //这里是组成员
-            list:[
-              {
-                id:'1',
-                img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-              },
-              {
-                id:'1',
-                img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-              },
-            ]
-          }
-        ]
+        
       },
+      addGroup: [],
       schemeList: [],
       addPlan: false,
       groupPlan: {
         courseId: '0608367675f54267aa6960fd0557cc1b',
         schemeName: "",
-        schemeType: 10
+        schemeType: 10,
       },
-
-      group:'1',  // 1 全部成员 2 未分配小组的成员
+      // 匹配分配类型参数
+      matchForm: {
+        searchType: 1,
+        searchName: '',
+        schemeId: '',
+        courseId: '0608367675f54267aa6960fd0557cc1b',
+      },
+      matchType:'1',  // 1 全部成员 2 未分配小组的成员
       isAddFa:false,
       isUpGrouplan:false,
       isAddGrouplan:false,
-      tableData: [
-        {
-          isCheck:false,
-          img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-          name:'小三',
-          xh:'123123',  //这个是学号
-          role:'1', //角色 1 学生 2 助教
-        },
-        {
-          isCheck:false,
-          img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-          name:'小三',
-          xh:'123123',  //这个是学号
-          role:'2', //角色 1 学生 2 助教
-        },
-        {
-          isCheck:false,
-          img:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg',
-          name:'小三',
-          xh:'123123',  //这个是学号
-          role:'1', //角色 1 学生 2 助教
-        },
-      ]
+      sourceData: [
+      ],
+      showData: [],
+      matchedList: []
     }
   },
   created() {
-    this.getPage(this.pageParmas)
     schemeList(this.courseId)
     .then((response)=> {
       this.schemeList = response.data
     })
   },
   methods: {
-    getPage() {
-      this.pageParmas.courseId = this.courseId
-      memberList(this.pageParmas)
-      .then((response)=> {
-        this.tableData = response.data.pageData
-        this.tableData.totalCount = response.data.totalCount
-        this.tableData.pageSize = response.data.pageSize
-        this.tableData.img = 'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2198746125,2255961738&fm=27&gp=0.jpg'
-        console.log(this.tableData)
+    // 添加组
+    addGroupBtn() {
+        this.addGroup.push({teamName: '', userList: []})
+    },
+    check(e){
+      this.matchedList = this.showData.filter(element=> {
+        return element.isCheck === true && element.teamName === null
       })
+      console.log('mlist', this.matchedList)
     },
     // 添加方案名称
     ensureAddPlan() {
@@ -237,8 +208,83 @@ export default {
       this.addPlan = false
     },
     // 点击编辑弹窗
-    editPlan() {
+    editPlan(item) {
+      console.log(item)
+      this.groupInfo.schemeId = item.schemeId
+      this.groupInfo.schemeName = item.schemeName
+      this.matchForm.schemeId = item.schemeId
+      memberEditList(item.schemeId)
+      .then((response)=> {
+        this.addGroup = response.data
+      })
       this.isAddFa = true
+    },
+    // 点击 +图片 按钮
+    addMember(item) {
+      console.log(this.matchType)
+      console.log(item)
+      this.groupInfo.teamId = item.teamId
+      this.groupInfo.teamName = item.teamName
+      this.matchForm.pageSize = 100
+      memberMatchList(this.matchForm).then((response) =>{
+        response.data.pageData.forEach(element => {
+          element.isCheck = element.teamName === null ? false : true
+        });
+        this.sourceData = response.data.pageData
+        this.showData = this.sourceData
+      })
+      this.isAddGrouplan = true
+    },
+    // radio选择改变
+    memberType(val) {
+      console.log(val)
+      this.matchForm.searchType = val
+      if(val === '2') {
+        this.showData = this.sourceData.filter(element=> {
+          return element.teamName === null
+        })
+      }else{
+        this.showData = this.sourceData
+      }
+    },
+    // 选完后确认
+    ensureMatch() {
+      this.sourceData.forEach(element=> {
+        if(element.teamName === this.groupInfo.teamName) {
+          this.matchedList.push(element)
+        }
+      })
+      console.log(this.matchedList)
+      this.groupInfo.userList = this.matchedList
+      this.groupInfo.courseId = '0608367675f54267aa6960fd0557cc1b'
+      this.matchedList.forEach(element=> {
+        element.teamName = this.groupInfo.teamName
+      }) 
+      this.groupInfo.userCount = this.matchedList.length
+
+      memberMatch(this.groupInfo)
+      .then(response=> {
+        console.log(response.data)
+      })
+      // {
+      //   "courseId": "string",
+      //   "schemeId": 0,
+      //   "teamId": 0,
+      //   "teamName": "string",
+      //   "userCount": 0,
+      //   "userList": [
+      //     {
+      //       "assistantStatus": 0,
+      //       "avatar": "string",
+      //       "mobile": "string",
+      //       "realName": "string",
+      //       "studentNo": "string",
+      //       "teamName": "string",
+      //       "userId": 0
+      //     }
+      //   ]
+      // }
+      // memberMatch
     }
   },
   filters: {
@@ -254,126 +300,154 @@ export default {
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
-  .groupPlan
-    .nav
-      padding-top:10px
-      padding-bottom:10px
+.groupPlan {
+  .nav {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
 
-    .center
-      padding-top:10px
+  .center {
+    padding-top: 10px;
 
-      .list
-        width:50%
-        display: inline-block
-        background:#F8F8F8
-        padding:10px 5px
+    .list {
+      width: 50%;
+      display: inline-block;
+      background: #F8F8F8;
+      padding: 10px 5px;
 
-        .title
-          padding-bottom:10px
-          border-bottom:1px solid #E6E6E6
-          margin-bottom:10px
+      .title {
+        padding-bottom: 10px;
+        border-bottom: 1px solid #E6E6E6;
+        margin-bottom: 10px;
+      }
 
-        .bottom
-          overflow:hidden
+      .bottom {
+        overflow: hidden;
 
-          .right
-            float:right
+        .right {
+          float: right;
 
-            i
-              margin-right:10px
-              cursor:pointer
+          i {
+            margin-right: 10px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+}
 
-  .groupPlanLint
-    margin-left:50px
+.groupPlanLint {
+  margin-left: 50px;
 
-    .list
-      background:#F8F8F8
-      padding:5px 10px
+  .list {
+    background: #F8F8F8;
+    padding: 5px 10px;
 
-      .title
-        border-bottom:1px solid #D8D8D8
-        padding-bottom:5px
-        overflow:hidden
+    .title {
+      border-bottom: 1px solid #D8D8D8;
+      padding-bottom: 5px;
+      overflow: hidden;
 
-        .right
-          float:right
+      .right {
+        float: right;
 
-          i
-            margin-left:20px
+        i {
+          margin-left: 20px;
+        }
+      }
+    }
 
-      .all-img-list
-        padding-top:10px
-        display: flex
-        flex-wrap:wrap
-        align-items:center
+    .all-img-list {
+      padding-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
 
-        .img-list
-          width:50px
-          height:50px
-          overflow:hidden
-          -webkit-border-radius: 50%
-          -moz-border-radius: 50%
-          border-radius: 50%
+      .img-list {
+        width: 50px;
+        height: 50px;
+        overflow: hidden;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
 
-          .img
-            width:auto
+        .img {
+          width: auto;
+        }
+      }
 
-        .add-img
-          font-size:50px
-          width:50px
-          height:50px
-          text-align: center
-          line-height: 40px
-          border:1px solid #D8D8D8
-          -webkit-border-radius: 50%
-          -moz-border-radius: 50%
-          border-radius: 50%
-          margin-left:10px
+      .add-img {
+        font-size: 50px;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        line-height: 40px;
+        border: 1px solid #D8D8D8;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+        margin-left: 10px;
+      }
+    }
+  }
 
-    .add
-      margin-top:10px
+  .add {
+    margin-top: 10px;
+  }
+}
 
-  .select-member
-    .search
-      .right
-        margin-right:20px
+.select-member {
+  .search {
+    .right {
+      margin-right: 20px;
+    }
+  }
 
-    .all-member
-      padding-bottom:10px
-      height: 600px
-      overflow scroll
+  .all-member {
+    padding-bottom: 10px;
+    height: 600px;
+    overflow: scroll;
 
-      .member-list
-        border-bottom:1px solid #CCCCCC
-        padding-top:5px
-        padding-bottom:5px
-        display:flex
-        flex-direction:row
-        align-items:center
-        
-        .imgs
-          width:50px
-          height:50px
-          overflow:hidden
-          -webkit-border-radius: 50%
-          -moz-border-radius: 50%
-          border-radius: 50%
-          margin-left:20px
-          margin-right:20px
+    .member-list {
+      border-bottom: 1px solid #CCCCCC;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
 
-          img
-            width:auto
+      .imgs {
+        width: 50px;
+        height: 50px;
+        overflow: hidden;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+        margin-left: 20px;
+        margin-right: 20px;
 
-        .right
-          .name
-            font-size:18px
+        img {
+          width: auto;
+        }
+      }
 
-          .sys
-            font-size:14px
-            display:inline-block
-            background:#FF7D44
-            padding-left:3px
-            padding-right:3px
-            color: #ffffff
-            margin-left:10px
+      .right {
+        .name {
+          font-size: 18px;
+        }
+
+        .sys {
+          font-size: 14px;
+          display: inline-block;
+          background: #FF7D44;
+          padding-left: 3px;
+          padding-right: 3px;
+          color: #ffffff;
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+}
 </style>
