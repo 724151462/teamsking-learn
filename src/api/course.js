@@ -237,6 +237,26 @@ export function memberEditList (data) {
 }
 
 
+
+/**
+ * 新增组名
+ */
+export function teamNameAdd (data) {
+  let url = `/api/v1/course/scheme/${data.schemeId}/team`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 修改组名
+ */
+export function teamNameModify (data) {
+  let url = `/api/v1/course/scheme/${data.schemeId}/team/${data.teamId}`
+  return commonsAjax(url, data, 'put')
+}
+
+
+
 /**
  * 根据方案id获取方案成员分配/未分配列表
  */

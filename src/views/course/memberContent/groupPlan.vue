@@ -49,7 +49,7 @@
             <div class="title">
               <span class="left">{{item.teamName}}</span>
               <span class="right">
-                <i class="el-icon-edit" @click="isUpGrouplan = true">改名</i>
+                <i class="el-icon-edit" @click="teamEvent('modify', item)">改名</i>
                 <i class="el-icon-delete">删除</i>
               </span>
             </div>
@@ -62,7 +62,7 @@
           </div>
         </div>
         <div class="add">
-          <el-button type="primary" @click="addGroupBtn">添加组</el-button>
+          <el-button type="primary" @click="teamEvent('add')">添加组</el-button>
         </div>
         <div style="text-align: right;">
           <el-button @click="isAddFa = false">取消</el-button>
@@ -74,12 +74,12 @@
       <el-dialog title="修改组名" :visible.sync="isUpGrouplan" width="40%" append-to-body>
         <el-form>
           <el-form-item label="修改组名">
-            <el-input style="width: 220px;"></el-input>
+            <el-input style="width: 220px;" v-model="groupInfo.teamName"></el-input>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="isUpGrouplan = false">取 消</el-button>
-          <el-button type="primary" @click="isUpGrouplan = false">确 定</el-button>
+          <el-button type="primary" @click="ensureTN()">确 定</el-button>
         </span>
       </el-dialog>
 
@@ -131,7 +131,9 @@ import {
   schemeList, 
   memberEditList,
   memberMatchList,
-  memberMatch
+  memberMatch,
+  teamNameAdd,
+  teamNameModify
 } from '@/api/course'
 export default {
   data(){
@@ -152,6 +154,7 @@ export default {
           group:1,  //组数
         },
       ],
+      teamNameOperaType: '',
       groupInfo:{
         name:'',  //小组方案名称
         sx:'',    //分组上限
@@ -189,10 +192,6 @@ export default {
     })
   },
   methods: {
-    // 添加组
-    addGroupBtn() {
-        this.addGroup.push({teamName: '', userList: []})
-    },
     check(e){
       this.matchedList = this.showData.filter(element=> {
         return element.isCheck === true && element.teamName === null
@@ -285,6 +284,31 @@ export default {
       //   ]
       // }
       // memberMatch
+    },
+    // 修改组名
+    teamEvent(...parmas) {
+      console.log('par', parmas[0])
+      this.teamNameOperaType = parmas[0]
+      if(parmas.length>1) {
+        alert(1)
+        this.groupInfo.teamId = parmas[1].teamId
+      }else{
+        alert(2)
+      }
+      this.isUpGrouplan = true
+    },
+    ensureTN() {
+      console.log(this.teamNameOperaType)
+       if(this.teamNameOperaType === 'add'){
+        this.groupInfo.courseTeam = 542
+        console.log(this.groupInfo)
+        teamNameAdd(this.groupInfo)
+      }else(
+        teamNameModify(this.groupInfo)
+        .then(response=> {
+          console.log(response.data)
+        })
+      )
     }
   },
   filters: {
