@@ -156,6 +156,7 @@ export default {
       ],
       teamNameOperaType: '',
       groupInfo:{
+        courseId: '0608367675f54267aa6960fd0557cc1b',
         name:'',  //小组方案名称
         sx:'',    //分组上限
         
@@ -212,7 +213,7 @@ export default {
       this.groupInfo.schemeId = item.schemeId
       this.groupInfo.schemeName = item.schemeName
       this.matchForm.schemeId = item.schemeId
-      memberEditList(item.schemeId)
+      memberEditList(this.groupInfo)
       .then((response)=> {
         this.addGroup = response.data
       })
@@ -290,10 +291,8 @@ export default {
       console.log('par', parmas[0])
       this.teamNameOperaType = parmas[0]
       if(parmas.length>1) {
-        alert(1)
         this.groupInfo.teamId = parmas[1].teamId
       }else{
-        alert(2)
       }
       this.isUpGrouplan = true
     },

@@ -232,7 +232,7 @@ export function schemeList (data) {
  * 根据方案id获取方案成员列表
  */
 export function memberEditList (data) {
-  let url = `/api/v1/course/scheme/${data}/teams`
+  let url = `/api/v1/course/scheme/?${data.schemeId}/teams`
   return commonsAjax(url, '', 'get')
 }
 
