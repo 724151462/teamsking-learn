@@ -232,7 +232,7 @@ export function schemeList (data) {
  * 根据方案id获取方案成员列表
  */
 export function memberEditList (data) {
-  let url = `/api/v1/course/scheme/?${data.schemeId}/teams`
+  let url = `/api/v1/course/scheme/${data.schemeId}/teams`
   return commonsAjax(url, '', 'get')
 }
 
@@ -251,8 +251,9 @@ export function teamNameAdd (data) {
  * 修改组名
  */
 export function teamNameModify (data) {
-  let url = `/api/v1/course/scheme/${data.schemeId}/team/${data.teamId}`
-  return commonsAjax(url, data, 'put')
+  console.log(data)
+  let url = `http://120.36.137.90:9008/api/v1/course/scheme/${data.schemeId}/team/${data.teamId}`
+  return commonsAjax(url, {'teamName': data.teamName}, 'put')
 }
 
 
@@ -272,4 +273,49 @@ export function memberMatchList (data) {
 export function memberMatch (data) {
   let url = `/api/v1/course/scheme/${data.schemeId}/team`
   return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 删除小组方案
+ */
+export function teamDelete (data) {
+  let url = `/api/v1/course/scheme/${data.schemeId}/team/${data.teamId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+
+/**
+ * 删除小组方案
+ */
+export function delGroupMember (data) {
+  let url = `/api/v1/course/scheme/team/${data.teamId}/user/${data.userId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+
+/**
+ * 修改方案名称
+ */
+export function planNameModify (data) {
+  let url = `/api/v1/course/scheme/${data.schemeId}`
+  return commonsAjax(url, data.nameForm, 'put')
+}
+
+
+/**
+ * 删除方案名称
+ */
+export function groupDelete (data) {
+  let url = `/api/v1/course/scheme/${data.schemeId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+
+/**
+ * 复制方案
+ */
+export function groupCopy (data) {
+  let url = `/api/v1/course/scheme/${data.schemeId}`
+  return commonsAjax(url, '', 'post')
 }

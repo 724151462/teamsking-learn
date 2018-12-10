@@ -16,9 +16,9 @@
           >{{item.userCount | coutFilter}}人已被划分为小组，划分为{{item.teamCount | coutFilter}}个小组</span>
           <span class="right">
             <i class="el-icon-tickets">详情</i>
-            <i class="el-icon-document">复制</i>
+            <i class="el-icon-document" @click="sechemeCopy(item)">复制</i>
             <i class="el-icon-edit" @click="editPlan(item)">编辑</i>
-            <i class="el-icon-delete">删除</i>
+            <i class="el-icon-delete" @click="sechemeDelete(item)">删除</i>
           </span>
         </div>
       </div>
@@ -44,29 +44,38 @@
           <el-input v-model="addGroup.sx" style="width: 220px;"></el-input>
         </el-form-item>-->
         <div class="groupPlanLint" v-for="(item, index) in addGroup" :key="index">
-          <div>5人为1小组</div>
+          <div>{{item.userCount}}人为1小组</div>
           <div class="list">
             <div class="title">
-              <span class="left">{{item.teamName}}</span>
-              <span class="right">
+              <!-- <span class="left">{{item.teamName}}</span> -->
+              <input class="left" v-if="item.isNew === true" v-model="item.teamName" :autofocus="true"/>
+              <span class="left" v-else>{{item.teamName}}</span>
+              <span class="right" v-if="item.isNew === false">
                 <i class="el-icon-edit" @click="teamEvent('modify', item)">改名</i>
-                <i class="el-icon-delete">删除</i>
+                <i class="el-icon-delete" @click="delTeam(item)">删除</i>
+              </span>
+              <span class="right" v-else>
+                <i class="el-icon-edit" @click="modifyTeamName(item)">确认</i>
+                <i class="el-icon-delete" @click="item.isNew = false">取消</i>
               </span>
             </div>
             <div class="all-img-list">
-              <div class="img-list" v-for="(member,i) in item.userList" :key="i">
-                <img :src="member.avatar" class="img">
-              </div>
+              <template v-for="(member,i) in item.userList">
+                <div class="img-list" :key="i">
+                  <img style="width:112px" :src="member.avatar" class="img">
+                </div>
+                <span :key="member.userId" class="delMember" @click="delMember(member,item.teamId)">×</span>
+              </template>
               <div class="add-img" @click="addMember(item)">+</div>
             </div>
           </div>
         </div>
         <div class="add">
-          <el-button type="primary" @click="teamEvent('add')">添加组</el-button>
+          <el-button type="primary" @click="newGroup">添加组</el-button>
         </div>
         <div style="text-align: right;">
           <el-button @click="isAddFa = false">取消</el-button>
-          <el-button type="primary" @click="isAddFa = false">确定</el-button>
+          <el-button type="primary" @click="groupNameModify">确定</el-button>
         </div>
       </el-form>
 
@@ -133,7 +142,12 @@ import {
   memberMatchList,
   memberMatch,
   teamNameAdd,
-  teamNameModify
+  teamNameModify,
+  teamDelete,
+  planNameModify,
+  delGroupMember,
+  groupDelete,
+  groupCopy
 } from '@/api/course'
 export default {
   data(){
@@ -207,6 +221,23 @@ export default {
       })
       this.addPlan = false
     },
+    groupNameModify() {
+      let data = {
+        schemeId: this.groupInfo.schemeId,
+        nameForm: {
+          id: this.groupInfo.schemeId,
+          name: this.groupInfo.schemeName
+        }
+      }
+      planNameModify(data)
+      .then(response=> {
+        console.log(response.data)
+      })
+    },
+    // 添加新小组
+    newGroup() {
+      this.addGroup.push({isNew: true, teamName: `小组${this.addGroup.length+1}`, userList: []})
+    },
     // 点击编辑弹窗
     editPlan(item) {
       console.log(item)
@@ -215,6 +246,9 @@ export default {
       this.matchForm.schemeId = item.schemeId
       memberEditList(this.groupInfo)
       .then((response)=> {
+        response.data.forEach(element => {
+          element.isNew = false
+        });
         this.addGroup = response.data
       })
       this.isAddFa = true
@@ -249,11 +283,6 @@ export default {
     },
     // 选完后确认
     ensureMatch() {
-      this.sourceData.forEach(element=> {
-        if(element.teamName === this.groupInfo.teamName) {
-          this.matchedList.push(element)
-        }
-      })
       console.log(this.matchedList)
       this.groupInfo.userList = this.matchedList
       this.groupInfo.courseId = '0608367675f54267aa6960fd0557cc1b'
@@ -288,13 +317,59 @@ export default {
     },
     // 修改组名
     teamEvent(...parmas) {
-      console.log('par', parmas[0])
+      
       this.teamNameOperaType = parmas[0]
       if(parmas.length>1) {
         this.groupInfo.teamId = parmas[1].teamId
       }else{
       }
-      this.isUpGrouplan = true
+      parmas[1].isNew = true
+      this.groupInfo.teamName = parmas[1].teamName
+      // console.log(this.groupInfo)
+    },
+    // 删除组
+    delTeam(item) {
+      this.groupInfo.teamId = item.teamId
+      console.log(this.groupInfo)
+      teamDelete(this.groupInfo)
+      .then(response=> {
+        console.log(response.data)
+      })
+    },
+    // 删除成员
+    delMember(item,teamId) {
+      console.log(item)
+      let data = {
+        teamId: teamId,
+        userId: item.userId
+      }
+      console.log(data)
+      delGroupMember(data)
+      .then(response=> {
+        console.log(response.data)
+      })
+    },
+    // 删除方案
+    sechemeDelete(item) {
+      groupDelete(item)
+      .then(response=> {
+        console.log(response)
+      })
+    },
+    // 复制方案
+    sechemeCopy(item) {
+      groupCopy(item)
+      .then(response=> {
+        console.log(response)
+      })
+    },
+    modifyTeamName(item) {
+      this.groupInfo.teamName = item.teamName
+      teamNameModify(this.groupInfo)
+      .then(response=> {
+        console.log(response.data)
+        item.isNew = false
+      })
     },
     ensureTN() {
       console.log(this.teamNameOperaType)
@@ -398,6 +473,20 @@ export default {
         .img {
           width: auto;
         }
+      }
+      .delMember {
+        height: 20px;
+        line-height:18px;
+        width:20px;
+        font-size:20px;
+        position:relative;
+        top:-25px;
+        cursor:pointer;
+        background: rgb(99,99,99);
+        color: #fff;
+        text-align: center;
+        border: 1px solid rgb(99,99,99)
+        border-radius: 50%
       }
 
       .add-img {
