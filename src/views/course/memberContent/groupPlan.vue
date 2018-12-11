@@ -4,8 +4,8 @@
       <router-link :to="{name: '成员'}">成员</router-link>> 成员小组方案
     </span>
     <div class="nav">
-      <el-button type="primary" @click="addPlan = true">+ 手动分组</el-button>
-      <el-button type="primary" @click="isAddFa = true">+ 随机分组</el-button>
+      <el-button type="primary" @click="setGroupName(10)">+ 手动分组</el-button>
+      <el-button type="primary" @click="setGroupName(20)">+ 随机分组</el-button>
     </div>
     <div class="center">
       <div class="list" v-for="item in schemeList" :key="item.schemeId">
@@ -26,7 +26,10 @@
     <el-dialog width="40%" title="添加方案" :visible.sync="addPlan">
       <el-form>
         <el-form-item label="小组方案名称" required>
-          <el-input v-model="groupPlan.schemeName"></el-input>
+          <el-input v-model="groupPlan.schemeName" style="width: 320px;"></el-input>
+        </el-form-item>
+        <el-form-item label="每组人数上限" v-if="groupPlan.schemeType === 20" required>
+          <el-input v-model="groupPlan.teamUserCount" style="width: 320px;"></el-input>
         </el-form-item>
       </el-form>
       <div style="text-align: right;">
@@ -213,8 +216,14 @@ export default {
       })
       console.log('mlist', this.matchedList)
     },
+    setGroupName(type) {
+      this.groupPlan.schemeType = type
+      this.groupPlan.schemeName = ''
+      this.addPlan = true
+    },
     // 添加方案名称
     ensureAddPlan() {
+      console.log(this.groupPlan)
       schemeAdd(this.groupPlan)
       .then((response)=> {
         alert('添加成功')
