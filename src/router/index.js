@@ -72,6 +72,11 @@ export const constantRouterMap = [{
                 name: '发布头脑风暴',
               },
               {
+                path: '/course/list/interact/brainresult',
+                component: _import('course/interactContent/brainResult'),
+                name: '头脑风暴结果',
+              },
+              {
                 path: 'interact/homework',
                 component: _import('course/interactContent/homeWork'),
                 name: '作业/小组任务',

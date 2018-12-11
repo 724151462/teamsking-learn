@@ -88,7 +88,8 @@ export default {
       alert(123)
     },
     toDetail() {
-      this.$router.push({path: '/course/list/interact/voteresult', query: {id: 123}})
+      // this.$router.push({path: '/course/list/interact/voteresult', query: {id: 123}})
+      this.$router.push({path: '/course/list/interact/brainresult', query: {id: 123}})
     },
     setEndTime() {
       this.setEndTimeDialog = true
