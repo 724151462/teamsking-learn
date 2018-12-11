@@ -24,7 +24,7 @@
           <template slot="title">
             <span style="margin-left: 20px">第一章  第一节</span>
           </template>
-          <div class="collapse-layout">
+          <div class="collapse-layout" @click="toDetail()">
             <div class="collapse-layout interact-left">
               <img width="60px" :src="require('../../assets/images/vote.png')" alt="">
               <div class="item-detail">
@@ -87,6 +87,9 @@ export default {
     click123() {
       alert(123)
     },
+    toDetail() {
+      this.$router.push({path: '/course/list/interact/voteresult', query: {id: 123}})
+    },
     setEndTime() {
       this.setEndTimeDialog = true
     }
@@ -129,6 +132,7 @@ div
       justify-content space-between
       margin 10px 0
       margin-left 10px
+      cursor pointer
       .interact-left
         justify-content flex-start
         div

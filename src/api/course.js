@@ -74,7 +74,7 @@ export function courseInfo(data) {
  * 根据课程id获取所有章节信息
  */
 export function chaptersList(data) {
-  let url = '/api/v1/course/' + data + '/chapters'
+  let url = 'http://120.36.137.90:9008/api/v1/course/' + data + '/chapters'
   return commonsAjax(url, '', 'get')
 }
 
