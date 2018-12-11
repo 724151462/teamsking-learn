@@ -1,7 +1,7 @@
 <template>
   <div class="addTest">
     <div class="title">
-      <div><span style="cursor: pointer" @click="toTest">试题管理</span> > 编辑试题</div>
+      <div><span style="cursor: pointer" @click="toTest">试题管理</span> > 添加试题</div>
     </div>
     <div style="padding-right: 35%">
       <el-form :model="testData" ref="testForm">
@@ -61,6 +61,7 @@
 
 <script>
   import E from 'wangeditor'
+  import {saveQuiz} from '@/api/course'
 
   export default {
     name: "addTest",
@@ -196,6 +197,10 @@
       },
       toTest(){
         this.$router.push('/course/resource/test');
+      },
+      // 保存试题
+      saveQuiz () {
+
       }
     }
   }

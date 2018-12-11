@@ -4,41 +4,42 @@
       <div><span style="cursor: pointer" @click="toTest">试题管理</span> > 编辑试题</div>
     </div>
     <div style="padding-right: 35%">
-      <el-form :model="testData" ref="testForm">
+      <el-form :model="quizData" ref="testForm">
         <el-form-item label="题干" required>
           <br>
-          <div ref="editor" style="text-align:left"></div>
+          <!--<div ref="editor" style="text-align:left" :v-model="quizData.quizTitle"></div>-->
+
         </el-form-item>
         <el-form-item label="题型" required>
-          <el-radio-group v-model="testData.quizType" @change="quizTypeChange">
-            <el-radio :label="0">单选</el-radio>
-            <el-radio :label="1">多选</el-radio>
-            <el-radio :label="2">判断题</el-radio>
-            <el-radio :label="3">主观</el-radio>
+          <el-radio-group v-model="quizData.quizType" @change="quizTypeChange">
+            <el-radio :label="10">单选</el-radio>
+            <el-radio :label="20">多选</el-radio>
+            <el-radio :label="30">判断题</el-radio>
+            <el-radio :label="40">主观</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="选项" required>
           <br>
-          <div v-if="testData.quizType===3">
+          <div v-if="quizData.quizType===40">
             <p style="padding-left: 40px">主观题无固定答案</p>
           </div>
           <div class="option-list"
-               v-for="(option, optionIndex) in testData.quizOption"
+               v-for="(option, optionIndex) in quizData.quizOption"
                :key="option.id"
                v-else>
             <div>{{optionItem[optionIndex]}}、</div>
             <div style="flex: 1">
               <el-input
                 placeholder="请输入内容"
-                v-model="testData.quizOption[optionIndex].optionTitle"
+                v-model="quizData.quizOption[optionIndex].optionTitle"
                 clearable>
               </el-input>
             </div>
-            <div class="option-flag" v-if="testData.quizOption[optionIndex].correctFlag === 0" @click="setCurrent(optionIndex)">设为正确答案</div>
-            <div class="option-flag currect-flag" v-else @click="setCurrent(optionIndex)">正确答案</div>
+            <div class="option-flag" v-if="quizData.quizOption[optionIndex].correctFlag === 1" @click="setCurrent(optionIndex)" style="user-select: none">设为正确答案</div>
+            <div class="option-flag currect-flag" v-else @click="setCurrent(optionIndex)" style="user-select: none">正确答案</div>
             <div style="margin: 0 20px;color: red" @click="deleteOption(optionIndex)"><i class="el-icon-error"></i></div>
           </div>
-          <div v-show="testData.quizType !== 3"><el-button type="text" @click="addOption">+添加选项</el-button></div>
+          <div v-show="quizData.quizType !== 40"><el-button type="text" @click="addOption">+添加选项</el-button></div>
         </el-form-item>
         <el-form-item label="解析" required>
           <br>
@@ -47,7 +48,7 @@
             :rows="5"
             class="ans-text"
             placeholder="请输入内容"
-            v-model="testData.quizAnalysis">
+            v-model="quizData.quizAnalysis">
           </el-input>
         </el-form-item>
       </el-form>
@@ -61,12 +62,21 @@
 
 <script>
   import E from 'wangeditor'
-
+  import editor from '@/views/course/resourse/test/myEditor'
+  import {quizInfo} from '@/api/course'
   export default {
     name: "editTest",
+    created () {
+      // if(this.$route.query.courseid && this.$route.query.courseid !== ''){
+      //   this.courseid = this.$route.query.courseid
+      // }
+      // this.getQuizInfo()
+      // setTimeout(this.getQuizInfo,5000)
+
+    },
     data () {
       return {
-        testData:{
+        quizData:{
           "catalogId": 0,
           "courseId": "string",
           "creatorName": "string",
@@ -100,8 +110,8 @@
               "quizId": 0
             },
           ],
-          quizTitle: "string",
-          quizType: 0, // 0 为单选，1为多选，2为判断，3为主观
+          quizTitle: "ii",
+          quizType: 0, // 10 为单选，20为多选，30为判断，40为主观
           "skillPoint": "string",
           "updateId": 0,
           "updateTime": "2018-11-28T03:10:25.082Z",
@@ -113,9 +123,12 @@
       }
     },
     mounted() {
+      this.getQuizInfo()
+
       var editor = new E(this.$refs.editor)
-      editor.customConfig.onchange = (html) => {
-        this.testData.quizTitle = html
+      editor.customConfig.onchange = (html) =>{
+        console.log(html)
+        this.quizData.quizTitle = html
       }
       editor.customConfig.menus = [
         'head',  // 标题
@@ -133,61 +146,77 @@
         'undo',  // 撤销
       ]
       editor.create()
+      // editor.txt.html(this.quizData.quizTitle)
     },
     methods:{
+      //获取试题信息
+      getQuizInfo () {
+        let quizId = this.$route.params.quizid
+        quizInfo(quizId).then(res=>{
+          console.log(res)
+          this.quizData = res.data
+          // this.editorContent = res.data.quizTitle
+          // this.$set(this.quizData,res.data);
+          this.$set(this.quizData,res.data)
+          // this.$set(this.quizData,quizTitle,res.data.quizTitle);
+          this.quizData = res.data
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
       // 题目类型改变
       quizTypeChange(e){
-        let data1 = [{"correctFlag": 0, "optionId": 0, "optionTitle": "主观题没有正确答案", "quizId": 0}],
+        let data1 = [{"correctFlag": 1, "optionId": 0, "optionTitle": "主观题没有正确答案", "quizId": 0}],
             data2 = [
               // 单选和多选
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
+              {"correctFlag": 1, "optionId": 0, "optionTitle": "", "quizId": 0},
+              {"correctFlag": 1, "optionId": 0, "optionTitle": "", "quizId": 0},
+              {"correctFlag": 1, "optionId": 0, "optionTitle": "", "quizId": 0},
+              {"correctFlag": 1, "optionId": 0, "optionTitle": "", "quizId": 0},
             ],
             data3 = [
               // 判断题
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
+              {"correctFlag": 1, "optionId": 0, "optionTitle": "", "quizId": 0},
+              {"correctFlag": 1, "optionId": 0, "optionTitle": "", "quizId": 0},
             ];
         //将数据组装为数组，若用push方法，会发生不可描述的错误
-        if(e === 3){
-          this.testData.quizOption = []
-          this.testData.quizOption = data1
-        } else if (e === 2){
-          this.testData.quizOption = []
-          this.testData.quizOption = data3
+        if(e === 40){
+          this.quizData.quizOption = []
+          this.quizData.quizOption = data1
+        } else if (e === 30){
+          this.quizData.quizOption = []
+          this.quizData.quizOption = data3
         }else{
-          this.testData.quizOption = []
-          this.testData.quizOption = data2
+          this.quizData.quizOption = []
+          this.quizData.quizOption = data2
         }
       },
       //设为正确答案
       setCurrent(optionIndex){
-        if(this.testData.quizType === 1){
-          this.testData.quizOption[optionIndex].correctFlag === 0 ? this.testData.quizOption[optionIndex].correctFlag = 1 :this.testData.quizOption[optionIndex].correctFlag = 0
+        if(this.quizData.quizType === 2){
+          this.quizData.quizOption[optionIndex].correctFlag === 1 ? this.quizData.quizOption[optionIndex].correctFlag = 2 :this.quizData.quizOption[optionIndex].correctFlag = 1
         }else{
           //单选和判断自能有一个答案
-          this.testData.quizOption.forEach((item)=>{
-            item.correctFlag = 0
+          this.quizData.quizOption.forEach((item)=>{
+            item.correctFlag = 1
           })
-          this.testData.quizOption[optionIndex].correctFlag = 1
+          this.quizData.quizOption[optionIndex].correctFlag = 2
         }
       },
       //删除答案选项
       deleteOption (optionIndex){
-        if(this.testData.quizOption.length <= 2){
+        if(this.quizData.quizOption.length <= 2){
           this.$notify.error({
             title: '错误',
             message: '最少设置两个选项'
           });
           return false
         }
-        this.$delete(this.testData.quizOption, optionIndex);
+        this.$delete(this.quizData.quizOption, optionIndex);
       },
       //  添加选项
       addOption(){
-        this.testData.quizOption.push({
+        this.quizData.quizOption.push({
           "correctFlag": 0,
           "optionId": 0,
           "optionTitle": "",

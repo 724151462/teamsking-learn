@@ -68,52 +68,6 @@ export function courseInfo (data) {
 }
 
 /**
- * 查询课程下资源列表
- */
-export function resourcePage (id, data) {
-  let url = '/api/v1/course/' + id + '/resource/page'
-  return commonsAjax(url, data, 'get')
-}
-
-/**
- * 删除课程下资源
- */
-export function deletedResource (id, data) {
-  // resourceId
-  let url = '/api/v1/course/resource/' + id
-  return commonsAjax(url, data, 'delete')
-}
-
-/**
- * 获取试题列表
- */
-// export function quizPage (id, data) {
-//   let url = '/api/v1/course/' + id + '/quiz/page'
-//   return commonsAjax(url, data, 'get')
-// }
-/**
- * 获取试题列表2
- */
-export function quizPage (data) {
-  let url = '/api/v1/library/quiz/page'
-  return commonsAjax(url, '', 'get')
-}
-/**
- * 保存试题
- */
-export function saveQuiz (data) {
-  return commonsAjax('/api/v1/course/quiz', data, 'post')
-}
-
-/**
- * 删除试题
- */
-export function deleteQuiz (data) {
-  let url = '/api/v1/course/quiz/' + data
-  return commonsAjax(url, '', 'delete')
-}
-
-/**
  * 根据课程id获取所有章节信息
  */
 export function chaptersList (data) {
@@ -196,12 +150,73 @@ export function getResourceList (data) {
   let url = '/api/v1/resource/page'
   return commonsAjax(url, '', 'get')
 }
+//============资源管理==================
+
+/**
+ * 查询课程下资源列表
+ */
+export function resourcePage (id, data) {
+  let url = '/api/v1/course/' + id + '/resource/page'
+  return commonsAjax(url, data, 'get')
+}
+
+/**
+ * 删除课程下资源
+ */
+export function deletedResource (id, data) {
+  // resourceId
+  let url = '/api/v1/course/resource/' + id
+  return commonsAjax(url, data, 'delete')
+}
 
 // ===============试题管理===============
 //
 /**
  * 上传试题模板
  */
-export function upTest() {
-
+export function upQuiz(id,data) {
+  let url = `/api/v1/course/${id}/quiz`
+  // console.log('模板上传路径为：'+url)
+  return commonsAjax(url, data, 'post')
 }
+
+/**
+ * 获取试题列表
+ */
+
+// export function quizPage (id, data) {
+//   let url = '/api/v1/course/' + id + '/quiz/page'
+//   return commonsAjax(url, data, 'get')
+// }
+
+/**
+ * 获取试题列表2
+ */
+export function quizPage (data) {
+  let url = '/api/v1/library/quiz/page'
+  return commonsAjax(url, '', 'get')
+}
+/**
+ * 保存单个试题信息
+ */
+export function saveQuiz (data) {
+  return commonsAjax('/api/v1/course/quiz', data, 'post')
+}
+
+/**
+ * 获取单个试题信息(包含选项)
+ */
+export function quizInfo (id) {
+  let url = `/api/v1/course/quiz/${id}`
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 删除试题
+ */
+export function deleteQuiz (data) {
+  let url = '/api/v1/course/quiz/' + data
+  return commonsAjax(url, '', 'delete')
+}
+
+
