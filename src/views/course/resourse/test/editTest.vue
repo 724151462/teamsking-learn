@@ -8,7 +8,7 @@
         <el-form-item label="题干" required>
           <br>
           <!--<div ref="editor" style="text-align:left" :v-model="quizData.quizTitle"></div>-->
-
+          <editor v-model="quizData.quizTitle" @change="getinfo"></editor>
         </el-form-item>
         <el-form-item label="题型" required>
           <el-radio-group v-model="quizData.quizType" @change="quizTypeChange">
@@ -66,6 +66,7 @@
   import {quizInfo} from '@/api/course'
   export default {
     name: "editTest",
+    components:{editor},
     created () {
       // if(this.$route.query.courseid && this.$route.query.courseid !== ''){
       //   this.courseid = this.$route.query.courseid
@@ -110,7 +111,7 @@
               "quizId": 0
             },
           ],
-          quizTitle: "ii",
+          quizTitle: "",
           quizType: 0, // 10 为单选，20为多选，30为判断，40为主观
           "skillPoint": "string",
           "updateId": 0,
@@ -225,6 +226,9 @@
       },
       toTest(){
         this.$router.push('/course/resource/test');
+      },
+      getingo(e){
+        console.log(e)
       }
     }
   }
