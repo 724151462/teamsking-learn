@@ -1,7 +1,7 @@
 <template>
   <div class="addTest">
     <div class="title">
-      <div>试题管理 > 添加试题</div>
+      <div><span style="cursor: pointer" @click="toTest">试题管理</span> > 添加试题</div>
     </div>
     <div style="padding-right: 35%">
       <el-form :model="testData" ref="testForm">
@@ -38,7 +38,7 @@
             <div class="option-flag currect-flag" v-else @click="setCurrent(optionIndex)">正确答案</div>
             <div style="margin: 0 20px;color: red" @click="deleteOption(optionIndex)"><i class="el-icon-error"></i></div>
           </div>
-          <div v-show="testData.quizType !== 3"><el-button type="text" @click="addOption()">+添加选项</el-button></div>
+          <div v-show="testData.quizType !== 3"><el-button type="text" @click="addOption">+添加选项</el-button></div>
         </el-form-item>
         <el-form-item label="解析" required>
           <br>
@@ -61,6 +61,7 @@
 
 <script>
   import E from 'wangeditor'
+  import {saveQuiz} from '@/api/course'
 
   export default {
     name: "addTest",
@@ -138,21 +139,28 @@
       // 题目类型改变
       quizTypeChange(e){
         let data1 = [{"correctFlag": 0, "optionId": 0, "optionTitle": "主观题没有正确答案", "quizId": 0}],
-            data2 = [
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-              {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-            ];
+          data2 = [
+            // 单选和多选
+            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
+            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
+            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
+            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
+          ],
+          data3 = [
+            // 判断题
+            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
+            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
+          ];
         //将数据组装为数组，若用push方法，会发生不可描述的错误
         if(e === 3){
           this.testData.quizOption = []
           this.testData.quizOption = data1
+        } else if (e === 2){
+          this.testData.quizOption = []
+          this.testData.quizOption = data3
         }else{
           this.testData.quizOption = []
-          for(let i=4; i>0; i--){
-            this.testData.quizOption = data2
-          }
+          this.testData.quizOption = data2
         }
       },
       //设为正确答案
@@ -186,6 +194,13 @@
           "optionTitle": "",
           "quizId": 0
         })
+      },
+      toTest(){
+        this.$router.push('/course/resource/test');
+      },
+      // 保存试题
+      saveQuiz () {
+
       }
     }
   }

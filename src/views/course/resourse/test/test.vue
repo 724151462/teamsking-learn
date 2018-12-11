@@ -1,22 +1,62 @@
 <template>
   <div class="test">
     <div class="title">
-      <div style="display: inline-block;float: left">试题管理</div>
-      <div style="float: right;display: inline-block" class="btn-warp">
-        <el-button type="success">下载模板</el-button>
-        <el-button >导入</el-button>
-        <el-button type="primary">添加</el-button>
+      <div>试题管理</div>
+      <div style="" class="btn-warp">
+        <div>
+          <el-button type="success">下载模板</el-button>
+        </div>
+        <div>
+          <!--<el-button @click="uploadDialog = true">导入模板</el-button>-->
+          <el-upload
+            :http-request="upTestFile"
+            action="string"
+            :show-file-list="false">
+            <el-button >选择文件</el-button>
+          </el-upload>
+        </div>
+        <div>
+          <el-button type="primary" @click="toAddTest()">添加</el-button>
+        </div>
       </div>
     </div>
+
+    <el-form :inline="true" :model="formInline" style="margin-top: 40px">
+      <el-form-item>
+        <div style="display: flex">
+          <el-input
+            placeholder="输入课程名称查询资源"
+            v-model="input">
+          </el-input>
+          <div>
+            <el-button icon="el-icon-search" class="search-btn"></el-button>
+          </div>
+        </div>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="value" placeholder="请选择" @change="getChapterQuiz">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="delAllQuiz">删除该课程全部试题</el-button>
+      </el-form-item>
+    </el-form>
+
     <el-table
       :data="tableData3"
       :header-cell-style="{'background-color': '#fafafa',}"
       height="85%"
       border
       highlight-current-row
-      @current-change="handleCurrentChange"
       class="test-table">
       <el-table-column
+        label="序号"
         type="index"
         width="50">
       </el-table-column>
@@ -39,15 +79,6 @@
         class="tigan"
         show-overflow-tooltip
         label="题干">
-        <!--<template slot-scope="scope">-->
-          <!--<el-popover trigger="hover" placement="bottom">-->
-            <!--<p>姓名: {{ scope.row.name }}</p>-->
-            <!--<p>住址: {{ scope.row.address }}</p>-->
-            <!--<div slot="reference" class="name-wrapper">-->
-                <!--{{ scope.row.address }}-->
-            <!--</div>-->
-          <!--</el-popover>-->
-        <!--</template>-->
       </el-table-column>
       <el-table-column
         prop="name"
@@ -64,11 +95,12 @@
         width="150">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="testView = true">查看</el-button>
-          <el-button type="text" size="small" @click="toAddTest">编辑</el-button>
+          <el-button type="text" size="small" @click="toEditTest">编辑</el-button>
           <el-button type="text" size="small" @click="testDelete = true">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
     <!--试题查看弹窗-->
     <el-dialog
       title="试题查看"
@@ -104,18 +136,13 @@
 </template>
 
 <script>
+  // import uposs from '@/components/up-oss.vue'
+  import {upQuiz} from "../../../../api/course";
+
   export default {
+    // components:{uposs},
     data() {
       return {
-        tableLabel:[
-          {label:'序号', prop: '', width: ''},
-          {label:'课程名称', prop: '', width: ''},
-          {label:'所属章节', prop: '', width: ''},
-          {label:'题干', prop: '', width: '200'},
-          {label:'难度', prop: '', width: ''},
-          {label:'题目类型', prop: '', width: ''},
-          {label:'答案', prop: '', width: ''},
-        ],
         tableData3: [
           {
           date: '2016-05-03',
@@ -135,16 +162,89 @@
 
           }
         ],
+        options: [{
+          value: '选项1',
+          label: '黄金糕'
+        }, {
+          value: '选项2',
+          label: '双皮奶'
+        }, {
+          value: '选项3',
+          label: '蚵仔煎'
+        }, {
+          value: '选项4',
+          label: '龙须面'
+        }, {
+          value: '选项5',
+          label: '北京烤鸭'
+        }],
+        value:'',
+        uploadDialog: false, //文件上传弹窗
         testView: false , //试题查看弹窗
         testDelete: false, //删除试题
+        //courseId: '0608367675f54267aa6960fd0557cc1b',//如果指定课程的话，课程ID
+        courseId: '',//如果指定课程的话，课程ID
       }
     },
     methods:{
-      toAddTest () {
-        this.$router.push('/course/addtest');
+      toEditTest () {
+        this.$router.push('/course/resource/edittest/1');
       },
-      handleCurrentChange (val) {
-        console.log(val)
+      toAddTest () {
+        this.$router.push('/course/resource/addtest');
+      },
+      // 导入试题模板
+      upTestFile (item) {
+        this.beforTestUpload()
+        console.log(item)
+        let fileFormData = new FormData();
+        fileFormData.append('file', item.file);
+        console.log(fileFormData)
+        upQuiz(this.courseId, fileFormData).then(res=>{
+          this.$notify({
+            title: '试题导入成功',
+            message: '新增'+res.data.totalCount+'个试题',
+            type: 'success',
+            duration: 0
+          });
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
+      //文件上传验证
+      beforTestUpload(file){
+
+        if(!this.courseId){
+          this.$notify.error({
+            title: '错误',
+            message: '请先搜索相关课程，再导入该课程的试题模板'
+          });
+          return false
+        }
+
+        console.log(file,'文件');
+        this.files = file;
+        const extension = file.name.split('.')[1] === 'xls'
+        const extension2 = file.name.split('.')[1] === 'xlsx'
+        const isLt2M = file.size / 1024 / 1024 < 5
+        if (!extension && !extension2) {
+          this.$message.warning('上传模板只能是 xls、xlsx格式!')
+          return
+        }
+        if (!isLt2M) {
+          this.$message.warning('上传模板大小不能超过 5MB!')
+          return
+        }
+        this.fileName = file.name;
+        return false // 返回false不会自动上传
+      },
+      //选择试题章节查询
+      getChapterQuiz(){
+        alert("按章节查询")
+      },
+      // 删除该课程全部试题
+      delAllQuiz(){
+
       }
     }
   }
@@ -157,12 +257,27 @@
     text-overflow:ellipsis
   .test
     padding:0 5% 20px 50px
+    .search-btn
+      border-left 0
+      background-color #f4f4f4
+      border-radius 4px
     .title
-      overflow hidden
+      width 100%
+      display flex
+      align-items center
       border-bottom 2px solid gray
       padding-bottom 10px
+      & div:first-chilf
+        height 45px;
+        width 100px;
     .btn-warp
-      padding-right 50px
+      flex 1
+      display flex
+      justify-content flex-end
+      & div
+        margin 0 10px
+      & div:last-child
+        margin-right 0
     .test-table
       width 100%
       margin 0 auto
