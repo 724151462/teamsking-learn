@@ -26,7 +26,10 @@
                 <span>用时</span>
                 <span>分数</span>
             </div>
-            <div v-for="(item, index) in students" :class="answer-container" :key="item.id" style="margin-top:30px">
+            <div v-for="(item, index) in students" 
+                :class="{'answer-container': true, 'answer-first': index === 0, 'answer-second': index === 1, 'answer-third': index === 2}" 
+                :key="item.id" 
+                style="margin-top:30px">
                 <span>{{item.ranking}}</span>
                 <div class="user-avatar">
                     <img :src="item.avatar" width="30" alt="">
@@ -127,5 +130,10 @@ export default {
     span
         width 80px
         text-align center
-
+.answer-first
+    color rgb(159,58,72)
+.answer-second
+    color rgb(192,166,135)
+.answer-third
+    color rgb(110,169,170)
 </style>

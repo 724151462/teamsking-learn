@@ -17,6 +17,25 @@ export function publish(data) {
   return commonsAjax(url, '', 'put')
 }
 
+
+/**
+ * 课程简单信息
+ */
+export function courseBaseInfo(data) {
+  let url = `/api/v1/course/${data}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 修改学习模式
+ */
+export function studyModeModify(data) {
+  let url = `/api/v1/course/${data.courseId}/studymode/${data.studyMode}`
+  return commonsAjax(url, '', 'put')
+}
+
+
 /**
  * 获取课程分类列表
  */
