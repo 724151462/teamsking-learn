@@ -30,7 +30,7 @@
                 <span>{{item.ranking}}</span>
                 <div class="user-avatar">
                     <img :src="item.avatar" width="30" alt="">
-                    <span>{{item.name}}</span>
+                    <span>{{item.name}} </span>
                 </div>
                 <span>{{item.studentNo}}</span>
                 <span>{{item.correctCount}}</span>
