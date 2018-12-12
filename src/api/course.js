@@ -1,3 +1,7 @@
+const devUrl = '/api/v1/course/' // 开发环境
+const prodUrl = 'http://120.36.137.90:8008/api/v1/course/' // 生产环境
+const url = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
+
 import {
   commonsAjax
 } from '../utils/requery'
@@ -6,7 +10,7 @@ import {
  * 获取课程列表
  */
 export function coursePage(data) {
-  return commonsAjax('/api/v1/course/page', data, 'get')
+  return commonsAjax(`${url}page`, data, 'get')
 }
 
 /**
