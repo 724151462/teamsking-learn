@@ -68,22 +68,21 @@
         </el-form-item>
 
         <el-form-item label="课程封面" required>
-          <el-upload
-              class="avatar-uploader"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload">
-            <img v-if="Course.courseCover" :src="Course.courseCover" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
+          <img src="@/assets/images/cover/1.jpg" alt="" style="width: 280px;height: 160px;">
+          <!--课程封面分辨比率为280x160-->
+          <el-button type="primary"
+                     style="margin-left: 20px;"
+                     @click="coverPreviewShow = true"
+                     >选择封面图
+          </el-button>
         </el-form-item>
+        <cover-preview :show="coverPreviewShow" @closeCoverPreview="closeCoverPreview"></cover-preview>
 
         <el-form-item label="课程价格" required>
           <el-radio v-model="Course.payMode" label="10">免费</el-radio>
-          <el-radio v-model="Course.payMode" label="20">收费</el-radio>
+<!--          <el-radio v-model="Course.payMode" label="20">收费</el-radio>
           <el-input v-model="Course.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;" v-show="Number(Course.payMode) === 20"></el-input>
-          <span v-show="Number(Course.payMode) === 20">元</span>
+          <span v-show="Number(Course.payMode) === 20">元</span>-->
         </el-form-item>
 
         <el-form-item label="课程标签" required>
@@ -142,7 +141,7 @@
         <el-form-item label="课程代码">
           <el-input v-model="Course.courseCode" style="width: 120px;"></el-input>
         </el-form-item>
-        <div style="margin-left: 30px;margin-bottom: 22px">
+<!--        <div style="margin-left: 30px;margin-bottom: 22px">
           <el-checkbox v-model="Course.isCoursePackge">引用已有课程包</el-checkbox>
           <el-select v-model="Course.coursePackge" filterable placeholder="请选择" style="margin-left: 12px">
             <el-option
@@ -153,7 +152,7 @@
             </el-option>
           </el-select>
           <span style="margin-left: 12px" class="remind-text-color">下拉选择已有课程包</span>
-        </div>
+        </div>-->
         <el-form-item label="课程介绍" required>
           <el-row style="text-align: right">
             <el-button type="text" v-show="!iseditor1" @click="iseditor1 = true">设置</el-button>
@@ -275,9 +274,6 @@
               </tr>-->
             </table>
           </div>
-<!--          <div class="right">
-            <div id="echart"></div>
-          </div>-->
         </div>
         <div style="overflow: hidden;">
           <div style="float: left;">
@@ -324,13 +320,16 @@
 
 <script>
   import wangEditor from 'wangeditor'
-  // import echarts from 'echarts'
+  import vueCropper from 'vue-cropper'
   import addTeachers from './upCourse/addTeacher.vue'
+  import coverPreview from './coverPreview.vue'
   import { categories, tags, instructorList, teachersList, saveCourse, courseInfo } from '../../api/course'
   import { formatDate } from '../../utils/utils'
   export default {
     components:{
-      addTeachers
+      addTeachers,
+      coverPreview,
+      vueCropper
     },
     data(){
       return{
@@ -411,6 +410,7 @@
         courseTime:[],  //课程开始 and 结束时间
         isAccredit:false, //弹出教学课程授权
         isSysTem:false, //弹出设置
+        coverPreviewShow: false, //弹出课程封面上传
         isTeacher:false,  //弹出添加老师
         isChooseTeacher:false, //选择讲师
         rules:[],
@@ -537,44 +537,6 @@
         this.isSysTem = true
         // this.canvasTab()
       },
-      //表格渲染
-/*      canvasTab(){
-        let self = this
-        setTimeout(function () {
-          let myChart = echarts.init(document.getElementById('echart'));
-          // 绘制图表
-          myChart.setOption({
-            color:['#FE6370','#63BAEE','#B8E664','#E38EF7','#FFB8CA','#ED9B63','#FFC0CB'],
-            series: [
-              {
-                type:'pie',
-                radius: ['50%', '70%'],
-                avoidLabelOverlap: false,
-                label: {
-                  normal: {
-                    show: false,
-                    position: 'center'
-                  },
-                },
-                labelLine: {
-                  normal: {
-                    show: false
-                  }
-                },
-                data:[
-                  {value:self.CourseSetEntity.videoPercent, name:'视频'},
-                  {value:self.CourseSetEntity.quizPercent, name:'测验'},
-                  {value:self.CourseSetEntity.homeworkPercent, name:'作业'},
-                  {value:self.CourseSetEntity.topicPercent, name:'讨论'},
-                  {value:self.CourseSetEntity.offlinePercent, name:'线下'},
-                  {value:self.CourseSetEntity.votePercent, name:'投票问卷'},
-                  {value:self.CourseSetEntity.stormPercent, name:'头脑风暴'}
-                ]
-              }
-            ]
-          })
-        },0)
-      },*/
       //图片上传方法
       handleAvatarSuccess(res, file) {
         this.imageUrl = URL.createObjectURL(file.raw);
@@ -683,6 +645,10 @@
         return (restaurant) => {
           return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
         };
+      },
+      // 上传封面图片弹窗的关闭
+      closeCoverPreview () {
+        this.coverPreviewShow = false
       }
     },
     mounted(){

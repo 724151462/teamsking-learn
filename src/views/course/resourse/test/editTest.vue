@@ -7,8 +7,9 @@
       <el-form :model="quizData" ref="testForm">
         <el-form-item label="题干" required>
           <br>
-          <!--<div ref="editor" style="text-align:left" :v-model="quizData.quizTitle"></div>-->
-          <editor v-model="quizData.quizTitle" @change="getinfo"></editor>
+          <div ref="editor" style="text-align:left"></div>
+          <!--<editor :editorContent="quizData.quizTitle" v-model="quizData.quizTitle" @change="getinfo"></editor>-->
+          {{this.quizData.quizTitle}}
         </el-form-item>
         <el-form-item label="题型" required>
           <el-radio-group v-model="quizData.quizType" @change="quizTypeChange">
@@ -71,12 +72,12 @@
       // if(this.$route.query.courseid && this.$route.query.courseid !== ''){
       //   this.courseid = this.$route.query.courseid
       // }
-      // this.getQuizInfo()
+      this.getQuizInfo()
       // setTimeout(this.getQuizInfo,5000)
-
     },
     data () {
       return {
+        title:'',
         quizData:{
           "catalogId": 0,
           "courseId": "string",
@@ -111,7 +112,7 @@
               "quizId": 0
             },
           ],
-          quizTitle: "",
+          // quizTitle: "",
           quizType: 0, // 10 为单选，20为多选，30为判断，40为主观
           "skillPoint": "string",
           "updateId": 0,
@@ -124,8 +125,7 @@
       }
     },
     mounted() {
-      this.getQuizInfo()
-
+      // this.getQuizInfo()
       var editor = new E(this.$refs.editor)
       editor.customConfig.onchange = (html) =>{
         console.log(html)
@@ -147,20 +147,17 @@
         'undo',  // 撤销
       ]
       editor.create()
-      // editor.txt.html(this.quizData.quizTitle)
+      editor.txt.html(this.quizData.quizTitle)
+      // editor.txt.append(this.quizData.quizTitle)
     },
     methods:{
       //获取试题信息
       getQuizInfo () {
         let quizId = this.$route.params.quizid
         quizInfo(quizId).then(res=>{
-          console.log(res)
+          // console.log(res)
           this.quizData = res.data
-          // this.editorContent = res.data.quizTitle
-          // this.$set(this.quizData,res.data);
-          this.$set(this.quizData,res.data)
-          // this.$set(this.quizData,quizTitle,res.data.quizTitle);
-          this.quizData = res.data
+          this.title = res.data.quizTitle
         }).catch(error=>{
           console.log(error)
         })

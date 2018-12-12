@@ -238,7 +238,15 @@ export const constantRouterMap = [{
           }
         ]
       },
-
+      {
+        path:'/packge',
+        component:Layout,
+        name:'课程包管理',
+        // redirect:'/school/student',
+        children:[
+          {path:'/course/packge/packge',component:_import('course/coursePackge/packgeMain'),name:'课程包广场',menuShow: true},
+        ]
+      }
     ],
 
   },
