@@ -1,3 +1,7 @@
+const devUrl = '${url}course/' // 开发环境
+const prodUrl = 'http://120.36.137.90:8008${url}course/' // 生产环境
+const url = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
+
 import { commonsAjax } from '../utils/requery'
 
 /**

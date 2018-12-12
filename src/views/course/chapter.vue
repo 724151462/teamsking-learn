@@ -466,7 +466,7 @@ export default {
         })
         courseBaseInfo(this.courseId)
         .then(response=> {
-            console.log(response.data)
+            this.studyMode.studyMode = 10
         })
     },
     methods: {
