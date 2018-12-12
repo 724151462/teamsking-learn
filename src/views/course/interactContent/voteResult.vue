@@ -13,7 +13,8 @@
         </div>
         
         <div class="main">
-            <div>
+            <span style="color:rgb(130,178,198);float: right;margin-right:100px">提示：按照提交顺序排序</span>
+            <div style="margin-top: 20px">
                 <span>题目1：在以下能有效防控欠款产生的措施中，。。。。。。</span>
                 <span style="color:rgb(130,178,198)">(单选题)</span>
             </div>

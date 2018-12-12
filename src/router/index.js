@@ -82,9 +82,19 @@ export const constantRouterMap = [{
                 name: '作业/小组任务',
               },
               {
+                path: '/course/list/interact/homeworkresult',
+                component: _import('course/interactContent/workResult'),
+                name: '作业/小组任务结果',
+              },
+              {
                 path: 'interact/test',
                 component: _import('course/interactContent/test'),
                 name: '发布测试',
+              },
+              {
+                path: '/course/list/interact/testresult',
+                component: _import('course/interactContent/testResult'),
+                name: '测试结果',
               },
               {
                 path: '/course/list/member',
