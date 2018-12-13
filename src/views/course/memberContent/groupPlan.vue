@@ -155,7 +155,7 @@ import {
 export default {
   data(){
     return{
-      courseId: '0608367675f54267aa6960fd0557cc1b',
+      courseId: this.$route.query.id,
       pageParmas: {
         pageSize:100
       },
@@ -173,7 +173,7 @@ export default {
       ],
       teamNameOperaType: '',
       groupInfo:{
-        courseId: '0608367675f54267aa6960fd0557cc1b',
+        courseId: this.$route.query.id,
         name:'',  //小组方案名称
         sx:'',    //分组上限
         
@@ -182,7 +182,7 @@ export default {
       schemeList: [],
       addPlan: false,
       groupPlan: {
-        courseId: '0608367675f54267aa6960fd0557cc1b',
+        courseId: this.$route.query.id,
         schemeName: "",
         schemeType: 10,
       },
@@ -191,7 +191,7 @@ export default {
         searchType: 1,
         searchName: '',
         schemeId: '',
-        courseId: '0608367675f54267aa6960fd0557cc1b',
+        courseId: this.$route.query.id,
       },
       matchType:'1',  // 1 全部成员 2 未分配小组的成员
       isAddFa:false,
@@ -294,7 +294,7 @@ export default {
     ensureMatch() {
       console.log(this.matchedList)
       this.groupInfo.userList = this.matchedList
-      this.groupInfo.courseId = '0608367675f54267aa6960fd0557cc1b'
+      this.groupInfo.courseId = this.$route.query.id
       this.matchedList.forEach(element=> {
         element.teamName = this.groupInfo.teamName
       }) 
