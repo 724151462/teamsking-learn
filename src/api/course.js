@@ -113,6 +113,16 @@ export function chaptersAdd(data) {
 
 
 /**
+ * 删除章
+ */
+
+export function chaptersDelete(data) {
+  let url = `${baseUrl}chapter/chapter`
+  return commonsAjax(url, data, 'delete')
+}
+
+
+/**
  * 添加节
  */
 
@@ -294,78 +304,125 @@ export function groupDelete(data) {
 
 //============资源管理==================
 
-  /**
-   * 查询课程下资源列表
-   */
-  export function resourcePage(id, data) {
-    let url = `${baseUrl}${id}/resource/page`
-    return commonsAjax(url, data, 'get')
-  }
+/**
+ * 查询课程下资源列表
+ */
+export function resourcePage(id, data) {
+  let url = `${baseUrl}${id}/resource/page`
+  return commonsAjax(url, data, 'get')
+}
 
-  /**
-   * 删除课程下资源
-   */
-  export function deletedResource(id, data) {
-    // resourceId
-    let url = `${baseUrl}resource/` + id
-    return commonsAjax(url, data, 'delete')
-  }
+/**
+ * 删除课程下资源
+ */
+export function deletedResource(id, data) {
+  // resourceId
+  let url = `${baseUrl}resource/` + id
+  return commonsAjax(url, data, 'delete')
+}
 
-  // ===============试题管理===============
-  //
-  /**
-   * 上传试题模板
-   */
-  export function upQuiz(id, data) {
-    let url = `${baseUrl}${id}/quiz`
-    // console.log('模板上传路径为：'+url)
-    return commonsAjax(url, data, 'post')
-  }
+// ===============试题管理===============
+//
+/**
+ * 上传试题模板
+ */
+export function upQuiz(id, data) {
+  let url = `${baseUrl}${id}/quiz`
+  // console.log('模板上传路径为：'+url)
+  return commonsAjax(url, data, 'post')
+}
 
-  /**
-   * 获取试题列表
-   */
+/**
+ * 获取试题列表
+ */
 
-  // export function quizPage (id, data) {
-  //   let url = '${baseUrl}' + id + '/quiz/page'
-  //   return commonsAjax(url, data, 'get')
-  // }
+// export function quizPage (id, data) {
+//   let url = '${baseUrl}' + id + '/quiz/page'
+//   return commonsAjax(url, data, 'get')
+// }
 
-  /**
-   * 获取试题列表2
-   */
-  export function quizPage(data) {
-    let url = `${baseUrl}library/quiz/page`
-    return commonsAjax(url, '', 'get')
-  }
-  /**
-   * 保存单个试题信息
-   */
-  export function saveQuiz(data) {
-    return commonsAjax(`${baseUrl}quiz`, data, 'post')
-  }
+/**
+ * 获取试题列表2
+ */
+export function quizPage(data) {
+  let url = `${baseUrl}library/quiz/page`
+  return commonsAjax(url, '', 'get')
+}
+/**
+ * 保存单个试题信息
+ */
+export function saveQuiz(data) {
+  return commonsAjax(`${baseUrl}quiz`, data, 'post')
+}
 
-  /**
-   * 获取单个试题信息(包含选项)
-   */
-  export function quizInfo(id) {
-    let url = `${baseUrl}quiz/${id}`
-    return commonsAjax(url, '', 'get')
-  }
+/**
+ * 获取单个试题信息(包含选项)
+ */
+export function quizInfo(id) {
+  let url = `${baseUrl}quiz/${id}`
+  return commonsAjax(url, '', 'get')
+}
 
-  /**
-   * 删除试题
-   */
-  export function deleteQuiz(data) {
-    let url = `${baseUrl}quiz/` + data
-    return commonsAjax(url, '', 'delete')
-  }
+/**
+ * 删除试题
+ */
+export function deleteQuiz(data) {
+  let url = `${baseUrl}quiz/` + data
+  return commonsAjax(url, '', 'delete')
+}
 
 
-  /**
-   * 复制方案
-   */
-  export function groupCopy(data) {
-    let url = `${baseUrl}scheme/${data.schemeId}`
-    return commonsAjax(url, '', 'post')
-  }
+/**
+ * 复制方案
+ */
+export function groupCopy(data) {
+  let url = `${baseUrl}scheme/${data.schemeId}`
+  return commonsAjax(url, '', 'post')
+}
+
+// ========测试=========
+
+
+/**
+ * 测试列表
+ */
+export function testList(data) {
+  let url = `${baseUrl}exam/list/${data.courseId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 测试成绩
+ */
+export function testMark(data) {
+  let url = `${baseUrl}exam/submit/list/${data.courseId}/${data.examId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 笔记列表
+ */
+export function noteList(data) {
+  let url = `${baseUrl}note/list/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 笔记删除
+ */
+export function noteDelete(data) {
+  let url = `${baseUrl}note`
+  return commonsAjax(url, data, 'delete')
+}
+
+
+/**
+ * 头脑风暴
+ */
+export function storm(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, '', 'get')
+}

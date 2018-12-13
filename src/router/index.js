@@ -143,9 +143,14 @@ export const constantRouterMap = [{
                     name: '测试管理',
                   },
                   {
-                    path: 'test/:id',
+                    path: 'testmark',
                     component: _import('course/teachContent/testMark'),
                     name: '测试成绩',
+                  },
+                  {
+                    path: 'video',
+                    component: _import('course/teachContent/videos'),
+                    name: '视频',
                   },
                 ]
               },

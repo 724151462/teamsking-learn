@@ -21,7 +21,7 @@
                         <span>{{chapter.chapterName}}</span>
                         <div slot="right-side" class="operate">
                             <span @click.stop="addJieBtn(chapter)">+添加节</span>
-                            <span>删除</span>
+                            <span @click.stop="delChapter(chapter)">删除</span>
                             <!-- <span class="spread" @click="spread(chapter)">{{fold}}</span> -->
                         </div>
                     </div>
@@ -223,10 +223,11 @@ import videoPlayer from '@/components/video-pay'
 import {
     chaptersList,
     chaptersAdd,
+    chapterDelete,
     sectionAdd,
     itemAdd,
     studyModeModify,
-    courseBaseInfo
+    courseBaseInfo,
 } from '@/api/course'
 export default {
     data() {
@@ -459,14 +460,14 @@ export default {
         subjPick: ''
       }
     },
-    mounted() {
+    created() {
         chaptersList(this.courseId)
         .then((response)=> {
             this.sourceData = response.data
         })
         courseBaseInfo(this.courseId)
         .then(response=> {
-            this.studyMode.studyMode = 10
+            this.patternId = String(response.data.studyMode)
         })
     },
     methods: {
@@ -515,6 +516,18 @@ export default {
         addChapter(chapterName) {
             chaptersAdd({chapterStatus: 2, courseId: this.courseId, chapterName: chapterName})
             .then((response)=> {
+                console.log(response.data)
+            })
+        },
+        // 删除章
+        delChapter(chapter) {
+            let delArr = []
+            delArr.push(chapter.id)
+            let params = {
+                chapterIds: delArr
+            }
+            chapterDelete(params)
+            .then(response=> {
                 console.log(response.data)
             })
         },

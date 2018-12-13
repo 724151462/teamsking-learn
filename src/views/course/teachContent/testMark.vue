@@ -23,9 +23,14 @@
 <script>
   import tableNoHeader from '@/components/table-no-header.vue'
   import adialog from '@/components/dialog'
+  import {testMark} from '@/api/course'
   export default {
     data() {
       return {
+        markParmas: {
+          courseId: this.$route.query.courseId,
+          examId: this.$route.query.examId
+        },
         tables:[
           {
             name:'学生',
@@ -47,7 +52,7 @@
         tableData:[
           {
             zyname:'资源名',
-            notesTitle:'笔记标题1',
+            notesTitle:'笔记标题11',
             notesContent:'<p>笔记内容</p>',
             fbr:'发布人',
             fbsj:'2018-1-1',
@@ -79,6 +84,13 @@
     },
     created(){
       this.$emit('teachingNav','test')
+    },
+    mounted() {
+      console.log('map', this.markParmas)
+      testMark(this.markParmas)
+      .then(response=> {
+        console.log('mark', response.data)
+      })
     },
     components: {
       tableNoHeader,
