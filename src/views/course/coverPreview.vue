@@ -1,102 +1,30 @@
 <template>
-
-  <!--
-  show: false,
-  dialogConfig: {
-      btnShow: true,
-      title: '查看笔记',
-      width: '40',
-      labelWidth: '120',
-      top: '20',
-      inputWidth: '70',
-      eventType: ''
-  },
-  dataObj: {
-      notesTitle: '笔记123',
-      fbr: '小明',
-      fbsj: '2018-11-29',
-      noteContent: 'werwrq'
-  },
-  formData: [
-            {
-              key: '笔记标题：',
-              inputType: 'string',
-              value: 'notesTitle'
-            },
-            {
-              key: '发布人：',
-              inputType: 'string',
-              value: 'fbr'
-            },
-            {
-              key: '发布日期：',
-              inputType: 'string',
-              value: 'fbsj'
-            },
-            {
-              key: '笔记内容：',
-              inputType: 'string',
-              value: 'notesContent'
-            },
-            {
-              key:'笔记图片',
-              inputType:'img',
-              value:'imgSrc',
-              imgWidth: 50
-            },
-          ]
-
-
-  <adialog :dialogConfig="dialogConfig"
-        :dataObj="dataObj"
-        :formData="formData"
-        @showComponentInfo="showComponentInfo"
-        :show.sync="show">
-        </adialog>
-  -->
   <el-dialog
     title="选择课程封面"
     :visible.sync="visible"
-    width="910px"
+    width="920px"
     @close="$emit('closeCoverPreview')">
-      <!--<el-upload-->
-        <!--class="avatar-uploader"-->
-        <!--action="https://jsonplaceholder.typicode.com/posts/"-->
-        <!--:show-file-list="false"-->
-        <!--:on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">-->
-
-        <!--<img v-if="Course.courseCover" :src="Course.courseCover" class="avatar">-->
-        <!--<i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
-      <!--</el-upload>-->
-    <!--<el-upload-->
-      <!--action="https://jsonplaceholder.typicode.com/posts/"-->
-      <!--style="margin-bottom: 20px"-->
-      <!--list-type="picture-card"-->
-      <!--:show-file-list="true"-->
-      <!--:on-preview="handlePictureCardPreview"-->
-      <!--:before-upload="beforeAvatarUpload"-->
-      <!--:on-remove="handleRemove">-->
-      <!--<i class="el-icon-plus"></i>-->
-    <!--</el-upload>-->
-    <!--<el-dialog :visible.sync="dialogVisible">-->
-      <!--<img width="100%" :src="dialogImageUrl" alt="">-->
-    <!--</el-dialog>-->
-    <el-button type="primary" @click="innerVisible= true">本地上传</el-button>
     <div style="display: inline-flex;flex-wrap:wrap">
-      <div v-for="src in imgSrc" :key="src.id" style="margin-bottom: 20px;margin-right: 10px;">
+      <div class="upload-warp" @click="innerVisible= true">
+        <i class="el-icon-upload upload-icon">
+          <span style="font-size: 16px">本地上传</span>
+        </i>
+      </div>
+      <div v-for="src in imgSrc" :key="src.id" class="cover-img-warp" style="margin-bottom: 20px;margin-right: 10px;position: relative">
         <img :src="src.imgUrl" alt="" style="width: 280px;height: 160px;cursor: pointer;">
+        <div class="img-mark">设为封面图</div>
       </div>
     </div>
     <!--图片裁剪框-->
     <el-dialog
-      width="80%"
+      width="1020px"
       title="封面图上传"
       :visible.sync="innerVisible"
       append-to-body>
       <div class="cropper-content">
         <div class="cropper">
           <vue-cropper ref="cropper"
-                       :img="imgSrc[0].imgUrl"
+                       :img="option.img"
                        :autoCrop = true
                        :autoCropWidth ="280"
                        :autoCropHeight="160"
@@ -105,21 +33,25 @@
                        :outputSize="1"
                        @realTime="realTime"></vue-cropper>
         </div>
-        <div>
+        <div style="margin-left: 40px;">
           <p>封面图片预览</p>
-          <div class="show-preview" :style="{'width': previews.w+ 'px', 'height': previews.h + 'px',  'overflow': 'hidden', 'margin': '5px'}">
-            <!--<p>图片预览</p>-->
-            <div :style="previews.div" class="preview">
-              <img :src="previews.url" :style="previews.img">
+          <div class="show-preview">
+            <div :style="{'width': previews.w+ 'px', 'height': previews.h + 'px',  'overflow': 'hidden'}">
+              <!--<p>图片预览</p>-->
+              <div :style="previews.div" class="preview">
+                <img :src="previews.url" :style="previews.img">
+              </div>
             </div>
           </div>
+          <p>说明：上传的封面图片宽为:280,高为:160px</p>
+          <p>可在左侧图片框内用鼠标滚轮控制图片大小</p>
         </div>
-
       </div>
-      <div>
-        <el-button @click="cut()">裁剪</el-button>
-
-        <el-button @click="down('blob')">下载</el-button>
+      <div style="margin-top: 40px;">
+        <label class="el-button el-button--primary" for="uploads">选择本地图片</label>
+        <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);" accept="image/png, image/jpeg, image/gif, image/jpg"
+               @change="uploadImg($event, 1)">
+        <el-button @click="down('blob')" type="primary" style="margin-left: 20px;" size="medium">开始上传</el-button>
       </div>
     </el-dialog>
   </el-dialog>
@@ -141,12 +73,20 @@
           {imgUrl: require("@/assets/images/cover/3.jpg")},
           {imgUrl: require("@/assets/images/cover/4.jpg")},
           {imgUrl: require("@/assets/images/cover/5.jpg")},
-          {imgUrl: require("@/assets/images/cover/6.jpg")}
+          {imgUrl: require("@/assets/images/cover/6.jpg")},
+          {imgUrl: require("@/assets/images/cover/7.jpg")},
+          {imgUrl: require("@/assets/images/cover/8.jpg")},
+          {imgUrl: require("@/assets/images/cover/9.jpg")},
+          {imgUrl: require("@/assets/images/cover/10.jpg")},
+          {imgUrl: require("@/assets/images/cover/11.jpg")},
+          {imgUrl: require("@/assets/images/cover/12.jpg")},
         ],
-        imageUrl:'',
         innerVisible:false, // 图片裁剪框
         dialogImageUrl: '',
         dialogVisible: false,
+        option:{
+          img : '' || require("@/assets/images/cover/1.jpg"),
+        },
         previews:{
           url:'',
           width:'',
@@ -180,9 +120,8 @@
         }
         return isJPG && isLt2M;
       },
-      //课程图，裁剪
+      //图片裁剪
       realTime(data) {
-        console.log(data)
         this.previews = data;
       },
       down(type) {
@@ -211,7 +150,35 @@
           // do something
           console.log(data)
         })
-      }
+      },
+      uploadImg(e, num) {
+        //上传图片
+        // this.option.img
+        var file = e.target.files[0]
+        if (!/\.(jpg|jpeg|png|GIF|JPG|PNG)$/.test(e.target.value)) {
+          alert('图片类型必须是jpeg,jpg,png中的一种')
+          return false
+        }
+        var reader = new FileReader()
+        reader.onload = (e) => {
+          let data
+          if (typeof e.target.result === 'object') {
+            // 把Array Buffer转化为blob 如果是base64不需要
+            data = window.URL.createObjectURL(new Blob([e.target.result]))
+          } else {
+            data = e.target.result
+          }
+          if (num === 1) {
+            this.option.img = data
+          } else if (num === 2) {
+            this.example2.img = data
+          }
+        }
+        // 转化为base64
+        // reader.readAsDataURL(file)
+        // 转化为blob
+        reader.readAsArrayBuffer(file)
+      },
     },
     watch: {
       show () {
@@ -228,7 +195,40 @@
       width 400px
       height 300px
     .show-preview
-      border 2px solid red
+      width 280px
+      margin 20px 0;
+      height 160px
+      border 1px solid #d9d9d9
+  .upload-warp
+    text-align center
+    color: #409EFF;
+    cursor pointer
+    height 160px
+    width 280px
+    margin-bottom: 20px;
+    margin-right: 10px;
+    border 1px dashed #d9d9d9
+    .upload-icon
+      font-size 28px
+      text-align center
+      line-height 160px
+  .cover-img-warp
+    .img-mark
+      height 160px
+      width 280px
+      /*background lightgray*/
+      background: rgba(0,0,0,0.5)
+      position absolute
+      text-align center
+      cursor pointer
+      line-height 160px
+      opacity 0
+      top 0
+      color #409EFF
+    .img-mark:hover
+      opacity 1
+
+
   .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;

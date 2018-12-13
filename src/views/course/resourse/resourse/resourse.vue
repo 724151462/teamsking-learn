@@ -50,7 +50,6 @@
                   <el-button type="primary" icon="el-icon-upload2" size="small" @click.stop="fileUpload">上传</el-button>
                 </div>
               </div>
-
             </template>
             <div>
               <div class="resource-list" v-for="resource in course.resources" :key="resource.id">

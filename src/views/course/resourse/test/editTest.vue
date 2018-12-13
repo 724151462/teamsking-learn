@@ -8,8 +8,6 @@
         <el-form-item label="题干" required>
           <br>
           <div ref="editor" style="text-align:left"></div>
-          <!--<editor :editorContent="quizData.quizTitle" v-model="quizData.quizTitle" @change="getinfo"></editor>-->
-          {{this.quizData.quizTitle}}
         </el-form-item>
         <el-form-item label="题型" required>
           <el-radio-group v-model="quizData.quizType" @change="quizTypeChange">
@@ -72,7 +70,7 @@
       // if(this.$route.query.courseid && this.$route.query.courseid !== ''){
       //   this.courseid = this.$route.query.courseid
       // }
-      this.getQuizInfo()
+      // this.getQuizInfo()
       // setTimeout(this.getQuizInfo,5000)
     },
     data () {
@@ -125,13 +123,11 @@
       }
     },
     mounted() {
-      // this.getQuizInfo()
-      var editor = new E(this.$refs.editor)
-      editor.customConfig.onchange = (html) =>{
-        console.log(html)
+      this.editor = new E(this.$refs.editor)
+      this.editor.customConfig.onchange = (html) =>{
         this.quizData.quizTitle = html
       }
-      editor.customConfig.menus = [
+      this.editor.customConfig.menus = [
         'head',  // 标题
         'bold',  // 粗体
         'fontSize',  // 字号
@@ -146,9 +142,9 @@
         'code',  // 插入代码
         'undo',  // 撤销
       ]
-      editor.create()
-      editor.txt.html(this.quizData.quizTitle)
-      // editor.txt.append(this.quizData.quizTitle)
+      this.editor.create()
+      //获取数据
+      this.getQuizInfo()
     },
     methods:{
       //获取试题信息
@@ -157,7 +153,7 @@
         quizInfo(quizId).then(res=>{
           // console.log(res)
           this.quizData = res.data
-          this.title = res.data.quizTitle
+          this.editor.txt.html(this.quizData.quizTitle)
         }).catch(error=>{
           console.log(error)
         })

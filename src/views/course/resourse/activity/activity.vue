@@ -44,7 +44,7 @@
         <el-collapse accordion>
           <el-collapse-item v-for="(course,courseIndex) in activityData" :key="course.id">
             <template slot="title">
-              <!--二级课程选择框-->
+              <!--课程选择框-->
               <el-checkbox
                 :indeterminate="course.indeterminate"
                 v-model="course.selected"
@@ -60,15 +60,24 @@
               </div>
             </template>
             <!--章节-->
-            <div v-for="(chapter, chapterIndex) in course.chapter" :key="chapter.id" style="padding-left: 80px;">
-              <div style="display: inline-flex;width: calc(100% - 100px)">
-                <div style="display: inline-block">{{chapter.chapterName}}</div>
-                <div style="flex: 1">1</div>
-                <div>
-                  <el-button type="primary" icon="el-icon-upload2" size="small" @click.stop="fileUpload">上传</el-button>
+            <el-collapse v-for="(chapter) in course.chapter" :key="chapter.id" style="padding-left: 50px;">
+              <el-collapse-item :title="chapter.chapterName">
+                <div style="display: flex">
+                  <div>单选框</div>
+                  <div style="flex: 1">测试：Word的基础操作 查看></div>
+                  <div>2018-6-31 12:00</div>
                 </div>
-              </div>
-            </div>
+              </el-collapse-item>
+            </el-collapse>
+            <!--<div v-for="(chapter, chapterIndex) in course.chapter" :key="chapter.id" style="padding-left: 80px;">-->
+              <!--<div style="display: inline-flex;width: calc(100% - 100px)">-->
+                <!--<div style="display: inline-block">{{chapter.chapterName}}</div>-->
+                <!--<div style="flex: 1"></div>-->
+                <!--<div>-->
+                  <!--2018-6-31 12:00-->
+                <!--</div>-->
+              <!--</div>-->
+            <!--</div>-->
           </el-collapse-item>
         </el-collapse>
       </div>

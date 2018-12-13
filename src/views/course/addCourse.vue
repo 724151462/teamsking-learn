@@ -58,23 +58,11 @@
                     default-time="12:00:00">
             </el-date-picker>
           </div>
-<!--          <el-date-picker
-              v-model="courseTime"
-              type="datetimerange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期">
-          </el-date-picker>-->
         </el-form-item>
-
         <el-form-item label="课程封面" required>
           <img src="@/assets/images/cover/1.jpg" alt="" style="width: 280px;height: 160px;">
           <!--课程封面分辨比率为280x160-->
-          <el-button type="primary"
-                     style="margin-left: 20px;"
-                     @click="coverPreviewShow = true"
-                     >选择封面图
-          </el-button>
+          <el-button type="primary" style="margin-left: 20px;" size="medium" @click="coverPreviewShow = true">选择封面图</el-button>
         </el-form-item>
         <cover-preview :show="coverPreviewShow" @closeCoverPreview="closeCoverPreview"></cover-preview>
 
@@ -105,8 +93,8 @@
               @change="yesInstructor"
               placeholder="请选择讲师">
             <el-option
-                v-for="item in instructorLists"
-                :key="item.instructorId"
+                v-for="(item) in CourseForm.instructor"
+                :key="item.id"
                 :label="item.instructorName"
                 :value="item.instructorId">
             </el-option>
@@ -141,6 +129,7 @@
         <el-form-item label="课程代码">
           <el-input v-model="Course.courseCode" style="width: 120px;"></el-input>
         </el-form-item>
+        <!--引用课程包，二期需求-->
 <!--        <div style="margin-left: 30px;margin-bottom: 22px">
           <el-checkbox v-model="Course.isCoursePackge">引用已有课程包</el-checkbox>
           <el-select v-model="Course.coursePackge" filterable placeholder="请选择" style="margin-left: 12px">
@@ -154,21 +143,21 @@
           <span style="margin-left: 12px" class="remind-text-color">下拉选择已有课程包</span>
         </div>-->
         <el-form-item label="课程介绍" required>
-          <el-row style="text-align: right">
+          <el-row>
             <el-button type="text" v-show="!iseditor1" @click="iseditor1 = true">设置</el-button>
           </el-row>
           <div id="editor1" v-show="iseditor1"></div>
         </el-form-item>
 
         <el-form-item label="教学目标" required>
-          <el-row style="text-align: right">
+          <el-row>
             <el-button type="text" v-show="!iseditor2" @click="iseditor2 = true">设置</el-button>
           </el-row>
           <div id="editor2" v-show="iseditor2"></div>
         </el-form-item>
 
         <el-form-item label="教学安排" required>
-          <el-row style="text-align: right">
+          <el-row>
             <el-button type="text" v-show="!iseditor3" @click="iseditor3 = true">设置</el-button>
           </el-row>
           <div id="editor3" v-show="iseditor3"></div>
@@ -349,12 +338,6 @@
           courseCode:'',  //课程代码/课程编码
           accreditTeacher:'',// 授权教师搜索框
           accreditTeacherList:[], //被授权教师列表
-          isCoursePackge:true, //是否引用已有课程包
-          coursePackge:'',
-          coursePackgeList:[
-            { "id": "1", "value": "商业贸易" },
-            { "id": "2", "value": "历史学" }
-            ], //课程包列表
           teacher:'', //教师id
           //一下的默认值
           studyMode:10, //课程学习模式
@@ -366,7 +349,7 @@
           instructor:[],  //要保存的讲师Id
           teacher:[], //要保存的教师Id
         },
-        //课程完成度
+        //课程完成度设置
         CourseSetEntity: {
           videoPercent: {// 视频成绩占比
             value: 50,
@@ -407,7 +390,7 @@
           teachingArrangement:null, //教学安排
           teachingTarget:null, //教学目标
         },
-        courseTime:[],  //课程开始 and 结束时间
+
         isAccredit:false, //弹出教学课程授权
         isSysTem:false, //弹出设置
         coverPreviewShow: false, //弹出课程封面上传
@@ -462,16 +445,23 @@
     created(){
       this.$emit('floorStatus','course')
       // this.selectListselectList()
-      // if(this.$route.query.courseId)
+      //课程编辑
       if(this.$route.query.courseId && this.$route.query.courseId !== ''){
         this.getUpData(this.$route.query.courseId)
       }
     },
     methods:{
-      //进入查询编辑数据
+      //课程编辑时获取该课程的数据
       getUpData(e){
         courseInfo(e).then(res=>{
-          console.log(res)
+          this.Course = res.data.course
+          //教室相关信息
+          this.CourseForm.instructor = res.data.instructor
+          this.CourseForm.teacher = res.data.teacher
+          // this.CourseSetEntity = res.data.set
+          console.log(res.data)
+          console.log(this.Course)
+          console.log(this.CourseForm)
         }).catch(error=>{
           console.log(error)
         })
@@ -506,6 +496,7 @@
           }
         })
       },
+      //所有填写完毕，创建课程
       goUpCourseResource(){
         let data = {
           course:this.Course,
@@ -652,8 +643,9 @@
       }
     },
     mounted(){
+      //编辑课程
       if(this.$route.query.type === 'upData') {
-        
+        console.log("课程编辑")
       }
       //课程介绍
       let self = this
