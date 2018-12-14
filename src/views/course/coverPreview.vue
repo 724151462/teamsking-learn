@@ -12,7 +12,7 @@
       </div>
       <div v-for="src in imgSrc" :key="src.id" class="cover-img-warp" style="margin-bottom: 20px;margin-right: 10px;position: relative">
         <img :src="src.imgUrl" alt="" style="width: 280px;height: 160px;cursor: pointer;">
-        <div class="img-mark">设为封面图</div>
+        <div class="img-mark" @click="cover(src.imgUrl)">设为封面</div>
       </div>
     </div>
     <!--图片裁剪框-->
@@ -179,6 +179,9 @@
         // 转化为blob
         reader.readAsArrayBuffer(file)
       },
+      cover(url){
+        this.$emit('chooseCover', url)
+      },
     },
     watch: {
       show () {
@@ -217,12 +220,14 @@
       height 160px
       width 280px
       /*background lightgray*/
-      background: rgba(0,0,0,0.5)
+      background: rgba(0,0,0,0.4)
       position absolute
       text-align center
       cursor pointer
       line-height 160px
       opacity 0
+      font-size 16px
+      font-weight bold
       top 0
       color #409EFF
     .img-mark:hover

@@ -2,6 +2,10 @@ const devUrl = '/api/v1/course/' // 开发环境
 const prodUrl = 'http://120.36.137.90:8008/api/v1/course/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
+const commonDevUrl = '/api/v1/' // 开发环境
+const commonProdUrl = 'http://120.36.137.90:8008/api/v1/' // 生产环境
+const commonBaseUrl = process.env.NODE_ENV === 'production' ? commonProdUrl : commonDevUrl
+
 import {
   commonsAjax
 } from '../utils/requery'
@@ -35,7 +39,7 @@ export function courseBaseInfo(data) {
  * 修改学习模式
  */
 export function studyModeModify(data) {
-  let url = `${baseUrl}${data.courseId}/studymode/${data.studyMode}`
+  let url = `${commonBaseUrl}${data.courseId}/studymode/${data.studyMode}`
   return commonsAjax(url, '', 'put')
 }
 
@@ -44,28 +48,28 @@ export function studyModeModify(data) {
  * 获取课程分类列表
  */
 export function categories(data) {
-  return commonsAjax(`${baseUrl}common/categories`, '', 'get')
+  return commonsAjax(`${commonBaseUrl}common/categories`, '', 'get')
 }
 
 /**
  * 获取课程分类列表
  */
 export function tags(data) {
-  return commonsAjax(`${baseUrl}common/tags`, 'data', 'get')
+  return commonsAjax(`${commonBaseUrl}common/tags`, 'data', 'get')
 }
 
 /**
  * 获取讲师列表
  */
 export function instructorList(data) {
-  return commonsAjax(`${baseUrl}instructor/list`, '', 'get')
+  return commonsAjax(`${baseUrl}instructor/list`, data, 'get')
 }
 
 /**
  * 获取教师列表
  */
 export function teachersList(data) {
-  let url = `${baseUrl}tenant/` + 1 + '/teachers'
+  let url = `${commonBaseUrl}tenant/` + 1 + '/teachers'
   return commonsAjax(url, '', 'get')
 }
 

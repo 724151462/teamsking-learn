@@ -11,13 +11,6 @@
         </el-form-item>
 
         <el-form-item label="课程分类" required>
-<!--          <el-cascader
-              placeholder="请选择课程分类"
-              :options="categoriesList"
-              :props='categoriesConfig'
-              @change="yesCategories"
-              filterable
-          ></el-cascader>-->
           <el-select v-model="Course.courseCategoryParent" placeholder="课程一级分类" @change="yesCategories">
             <el-option
               v-for="(item , index) in categoriesList"
@@ -26,11 +19,7 @@
               :value="item.categoryName">
             </el-option>
           </el-select>
-          <el-select
-            v-model="Course.courseCategory"
-            placeholder="课程二级分类"
-            style="margin-left: 30px"
-            v-show="isCourseChild">
+          <el-select v-model="Course.courseCategory" placeholder="课程二级分类" style="margin-left: 30px" v-show="isCourseChild">
             <el-option
               v-for="item in categoriesChildList"
               :key="item.categoryId"
@@ -60,46 +49,72 @@
           </div>
         </el-form-item>
         <el-form-item label="课程封面" required>
-          <img src="@/assets/images/cover/1.jpg" alt="" style="width: 280px;height: 160px;">
-          <!--课程封面分辨比率为280x160-->
-          <el-button type="primary" style="margin-left: 20px;" size="medium" @click="coverPreviewShow = true">选择封面图</el-button>
+          <div class="avatar-uploader" @click="coverPreviewShow = true">
+            <img v-if="Course.courseCover" :src="Course.courseCover" class="avatar" >
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </div>
         </el-form-item>
-        <cover-preview :show="coverPreviewShow" @closeCoverPreview="closeCoverPreview"></cover-preview>
+        <cover-preview :show="coverPreviewShow"
+                       @closeCoverPreview="closeCoverPreview"
+                       @chooseCover="chooseCover"></cover-preview>
 
         <el-form-item label="课程价格" required>
-          <el-radio v-model="Course.payMode" label="10">免费</el-radio>
+          <el-radio v-model="Course.payMode" :label="10">免费</el-radio>
 <!--          <el-radio v-model="Course.payMode" label="20">收费</el-radio>
           <el-input v-model="Course.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;" v-show="Number(Course.payMode) === 20"></el-input>
           <span v-show="Number(Course.payMode) === 20">元</span>-->
         </el-form-item>
 
         <el-form-item label="课程标签" required>
-          <el-cascader
-              placeholder="请选择课程标签"
-              :options="tagsList"
-              :props='tagsConfig'
-              @change="yesTages"
-              filterable
-          ></el-cascader>
+          <div class="course-tag-warp">
+            <div v-show="CourseForm.instructor.length === 0" style="color: #b3b3b3">选择课程标签</div>
+            <el-tag
+              size="small"
+              v-for="instructor in CourseForm.instructor"
+              :key="instructor.id"
+              @close="instructorRemove(instructor)"
+              closable>
+              {{instructor.instructorName}}
+            </el-tag>
+          </div>
+          <el-row>
+            <el-autocomplete
+              style="width: 150px;"
+              v-model="instructor"
+              suffix-icon="el-icon-search"
+              :fetch-suggestions="instructorSearch"
+              placeholder="搜索标签"
+              @select="yesInstructor"
+            ></el-autocomplete>
+          </el-row>
         </el-form-item>
 
         <el-form-item label="讲师" required>
-          <el-select
-              v-model="CourseForm.instructor"
-              multiple
-              filterable
-              allow-create
-              default-first-option
-              @change="yesInstructor"
-              placeholder="请选择讲师">
-            <el-option
-                v-for="(item) in CourseForm.instructor"
-                :key="item.id"
-                :label="item.instructorName"
-                :value="item.instructorId">
-            </el-option>
-          </el-select>
-          <el-button type="primary" round style="margin-left: 20px;" @click="isTeacher = true">创建讲师</el-button>
+          <div class="instructor-tag-warp">
+            <div v-show="CourseForm.instructor.length === 0" style="color: #b3b3b3">请选择讲师</div>
+            <el-tag
+              size="small"
+              v-for="instructor in CourseForm.instructor"
+              :key="instructor.id"
+              @close="instructorRemove(instructor)"
+              closable>
+              {{instructor.instructorName}}
+            </el-tag>
+          </div>
+          <el-row>
+              <el-autocomplete
+                style="width: 300px;"
+                v-model="instructor"
+                suffix-icon="el-icon-search"
+                :fetch-suggestions="instructorSearch"
+                placeholder="请输入老师名字搜索"
+                @select="yesInstructor"
+              ></el-autocomplete>
+            <el-button type="primary"
+                       size="medium"
+                       style="margin-left: 20px;display: inline-block"
+                       @click="isTeacher = true">增加讲师</el-button>
+          </el-row>
         </el-form-item>
 
         <el-form-item label="教学课程授权" label-width="120px" required>
@@ -327,7 +342,7 @@
           courseCategoryParent:'',  //课程分类
           courseCategory:'',  //课程子分类
           courseTagParent:'', //课程标签
-          courseTag:'', //课程子标签
+          courseTagIds:[], // 课程标签
           beginTime:'', //开课时间
           endTime:'', //结课时间
           courseCover:'', //课程封面
@@ -390,7 +405,7 @@
           teachingArrangement:null, //教学安排
           teachingTarget:null, //教学目标
         },
-
+        instructor:'', //讲师搜索时用
         isAccredit:false, //弹出教学课程授权
         isSysTem:false, //弹出设置
         coverPreviewShow: false, //弹出课程封面上传
@@ -410,17 +425,9 @@
         addEditor2:null,
         addEditor3:null,
         //课程分类
-        categoriesList:[],
-        //二级课程
-        categoriesChildList:[],
-        //二级课程选择框的隐显
-        isCourseChild: false,
-        //配置二级
-        categoriesConfig:{
-          label:'categoryName',
-          value:'categoryId',
-          children:'children'
-        },
+        categoriesList:[],  //一级课程
+        categoriesChildList:[],   //二级课程
+        isCourseChild: false,    //二级课程选择框的隐显
         //课程标签列表
         tagsList:[],
         //配置二级
@@ -444,7 +451,7 @@
     },
     created(){
       this.$emit('floorStatus','course')
-      // this.selectListselectList()
+      this.selectList()
       //课程编辑
       if(this.$route.query.courseId && this.$route.query.courseId !== ''){
         this.getUpData(this.$route.query.courseId)
@@ -460,8 +467,8 @@
           this.CourseForm.teacher = res.data.teacher
           // this.CourseSetEntity = res.data.set
           console.log(res.data)
-          console.log(this.Course)
-          console.log(this.CourseForm)
+          // console.log(this.Course)
+          // console.log(this.CourseForm)
         }).catch(error=>{
           console.log(error)
         })
@@ -479,7 +486,9 @@
       },
       //讲师
       yesInstructor (e) {
-        this.CourseForm.instructor = e
+        delete e.value
+        this.CourseForm.instructor.push(e)
+        console.log(this.CourseForm.instructor)
       },
       //标签数据赋值
       yesTages(e){
@@ -544,18 +553,54 @@
         }
         return isJPG && isLt2M;
       },
-      //获取基础选择列表分类信息
-      selectList () {
-        //课程列表
-        categories().then(res=>{
-          // console.log('课程列表数据:'+JSON.stringify(res))
+      //讲师移除
+      instructorRemove(e){
+        console.log(e.instructorId)
+        let data = this.CourseForm.instructor,
+            newData = [];
+        data.forEach((item)=>{
+          if (item.instructorId !== e.instructorId){
+            newData.push(item)
+          }
+        })
+        this.CourseForm.instructor = newData
+      },
+      //获取讲师搜索的列表
+      instructorSearch(queryString, cb) {
+        instructorList({instructorName:queryString}).then(res=>{
           if(Number(res.code) === 200){
-            //数据处理
-            let data = this.electChilder(res.data)
+            //给查询到的值加入value字段，用于组件值的显示，数据提交时需删除
+            let data = []
+            res.data.forEach((item)=>{
+              item.value = item.instructorName
+              data.push(item)
+            })
+
+            this.teachersLists = data
+
+            // 调用 callback 返回建议列表的数据
+            cb(data)
+
+          }else{
+            this.$message({
+              message:'讲师列表获取失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
+      //从后台获取基础信息
+      selectList () {
+        //课程分类列表
+        categories().then(res=>{
+          if(Number(res.code) === 200){
+            let data = this.electChilder(res.data) //删除为空的子节点
             this.categoriesList = data
           }else{
             this.$message({
-              message:'课程分类数据获取失败',
+              message:'课程分类获取失败',
               type:'error'
             })
           }
@@ -564,23 +609,23 @@
         })
         //课程标签列表
         tags().then(res=>{
-          // console.log('课程标签列表'+JSON.stringify(res));
           if(Number(res.code) === 200){
             let data = this.electChilder(res.data)
             this.tagsList = data
             // console.log('标签列表:' + this.tagsList)
           }else{
             this.$message({
-              message:'课程列表获取失败',
+              message:'课程标签获取失败',
               type:'error'
             })
           }
         }).catch(error=>{
           console.log(error)
         })
-        //讲师列表
+        //获取讲师列表的数据
         instructorList().then(res=>{
-          // console.log('讲师列表:' +JSON.stringify(res))
+          // console.log('讲师列表:')
+          // console.log(res)
           if(Number(res.code) === 200){
             this.instructorLists = res.data
           }else{
@@ -592,9 +637,10 @@
         }).catch(error=>{
           console.log(error)
         })
-        //教师列表
+        //获取教师列表的数据
         teachersList().then(res=>{
-          console.log('教师列表:' +JSON.stringify(res))
+          // console.log('教师列表:')
+          // console.log(res)
           if(Number(res.code) === 200){
             this.teachersLists = res.data
           }else{
@@ -632,20 +678,20 @@
         // 调用 callback 返回建议列表的数据
         cb(results);
       },
-      createFilter(queryString) {
-        return (restaurant) => {
-          return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-        };
-      },
       // 上传封面图片弹窗的关闭
       closeCoverPreview () {
         this.coverPreviewShow = false
+      },
+      // 封面图替换
+      chooseCover(url){
+        this.coverPreviewShow = false
+        this.Course.courseCover = url
       }
     },
     mounted(){
       //编辑课程
       if(this.$route.query.type === 'upData') {
-        console.log("课程编辑")
+        // console.log("课程编辑")
       }
       //课程介绍
       let self = this
@@ -690,12 +736,27 @@
   .addCourse
     overflow: hidden
     height:50px
-
+  .course-tag-warp
+    width 300px
+    border-radius 5px
+    border 1px solid #e9e9e9
+    padding-left 5px
+    padding-bottom 10px
+  .instructor-tag-warp
+    width 411px
+    border-radius 5px
+    border 1px solid #e9e9e9
+    border-bottom 0
+    /*padding 5px*/
+    padding-left 5px
+    padding-bottom 10px
+    /*margin-bottom 10px;*/
+    & span
+      margin-right 5px
   .isSystem
     .top
       padding-bottom:10px
       overflow:hidden
-
     .center
       .left
         display:inline-block
@@ -781,22 +842,26 @@
       color:#3EABA8
       margin-left:20px
 
-  .avatar-uploader .el-upload
+  .avatar-uploader
     border: 1px dashed #d9d9d9
     border-radius: 6px
+    width 280px
+    height 160px
     cursor: pointer
     position: relative
     overflow: hidden
-
-  .avatar-uploader .el-upload:hover
+  .avatar-uploader img
+    height 160px
+    width 280px
+  .avatar-uploader:hover
     border-color: #409EFF
 
   .avatar-uploader-icon
     font-size: 28px
     color: #8c939d
-    width: 178px
-    height: 178px
-    line-height: 178px
+    width: 280px
+    height: 160px
+    line-height: 160px
     text-align: center
     border:1px solid #ded5d5
 
