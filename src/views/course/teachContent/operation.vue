@@ -53,6 +53,7 @@
 <script>
   import tableNoHeader from '@/components/table-no-header.vue'
   import adialog from '@/components/dialog'
+  import {homeWorkList} from '@/api/course'
   export default {
     data() {
       return {
@@ -189,6 +190,9 @@
     },
     created(){
       this.$emit('teachingNav','operation')
+    },
+    mounted() {
+      homeWorkList({courseId:this.$route.query.id})
     },
     components: {
       tableNoHeader,

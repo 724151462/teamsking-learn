@@ -150,6 +150,10 @@ export default {
           .then((response)=> {
             if(response.code === 200) {
               info.assistantStatus = 1
+              this.$message({
+                message: '设置成功',
+                type: 'success'
+              })
             }
           })
           break;
@@ -158,6 +162,10 @@ export default {
           .then((response)=> {
             if(response.code === 200) {
               info.assistantStatus = 2
+              this.$message({
+                message: '设置成功',
+                type: 'success'
+              })
             }
           })
           break;

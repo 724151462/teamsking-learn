@@ -299,6 +299,7 @@ export function planNameModify(data) {
  */
 export function groupDelete(data) {
   let url = `${baseUrl}scheme/${data.schemeId}`
+  return commonsAjax(url, data, 'delete')
 }
 
 
@@ -402,6 +403,15 @@ export function testMark(data) {
 
 
 /**
+ * 成绩详情
+ */
+export function markDetail(data) {
+  let url = `${baseUrl}exam/submit/detail/${data.examId}/${data.examSubmissionId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
  * 笔记列表
  */
 export function noteList(data) {
@@ -424,5 +434,14 @@ export function noteDelete(data) {
  */
 export function storm(data) {
   let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 作业列表
+ */
+export function homeWorkList(data) {
+  let url = `${baseUrl}homeworksubmission/${data.courseId}`
   return commonsAjax(url, '', 'get')
 }

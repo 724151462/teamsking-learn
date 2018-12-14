@@ -11,9 +11,18 @@
     <el-dialog
       :visible.sync="show"
       title="作答记录">
-      <template v-for="item in subject">
-        <p class="margin-sides" :key="item.id">{{item.title}}</p>
-        <el-radio v-for="(option, i) in item.option" :key="i" :label="optionFilter(i)+option.label"></el-radio>
+      <template>
+        <!-- <span>{{examObj.examVO.examTitle}} (共{{examObj.examVO.quizCount}}题，共100分)</span>
+        <div v-for="quiz in examObj.examVO.libraryQuizVOS" :key="quiz.quizId" style="margin: 15px 20px">
+          <span>{{quiz.quizTitle}}</span>
+          <div>
+            <el-radio v-for="option in quiz.quizOption" :key="option.quizId" :label="option.optionId">
+              {{option.optionTitle}}
+            </el-radio>
+          </div>
+        </div> -->
+        <!-- <p class="margin-sides" :key="item.id">{{item.title}}</p>
+        <el-radio v-for="(option, i) in item.option" :key="i" :label="optionFilter(i)+option.label"></el-radio> -->
       </template>
       </el-dialog>
   </div>
@@ -23,7 +32,10 @@
 <script>
   import tableNoHeader from '@/components/table-no-header.vue'
   import adialog from '@/components/dialog'
-  import {testMark} from '@/api/course'
+  import {
+    testMark,
+    markDetail,
+  } from '@/api/course'
   export default {
     data() {
       return {
@@ -34,19 +46,19 @@
         tables:[
           {
             name:'学生',
-            prop:'notesTitle',
+            prop:'realName',
           },
           {
             name:'状态',
-            prop:'notesContent',
+            prop:'submitStatus',
           },
           {
             name:'提交时间',
-            prop:'zyname',
+            prop:'createTime',
           },
           {
             name:'测试得分',
-            prop:'fbr',
+            prop:'score',
           },
         ],
         tableData:[
@@ -74,22 +86,19 @@
 
         // 对话框
         show: false,
-        subject: [{
-          title: '第一题', id:'a', option: [{name: '123', label: '12312'}, {name: '456', label: "214215"}]  
-        },
-        {
-          title: '第二题', id:'b', option: [{name: '123', label: '12312'}, {name: '456', label: "214215"}]  
-        }], 
+        examObj: {}
       }
     },
     created(){
       this.$emit('teachingNav','test')
     },
     mounted() {
-      console.log('map', this.markParmas)
       testMark(this.markParmas)
       .then(response=> {
-        console.log('mark', response.data)
+        response.data.pageData.forEach(element => {
+          element.submitStatus = element.submitStatus === 1 ? '未提交' : '已提交'
+        });
+        this.tableData = response.data.pageData
       })
     },
     components: {
@@ -102,6 +111,15 @@
         console.log(type)
         switch (type) {
           case 'view':
+            let detailViewParams = {
+              examId: params[1].examId,
+              examSubmissionId: params[1].examSubmissionId
+            }
+            markDetail(detailViewParams)
+            .then(response=> {
+              this.examObj = response.data
+              console.log(this.examObj)
+            })
             this.show = true
             break;
         
