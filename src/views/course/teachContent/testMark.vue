@@ -32,7 +32,7 @@
                 v-else
               >{{option.optionTitle}}</el-checkbox>
             </template>
-            <div>正确答案：{{rightAnswer(quiz.quizOption)}}</div>
+            <div v-if="quiz.error">正确答案：<span style="color: red">{{rightAnswer(quiz.quizOption)}}</span></div>
           </div>
         </div>
         <!-- <p class="margin-sides" :key="item.id">{{item.title}}</p>
@@ -126,6 +126,7 @@ export default {
       });
       this.tableData = response.data.pageData;
     });
+
   },
   computed: {
     correctVal(val) {
@@ -165,9 +166,7 @@ export default {
                         response.data.examVO.libraryQuizVOS[index].error = true;
                       }
                       // 多选题学生选的勾中
-                      response.data.examVO.libraryQuizVOS[index].quizOption[
-                        i
-                      ].isCheckd = true;
+                      response.data.examVO.libraryQuizVOS[index].quizOption[i].isCheckd = true;
                     }
                     // console.log('abc',response.data.examVO.libraryQuizVOS[index].quizOption[i])
                   });
@@ -186,20 +185,14 @@ export default {
     },
     rightAnswer(optionList) {
       let correctStr = ''
-      let count = 0
       optionList.forEach((element, i)=> {
         if(element.correctFlag === 1) {
-          console.log(12,optionList[i])
-          if(count>1) {
-            correctStr = element.optionTitle+','
-          }else{
-            correctStr = element.optionTitle
-          }
-          count ++
+            correctStr += element.optionTitle+','
         }
       })
-      return correctStr
       console.log(correctStr)
+      let concatStr = correctStr.substring(0, correctStr.length-1)
+      return concatStr
     },
     optionFilter(i) {
       switch (i) {

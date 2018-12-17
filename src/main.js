@@ -10,6 +10,9 @@ import Cookie from 'js-cookie'
 
 Vue.use(ElementUI)
 
+// 引入mockjs
+require('./mock.js')
+
 Vue.config.productionTip = false
 
 var routeList = []

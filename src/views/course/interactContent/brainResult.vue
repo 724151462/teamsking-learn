@@ -42,10 +42,22 @@
 </template>
 
 <script>
+import {
+    interactBS
+} from '@/api/course'
 export default {
     data() {
         return {
+            brainParams: {
+                stormId: this.$route.query.interactId
+            }
         }
+    },
+    mounted() {
+        interactBS(this.brainParams)
+        .then(response=> {
+
+        })
     }
 }
 </script>

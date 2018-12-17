@@ -4,7 +4,7 @@
             <div>
                 <img :src="require('@/assets/images/vote.png')" alt="">
                 <span style="margin: 0 20px 0 10px">投票进度</span>
-                <span>共1道题 | 50人作答</span>
+                <span>共{{voteObj.voteQuizzes.length}}道题 | 50人作答</span>
             </div>
             <div>
                 <el-button>导出结果</el-button>
@@ -14,29 +14,44 @@
         
         <div class="main">
             <span style="color:rgb(130,178,198);float: right;margin-right:100px">提示：按照提交顺序排序</span>
-            <div style="margin-top: 20px">
-                <span>题目1：在以下能有效防控欠款产生的措施中，。。。。。。</span>
-                <span style="color:rgb(130,178,198)">(单选题)</span>
-            </div>
-            <div class="answer-container">
-                <div class="answer-item">
-                    <span>A.啊啊啊啊啊啊啊啊啊啊啊</span>
-                    <div>
-                        <el-progress :text-inside="true" class="progress" :stroke-width="18" :percentage="20"></el-progress>
-                        <span style="margin-left: 5px;color:rgb(130,178,198)">25人</span>
-                    </div>
+            <template v-for="(item, index) in voteObj.voteQuizzes">
+                <div style="margin-top: 20px" :key="item.quizId">
+                    <span>题目{{index+1}} {{item.quizTitle}}</span>
+                    <span style="color:rgb(130,178,198)">({{item.quizType===10 ? '单选题' : '多选题'}})</span>
                 </div>
-                
-            </div>
+                <div class="answer-container" v-for="(subject, i) in item.voteQuizOptions" :key="i">
+                    <div class="answer-item">
+                        <span>{{subject.optionTitle}}</span>
+                        <div>
+                            <el-progress :text-inside="true" class="progress" :stroke-width="18" :percentage="subject.percent"></el-progress>
+                            <span style="margin-left: 5px;color:rgb(130,178,198)">{{subject.userCount}}人</span>
+                        </div>
+                    </div>
+                    
+                </div>
+            </template>
         </div>
     </div>
 </template>
 
 <script>
+import {
+    interactVote
+} from '@/api/course'
 export default {
     data() {
         return {
+            voteObj: {
+                voteQuizzes:[]
+            }
         }
+    },
+    mounted() {
+        console.log(this.$route.query)
+        interactVote({voteId: this.$route.query.interactId})
+        .then(response=> {
+            this.voteObj = response.data
+        })
     }
 }
 </script>

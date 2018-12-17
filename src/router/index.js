@@ -128,6 +128,11 @@ export const constantRouterMap = [{
                     name: '作业管理',
                   },
                   {
+                    path: 'homeworkdetail',
+                    component: _import('course/teachContent/homeworkDetail'),
+                    name: '学生作业详情',
+                  },
+                  {
                     path: 'storm',
                     component: _import('course/teachContent/storm'),
                     name: '头脑风暴',

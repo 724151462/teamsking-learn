@@ -46,9 +46,15 @@
 </template>
 
 <script>
+import {
+    interactExam
+}from '@/api/course'
 export default {
     data() {
         return {
+            examParams:{
+                examId: this.$route.query.interactId
+            },
             students: [
                 {
                     ranking: 1,
@@ -96,6 +102,12 @@ export default {
                 }
             ]
         }
+    },
+    mounted() {
+        interactExam(this.examParams)
+        .then(response=> {
+            
+        })
     }
 }
 </script>

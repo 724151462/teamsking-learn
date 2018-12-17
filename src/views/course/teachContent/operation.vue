@@ -1,13 +1,13 @@
 <template>
   <div>
-    <el-steps :active="0" align-center :space="350" finish-status="success">
+    <!-- <el-steps :active="0" align-center :space="350" finish-status="success">
       <el-step title="作业提交阶段" >
         <span slot="description" style="color:gray">2019-01-13 00:00:00结束</span>
       </el-step>
       <el-step title="成绩公布">
         <span slot="description" style="color:gray">2019-01-13 00:00:00结束</span>
       </el-step>
-    </el-steps>
+    </el-steps> -->
     <div  class="margin-sides" style="font-size: 15px">
       <span style="color: red">注：</span>
       <span style="color: rgb(72,191,247)">老师在提交作业阶段可随时查看，可打回不满意的作业。<br>
@@ -32,19 +32,6 @@
         :buttonStylus="sysButton" 
         @showComponentInfo="showComponentInfo"
       ></tableNoHeader>
-      <adialog :dialogConfig="dialogConfig"
-      :dataObj="dataObj"
-      :formData="formData"
-      @showComponentInfo="showComponentInfo"
-      :show.sync="show">
-      <template></template>
-        <div class="dialog-header" slot="header">
-          <span>陈晓霞</span>
-          <el-button type="warning" size="small">
-            打回作业
-          </el-button>
-        </div>
-      </adialog>
     </div>
   </div>
   
@@ -60,24 +47,21 @@
         tables:[
           {
             name:'作业名称',
-            prop:'notesTitle',
-          },
-          {
-            name:'学生名称',
-            prop:'notesContent',
+            prop:'title',
           },
           {
             name:'状态',
-            prop:'zyname',
+            prop:'interactionStatus',
           },
           {
-            name:'所属组',
-            prop:'fbr',
+            name:'提交截止时间',
+            prop:'expireTime',
           },
           {
-            name:'提交时间',
-            prop:'fbsj',
+            name:'已提交/应提交/待批阅',
+            prop:'submitStatus',
           },
+          
         ],
         tableData:[
           {
@@ -99,7 +83,7 @@
         ],
         sysButton:[
           {
-            name:'评分',
+            name:'查看详情',
             type:'mark',
           },
         ],
@@ -130,7 +114,6 @@
             value: 2
           }
         ],
-        show: false,
         dialogConfig: {
             btnShow: true,
             title: '查看笔记',
@@ -140,52 +123,6 @@
             inputWidth: '70',
             eventType: ''
         }, 
-        formData: [
-          {
-            key: '学号：',
-            inputType: 'info',
-            value: 'notesTitle'
-          },
-          {
-            key: '班组：',
-            inputType: 'info',
-            value: 'fbr'
-          },
-          {
-            key: '学生答案：',
-            inputType: 'info',
-            value: 'fbsj'
-          },
-          {
-            key: '提交时间：',
-            inputType: 'info',
-            value: 'notesContent'
-          },
-          {
-            key:'老师评分',
-            inputType:'string',
-            value:'score',
-          },
-          {
-            key:'评分参照',
-            inputType:'tip',
-            value:'tip',
-          },
-          {
-            key:'老师评语',
-            inputType:'textarea',
-            value:'pingyu',
-          },
-        ],
-        dataObj: {
-            notesTitle: '笔记123',
-            fbr: '小明',
-            fbsj: '2018-11-29',
-            notesContent: 'werwrq',
-            mark: '',
-            tip: [{content: '评分点1 <span>4分</span>'}, {content: '评分点2'}],
-            pingyu: 'gewjigovfjqwehgw'
-        },
       }
     },
     created(){
@@ -193,6 +130,14 @@
     },
     mounted() {
       homeWorkList({courseId:this.$route.query.id})
+      .then(response=> {
+        response.data.pageData.forEach(element=> {
+          element.submitStatus = `${element.submitCount}/${element.allCount}/${element.notReviewCount}`
+        })
+        this.tableData = response.data.pageData
+        console.log(this.tableData)
+      })
+
     },
     components: {
       tableNoHeader,
@@ -201,10 +146,10 @@
     methods: {
       showComponentInfo(...params) {
         let type = params[0]
-        console.log(type)
+        console.log(params[1])
         switch (type) {
           case 'mark':
-            this.show = true
+            this.$router.push({path: '/course/list/teach/homeworkdetail', query: {id: this.$route.query.id, homeworkId: params[1].homeworkId}})
             break;
         
           default:

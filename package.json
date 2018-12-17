@@ -34,6 +34,7 @@
     "axios": "^0.18.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.0.1",
+    "mockjs": "^1.0.1-beta3",
     "qs": "^6.5.2",
     "script-loader": "^0.7.2",
     "stylus": "^0.54.5",

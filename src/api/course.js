@@ -102,6 +102,12 @@ export function chaptersList(data) {
 }
 
 
+export function chaptersListSimple(data) {
+  let url = `${baseUrl}chapter/list/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
 /**
  * 添加章
  */
@@ -385,6 +391,15 @@ export function groupCopy(data) {
 
 
 /**
+ * 测试添加
+ */
+export function testAdd(data) {
+  let url = `${baseUrl}exam`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
  * 测试列表
  */
 export function testList(data) {
@@ -439,9 +454,55 @@ export function storm(data) {
 
 
 /**
+ * 作业详情
+ */
+export function homeWorkDetail(data) {
+  let url = `${baseUrl}homework/${data.homeworkId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
  * 作业列表
  */
 export function homeWorkList(data) {
   let url = `${baseUrl}homeworksubmission/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+// ==========活动==========
+/**
+ * 活动列表
+ */
+export function interactList(data) {
+  let url = `${baseUrl}${data.courseId}/interactions`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 投票详情
+ */
+export function interactVote(data) {
+  let url = `${baseUrl}vote/${data.voteId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 头脑风暴详情
+ */
+export function interactBS(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 测试详情
+ */
+export function interactExam(data) {
+  let url = `${baseUrl}exam/${data.examId}`
   return commonsAjax(url, '', 'get')
 }

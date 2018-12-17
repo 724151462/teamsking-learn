@@ -13,12 +13,12 @@
             <div>
                 <el-tabs v-model="testContentArrValue" @tab-click="handleClick" type="card" closable @tab-remove="removeTab">
                 <el-tab-pane
-                    v-for="item in testObj.testContentArr"
+                    v-for="item in testObj.quizIds"
                     :key="item.name"
                     :label="item.title"
                     :name="item.name"
                 >
-                    <el-input type="textarea" v-model="item.testTitle" placeholder="请输入题目" style="width:600px;" autofocus="autofocus"/>
+                    <el-input type="textarea" v-model="item.examTitle" placeholder="请输入题目" style="width:600px;" autofocus="autofocus"/>
                 </el-tab-pane>
                 </el-tabs>
             </div>
@@ -26,21 +26,18 @@
                     <span>标题</span>
                 </div>
                 <div>
-                    <el-input style="width:600px" v-model="testObj.belongTitle"></el-input>
+                    <el-input style="width:600px" v-model="testObj.examTitle"></el-input>
                 </div>
                 <div class="margin-sides">
                     <span>所属章节</span>
                 </div>
                 <div>
-                    <el-select v-model="testObj.chapter">
-                        <el-option value="1">第一章</el-option>
-                    </el-select>
-                    <el-select v-model="testObj.section">
-                        <el-option value="1.1">第一节</el-option>
+                    <el-select v-model="testObj.chapterId">
+                        <el-option v-for="item in chapterList" :key="item.chapterId" :label="item.chapterName" :value="item.chapterId">{{item.chapterName}}</el-option>
                     </el-select>
                 </div>
                 <div>
-                    <el-checkbox v-model="testObj.orderDesc">
+                    <el-checkbox v-model="testObj.disorderOrder" true-label="1" false-label="2">
                         题目乱序
                     </el-checkbox>
                 </div>
@@ -52,13 +49,13 @@
                 </div>
                 <div class="margin-sides">
                     <span>重做次数</span>
-                    <el-input v-model="testObj.retryTimes" class="small-input" size="small" style="margin:10px"></el-input>次
+                    <el-input v-model="testObj.repeatTimes" class="small-input" size="small" style="margin:10px"></el-input>次
                     <span class="tip">学生可重复答题次数，成绩取最高分</span>
                 </div>
                 <div class="margin-sides">
                     <span style="margin-right:10px">查看时机</span>
-                    <el-radio v-model="testObj.seeAnswer" label="1">测试活动结束后查看答案</el-radio>
-                    <el-radio v-model="testObj.seeAnswer" label="2">交卷后查看答案</el-radio>
+                    <el-radio v-model="testObj.showAnswer" label="10">测试活动结束后查看答案</el-radio>
+                    <el-radio v-model="testObj.showAnswer" label="20">交卷后查看答案</el-radio>
                 </div>
         </div>
         <el-button @click="savetestArr">保存</el-button>
@@ -66,44 +63,56 @@
 </template>
 
 <script>
+import {
+    testAdd,
+    chaptersListSimple
+} from '@/api/course'
 export default {
     data() {
         return {
+            chapterList: [],
             testContentArrValue: '1',
             testObj: {
+                courseId: this.$route.query.id,
                 belongTitle: '',
-                chapter: '',
-                section: '',
-                orderDesc: false,
-                retryTimes: '',
+                chapterId: '',
+                disorderOrder: false,
+                repeatTimes: '',
                 testHour: '',
                 testMinute: '',
-                testContentArr: [
+                quizIds: [
                     {
                         title: `第1题`,
                         name: '1',
-                        testTitle: '',
+                        examTitle: '',
                         typeCheck: '',
                     },
                 ],
+                list: '',
+                examTitle: '',
+                showAnswer: "10"
             },
             tabIndex: 1,
-            testTitle: '',
-            showTitle: '',
         }
+    },
+    mounted() {
+        chaptersListSimple({courseId: this.testObj.courseId})
+        .then(response=> {
+            this.chapterList = response.data
+        })
     },
     methods: {
         addTab(targetName) {
             let newTabName = ++this.tabIndex + '';
-            this.testObj.testContentArr.push({
-            title: `第${this.testObj.testContentArr.length+1}题`,
+            this.testObj.quizIds.push({
+            title: `第${this.testObj.quizIds.length+1}题`,
             name: newTabName,
             content: 'New Tab content'
             });
             this.testContentArrValue = newTabName;
         },
         removeTab(targetName) {
-            let tabs = this.testObj.testContentArr;
+            let tabs = this.testObj.quizIds;
             let activeName = this.testContentArrValue;
             if (activeName === targetName) {
             tabs.forEach((tab, index) => {
@@ -117,13 +126,19 @@ export default {
             }
             
             this.testContentArrValue = activeName;
-            this.testObj.testContentArr = tabs.filter(tab => tab.name !== targetName);
-            this.testObj.testContentArr.forEach((tab, index) => {
+            this.testObj.quizIds = tabs.filter(tab => tab.name !== targetName);
+            this.testObj.quizIds.forEach((tab, index) => {
                 tab.title = `第${index+1}题`
             });
         },
         savetestArr() {
+            let minute = Number(this.testObj.testHour) * 60 + Number(this.testObj.testMinute)
+            this.testObj.limitTime = minute
             console.log(this.testObj)
+            testAdd(this.testObj)
+            .then(response=> {
+                console.log(response.data)
+            })
         },
         handleClick(tab,event) {
             
