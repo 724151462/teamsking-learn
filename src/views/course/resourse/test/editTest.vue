@@ -52,7 +52,7 @@
         </el-form-item>
       </el-form>
       <div class="btn-groud">
-        <el-button type="primary" style="margin-right: 40px">保存</el-button>
+        <el-button type="primary" style="margin-right: 40px" @click="put">保存</el-button>
         <el-button>取消</el-button>
       </div>
     </div>
@@ -62,7 +62,7 @@
 <script>
   import E from 'wangeditor'
   import editor from '@/views/course/resourse/test/myEditor'
-  import {quizInfo} from '@/api/course'
+  import {quizInfo, putQuiz} from '@/api/course'
   export default {
     name: "editTest",
     components:{editor},
@@ -81,6 +81,7 @@
           "courseId": "string",
           "creatorName": "string",
           "difficulty": 0,
+          displayOrder: 1,
           quizAnalysis: "",
           "quizId": 0,
           quizOption: [
@@ -151,7 +152,7 @@
       getQuizInfo () {
         let quizId = this.$route.params.quizid
         quizInfo(quizId).then(res=>{
-          // console.log(res)
+          console.log(res)
           this.quizData = res.data
           this.editor.txt.html(this.quizData.quizTitle)
         }).catch(error=>{
@@ -222,6 +223,25 @@
       },
       getingo(e){
         console.log(e)
+      },
+      //修改试题
+      put(){
+        console.log('修改试题')
+        let data = this.quizData
+        console.log(data)
+        putQuiz(data).then(res=>{
+          if(Number(res.code) === 200){
+            console.log(res)
+            this.$message.success('修改成功');
+          }else{
+            this.$message({
+              message:'修改失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
       }
     }
   }

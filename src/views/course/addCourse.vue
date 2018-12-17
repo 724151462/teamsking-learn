@@ -16,7 +16,7 @@
               v-for="(item , index) in categoriesList"
               :key="index"
               :label="item.categoryName"
-              :value="item.categoryName">
+              :value="item.categoryId">
             </el-option>
           </el-select>
           <el-select v-model="Course.courseCategory" placeholder="课程二级分类" style="margin-left: 30px" v-show="isCourseChild">
@@ -24,7 +24,7 @@
               v-for="item in categoriesChildList"
               :key="item.categoryId"
               :label="item.categoryName"
-              :value="item.categoryName">
+              :value="item.categoryId">
             </el-option>
           </el-select>
         </el-form-item>
@@ -36,6 +36,7 @@
                     type="datetime"
                     prefix-icon="el-icon-date"
                     placeholder="选择日期时间"
+                    value-format="yyyy-MM-dd HH:mm:ss"
                     default-time="12:00:00">
             </el-date-picker>
             <span style="margin: 0 20px">至</span>
@@ -44,6 +45,7 @@
                     type="datetime"
                     prefix-icon="el-icon-date"
                     placeholder="选择日期时间"
+                    value-format="yyyy-MM-dd HH:mm:ss"
                     default-time="12:00:00">
             </el-date-picker>
           </div>
@@ -67,24 +69,24 @@
 
         <el-form-item label="课程标签" required>
           <div class="course-tag-warp">
-            <div v-show="CourseForm.instructor.length === 0" style="color: #b3b3b3">选择课程标签</div>
+            <div v-show="Course.courseTagIds.length === 0" style="color: #b3b3b3">请选择课程标签</div>
             <el-tag
               size="small"
-              v-for="instructor in CourseForm.instructor"
-              :key="instructor.id"
-              @close="instructorRemove(instructor)"
+              v-for="tag in Course.courseTagIds"
+              :key="tag.id"
+              @close="tagRemove(tag)"
               closable>
-              {{instructor.instructorName}}
+              {{tag.tagName}}
             </el-tag>
           </div>
           <el-row>
             <el-autocomplete
-              style="width: 150px;"
-              v-model="instructor"
+              style="width: 305px;"
+              v-model="tag"
               suffix-icon="el-icon-search"
-              :fetch-suggestions="instructorSearch"
-              placeholder="搜索标签"
-              @select="yesInstructor"
+              :fetch-suggestions="tagSearch"
+              placeholder="选择课程标签"
+              @select="yesTages"
             ></el-autocomplete>
           </el-row>
         </el-form-item>
@@ -124,9 +126,9 @@
         <el-form-item label="选课名单" required>
           <el-row>
             <span>开放范围：</span>
-            <el-radio v-model="Course.courseMode" label="10">选课名单学员</el-radio>
-            <el-radio v-model="Course.courseMode" label="20">本校学员</el-radio>
-            <el-radio v-model="Course.courseMode" label="30">全部学员</el-radio>
+            <el-radio v-model="Course.courseMode" :label="10">选课名单学员</el-radio>
+            <el-radio v-model="Course.courseMode" :label="20">本校学员</el-radio>
+            <el-radio v-model="Course.courseMode" :label="30">全部学员</el-radio>
           </el-row>
           <el-row>
             <span>退课权限：</span>
@@ -135,8 +137,15 @@
         </el-form-item>
 
         <el-form-item label="成绩考核" required>
-          <div style="display: inline-block" v-for="item in CourseSetEntity" :key="item.id">
-            <span class="courseExplanation" v-if="item.value !=0" style="margin-right: 10px">{{item.name}}{{item.value}}%</span>
+          <div style="display: inline-block">
+            <span class="courseExplanation" v-show="CourseSetEntity.videoPercent !=0" style="margin-right: 10px">视频{{CourseSetEntity.videoPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.quizPercent !=0" style="margin-right: 10px">测试{{CourseSetEntity.quizPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.homeworkPercent !=0" style="margin-right: 10px">作业{{CourseSetEntity.homeworkPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.topicPercent !=0" style="margin-right: 10px">讨论{{CourseSetEntity.topicPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.offlinePercent !=0" style="margin-right: 10px">线下{{CourseSetEntity.offlinePercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.votePercent !=0" style="margin-right: 10px">投票{{CourseSetEntity.votePercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.stormPercent !=0" style="margin-right: 10px">头脑风暴{{CourseSetEntity.stormPercent}}%</span>
+            {{item}}
           </div>
           <a class="sysTem" @click="isSys">设置</a>
         </el-form-item>
@@ -186,16 +195,16 @@
       <el-dialog title="教学课程授权" :visible.sync="isAccredit" width="50%" class="addCourse-dialog">
           <el-autocomplete
                   class="accredit-input"
-                  v-model="Course.accreditTeacher"
+                  v-model="accreditTeacher"
                   suffix-icon="el-icon-search"
-                  :fetch-suggestions="querySearch"
-                  placeholder="请输入内容"
+                  :fetch-suggestions="teacherSearch"
+                  placeholder="输入名字进行搜索"
                   :trigger-on-focus="false"
-                  @select="accreditSelect"
+                  @select="yesTeacher"
           ></el-autocomplete>
         <div>
-          <el-checkbox-group v-model="Course.accreditTeacherList">
-            <el-checkbox v-for="teacher in teachersLists" :label="teacher.teacherName" :value="teacher.teacherNumber" :name="teacher.teacherNumber" :key="teacher.id"></el-checkbox>
+          <el-checkbox-group v-model="CourseForm.teacher">
+            <el-checkbox v-for="teacher in teachersLists" :label="teacher.teacherName" :value="teacher.teacherId" :name="teacher.teacherNumber" :key="teacher.id"></el-checkbox>
           </el-checkbox-group>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -231,51 +240,27 @@
               <tr class="tr-h">
                 <td>权重共100%</td>
                 <td>
-                  <el-input v-model="CourseSetEntity.videoPercent.value" style="width:50px;"></el-input>%
+                  <el-input v-model="CourseSetEntity.videoPercent" style="width:50px;"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.quizPercent.value" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.quizPercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.homeworkPercent.value" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.homeworkPercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.topicPercent.value" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.topicPercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.offlinePercent.value" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.offlinePercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.votePercent.value" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.votePercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.stormPercent.value" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.stormPercent" style="width:50px"></el-input>%
                 </td>
               </tr>
-              <!--<tr class="tr-h">
-                <td>单项分数</td>
-                <td>
-                  <span class="icons" style="background:#FE6370">A</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#63BAEE">B</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#B8E664">C</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#E38EF7">D</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#FFB8CA">E</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#ED9B63">F</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#FFC0CB">G</span>
-                </td>
-              </tr>-->
             </table>
           </div>
         </div>
@@ -286,7 +271,7 @@
           <div style="float: left">
             <p>
               观看完单个视屏的
-              <el-input v-model="CourseSetEntity.seeVideo.value" style="width:50px"></el-input>%
+              <el-input v-model="CourseSetEntity.seeVideo" style="width:50px"></el-input>%
               即可视为学生已完成该视频
             </p>
             <p>(请谨慎设置，一旦有学生已开始学习，完成度规则将无法再更改)</p>
@@ -297,13 +282,13 @@
           <span class="norm-right">（默认分数全部为100分，投票问卷默认90分）</span>
         </div>
         <div class="score">
-          <div class="list">视频得分 = 完整观看视频 / 总视频数 * 100 分 * <span class="blue-text">{{CourseSetEntity.videoPercent.value}}</span>%</div>
-          <div class="list">测试得分 = 测试得分总和 / 测验次数 * <span class="blue-text">{{CourseSetEntity.quizPercent.value}}</span>%</div>
-          <div class="list">作业得分 = 作业得分总和 / 作业次数 * <span class="blue-text">{{CourseSetEntity.homeworkPercent.value}}</span>%</div>
-          <div class="list">讨论得分 = 获得分数的讨论数 / 讨论次数 * 100分 * <span class="blue-text">{{CourseSetEntity.topicPercent.value}}</span>%</div>
-          <div class="list">线下得分 = 线下得分 * <span class="blue-text">{{CourseSetEntity.offlinePercent.value}}</span>%</div>
-          <div class="list">投票问卷得分 = 投票问卷得分 * <span class="blue-text">{{CourseSetEntity.votePercent.value}}</span>%</div>
-          <div class="list">头脑风暴得分 = 头脑风暴得分 * <span class="blue-text">{{CourseSetEntity.stormPercent.value}}</span>%</div>
+          <div class="list">视频得分 = 完整观看视频 / 总视频数 * 100 分 * <span class="blue-text">{{CourseSetEntity.videoPercent}}</span>%</div>
+          <div class="list">测试得分 = 测试得分总和 / 测验次数 * <span class="blue-text">{{CourseSetEntity.quizPercent}}</span>%</div>
+          <div class="list">作业得分 = 作业得分总和 / 作业次数 * <span class="blue-text">{{CourseSetEntity.homeworkPercent}}</span>%</div>
+          <div class="list">讨论得分 = 获得分数的讨论数 / 讨论次数 * 100分 * <span class="blue-text">{{CourseSetEntity.topicPercent}}</span>%</div>
+          <div class="list">线下得分 = 线下得分 * <span class="blue-text">{{CourseSetEntity.offlinePercent}}</span>%</div>
+          <div class="list">投票问卷得分 = 投票问卷得分 * <span class="blue-text">{{CourseSetEntity.votePercent}}</span>%</div>
+          <div class="list">头脑风暴得分 = 头脑风暴得分 * <span class="blue-text">{{CourseSetEntity.stormPercent}}</span>%</div>
         </div>
       </el-row>
       <el-row style="text-align: right;">
@@ -340,20 +325,17 @@
         Course:{
           courseName:'',  //课程名称
           courseCategoryParent:'',  //课程分类
-          courseCategory:'',  //课程子分类
-          courseTagParent:'', //课程标签
+          courseCategory:0,  //课程子分类
           courseTagIds:[], // 课程标签
           beginTime:'', //开课时间
           endTime:'', //结课时间
           courseCover:'', //课程封面
-          payMode:'10',  //课程价格 10授课 20售卖
+          payMode: 10,  //课程价格 10授课 20售卖
           coursePrice:0, //课程价格
-          courseMode:'10',  //10：教师导入 20 本校学生 30 全部学员 ,
-          dropCourse:false, //1 允许退课 2 不允许
+          courseMode: 10,  //10：教师导入 20 本校学生 30 全部学员 ,
+          dropCourse:true, //1 允许退课 2 不允许
           courseCode:'',  //课程代码/课程编码
-          accreditTeacher:'',// 授权教师搜索框
-          accreditTeacherList:[], //被授权教师列表
-          teacher:'', //教师id
+          // teacher:'', //教师id
           //一下的默认值
           studyMode:10, //课程学习模式
           difficultyStatus:10,  //课程难度
@@ -366,46 +348,33 @@
         },
         //课程完成度设置
         CourseSetEntity: {
-          videoPercent: {// 视频成绩占比
-            value: 50,
-            name: '视频'
-          },
-          homeworkPercent :{// 作业成绩占比
-            value: 0,
-            name: '作业'
-          },
-          quizPercent :{// 测试成绩占比
-            value: 30,
-            name: '测试'
-          },
-          offlinePercent :{// 线下成绩占比
-            value: 0,
-            name: '线下'
-          },
-          stormPercent :{// 头脑风暴成绩占比
-            value: 20,
-            name: '头脑风暴'
-          },
-          topicPercent :{// 讨论成绩占比
-            value: 0,
-            name: '讨论'
-          },
-          votePercent :{// 投票成绩占比
-            value: 0,
-            name: '投票'
-          },
-          seeVideo: {// 视频进度判定
-            value: 90,
-            name: '视频完成度'
-          },
+          // 视频成绩占比
+          videoPercent: 50,
+          //作业占比
+          homeworkPercent: 0,
+          // 测试成绩占比
+          quizPercent :30,
+          // 线下成绩占比
+          offlinePercent : 0,
+          // 头脑风暴成绩占比
+          stormPercent : 20,
+          // 讨论成绩占比
+          topicPercent : 0,
+          // 投票成绩占比
+          votePercent : 0,
+          // 视频进度判定
+          seeVideo:  90,
         },
         //课程相关
         CourseInfoEntity:{
-          courseDescription:null, //课程信息
-          teachingArrangement:null, //教学安排
-          teachingTarget:null, //教学目标
+          courseDescription:"", //课程信息
+          teachingArrangement:"", //教学安排
+          teachingTarget:"", //教学目标
         },
         instructor:'', //讲师搜索时用
+        tag:'', //标签搜索用
+        accreditTeacher:'',// 授权教师用
+        // accreditTeacherList:[], //被授权教师列表
         isAccredit:false, //弹出教学课程授权
         isSysTem:false, //弹出设置
         coverPreviewShow: false, //弹出课程封面上传
@@ -429,13 +398,7 @@
         categoriesChildList:[],   //二级课程
         isCourseChild: false,    //二级课程选择框的隐显
         //课程标签列表
-        tagsList:[],
-        //配置二级
-        tagsConfig:{
-          label:'tagName',
-          value:'tagId',
-          children:'children'
-        },
+        tagLists:[],
         //讲师列表
         instructorLists:[],
         //教师列表
@@ -462,10 +425,16 @@
       getUpData(e){
         courseInfo(e).then(res=>{
           this.Course = res.data.course
-          //教室相关信息
+          //教师相关信息
           this.CourseForm.instructor = res.data.instructor
           this.CourseForm.teacher = res.data.teacher
           // this.CourseSetEntity = res.data.set
+          //临时数据，规范课程标签数据结构
+          //是否可退课，1为允许，2为不允许
+          this.Course.dropCourse = this.Course.dropCourse ===1 ? true : false
+
+          console.log(this.Course.dropCourse)
+          // 判断是否可退课，后台传值为
           console.log(res.data)
           // console.log(this.Course)
           // console.log(this.CourseForm)
@@ -492,35 +461,64 @@
       },
       //标签数据赋值
       yesTages(e){
-        this.Course.courseTagParent = e[0]
-        this.Course.courseTag = e[1]
+        delete e.value
+        this.Course.courseTagIds.push(e)
+        console.log(this.CourseForm.instructor)
       },
       //赋值二级课程
       yesCategories(e){
         let course = e
         this.categoriesList.forEach( (item, index) =>{
-          if(item.categoryName === course){
+          if(item.categoryId === course){
             this.categoriesChildList = item.children
             this.isCourseChild = true
           }
         })
       },
-      //所有填写完毕，创建课程
+      //创建课程
       goUpCourseResource(){
+        let currentTag = [],
+          currnetteacher = [],
+          currentinstructor = [];
+        this.Course.courseTagIds.forEach((item)=>{
+          console.log(item)
+          currentTag.push(item.tagId)
+        })
+        this.CourseForm.teacher.forEach((item)=>{
+          this.teachersLists.forEach((list)=>{
+            if(item === list.teacherName){
+              currnetteacher.push(list.teacherId)
+            }
+          })
+        })
+        this.CourseForm.instructor.forEach((item)=>{
+          currentinstructor.push(item.instructorId)
+        })
+        this.Course.courseTagIds = currentTag
+        this.CourseForm.teacher = currnetteacher
+        this.CourseForm.instructor = currentinstructor
+        // 数据处理
         let data = {
           course:this.Course,
           info:this.CourseInfoEntity,
-          set:this.CourseSetEntity
+          set:this.CourseSetEntity,
+          teacher:this.CourseForm.teacher,
+          instructor:this.CourseForm.instructor
         }
+
         data.course.dropCourse = !data.course.dropCourse ? 1 : 2
         let fun = null
+        delete data.set.seeVideo
+
+        console.log('要上传的数据')
+        console.log(data)
 
         saveCourse(data).then(res=>{
           console.log(res)
           if(Number(res.code) === 200) {
-            this.$router.push({
-              path:'/course/upCourses/resource'
-            })
+            // this.$router.push({
+            //   path:'/course/upCourses/resource'
+            // })
           }else if(Number(res.code) === 440){
             let msgs = JSON.parse(res.msg)
             this.$message({
@@ -553,6 +551,19 @@
         }
         return isJPG && isLt2M;
       },
+      //标签移除
+      tagRemove(e){
+        console.log(e.tagId)
+        let data = this.Course.courseTagIds,
+          newData = [];
+        data.forEach((item)=>{
+          if (item.tagId !== e.tagId){
+              newData.push(item)
+          }
+        })
+        console.log(newData)
+        this.Course.courseTagIds = newData
+      },
       //讲师移除
       instructorRemove(e){
         console.log(e.instructorId)
@@ -565,19 +576,44 @@
         })
         this.CourseForm.instructor = newData
       },
+      // 标签搜索筛选
+      tagSearch(queryString, cb){
+        //后台返回所有标签列表，前端进行模糊查询匹配
+        tags().then(res=>{
+          if(Number(res.code) === 200){
+            let data = [],
+                rsdata = [];
+            //临时填充value用于组件值的展示
+            res.data.forEach((item)=>{
+              item.value = item.tagName
+              rsdata.push(item)
+            })
+            data = rsdata.filter((item)=>{
+              return item.tagName.indexOf(queryString) != -1
+            });
+            // this.tagLists = data
+            // 调用 callback 返回建议列表的数据
+            cb(data)
+          }else{
+            this.$message({
+              message:'讲师列表获取失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
       //获取讲师搜索的列表
       instructorSearch(queryString, cb) {
         instructorList({instructorName:queryString}).then(res=>{
           if(Number(res.code) === 200){
-            //给查询到的值加入value字段，用于组件值的显示，数据提交时需删除
+            //给查询到的值加入value字段，用于搜索组件值的显示，数据提交时需将value字段删除
             let data = []
             res.data.forEach((item)=>{
               item.value = item.instructorName
               data.push(item)
             })
-
-            this.teachersLists = data
-
             // 调用 callback 返回建议列表的数据
             cb(data)
 
@@ -592,12 +628,36 @@
         })
       },
       //从后台获取基础信息
+      // 授权教师搜索
+      teacherSearch(queryString,cb){
+        teachersList().then(res=>{
+          if(Number(res.code) === 200){
+            //给查询到的值加入value字段，用于搜索组件值的显示，数据提交时需将value字段删除
+            let data = []
+            res.data.forEach((item)=>{
+              item.value = item.teacherName
+              data.push(item)
+            })
+            // 调用 callback 返回建议列表的数据
+            cb(data)
+          }else{
+            this.$message({
+              message:'教师列表获取失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
       selectList () {
         //课程分类列表
         categories().then(res=>{
           if(Number(res.code) === 200){
             let data = this.electChilder(res.data) //删除为空的子节点
-            this.categoriesList = data
+            this.categoriesList = res.data
+            // console.log('课程分类')
+            // console.log(this.categoriesList)
           }else{
             this.$message({
               message:'课程分类获取失败',
@@ -612,10 +672,12 @@
           if(Number(res.code) === 200){
             let data = this.electChilder(res.data)
             this.tagsList = data
-            // console.log('标签列表:' + this.tagsList)
+            //Course课程信息下的列表仅存了标签的ID
+            // console.log('标签列表:')
+            // console.log(this.tagsList)
           }else{
             this.$message({
-              message:'课程标签获取失败',
+              message:'课程课程标签获取失败',
               type:'error'
             })
           }
@@ -742,8 +804,10 @@
     border 1px solid #e9e9e9
     padding-left 5px
     padding-bottom 10px
+    & span
+      margin-right 5px
   .instructor-tag-warp
-    width 411px
+    width 300px
     border-radius 5px
     border 1px solid #e9e9e9
     border-bottom 0

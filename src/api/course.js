@@ -6,6 +6,11 @@ const commonDevUrl = '/api/v1/' // 开发环境
 const commonProdUrl = 'http://120.36.137.90:8008/api/v1/' // 生产环境
 const commonBaseUrl = process.env.NODE_ENV === 'production' ? commonProdUrl : commonDevUrl
 
+//资源库基础URL
+const libDevUrl = '/api/v1/library/' // 开发环境
+const libProdUrl = 'http://120.36.137.90:8008/api/v1/library/' // 生产环境
+const libBaseUrl = process.env.NODE_ENV === 'production' ? libProdUrl : libDevUrl
+
 import {
   commonsAjax
 } from '../utils/requery'
@@ -85,7 +90,7 @@ export function addInstructor(data) {
  * 保存课程
  */
 export function saveCourse(data) {
-  return commonsAjax(`${baseUrl}course`, data, 'post')
+  return commonsAjax(`/api/v1/course`, data, 'post')
 }
 
 /**
@@ -353,7 +358,7 @@ export function groupDelete(data) {
    * 获取单个试题信息(包含选项)
    */
   export function quizInfo(id) {
-    let url = `${baseUrl}quiz/${id}`
+    let url = `${libBaseUrl}quiz/${id}`
     return commonsAjax(url, '', 'get')
   }
 
@@ -365,6 +370,13 @@ export function groupDelete(data) {
     return commonsAjax(url, '', 'delete')
   }
 
+/**
+ * 修改试题
+ */
+export function putQuiz(data) {
+  let url = `${baseUrl}quiz`
+  return commonsAjax(url, data, 'put')
+}
 
   /**
    * 复制方案

@@ -73,7 +73,6 @@
           "creatorName": "string",
           "difficulty": 0,
           quizAnalysis: "",
-          "quizId": 0,
           quizOption: [
             {
               "correctFlag": 0,

@@ -2,6 +2,19 @@
   <div class="test">
     <div class="title">
       <div>试题管理</div>
+    </div>
+
+    <div>
+      <div style="display: flex">
+        <el-input
+          placeholder="输入课程名称查询资源"
+          v-model="input">
+        </el-input>
+        <div>
+          <el-button icon="el-icon-search" class="search-btn"></el-button>
+        </div>
+      </div>
+
       <div style="" class="btn-warp">
         <div>
           <el-button type="success">下载模板</el-button>
@@ -20,33 +33,6 @@
         </div>
       </div>
     </div>
-
-    <el-form :inline="true" :model="formInline" style="margin-top: 40px">
-      <el-form-item>
-        <div style="display: flex">
-          <el-input
-            placeholder="输入课程名称查询资源"
-            v-model="input">
-          </el-input>
-          <div>
-            <el-button icon="el-icon-search" class="search-btn"></el-button>
-          </div>
-        </div>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="value" placeholder="请选择" @change="getChapterQuiz">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="delAllQuiz">删除该课程全部试题</el-button>
-      </el-form-item>
-    </el-form>
 
     <el-table
       :data="tableData3"
