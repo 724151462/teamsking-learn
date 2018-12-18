@@ -33,10 +33,9 @@
       @showComponentInfo="showComponentInfo"
       :show.sync="show"
     >
-      <template></template>
       <div class="dialog-header" slot="header">
-        <span>陈晓霞</span>
-        <el-button type="warning" size="small">打回作业</el-button>
+        <span>{{dataObj.userName}}</span>
+        <el-button type="warning" size="small" @click="repulse">打回作业</el-button>
       </div>
     </adialog>
   </div>
@@ -45,7 +44,11 @@
 <script>
 import tableNoHeader from "@/components/table-no-header.vue";
 import adialog from "@/components/dialog";
-import { homeWorkDetail } from "@/api/course";
+import { 
+  homeWorkAnswerList,
+  homeWorkRepulse,
+  homeWorkScore
+} from "@/api/course";
 export default {
   data() {
     return {
@@ -56,19 +59,19 @@ export default {
         },
         {
           name: "学生名称",
-          prop: "interactionStatus"
+          prop: "userName"
         },
         {
           name: "状态",
-          prop: "expireTime"
+          prop: "reviewStatus"
         },
         {
           name: "班组",
-          prop: "submitStatus"
+          prop: "teamName"
         },
         {
           name: "提交时间",
-          prop: "submitStatus"
+          prop: "createTime"
         }
       ],
       tableData: [
@@ -125,33 +128,33 @@ export default {
       show: false,
       dialogConfig: {
         btnShow: true,
-        title: "查看笔记",
+        title: "查看作业",
         width: "40",
         labelWidth: "120",
         top: "20",
         inputWidth: "70",
-        eventType: ""
+        eventType: "give a mark"
       },
       formData: [
         {
           key: "作业名称:",
           inputType: "info",
-          value: "notesTitle"
+          value: "title"
         },
         {
           key: "状态:",
           inputType: "info",
-          value: "fbr"
+          value: "reviewStatus"
         },
         {
           key: "学生答案：",
           inputType: "info",
-          value: "fbsj"
+          value: "content"
         },
         {
           key: "提交时间：",
           inputType: "info",
-          value: "notesContent"
+          value: "createTime"
         },
         {
           key: "老师评分",
@@ -161,12 +164,12 @@ export default {
         {
           key: "评分参照",
           inputType: "tip",
-          value: "tip"
+          value: "homeworkMarkEntity",
         },
         {
           key: "老师评语",
           inputType: "textarea",
-          value: "pingyu"
+          value: "markContent"
         }
       ],
       dataObj: {
@@ -177,16 +180,21 @@ export default {
         mark: "",
         tip: [{ content: "评分点1 <span>4分</span>" }, { content: "评分点2" }],
         pingyu: "gewjigovfjqwehgw"
-      }
+      },
+      // 作业id
+      homeworkSubmissionId: ''
     };
   },
   created() {
     this.$emit("teachingNav", "operation");
   },
   mounted() {
-    homeWorkDetail({ homeworkId: this.$route.query.homeworkId }).then(response => {
-      this.tableData = response.data.homeworkMarks;
-      console.log(this.tableData);
+    homeWorkAnswerList({ courseId: this.$route.query.id, homeworkId: this.$route.query.homeworkId }).then(response => {
+      response.data.forEach(element => {
+        element.reviewStatus= element.reviewStatus === 1 ? "未批阅" : (element.reviewStatus===2?"已批阅":"未提交")
+      });
+      this.tableData = response.data;
+      // console.log(this.tableData);
     });
   },
   components: {
@@ -199,13 +207,33 @@ export default {
       console.log(type);
       switch (type) {
         case "mark":
-          // this.$route.push
-          // this.show = true
+          this.homeworkSubmissionId = params[1].homeworkSubmissionId
+          this.dataObj = params[1]
+          this.show = true
           break;
-
+        case "give a mark":
+          let commitObj = {}
+          let tem = JSON.stringify(this.dataObj)
+          commitObj = JSON.parse(tem)
+          commitObj.reviewStatus = commitObj.reviewStatus === "未批阅" ? 1 : (commitObj.reviewStatus==="已批阅"? 2 : 3)
+          homeWorkScore(commitObj)
+          break;
         default:
           break;
       }
+    },
+    // 打回作业
+    repulse() {
+      console.log(this.homeworkSubmissionId)
+      homeWorkRepulse({homeworkSubmissionId: this.homeworkSubmissionId})
+      .then(response=> {
+        if(response.code === 200) {
+          this.$message({
+            message: '已打回作业',
+            type: 'success'
+          })
+        }
+      })
     }
   }
 };

@@ -471,6 +471,29 @@ export function homeWorkList(data) {
 }
 
 
+/**
+ * 作业回答列表
+ */
+export function homeWorkAnswerList(data) {
+  let url = `${baseUrl}homeworksubmission/item/${data.courseId}/${data.homeworkId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+export function homeWorkRepulse(data) {
+  let url = `${baseUrl}homeworksubmission/repulse/${data.homeworkSubmissionId}`
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 作业评分
+ */
+export function homeWorkScore(data) {
+  let url = `${baseUrl}homeworksubmission`
+  return commonsAjax(url, data, 'post')
+}
+
+
 // ==========活动==========
 /**
  * 活动列表
@@ -487,6 +510,15 @@ export function interactList(data) {
 export function interactVote(data) {
   let url = `${baseUrl}vote/${data.voteId}`
   return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 保存投票
+ */
+export function voteSave(data) {
+  let url = `${baseUrl}vote`
+  return commonsAjax(url, data, 'post')
 }
 
 

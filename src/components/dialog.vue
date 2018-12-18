@@ -73,8 +73,11 @@ formData: [
                 <template v-else-if="item.inputType==='info'">
                     <span>{{dataObj[item.value]}}<br></span>
                 </template>
-                <template v-else-if="item.inputType==='tip'">
-                    <span v-for="(tip,i) in dataObj[item.value]" :key="i">{{tip.content}}<br></span>
+                <template v-else-if="item.inputType==='tip'" v-for="(tip,i) in dataObj[item.value]">
+                    <div :key="i">
+                        <p>评分点：{{tip.markPoint}}</p>
+                        <span>分值：{{tip.markScore}}</span>
+                    </div>
                 </template>
                 <el-radio-group v-else-if="item.inputType==='radio'" v-model="dataObj[item.value]">
                     <el-radio v-for="(val, i) in item.option" :key="i" :label="val"></el-radio>

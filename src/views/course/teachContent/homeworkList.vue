@@ -132,6 +132,19 @@
       homeWorkList({courseId:this.$route.query.id})
       .then(response=> {
         response.data.pageData.forEach(element=> {
+          switch (element.interactionStatus) {
+            case 10:
+              element.interactionStatus = '已开始'
+              break;
+            case 20:
+              element.interactionStatus = '未开始'
+              break;
+            case 30:
+              element.interactionStatus = '已结束'
+              break;
+            default:
+              break;
+          }
           element.submitStatus = `${element.submitCount}/${element.allCount}/${element.notReviewCount}`
         })
         this.tableData = response.data.pageData

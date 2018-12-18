@@ -124,7 +124,7 @@ export const constantRouterMap = [{
                   },
                   {
                     path: 'homework',
-                    component: _import('course/teachContent/operation'),
+                    component: _import('course/teachContent/homeworkList'),
                     name: '作业管理',
                   },
                   {
