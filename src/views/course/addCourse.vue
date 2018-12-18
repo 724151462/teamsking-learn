@@ -145,7 +145,6 @@
             <span class="courseExplanation" v-show="CourseSetEntity.offlinePercent !=0" style="margin-right: 10px">线下{{CourseSetEntity.offlinePercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.votePercent !=0" style="margin-right: 10px">投票{{CourseSetEntity.votePercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.stormPercent !=0" style="margin-right: 10px">头脑风暴{{CourseSetEntity.stormPercent}}%</span>
-            {{item}}
           </div>
           <a class="sysTem" @click="isSys">设置</a>
         </el-form-item>
@@ -187,8 +186,11 @@
           <div id="editor3" v-show="iseditor3"></div>
         </el-form-item>
       </el-form>
-      <el-row style="text-align: center">
+      <el-row style="text-align: center" v-if="!isUpdata">
         <el-button type="primary" @click="goUpCourseResource">完成</el-button>
+      </el-row>
+      <el-row style="text-align: center" v-else>
+        <el-button type="primary" @click="goPutCourse">修改</el-button>
       </el-row>
     </div>
     <!--教学课程授权设置-->
@@ -312,7 +314,7 @@
   import vueCropper from 'vue-cropper'
   import addTeachers from './upCourse/addTeacher.vue'
   import coverPreview from './coverPreview.vue'
-  import { categories, tags, instructorList, teachersList, saveCourse, courseInfo } from '../../api/course'
+  import { categories, tags, instructorList, teachersList, saveCourse, courseInfo , putCourse} from '../../api/course'
   import { formatDate } from '../../utils/utils'
   export default {
     components:{
@@ -381,6 +383,8 @@
         isTeacher:false,  //弹出添加老师
         isChooseTeacher:false, //选择讲师
         rules:[],
+        //判断是否为编辑课程
+        isUpdata:false,
         //三个富文本的显隐
         iseditor1:false,
         iseditor2:false,
@@ -418,26 +422,29 @@
       //课程编辑
       if(this.$route.query.courseId && this.$route.query.courseId !== ''){
         this.getUpData(this.$route.query.courseId)
+        this.isUpdata = true
       }
     },
     methods:{
       //课程编辑时获取该课程的数据
       getUpData(e){
         courseInfo(e).then(res=>{
-          this.Course = res.data.course
-          //教师相关信息
-          this.CourseForm.instructor = res.data.instructor
-          this.CourseForm.teacher = res.data.teacher
-          // this.CourseSetEntity = res.data.set
-          //临时数据，规范课程标签数据结构
-          //是否可退课，1为允许，2为不允许
-          this.Course.dropCourse = this.Course.dropCourse ===1 ? true : false
-
-          console.log(this.Course.dropCourse)
-          // 判断是否可退课，后台传值为
+          console.log('接收')
           console.log(res.data)
-          // console.log(this.Course)
-          // console.log(this.CourseForm)
+          //后台请求到的数据不完全适合展示，需要清洗
+          let data = this.upDataFilter(res.data)
+          console.log(data)
+          this.Course = data.course
+          //教师相关信息
+          this.CourseForm.instructor = data.instructor
+          this.CourseForm.teacher = data.teacher
+          this.CourseSetEntity = data.set
+          // 课程介绍
+          this.editor1.txt.html(data.info.courseDescription)
+          //教学目标
+          this.editor2.txt.html(data.info.teachingTarget)
+          //教学安排
+          this.editor3.txt.html(data.info.teachingArrangement)
         }).catch(error=>{
           console.log(error)
         })
@@ -478,8 +485,8 @@
       //创建课程
       goUpCourseResource(){
         let currentTag = [],
-          currnetteacher = [],
-          currentinstructor = [];
+            currnetteacher = [],
+            currentinstructor = [];
         this.Course.courseTagIds.forEach((item)=>{
           console.log(item)
           currentTag.push(item.tagId)
@@ -506,9 +513,9 @@
           instructor:this.CourseForm.instructor
         }
 
-        data.course.dropCourse = !data.course.dropCourse ? 1 : 2
+        data.course.dropCourse = data.course.dropCourse ? 1 : 2
         let fun = null
-        delete data.set.seeVideo
+        delete data.set.seeVideo  //后台需要补上的接口
 
         console.log('要上传的数据')
         console.log(data)
@@ -576,7 +583,7 @@
         })
         this.CourseForm.instructor = newData
       },
-      // 标签搜索筛选
+      //标签搜索筛选
       tagSearch(queryString, cb){
         //后台返回所有标签列表，前端进行模糊查询匹配
         tags().then(res=>{
@@ -628,7 +635,7 @@
         })
       },
       //从后台获取基础信息
-      // 授权教师搜索
+      //授权教师搜索
       teacherSearch(queryString,cb){
         teachersList().then(res=>{
           if(Number(res.code) === 200){
@@ -748,6 +755,87 @@
       chooseCover(url){
         this.coverPreviewShow = false
         this.Course.courseCover = url
+      },
+      //课程编辑时对取到的数据进行处理
+      upDataFilter(data){
+        //获取到的数据有些字段的值只有id，渲染时要将值补上
+        let redata = data,
+            currentTags = [],
+            curTeacher=[];
+        console.log('获取到的编辑数据')
+        console.log(data)
+        //标签数据
+        redata.course.courseTagIds.forEach((item)=>{
+          this.tagsList.forEach((list)=>{
+            // console.log(list)
+            if(list.tagId === item){
+              currentTags.push(list)
+            }
+          })
+        })
+        // 教师列表
+        redata.teacher.forEach((item)=>{
+          curTeacher.push(item.teacherName)
+        })
+        //是否可退课，1为允许，2为不允许
+        data.course.dropCourse = redata.course.dropCourse === 1 ? true : false
+        data.course.courseTagIds = currentTags;
+        data.teacher = curTeacher;
+        return data
+      },
+      //上传，修改课程时数据清洗
+      goDataFilter(){
+        let data = {
+          course:this.Course,
+          info:this.CourseInfoEntity,
+          set:this.CourseSetEntity,
+          teacher:this.CourseForm.teacher,
+          instructor:this.CourseForm.instructor
+        }
+        let currentTag = [],
+            currnetteacher = [],
+            currentinstructor = [];
+        this.Course.courseTagIds.forEach((item)=>{
+          console.log(item)
+          currentTag.push(item.tagId)
+        })
+        this.CourseForm.teacher.forEach((item)=>{
+          this.teachersLists.forEach((list)=>{
+            if(item === list.teacherName){
+              currnetteacher.push(list.teacherId)
+            }
+          })
+        })
+        this.CourseForm.instructor.forEach((item)=>{
+          currentinstructor.push(item.instructorId)
+        })
+
+        let curData =JSON.parse( JSON.stringify(data));
+
+        curData.course.courseTagIds = currentTag
+        curData.teacher = currnetteacher
+        curData.instructor = currentinstructor
+        curData.course.dropCourse = this.Course.dropCourse ? 1 : 2
+        return curData
+      },
+      //修改课程
+      goPutCourse () {
+        let data = this.goDataFilter()
+        console.log(data)
+        return false
+        putCourse(data).then(res=>{
+          if(Number(res.code) === 200) {
+            this.$message.success('课程修改成功')
+          }else if(Number(res.code) === 440){
+            let msgs = JSON.parse(res.msg)
+            this.$message({
+              message:msgs[0].message,
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
       }
     },
     mounted(){

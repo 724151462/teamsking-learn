@@ -57,7 +57,7 @@ export function categories(data) {
 }
 
 /**
- * 获取课程分类列表
+ * 获取课程标签列表
  */
 export function tags(data) {
   return commonsAjax(`${commonBaseUrl}common/tags`, 'data', 'get')
@@ -79,10 +79,10 @@ export function teachersList(data) {
 }
 
 /**
- * 获取教师列表
+ * 添加讲师
  */
 export function addInstructor(data) {
-  console.log('要穿的数据', data)
+  console.log('添加讲师')
   return commonsAjax(`${baseUrl}instructor`, data, 'post')
 }
 
@@ -92,7 +92,12 @@ export function addInstructor(data) {
 export function saveCourse(data) {
   return commonsAjax(`/api/v1/course`, data, 'post')
 }
-
+/**
+ * 修改课程
+ */
+export function putCourse(data) {
+  return commonsAjax(`/api/v1/course`, data, 'put')
+}
 /**
  * 查询课程信息
  */
