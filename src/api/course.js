@@ -99,7 +99,7 @@ export function putCourse(data) {
 
 /**
  * 查询课程信息
- */▆
+ */
 export function courseInfo(data) {
   console.log(data)
   let url = `${baseUrl}info/` + data
