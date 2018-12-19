@@ -6,11 +6,6 @@ const commonDevUrl = '/api/v1/' // 开发环境
 const commonProdUrl = 'http://120.36.137.90:8008/api/v1/' // 生产环境
 const commonBaseUrl = process.env.NODE_ENV === 'production' ? commonProdUrl : commonDevUrl
 
-//资源库基础URL
-const libDevUrl = '/api/v1/library/' // 开发环境
-const libProdUrl = 'http://120.36.137.90:8008/api/v1/library/' // 生产环境
-const libBaseUrl = process.env.NODE_ENV === 'production' ? libProdUrl : libDevUrl
-
 import {
   commonsAjax
 } from '../utils/requery'
@@ -44,7 +39,7 @@ export function courseBaseInfo(data) {
  * 修改学习模式
  */
 export function studyModeModify(data) {
-  let url = `${commonBaseUrl}${data.courseId}/studymode/${data.studyMode}`
+  let url = `${baseUrl}${data.courseId}/studymode/${data.studyMode}`
   return commonsAjax(url, '', 'put')
 }
 
@@ -90,14 +85,18 @@ export function addInstructor(data) {
  * 保存课程
  */
 export function saveCourse(data) {
-  return commonsAjax(`/api/v1/course`, data, 'post')
+  return commonsAjax(`${baseUrl}`, data, 'post')
 }
+
+
 /**
  * 修改课程
  */
 export function putCourse(data) {
-  return commonsAjax(`/api/v1/course`, data, 'put')
+  return commonsAjax(`${baseUrl}`, data, 'put')
 }
+
+
 /**
  * 查询课程信息
  */
@@ -116,6 +115,12 @@ export function chaptersList(data) {
 }
 
 
+export function chaptersListSimple(data) {
+  let url = `${baseUrl}chapter/list/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
 /**
  * 添加章
  */
@@ -123,6 +128,16 @@ export function chaptersList(data) {
 export function chaptersAdd(data) {
   let url = `${baseUrl}chapter`
   return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 删除章
+ */
+
+export function chaptersDelete(data) {
+  let url = `${baseUrl}chapter/chapter`
+  return commonsAjax(url, data, 'delete')
 }
 
 
@@ -303,90 +318,166 @@ export function planNameModify(data) {
  */
 export function groupDelete(data) {
   let url = `${baseUrl}scheme/${data.schemeId}`
+  return commonsAjax(url, data, 'delete')
 }
 
-
-//============资源管理==================
-
-  /**
-   * 查询课程下资源列表
-   */
-  export function resourcePage(id, data) {
-    let url = `${baseUrl}${id}/resource/page`
-    return commonsAjax(url, data, 'get')
-  }
-
-  /**
-   * 删除课程下资源
-   */
-  export function deletedResource(id, data) {
-    // resourceId
-    let url = `${baseUrl}resource/` + id
-    return commonsAjax(url, data, 'delete')
-  }
-
-  // ===============试题管理===============
-  //
-  /**
-   * 上传试题模板
-   */
-  export function upQuiz(id, data) {
-    let url = `${baseUrl}${id}/quiz`
-    // console.log('模板上传路径为：'+url)
-    return commonsAjax(url, data, 'post')
-  }
-
-  /**
-   * 获取试题列表
-   */
-
-  // export function quizPage (id, data) {
-  //   let url = '${baseUrl}' + id + '/quiz/page'
-  //   return commonsAjax(url, data, 'get')
-  // }
-
-  /**
-   * 获取试题列表2
-   */
-  export function quizPage(data) {
-    let url = `${baseUrl}library/quiz/page`
-    return commonsAjax(url, '', 'get')
-  }
-  /**
-   * 保存单个试题信息
-   */
-  export function saveQuiz(data) {
-    return commonsAjax(`${baseUrl}quiz`, data, 'post')
-  }
-
-  /**
-   * 获取单个试题信息(包含选项)
-   */
-  export function quizInfo(id) {
-    let url = `${libBaseUrl}quiz/${id}`
-    return commonsAjax(url, '', 'get')
-  }
-
-  /**
-   * 删除试题
-   */
-  export function deleteQuiz(data) {
-    let url = `${baseUrl}quiz/` + data
-    return commonsAjax(url, '', 'delete')
-  }
 
 /**
- * 修改试题
+ * 复制方案
  */
-export function putQuiz(data) {
-  let url = `${baseUrl}quiz`
-  return commonsAjax(url, data, 'put')
+export function groupCopy(data) {
+  let url = `${baseUrl}scheme/${data.schemeId}`
+  return commonsAjax(url, '', 'post')
 }
 
-  /**
-   * 复制方案
-   */
-  export function groupCopy(data) {
-    let url = `${baseUrl}scheme/${data.schemeId}`
-    return commonsAjax(url, '', 'post')
-  }
+// ========测试=========
+
+
+/**
+ * 测试添加
+ */
+export function testAdd(data) {
+  let url = `${baseUrl}exam`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 测试列表
+ */
+export function testList(data) {
+  let url = `${baseUrl}exam/list/${data.courseId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 测试成绩
+ */
+export function testMark(data) {
+  let url = `${baseUrl}exam/submit/list/${data.courseId}/${data.examId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 成绩详情
+ */
+export function markDetail(data) {
+  let url = `${baseUrl}exam/submit/detail/${data.examId}/${data.examSubmissionId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 笔记列表
+ */
+export function noteList(data) {
+  let url = `${baseUrl}note/list/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 笔记删除
+ */
+export function noteDelete(data) {
+  let url = `${baseUrl}note`
+  return commonsAjax(url, data, 'delete')
+}
+
+
+/**
+ * 头脑风暴
+ */
+export function storm(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 作业详情
+ */
+export function homeWorkDetail(data) {
+  let url = `${baseUrl}homework/${data.homeworkId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 作业列表
+ */
+export function homeWorkList(data) {
+  let url = `${baseUrl}homeworksubmission/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 作业回答列表
+ */
+export function homeWorkAnswerList(data) {
+  let url = `${baseUrl}homeworksubmission/item/${data.courseId}/${data.homeworkId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+export function homeWorkRepulse(data) {
+  let url = `${baseUrl}homeworksubmission/repulse/${data.homeworkSubmissionId}`
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 作业评分
+ */
+export function homeWorkScore(data) {
+  let url = `${baseUrl}homeworksubmission`
+  return commonsAjax(url, data, 'post')
+}
+
+
+// ==========活动==========
+/**
+ * 活动列表
+ */
+export function interactList(data) {
+  let url = `${baseUrl}${data.courseId}/interactions`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 投票详情
+ */
+export function interactVote(data) {
+  let url = `${baseUrl}vote/${data.voteId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 保存投票
+ */
+export function voteSave(data) {
+  let url = `${baseUrl}vote`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 头脑风暴详情
+ */
+export function interactBS(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 测试详情
+ */
+export function interactExam(data) {
+  let url = `${baseUrl}exam/${data.examId}`
+  return commonsAjax(url, '', 'get')
+}
