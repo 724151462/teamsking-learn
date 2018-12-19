@@ -40,7 +40,7 @@
                 ],
     -->
     <div class="table-theAgain">
-        <div class="tableOperate">
+        <div class="tableOperate" v-if="tableOperate">
             <el-button v-for="item in tableOperate" type="primary" class="" @click="onSubmit(item.type,multipleSelection)" >{{ item.content }}</el-button>
         </div>
 
@@ -75,6 +75,17 @@
                     </template>
                   </el-table-column>
                 </template>
+                <template v-else-if="list.progress">
+                  <el-table-column :label="list.name"
+                                   align="center"
+                                   :key="index">
+                    <template scope="scope">
+                      <div>
+                        <el-progress :text-inside="true" :stroke-width="18" :percentage="scope.row[list.prop]" status="success"></el-progress>
+                      </div>
+                    </template>
+                  </el-table-column>
+                </template>
                 <template v-else>
 
                   <el-table-column
@@ -104,6 +115,7 @@
                 </template>
               </template>
                 <el-table-column
+                        v-if="operateList"
                         fixed="right"
                         label="操作"
                         :width="operateList.length * 100"

@@ -21,24 +21,24 @@
       };
     },
     mounted() {
-      console.log(this.$route.query.id)
-      switch(this.$route.name) {
-        case '章节内容':
+      console.log(this.$route.path)
+      switch(this.$route.path) {
+        case '/course/list/chapter':
           this.activeIndex = '1'
           break;
-        case '互动':
+        case '/course/list/interact':
           this.activeIndex = '2'
           break;
-        case '成员':
+        case '/course/list/member':
           this.activeIndex = '3'
           break;
-        case '教学管理':
+        case '/course/list/teach/grade':
           this.activeIndex = '4'
           break;
-        case '通知管理':
+        case '/course/list/notice':
           this.activeIndex = '5'
           break;
-        case '讨论中心':
+        case '/course/list/discuss':
           this.activeIndex = '6'
           break;
       }
@@ -49,22 +49,40 @@
         console.log(key, keyPath);
         switch(key) {
             case '1':
-            this.$router.push({name: '章节内容'})
+            this.$router.push({
+              path: '/course/list/chapter',
+              query: {id: this.$route.query.id}
+            })
             break;
             case '2':
-            this.$router.push({name: '互动'})
+            this.$router.push({
+              path: '/course/list/interact',
+              query: {id: this.$route.query.id}
+            })
             break;
             case '3':
-            this.$router.push({name: '成员'})
+            this.$router.push({
+              path: '/course/list/member',
+              query: {id: this.$route.query.id}
+            })
             break;
             case '4':
-            this.$router.push({name: '教学管理'})
+            this.$router.push({
+              path: '/course/list/teach',
+              query: {id: this.$route.query.id}
+            })
             break;
             case '5':
-            this.$router.push({name: '通知管理'})
+            this.$router.push({
+              path: '/course/list/notice',
+              query: {id: this.$route.query.id}
+            })
             break;
             case '6':
-            this.$router.push({name: '讨论中心'})
+            this.$router.push({
+              path: '/course/list/discuss',
+              query: {id: this.$route.query.id}
+            })
             break;
         }
       }

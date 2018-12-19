@@ -99,6 +99,7 @@
       <el-dialog
         title="选择成员"
         :visible.sync="isAddGrouplan"
+        top="5vh"
         width="50%"
         custom-class="select-member"
         append-to-body
@@ -106,8 +107,8 @@
         <div class="search">
           <el-radio v-model="matchType" label="1" @change="memberType">全部成员</el-radio>
           <el-radio v-model="matchType" label="2" class="right" @change="memberType">未分配小组成员</el-radio>
-          <el-input placeholder="请输入成员名称" style="width:220px"></el-input>
-          <el-button type="primary">搜索</el-button>
+          <el-input v-model="searchMember" placeholder="请输入成员名称" style="width:220px"></el-input>
+          <el-button type="primary" @click="searchMem">搜索</el-button>
         </div>
         <div class="all-member">
           <div class="member-list" v-for="(list, index) in showData" :key="index">
@@ -115,9 +116,11 @@
               v-model="list.isCheck"
               :disabled="list.teamName === null ? false : true"
               @change="check(list)"
-            >{{list.teamName}}</el-checkbox>
+            >
+            <span style="display: inline-block; width:150px">{{list.teamName || '未分组'}}</span>
+            </el-checkbox>
             <div class="imgs">
-              <img :src="list.img">
+              <img :src="list.avatar" style="width:112px" class="img">
             </div>
             <div class="right">
               <div>
@@ -132,6 +135,19 @@
           <el-button type="primary" @click="ensureMatch">已选择{{matchedList.length}}人，确认选择</el-button>
         </div>
       </el-dialog>
+    </el-dialog>
+    <!-- 删除确认弹窗 -->
+    <el-dialog 
+      title="删除"
+      :visible.sync="delDialog"
+      top="30vh"
+      :modal="false"
+      >
+      <span>{{delDialogParm.info}}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="delDialog = false">取 消</el-button>
+        <el-button type="primary" @click="delEvent">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -155,7 +171,11 @@ import {
 export default {
   data(){
     return{
-      courseId: '0608367675f54267aa6960fd0557cc1b',
+      courseId: this.$route.query.id,
+      // 删除确认弹窗
+      delDialog: false,
+      // 删除参数
+      delDialogParm: {},
       pageParmas: {
         pageSize:100
       },
@@ -173,7 +193,7 @@ export default {
       ],
       teamNameOperaType: '',
       groupInfo:{
-        courseId: '0608367675f54267aa6960fd0557cc1b',
+        courseId: this.$route.query.id,
         name:'',  //小组方案名称
         sx:'',    //分组上限
         
@@ -182,16 +202,18 @@ export default {
       schemeList: [],
       addPlan: false,
       groupPlan: {
-        courseId: '0608367675f54267aa6960fd0557cc1b',
+        courseId: this.$route.query.id,
         schemeName: "",
         schemeType: 10,
       },
+      // 查询成员
+      searchMember: '',
       // 匹配分配类型参数
       matchForm: {
         searchType: 1,
         searchName: '',
         schemeId: '',
-        courseId: '0608367675f54267aa6960fd0557cc1b',
+        courseId: this.$route.query.id,
       },
       matchType:'1',  // 1 全部成员 2 未分配小组的成员
       isAddFa:false,
@@ -226,7 +248,11 @@ export default {
       console.log(this.groupPlan)
       schemeAdd(this.groupPlan)
       .then((response)=> {
-        alert('添加成功')
+        this.schemeList.push(response.data)
+        this.$message({
+          message: '添加方案成功',
+          type: 'success'
+        })
       })
       this.addPlan = false
     },
@@ -240,12 +266,30 @@ export default {
       }
       planNameModify(data)
       .then(response=> {
-        console.log(response.data)
+        if(response.code === 200) {
+          console.log(this.schemeList)
+          this.schemeList.forEach((element, i) => {
+            if(element.schemeId === data.schemeId) {
+              console.log(element)
+              this.schemeList[i].schemeName = data.nameForm.name
+            }
+          });      
+          this.$message({
+            message: '修改组名成功',
+            type: 'success'
+          })
+        }
+        this.isAddFa = false
       })
     },
     // 添加新小组
     newGroup() {
-      this.addGroup.push({isNew: true, teamName: `小组${this.addGroup.length+1}`, userList: []})
+      memberMatch({schemeId: this.groupInfo.schemeId,teamName: `小组${this.addGroup.length+1}`, userList: []})
+      .then(response=> {
+        response.data.isNew = true
+        this.addGroup.push(response.data)
+      })
+      
     },
     // 点击编辑弹窗
     editPlan(item) {
@@ -264,8 +308,8 @@ export default {
     },
     // 点击 +图片 按钮
     addMember(item) {
+      this.matchType = '1'
       console.log(this.matchType)
-      console.log(item)
       this.groupInfo.teamId = item.teamId
       this.groupInfo.teamName = item.teamName
       this.matchForm.pageSize = 100
@@ -277,6 +321,15 @@ export default {
         this.showData = this.sourceData
       })
       this.isAddGrouplan = true
+    },
+    // 搜索成员
+    searchMem() {
+      return this.showData = this.sourceData.filter(item => {
+               if (item.realName.indexOf(this.searchMember) !== -1) {
+                   return item
+                 }
+           })
+
     },
     // radio选择改变
     memberType(val) {
@@ -292,9 +345,8 @@ export default {
     },
     // 选完后确认
     ensureMatch() {
-      console.log(this.matchedList)
       this.groupInfo.userList = this.matchedList
-      this.groupInfo.courseId = '0608367675f54267aa6960fd0557cc1b'
+      this.groupInfo.courseId = this.$route.query.id
       this.matchedList.forEach(element=> {
         element.teamName = this.groupInfo.teamName
       }) 
@@ -302,7 +354,20 @@ export default {
 
       memberMatch(this.groupInfo)
       .then(response=> {
-        console.log(response.data)
+        this.addGroup.forEach(element => {
+          if(element.teamId === this.groupInfo.teamId) {
+            response.data.userList.forEach(user=>{
+              element.userList.push(user)
+            })
+          }
+        });
+        this.isAddGrouplan = false
+        if(response.code === 200) {
+          this.$message({
+            message: '添加成员成功',
+            type: 'success'
+          })
+        }
       })
       // {
       //   "courseId": "string",
@@ -336,40 +401,116 @@ export default {
       this.groupInfo.teamName = parmas[1].teamName
       // console.log(this.groupInfo)
     },
+    // 删除事件
+    delEvent() {
+      console.log('删除对象的参数', this.delDialogParm)
+      switch (this.delDialogParm.type) {
+        case 'delMember':
+          this.delMemberEnsure()
+          break;
+        case 'delSecheme':
+          this.sechemeDeleteEnsure()
+          break;
+        case 'delGroup':
+          this.delTeamEnsure()
+        default:
+          break;
+      }
+    },
     // 删除组
     delTeam(item) {
-      this.groupInfo.teamId = item.teamId
-      console.log(this.groupInfo)
-      teamDelete(this.groupInfo)
+      this.delDialogParm = {}
+      this.delDialogParm.info = '确认删除小组？'
+      this.delDialogParm.type = 'delGroup'
+      this.delDialogParm.teamId = item.teamId
+      this.delDialogParm.schemeId = item.schemeId
+      this.delDialog = true
+    },
+    delTeamEnsure() {
+      teamDelete(this.delDialogParm)
       .then(response=> {
-        console.log(response.data)
+        if (response.code === 200) {
+          this.addGroup.forEach((element,i) => {
+            if(element.teamId === this.delDialogParm.teamId) {
+              this.addGroup.splice(i, 1)
+            }
+          });
+          this.$message({
+            message: '删除小组成功',
+            type: 'success'
+          })
+          this.delDialog = false
+        }
       })
     },
     // 删除成员
     delMember(item,teamId) {
-      console.log(item)
+      this.delDialogParm.info = "确认移除组员？"
+      this.delDialogParm.type = 'delMember'
+      this.delDialog = true
+      this.delDialogParm.teamId = teamId 
+      this.delDialogParm.userId = item.userId
+    },
+    delMemberEnsure(item,teamId) {
       let data = {
-        teamId: teamId,
-        userId: item.userId
+        teamId: this.delDialogParm.teamId,
+        userId: this.delDialogParm.userId
       }
-      console.log(data)
+      console.log('data', data)
+      
       delGroupMember(data)
-      .then(response=> {
-        console.log(response.data)
+      .then(response=> {  
+        if (response.code === 200) {
+          this.$message({
+            message: '移除组员成功',
+            type: 'success'
+          })
+        } 
+        this.addGroup.forEach(element => {
+          if(element.teamId === data.teamId) {
+            element.userList.forEach((member, i) => {
+              if(member.userId === data.userId) {
+                element.userList.splice(i,1)
+              }
+            });
+          }
+        });
+        this.delDialog = false
       })
     },
     // 删除方案
     sechemeDelete(item) {
-      groupDelete(item)
+      console.log(item)
+      this.delDialogParm.info = "确认删除方案？"
+      this.delDialogParm.type = 'delSecheme'
+      this.delDialogParm.schemeId = item.schemeId
+      this.delDialog = true
+      
+    },
+    sechemeDeleteEnsure() {
+      groupDelete({schemeId: this.delDialogParm.schemeId})
       .then(response=> {
-        console.log(response)
+        this.schemeList.forEach((element, i) => {
+          if(element.schemeId === this.delDialogParm.schemeId) {
+            this.schemeList.splice(i, 1)
+          }
+        });
+        this.$message({
+          message: '删除方案成功',
+          type: 'success'
+        })
+        this.delDialog = false
       })
     },
     // 复制方案
     sechemeCopy(item) {
       groupCopy(item)
       .then(response=> {
-        console.log(response)
+        this.schemeList.push(item)
+        this.$message({
+          message: '删除方案成功',
+          type: 'success'
+        })
       })
     },
     modifyTeamName(item) {
@@ -400,6 +541,13 @@ export default {
         return 0
       } else {
         return value
+      }
+    }
+  },
+  watch:{
+    searchMember(val) {
+      if (val === '') {
+        this.showData = this.sourceData
       }
     }
   }
@@ -460,6 +608,7 @@ export default {
         float: right;
 
         i {
+          cursor: pointer;
           margin-left: 20px;
         }
       }
@@ -509,6 +658,7 @@ export default {
         -moz-border-radius: 50%;
         border-radius: 50%;
         margin-left: 10px;
+        cursor: pointer;
       }
     }
   }

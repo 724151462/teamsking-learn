@@ -14,6 +14,7 @@
   import wangEditors from 'wangeditor'
   import tableNoHeader from '@/components/table-no-header.vue'
   import adialog from '@/components/dialog'
+  import {noteList,noteDelete} from '@/api/course'
   export default {
     components:{
       tableNoHeader,
@@ -24,30 +25,25 @@
         tables:[
           {
             name:'笔记标题',
-            prop:'notesTitle',
-            width:'150'
+            prop:'noteName',
           },
           {
             name:'笔记内容',
-            prop:'notesContent',
+            prop:'noteContent',
             popover: true,
             popoverTitle: '笔记内容',
-            width:'200'
           },
           {
             name:'资源节点',
-            prop:'zyname',
-            width:'120'
+            prop:'itemTimePoint',
           },
           {
             name:'发布人',
-            prop:'fbr',
-            width:'150'
+            prop:'realName',
           },
           {
             name:'发布时间',
-            prop:'fbsj',
-            width:'150'
+            prop:'createTime',
           },
         ],
         tableData:[
@@ -79,9 +75,11 @@
           }
         ],
         listQuery:{
+          courseId: this.$route.query.id,
           pageIndex:1,
           pageSize:10
         },
+        delArr:[],
         isInfo:false,
         notesData:null, //笔记的详细数据
         notesEditor:null, //显示笔记数据
@@ -89,7 +87,7 @@
         // 对话框
         show: false,
         dialogConfig: {
-            btnShow: true,
+            btnShow: false,
             title: '查看笔记',
             width: '40',
             labelWidth: '120',
@@ -98,32 +96,29 @@
             eventType: ''
         }, 
         dataObj: {
-          notesTitle: '笔记123',
-          fbr: '小明',
-          fbsj: '2018-11-29',
-          noteContent: 'werwrq'
+          
         },
         dialogVisible: false,
         formData: [
           {
             key: '笔记标题：',
-            inputType: 'string',
-            value: 'notesTitle'
+            inputType: 'info',
+            value: 'noteName'
           },
           {
             key: '发布人：',
-            inputType: 'string',
-            value: 'fbr'
+            inputType: 'info',
+            value: 'realName'
           },
           {
             key: '发布日期：',
-            inputType: 'string',
-            value: 'fbsj'
+            inputType: 'info',
+            value: 'createTime'
           },
           {
             key: '笔记内容：',
-            inputType: 'string',
-            value: 'notesContent'
+            inputType: 'textarea',
+            value: 'noteContent'
           },
           {
             key:'笔记图片',
@@ -145,16 +140,37 @@
     created(){
       this.$emit('teachingNav','notes')
     },
+    mounted() {
+      noteList(this.listQuery)
+      .then(response=> {
+        response.data.pageData.forEach(element => {
+          element.popover = element.noteContent
+        });
+        this.tableData = response.data.pageData
+      })
+    },
     methods:{
       showComponentInfo (e,data,index) {
         console.log(e,data,index)
         switch (e) {
           case 'get':
+            console.log('123',this.tableData)
             this.show = true
             this.dataObj = data
-            this.dataObj.imgSrc = [{src:require('@/assets/images/vote.png')},{src:require('@/assets/images/brainStorme.png')}]
+            this.dataObj.imgSrc = this.tableData.imgSrc
+            console.log('123',this.dataObj)
             break;
-        
+          case 'delete':
+            this.delArr.push(data.noteId)
+            noteDelete(this.delArr)
+            .then(response=> {
+              if(response.code === 200) {
+                this.$message({
+                  message: '删除成功',
+                  type: 'success'
+                })
+              }
+            })
           default:
             break;
         }

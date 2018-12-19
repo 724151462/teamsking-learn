@@ -62,9 +62,19 @@ export const constantRouterMap = [{
                 name: '发布投票',
               },
               {
+                path: '/course/list/interact/voteresult',
+                component: _import('course/interactContent/voteResult'),
+                name: '投票结果',
+              },
+              {
                 path: 'interact/brainstorm',
                 component: _import('course/interactContent/brainStorm'),
                 name: '发布头脑风暴',
+              },
+              {
+                path: '/course/list/interact/brainresult',
+                component: _import('course/interactContent/brainResult'),
+                name: '头脑风暴结果',
               },
               {
                 path: 'interact/homework',
@@ -72,9 +82,19 @@ export const constantRouterMap = [{
                 name: '作业/小组任务',
               },
               {
+                path: '/course/list/interact/homeworkresult',
+                component: _import('course/interactContent/workResult'),
+                name: '作业/小组任务结果',
+              },
+              {
                 path: 'interact/test',
                 component: _import('course/interactContent/test'),
                 name: '发布测试',
+              },
+              {
+                path: '/course/list/interact/testresult',
+                component: _import('course/interactContent/testResult'),
+                name: '测试结果',
               },
               {
                 path: '/course/list/member',
@@ -104,8 +124,13 @@ export const constantRouterMap = [{
                   },
                   {
                     path: 'homework',
-                    component: _import('course/teachContent/operation'),
+                    component: _import('course/teachContent/homeworkList'),
                     name: '作业管理',
+                  },
+                  {
+                    path: 'homeworkdetail',
+                    component: _import('course/teachContent/homeworkDetail'),
+                    name: '学生作业详情',
                   },
                   {
                     path: 'storm',
@@ -123,9 +148,14 @@ export const constantRouterMap = [{
                     name: '测试管理',
                   },
                   {
-                    path: 'test/:id',
+                    path: 'testmark',
                     component: _import('course/teachContent/testMark'),
                     name: '测试成绩',
+                  },
+                  {
+                    path: 'video',
+                    component: _import('course/teachContent/videos'),
+                    name: '视频',
                   },
                 ]
               },

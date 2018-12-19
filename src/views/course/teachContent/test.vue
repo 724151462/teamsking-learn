@@ -14,25 +14,30 @@
 
 <script>
   import tableNoHeader from '@/components/table-no-header.vue'
+  import {testList} from '@/api/course'
   export default {
     data() {
       return {
         tables:[
           {
             name:'测验名称',
-            prop:'notesTitle',
+            prop:'examTitle',
+          },
+          {
+            name:'所属章',
+            prop:'chapterName',
           },
           {
             name:'状态',
-            prop:'notesContent',
+            prop:'interactionStatus',
           },
           {
             name:'已提交/应提交',
-            prop:'zyname',
+            prop:'submitStatus',
           },
           {
             name:'提交截止时间',
-            prop:'fbr',
+            prop:'expireTime',
           },
         ],
         tableData:[
@@ -57,23 +62,46 @@
             type:'testMark',
           },
         ],
-
+        testListParmas:{
+          courseId: this.$route.query.id
+        }
       }
     },
     created(){
       this.$emit('teachingNav','test')
+    },
+    mounted() {
+      testList(this.testListParmas)
+      .then(response=> {
+        response.data.pageData.forEach(element => {
+          switch(element.interactionStatus) {
+            case 10:
+            element.interactionStatus = '未开始'
+            break
+            case 20:
+            element.interactionStatus = '正在进行'
+            break
+            case 30:
+            element.interactionStatus = '已结束'
+            break
+          }
+          element.submitStatus = `${element.submitCount}/${element.allCount}`
+        });
+        this.tableData = response.data.pageData
+      })
     },
     components: {
       tableNoHeader,
     },
     methods: {
       showComponentInfo(...params) {
+        console.log(params)
         let type = params[0]
-        let groupId = '3'
+        let groupId = params[1].examId
         console.log(type)
         switch (type) {
           case 'testMark':
-            this.$router.push({name: "测试成绩", params: {id:groupId}})
+            this.$router.push({name: "测试成绩", query: {courseId:this.$route.query.id, examId:groupId}})
             break;
         
           default:

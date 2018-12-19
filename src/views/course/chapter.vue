@@ -3,10 +3,10 @@
         <div style="background:gray">
             <span class="shuxian">|</span><span>教学模式</span>
             <div class="radio">
-                <el-radio v-model="patternId" 
+                <el-radio @change="changeTModel" v-model="patternId" 
                     v-for="(option, index) in pattern" :key="index" 
-                    :value="option.value"
                     :label="option.label">
+                    {{option.modelName}}
                 </el-radio>
             </div>
         </div>
@@ -21,7 +21,7 @@
                         <span>{{chapter.chapterName}}</span>
                         <div slot="right-side" class="operate">
                             <span @click.stop="addJieBtn(chapter)">+添加节</span>
-                            <span>删除</span>
+                            <span @click.stop="delChapter(chapter)">删除</span>
                             <!-- <span class="spread" @click="spread(chapter)">{{fold}}</span> -->
                         </div>
                     </div>
@@ -223,18 +223,25 @@ import videoPlayer from '@/components/video-pay'
 import {
     chaptersList,
     chaptersAdd,
+    chapterDelete,
     sectionAdd,
     itemAdd,
+    studyModeModify,
+    courseBaseInfo,
 } from '@/api/course'
 export default {
     data() {
       return {
         // courseId: '0608367675f54267aa6960fd0557cc1b',
         courseId: this.$route.query.id,
+        studyMode: {
+            courseId: this.$route.query.id,
+            studyMode: ''
+        },
         chapterFold: false,
         jieFold: false,
-        pattern: [{label: '开放学习', value: 1}, {label: '顺序学习', value: 2}],
-        patternId: '开放学习',
+        pattern: [{label: '10', modelName: "开放学习"}, {label: '20', modelName: "顺序学习"}],
+        patternId: '10',
         // 对话框
         show: false,
         dialogConfig: {
@@ -453,27 +460,26 @@ export default {
         subjPick: ''
       }
     },
-    mounted() {
+    created() {
         chaptersList(this.courseId)
         .then((response)=> {
-            // console.log(response.data)
-            response.data.forEach(element => {
-                element.catalogSection.forEach(ele => {
-                    ele.catalogItem.forEach(elem => {
-                        console.log(elem.contentType)
-                        // if(elem.contentType === 40){
-                        //     this.typeIcon = require('../../assets/images/vedio.png')
-                        // }else{
-                        //     this.typeIcon = require('../../assets/images/word.png')
-                        // }
-                        
-                    });
-                });
-            });
             this.sourceData = response.data
+        })
+        courseBaseInfo(this.courseId)
+        .then(response=> {
+            this.patternId = String(response.data.studyMode)
         })
     },
     methods: {
+        // 修改教学模式
+        changeTModel(value) {
+            this.studyMode.studyMode = value
+            // console.log(this.studyMode)
+            studyModeModify(this.studyMode)
+            .then(response=> {
+                console.log(response.data)
+            })
+        },
         chapterClick(value) {
             
             // console.log(value)
@@ -510,6 +516,18 @@ export default {
         addChapter(chapterName) {
             chaptersAdd({chapterStatus: 2, courseId: this.courseId, chapterName: chapterName})
             .then((response)=> {
+                console.log(response.data)
+            })
+        },
+        // 删除章
+        delChapter(chapter) {
+            let delArr = []
+            delArr.push(chapter.id)
+            let params = {
+                chapterIds: delArr
+            }
+            chapterDelete(params)
+            .then(response=> {
                 console.log(response.data)
             })
         },
@@ -565,7 +583,6 @@ export default {
         },
         // 资源类型图标
         typeIcon(info) {
-            console.log('aaa', info.contentType)
             if (info.contentType === 10) {
                 return require('../../assets/images/vedio.png')
             }else{
@@ -583,7 +600,6 @@ export default {
         },
         // 转码信息过滤
         transProgress(info) {
-            console.log('转码值', info)
             switch (info) {
                 case 10:
                     return '正在转码'

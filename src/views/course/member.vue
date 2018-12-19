@@ -3,7 +3,7 @@
     <div class="navs">
       <el-input v-model="pageParmas.searchKey" placeholder="请输入内容" style="width: 200px;"></el-input>
       <el-button type="primary" @click="searchMember">搜索</el-button>
-      <el-button type="primary"><router-link :to="{name: '成员方案管理'}">成员小组方案管理</router-link></el-button>
+      <el-button type="primary"><router-link :to="{name: '成员方案管理', query: {id: $route.query.id}}">成员小组方案管理</router-link></el-button>
       <el-button type="primary">导入成员</el-button>
     </div>
     <item-table :tables="tables" :tableData="tableData" @showComponentInfo="showComponentInfo" :buttonStylus="buttonType"></item-table>
@@ -44,7 +44,7 @@ export default {
   },
   data(){
     return{
-      courseId: '0608367675f54267aa6960fd0557cc1b',
+      courseId: this.$route.query.id,
       input:'',
       pageParmas: {
         searchKey: ''
@@ -150,6 +150,10 @@ export default {
           .then((response)=> {
             if(response.code === 200) {
               info.assistantStatus = 1
+              this.$message({
+                message: '设置成功',
+                type: 'success'
+              })
             }
           })
           break;
@@ -158,6 +162,10 @@ export default {
           .then((response)=> {
             if(response.code === 200) {
               info.assistantStatus = 2
+              this.$message({
+                message: '设置成功',
+                type: 'success'
+              })
             }
           })
           break;

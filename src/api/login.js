@@ -1,17 +1,21 @@
+const devUrl = '/api/v1/sys/' // 开发环境
+const prodUrl = 'http://120.36.137.90:9008/api/v1/sys/' // 生产环境
+const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
+
 import { commonsAjax } from '@/utils/requery'
 
 /**
  * 登陆
  * */
 export function logins (data) {
-  return commonsAjax('/api/v1/sys/login', data, 'post')
+  return commonsAjax(`${baseUrl}login`, data, 'post')
 }
 
 /**
  * 登陆
  * */
 export function loginDebug (data) {
-  return commonsAjax('/api/v1/sys/login/debug', data, 'post')
+  return commonsAjax(`${baseUrl}login/debug`, data, 'post')
 }
 
 
@@ -19,5 +23,5 @@ export function loginDebug (data) {
  * 菜单
  * */
 export function menuList (data) {
-  return commonsAjax('http://192.168.10.48:9008/api/v1/sys/user/menu/list', '', 'get')
+  return commonsAjax(`${baseUrl}user/menu/list`, '', 'get')
 }
