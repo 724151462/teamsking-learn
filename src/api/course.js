@@ -397,6 +397,15 @@ export function storm(data) {
 
 
 /**
+ * 作业发起
+ */
+export function homeWorkSave(data) {
+  let url = `${baseUrl}homework`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
  * 作业详情
  */
 export function homeWorkDetail(data) {
@@ -466,10 +475,28 @@ export function voteSave(data) {
 
 
 /**
+ * 头脑风暴发起
+ */
+export function stormSave(data) {
+  let url = `${baseUrl}storm`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
  * 头脑风暴详情
  */
 export function interactBS(data) {
-  let url = `${baseUrl}storm/${data.stormId}`
+  let url = `${baseUrl}storm/record/${data.stormId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 头脑风暴加分
+ */
+export function stormAddScore(data) {
+  let url = `${baseUrl}storm/bonus/${data.recordId}`
   return commonsAjax(url, '', 'get')
 }
 
@@ -480,4 +507,13 @@ export function interactBS(data) {
 export function interactExam(data) {
   let url = `${baseUrl}exam/${data.examId}`
   return commonsAjax(url, '', 'get')
+}
+
+// ========课程附件=========
+/**
+ * 测试详情
+ */
+export function assetCreate(data) {
+  let url = `${baseUrl}asset`
+  return commonsAjax(url, data, 'post')
 }
