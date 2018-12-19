@@ -7,8 +7,7 @@
       <el-form :model="quizData" ref="testForm">
         <el-form-item label="题干" required>
           <br>
-          <!--<div ref="editor" style="text-align:left" :v-model="quizData.quizTitle"></div>-->
-
+          <div ref="editor" style="text-align:left"></div>
         </el-form-item>
         <el-form-item label="题型" required>
           <el-radio-group v-model="quizData.quizType" @change="quizTypeChange">
@@ -53,7 +52,7 @@
         </el-form-item>
       </el-form>
       <div class="btn-groud">
-        <el-button type="primary" style="margin-right: 40px">保存</el-button>
+        <el-button type="primary" style="margin-right: 40px" @click="put">保存</el-button>
         <el-button>取消</el-button>
       </div>
     </div>
@@ -63,24 +62,26 @@
 <script>
   import E from 'wangeditor'
   import editor from '@/views/course/resourse/test/myEditor'
-  import {quizInfo} from '@/api/course'
+  import {quizInfo, putQuiz} from '@/api/course'
   export default {
     name: "editTest",
+    components:{editor},
     created () {
       // if(this.$route.query.courseid && this.$route.query.courseid !== ''){
       //   this.courseid = this.$route.query.courseid
       // }
       // this.getQuizInfo()
       // setTimeout(this.getQuizInfo,5000)
-
     },
     data () {
       return {
+        title:'',
         quizData:{
           "catalogId": 0,
           "courseId": "string",
           "creatorName": "string",
           "difficulty": 0,
+          displayOrder: 1,
           quizAnalysis: "",
           "quizId": 0,
           quizOption: [
@@ -110,7 +111,7 @@
               "quizId": 0
             },
           ],
-          quizTitle: "ii",
+          // quizTitle: "",
           quizType: 0, // 10 为单选，20为多选，30为判断，40为主观
           "skillPoint": "string",
           "updateId": 0,
@@ -123,14 +124,11 @@
       }
     },
     mounted() {
-      this.getQuizInfo()
-
-      var editor = new E(this.$refs.editor)
-      editor.customConfig.onchange = (html) =>{
-        console.log(html)
+      this.editor = new E(this.$refs.editor)
+      this.editor.customConfig.onchange = (html) =>{
         this.quizData.quizTitle = html
       }
-      editor.customConfig.menus = [
+      this.editor.customConfig.menus = [
         'head',  // 标题
         'bold',  // 粗体
         'fontSize',  // 字号
@@ -145,8 +143,9 @@
         'code',  // 插入代码
         'undo',  // 撤销
       ]
-      editor.create()
-      // editor.txt.html(this.quizData.quizTitle)
+      this.editor.create()
+      //获取数据
+      this.getQuizInfo()
     },
     methods:{
       //获取试题信息
@@ -155,11 +154,7 @@
         quizInfo(quizId).then(res=>{
           console.log(res)
           this.quizData = res.data
-          // this.editorContent = res.data.quizTitle
-          // this.$set(this.quizData,res.data);
-          this.$set(this.quizData,res.data)
-          // this.$set(this.quizData,quizTitle,res.data.quizTitle);
-          this.quizData = res.data
+          this.editor.txt.html(this.quizData.quizTitle)
         }).catch(error=>{
           console.log(error)
         })
@@ -225,6 +220,28 @@
       },
       toTest(){
         this.$router.push('/course/resource/test');
+      },
+      getingo(e){
+        console.log(e)
+      },
+      //修改试题
+      put(){
+        console.log('修改试题')
+        let data = this.quizData
+        console.log(data)
+        putQuiz(data).then(res=>{
+          if(Number(res.code) === 200){
+            console.log(res)
+            this.$message.success('修改成功');
+          }else{
+            this.$message({
+              message:'修改失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
       }
     }
   }

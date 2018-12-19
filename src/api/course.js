@@ -1,6 +1,10 @@
 const devUrl = '/api/v1/course/' // 开发环境
-const prodUrl = 'http://120.36.137.90:9008/api/v1/course/' // 生产环境
+const prodUrl = 'http://120.36.137.90:8008/api/v1/course/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
+
+const commonDevUrl = '/api/v1/' // 开发环境
+const commonProdUrl = 'http://120.36.137.90:8008/api/v1/' // 生产环境
+const commonBaseUrl = process.env.NODE_ENV === 'production' ? commonProdUrl : commonDevUrl
 
 import {
   commonsAjax
@@ -44,36 +48,36 @@ export function studyModeModify(data) {
  * 获取课程分类列表
  */
 export function categories(data) {
-  return commonsAjax(`${baseUrl}common/categories`, '', 'get')
+  return commonsAjax(`${commonBaseUrl}common/categories`, '', 'get')
 }
 
 /**
- * 获取课程分类列表
+ * 获取课程标签列表
  */
 export function tags(data) {
-  return commonsAjax(`${baseUrl}common/tags`, 'data', 'get')
+  return commonsAjax(`${commonBaseUrl}common/tags`, 'data', 'get')
 }
 
 /**
  * 获取讲师列表
  */
 export function instructorList(data) {
-  return commonsAjax(`${baseUrl}instructor/list`, '', 'get')
+  return commonsAjax(`${baseUrl}instructor/list`, data, 'get')
 }
 
 /**
  * 获取教师列表
  */
 export function teachersList(data) {
-  let url = `${baseUrl}tenant/` + 1 + '/teachers'
+  let url = `${commonBaseUrl}tenant/` + 1 + '/teachers'
   return commonsAjax(url, '', 'get')
 }
 
 /**
- * 获取教师列表
+ * 添加讲师
  */
 export function addInstructor(data) {
-  console.log('要穿的数据', data)
+  console.log('添加讲师')
   return commonsAjax(`${baseUrl}instructor`, data, 'post')
 }
 
@@ -81,12 +85,11 @@ export function addInstructor(data) {
  * 保存课程
  */
 export function saveCourse(data) {
-  return commonsAjax(`${baseUrl}course`, data, 'post')
+  return commonsAjax(`${baseUrl}`, data, 'post')
 }
-
 /**
  * 查询课程信息
- */
+ */▆
 export function courseInfo(data) {
   console.log(data)
   let url = `${baseUrl}info/` + data
@@ -306,76 +309,6 @@ export function planNameModify(data) {
 export function groupDelete(data) {
   let url = `${baseUrl}scheme/${data.schemeId}`
   return commonsAjax(url, data, 'delete')
-}
-
-
-//============资源管理==================
-
-/**
- * 查询课程下资源列表
- */
-export function resourcePage(id, data) {
-  let url = `${baseUrl}${id}/resource/page`
-  return commonsAjax(url, data, 'get')
-}
-
-/**
- * 删除课程下资源
- */
-export function deletedResource(id, data) {
-  // resourceId
-  let url = `${baseUrl}resource/` + id
-  return commonsAjax(url, data, 'delete')
-}
-
-// ===============试题管理===============
-//
-/**
- * 上传试题模板
- */
-export function upQuiz(id, data) {
-  let url = `${baseUrl}${id}/quiz`
-  // console.log('模板上传路径为：'+url)
-  return commonsAjax(url, data, 'post')
-}
-
-/**
- * 获取试题列表
- */
-
-// export function quizPage (id, data) {
-//   let url = '${baseUrl}' + id + '/quiz/page'
-//   return commonsAjax(url, data, 'get')
-// }
-
-/**
- * 获取试题列表2
- */
-export function quizPage(data) {
-  let url = `${baseUrl}library/quiz/page`
-  return commonsAjax(url, '', 'get')
-}
-/**
- * 保存单个试题信息
- */
-export function saveQuiz(data) {
-  return commonsAjax(`${baseUrl}quiz`, data, 'post')
-}
-
-/**
- * 获取单个试题信息(包含选项)
- */
-export function quizInfo(id) {
-  let url = `${baseUrl}quiz/${id}`
-  return commonsAjax(url, '', 'get')
-}
-
-/**
- * 删除试题
- */
-export function deleteQuiz(data) {
-  let url = `${baseUrl}quiz/` + data
-  return commonsAjax(url, '', 'delete')
 }
 
 
