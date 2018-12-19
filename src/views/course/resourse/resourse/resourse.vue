@@ -28,70 +28,131 @@
           <el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>
         </div>
         <div>
-          <el-button type="primary" icon="el-icon-download" size="small">下载</el-button>
-          <el-button icon="el-icon-delete" size="small">删除</el-button>
+          <el-button type="primary" size="small">创建目录</el-button>
+          <el-button type="primary" size="small">移动到</el-button>
+          <el-button type="primary" size="small">删除</el-button>
         </div>
       </div>
       <div>
         <el-collapse accordion>
           <el-collapse-item v-for="(course,courseIndex) in resourceData" :key="course.id">
             <template slot="title">
-              <!--二级课程选择框-->
-              <el-checkbox
-                :indeterminate="course.indeterminate"
-                v-model="course.selected"
-                style="padding-left: 25px"
-                @change="checkCourseAll(courseIndex, $event)"></el-checkbox>
-              <div style="display: inline-flex;width: calc(100% - 100px)">
-                <div style="display: inline-block"><img :src="imgSrc.folder" style="width: 20px;margin: 0 10px;"/></div>
-                <div style="display: inline-block">{{course.courseName}}</div>
-                <div style="flex: 1">1</div>
+              <div style="display: flex;align-items: center">
                 <div>
-                  <el-button type="primary" icon="el-icon-upload2" size="small" @click.stop="fileUpload">上传</el-button>
+                  <el-checkbox
+                    :indeterminate="course.indeterminate"
+                    v-model="course.selected"
+                    style="padding-left: 25px"
+                    @change="checkCourseAll(courseIndex, $event)"></el-checkbox>
+                </div>
+                <div>
+                  <img :src="imgSrc.folder" style="width: 20px;margin: -3px 10px;"/>
+                  {{course.courseName}}
+                </div>
+                <div style="flex: 1">
+                  <el-button type="primary" icon="el-icon-upload2" size="small" @click.stop="fileUpload" style="float: right">上传</el-button>
                 </div>
               </div>
-
             </template>
             <div>
-              <div class="resource-list" v-for="resource in course.resources" :key="resource.id">
-                <div class="padding-box">
-                  <!--边框填充盒子(有用)-->
-                  <div></div>
-                </div>
+              <el-collapse-item v-for="(course,courseIndex) in resourceData" :key="course.id">
+                <template slot="title">
+                  <div style="display: flex;align-items: center">
+                    <div>
+                      <el-checkbox
+                        :indeterminate="course.indeterminate"
+                        v-model="course.selected"
+                        style="padding-left: 25px"
+                        @change="checkCourseAll(courseIndex, $event)"></el-checkbox>
+                    </div>
+                    <div>
+                      <img :src="imgSrc.folder" style="width: 20px;margin: -3px 10px;"/>
+                      {{course.courseName}}
+                    </div>
+                    <div style="flex: 1">
+                      <el-button type="primary" icon="el-icon-upload2" size="small" @click.stop="fileUpload" style="float: right">上传</el-button>
+                    </div>
+                  </div>
+                </template>
                 <div>
-                  <!--三级单个资源选择-->
-                  <el-checkbox v-model="resource.selected" @change="checkResource(courseIndex)"></el-checkbox>
-                </div>
-                <div>
+                  <div class="resource-list" v-for="resource in course.resources" :key="resource.id">
+                    <div class="padding-box">
+                      <div></div>  <!--边框填充盒子(有用)-->
+                    </div>
+                    <div>
+                      <!--三级单个资源选择-->
+                      <el-checkbox v-model="resource.selected" @change="checkResource(courseIndex)"></el-checkbox>
+                    </div>
+                    <div>
                   <span class="img-span">
                     <img :src="getImgSrc(resource.contentType)" class="img-icon">
                   </span>
+                    </div>
+                    <div>
+                      <span style="display: inline-block">{{resource.resourceTitle}}</span>
+                    </div>
+                    <div style="flex: 1">
+                      <el-tag type="danger" size="mini" style="margin: 0 5px">
+                        <i class="el-icon-loading"></i>转码中
+                      </el-tag>
+                      <el-tag type="success" size="mini" style="margin: 0 5px">字幕</el-tag>
+                    </div>
+                    <div style="min-width: 200px" class="resource-info-box">
+                      <div>时长01:00:05</div>
+                      <div>{{resource.resourceSize}}MB</div>
+                      <div>2018-06-13 14:02</div>
+                    </div>
+                    <div>
+                      <el-button type="text">
+                        <a :href="resource.coverUrl">预览</a>
+                      </el-button>&nbsp;| &nbsp;
+                      <el-button
+                        type="text"
+                        style="margin-left: -10px"
+                        @click="fileDownload(resource.resourceUrl)"
+                      >下载</el-button>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <span style="display: inline-block">{{resource.resourceTitle}}</span>
-                </div>
-                <div style="flex: 1">
-                  <el-tag type="danger" size="mini" style="margin: 0 5px">
-                    <i class="el-icon-loading"></i>转码中
-                  </el-tag>
-                  <el-tag type="success" size="mini" style="margin: 0 5px">字幕</el-tag>
-                </div>
-                <div style="min-width: 200px" class="resource-info-box">
-                  <div>时长01:00:05</div>
-                  <div>{{resource.resourceSize}}MB</div>
-                  <div>2018-06-13 14:02</div>
-                </div>
-                <div>
-                  <el-button type="text">
-                    <a :href="resource.coverUrl">预览</a>
-                  </el-button>&nbsp;| &nbsp;
-                  <el-button
-                    type="text"
-                    style="margin-left: -10px"
-                    @click="fileDownload(resource.resourceUrl)"
-                  >下载</el-button>
-                </div>
-              </div>
+              </el-collapse-item>
+              <!--<div class="resource-list" v-for="resource in course.resources" :key="resource.id">-->
+                <!--<div class="padding-box">-->
+                  <!--<div></div>  &lt;!&ndash;边框填充盒子(有用)&ndash;&gt;-->
+                <!--</div>-->
+                <!--<div>-->
+                  <!--&lt;!&ndash;三级单个资源选择&ndash;&gt;-->
+                  <!--<el-checkbox v-model="resource.selected" @change="checkResource(courseIndex)"></el-checkbox>-->
+                <!--</div>-->
+                <!--<div>-->
+                  <!--<span class="img-span">-->
+                    <!--<img :src="getImgSrc(resource.contentType)" class="img-icon">-->
+                  <!--</span>-->
+                <!--</div>-->
+                <!--<div>-->
+                  <!--<span style="display: inline-block">{{resource.resourceTitle}}</span>-->
+                <!--</div>-->
+                <!--<div style="flex: 1">-->
+                  <!--<el-tag type="danger" size="mini" style="margin: 0 5px">-->
+                    <!--<i class="el-icon-loading"></i>转码中-->
+                  <!--</el-tag>-->
+                  <!--<el-tag type="success" size="mini" style="margin: 0 5px">字幕</el-tag>-->
+                <!--</div>-->
+                <!--<div style="min-width: 200px" class="resource-info-box">-->
+                  <!--<div>时长01:00:05</div>-->
+                  <!--<div>{{resource.resourceSize}}MB</div>-->
+                  <!--<div>2018-06-13 14:02</div>-->
+                <!--</div>-->
+                <!--<div>-->
+                  <!--<el-button type="text">-->
+                    <!--<a :href="resource.coverUrl">预览</a>-->
+                  <!--</el-button>&nbsp;| &nbsp;-->
+                  <!--<el-button-->
+                    <!--type="text"-->
+                    <!--style="margin-left: -10px"-->
+                    <!--@click="fileDownload(resource.resourceUrl)"-->
+                  <!--&gt;下载</el-button>-->
+                <!--</div>-->
+              <!--</div>-->
             </div>
           </el-collapse-item>
         </el-collapse>
