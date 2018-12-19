@@ -87,6 +87,16 @@ export function addInstructor(data) {
 export function saveCourse(data) {
   return commonsAjax(`${baseUrl}`, data, 'post')
 }
+
+
+/**
+ * 修改课程
+ */
+export function putCourse(data) {
+  return commonsAjax(`${baseUrl}`, data, 'put')
+}
+
+
 /**
  * 查询课程信息
  */▆
