@@ -26,25 +26,27 @@
 
 <script>
   import tableNoHeader from '@/components/table-no-header.vue'
+  import {interactList} from '@/api/course'
   export default {
     data() {
       return {
+        stormParams: {courseId: this.$route.query.id},
         tables:[
           {
             name:'题目',
-            prop:'notesTitle',
+            prop:'interactionName',
           },
           {
             name:'状态',
-            prop:'notesContent',
+            prop:'interactionStatus',
           },
           {
             name:'已作答/应作答',
-            prop:'zyname',
+            prop:'answerStatus',
           },
           {
             name:'截止时间',
-            prop:'fbr',
+            prop:'endTime',
           },
         ],
         tableData:[
@@ -71,7 +73,7 @@
             type:'view',
           },
         ],
-
+        answerList: [],
 
         // 对话框
         show: false,
@@ -79,6 +81,37 @@
     },
     created(){
       this.$emit('teachingNav','storm')
+    },
+    mounted() {
+      interactList(this.stormParams)
+      .then(response=> {
+        let stormArr = []
+        response.data.forEach(element=> {
+          element.interactions.forEach(item=> {
+            if(item.interactionType === 50) {
+              console.log('item.interactionStatus', item.interactionStatus)
+              item.answerStatus = `?/${item.userCount}`
+              item.endTime = '?'
+              switch (item.interactionStatus) {
+                case 10:
+                  item.interactionStatus = '已开始'
+                  break;
+                case 20:
+                  item.interactionStatus = '未开始'
+                  break;
+                case 30:
+                  item.interactionStatus = '已结束'
+                  break;
+                default:
+                  break;
+              }
+              
+              stormArr.push(item)
+            }
+          })
+        })
+        this.tableData = stormArr
+      })
     },
     components: {
       tableNoHeader,

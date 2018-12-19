@@ -1,10 +1,10 @@
 <template>
     <div>
       <el-row>
-        <el-button round size="small">全部课程</el-button>
-        <el-button round size="small">已发布</el-button>
-        <el-button round size="small">未发布</el-button>
-        <el-button round size="small">已关闭</el-button>
+        <el-button round size="small" @click="courseType()">全部课程</el-button>
+        <el-button round size="small" @click="courseType(30)">已发布</el-button>
+        <el-button round size="small" @click="courseType(10)">未发布</el-button>
+        <el-button round size="small" @click="courseType(40)">已关闭</el-button>
         <div class="list-search">
           <el-input v-model="listQuery.courseName" type="text" placeholder="请输入课程名称" style="width:180px;margin-left: 100px;"></el-input>
           <el-button type="primary" @click="getList">搜索</el-button>
@@ -107,7 +107,8 @@ export default {
       listQuery: {
         pageIndex: 1,
         pageSize: 10,
-        courseName: ''
+        courseName: '',
+        courseStatus: ''
       }
     }
   },
@@ -119,6 +120,22 @@ export default {
     goGetList (e) {
       this.listQuery.pageIndex = e
       this.getList()
+    },
+    courseType(type = '') {
+      this.listQuery.courseStatus = type
+      coursePage(this.listQuery).then(res => {
+        if (res.code === 200) {
+          this.data = res.data.pageData
+          this.listQuery.total = res.data.totalCount
+        } else {
+          this.$message({
+            message: res.msg,
+            type: 'error'
+          })
+        }
+      }).catch(error => {
+        console.log(error)
+      })
     },
     upData (e) {
       this.$router.push({
@@ -132,17 +149,11 @@ export default {
     courseStatus (val) {
       let vals = Number(val)
       if (vals === 10) {
-        return '待发布'
-      } else if (vals === 20) {
-        return '预发布'
+        return '未发布'
       } else if (vals === 30) {
         return '已发布'
       } else if (vals === 40) {
         return '关闭'
-      } else if (vals === 50) {
-        return '已归档'
-      } else {
-        return vals
       }
     },
     yesTimeSell (e) {

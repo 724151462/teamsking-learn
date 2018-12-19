@@ -10,6 +10,7 @@ import Cookie from 'js-cookie'
 
 Vue.use(ElementUI)
 
+
 Vue.config.productionTip = false
 
 var routeList = []

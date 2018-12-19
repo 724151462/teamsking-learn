@@ -20,37 +20,37 @@
         nav:[
           {
             name:'成绩管理',
-            url:{name: "成绩管理"},
+            url:{name: "成绩管理", query: {id: this.$route.query.id}},
             isNav:'grade'
           },
           {
             name:'笔记管理',
-            url: {name: "笔记管理"},
+            url: {name: "笔记管理", query: {id: this.$route.query.id}},
             isNav:'notes'
           },
           {
             name:'作业管理',
-            url: {name: "作业管理"},
+            url: {name: "作业管理", query: {id: this.$route.query.id}},
             isNav:'operation'
           },
           {
             name:'测验',
-            url: {name: "测试管理"},
+            url: {name: "测试管理", query: {id: this.$route.query.id}},
             isNav:'test'
           },
           {
             name:'头脑风暴',
-            url: {name: "头脑风暴"},
+            url: {name: "头脑风暴", query: {id: this.$route.query.id}},
             isNav:'storm'
           },
           {
             name:'投票问卷',
-            url: {name: "投票问卷"},
+            url: {name: "投票问卷", query: {id: this.$route.query.id}},
             isNav:'questionnaire'
           },
           {
             name:'视频',
-            url:{name: "视频"},
+            url:{name: "视频", query: {id: this.$route.query.id}},
             isNav:'videos'
           },
         ],

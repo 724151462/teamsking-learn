@@ -1,3 +1,7 @@
+const devUrl = '/api/v1/course/' // 开发环境
+const prodUrl = 'http://120.36.137.90:9008/api/v1/course/' // 生产环境
+const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
+
 import {
   commonsAjax
 } from '../utils/requery'
@@ -6,43 +10,62 @@ import {
  * 获取课程列表
  */
 export function coursePage(data) {
-  return commonsAjax('/api/v1/course/page', data, 'get')
+  return commonsAjax(`${baseUrl}page`, data, 'get')
 }
 
 /**
  * 发布课程
  */
 export function publish(data) {
-  let url = '/api/v1/course/' + data + '/publish'
+  let url = `${baseUrl}` + data + '/publish'
   return commonsAjax(url, '', 'put')
 }
+
+
+/**
+ * 课程简单信息
+ */
+export function courseBaseInfo(data) {
+  let url = `${baseUrl}${data}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 修改学习模式
+ */
+export function studyModeModify(data) {
+  let url = `${baseUrl}${data.courseId}/studymode/${data.studyMode}`
+  return commonsAjax(url, '', 'put')
+}
+
 
 /**
  * 获取课程分类列表
  */
 export function categories(data) {
-  return commonsAjax('/api/v1/common/categories', '', 'get')
+  return commonsAjax(`${baseUrl}common/categories`, '', 'get')
 }
 
 /**
  * 获取课程分类列表
  */
 export function tags(data) {
-  return commonsAjax('/api/v1/common/tags', 'data', 'get')
+  return commonsAjax(`${baseUrl}common/tags`, 'data', 'get')
 }
 
 /**
  * 获取讲师列表
  */
 export function instructorList(data) {
-  return commonsAjax('/api/v1/course/instructor/list', '', 'get')
+  return commonsAjax(`${baseUrl}instructor/list`, '', 'get')
 }
 
 /**
  * 获取教师列表
  */
 export function teachersList(data) {
-  let url = '/api/v1/tenant/' + 1 + '/teachers'
+  let url = `${baseUrl}tenant/` + 1 + '/teachers'
   return commonsAjax(url, '', 'get')
 }
 
@@ -51,14 +74,14 @@ export function teachersList(data) {
  */
 export function addInstructor(data) {
   console.log('要穿的数据', data)
-  return commonsAjax('/api/v1/course/instructor', data, 'post')
+  return commonsAjax(`${baseUrl}instructor`, data, 'post')
 }
 
 /**
  * 保存课程
  */
 export function saveCourse(data) {
-  return commonsAjax('/api/v1/course', data, 'post')
+  return commonsAjax(`${baseUrl}course`, data, 'post')
 }
 
 /**
@@ -66,7 +89,7 @@ export function saveCourse(data) {
  */
 export function courseInfo(data) {
   console.log(data)
-  let url = '/api/v1/course/info/' + data
+  let url = `${baseUrl}info/` + data
   return commonsAjax(url, '', 'get')
 }
 
@@ -74,7 +97,13 @@ export function courseInfo(data) {
  * 根据课程id获取所有章节信息
  */
 export function chaptersList(data) {
-  let url = '/api/v1/course/' + data + '/chapters'
+  let url = `${baseUrl}` + data + '/chapters'
+  return commonsAjax(url, '', 'get')
+}
+
+
+export function chaptersListSimple(data) {
+  let url = `${baseUrl}chapter/list/${data.courseId}`
   return commonsAjax(url, '', 'get')
 }
 
@@ -84,8 +113,18 @@ export function chaptersList(data) {
  */
 
 export function chaptersAdd(data) {
-  let url = '/api/v1/course/chapter'
+  let url = `${baseUrl}chapter`
   return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 删除章
+ */
+
+export function chaptersDelete(data) {
+  let url = `${baseUrl}chapter/chapter`
+  return commonsAjax(url, data, 'delete')
 }
 
 
@@ -94,7 +133,7 @@ export function chaptersAdd(data) {
  */
 
 export function sectionAdd(data) {
-  let url = '/api/v1/course/chapter/section'
+  let url = `${baseUrl}chapter/section`
   return commonsAjax(url, data, 'post')
 }
 
@@ -103,7 +142,7 @@ export function sectionAdd(data) {
  * 根据课程id获取成员
  */
 export function memberList(data) {
-  let url = `/api/v1/course/${data.courseId}/user/page`
+  let url = `${baseUrl}${data.courseId}/user/page`
   return commonsAjax(url, data, 'get')
 }
 
@@ -112,7 +151,7 @@ export function memberList(data) {
  * 根据课程id获取未分配和已分配的组员
  */
 export function memberScheme(data) {
-  let url = `/api/v1/course/{courseId}/scheme/{schemeId}/team/user`
+  let url = `${baseUrl}${data.courseId}/scheme/${data.schemeId}/team/user`
   return commonsAjax(url, data, 'get')
 }
 
@@ -121,7 +160,7 @@ export function memberScheme(data) {
  * 设置为助教
  */
 export function setAssistant(data) {
-  let url = `/api/v1/course/${data.courseId}/user/${data.userId}/assistant`
+  let url = `${baseUrl}${data.courseId}/user/${data.userId}/assistant`
   return commonsAjax(url, '', 'post')
 }
 
@@ -130,7 +169,7 @@ export function setAssistant(data) {
  * 取消助教
  */
 export function unsetAssistant(data) {
-  let url = `/api/v1/course/${data.courseId}/user/${data.userId}/assistant`
+  let url = `${baseUrl}${data.courseId}/user/${data.userId}/assistant`
   return commonsAjax(url, '', 'delete')
 }
 
@@ -139,7 +178,7 @@ export function unsetAssistant(data) {
  * 取消助教
  */
 export function deleteUser(data) {
-  let url = `/api/v1/course/${data.courseId}/user/${data.userId}`
+  let url = `${baseUrl}${data.courseId}/user/${data.userId}`
   return commonsAjax(url, '', 'delete')
 }
 
@@ -150,7 +189,7 @@ export function deleteUser(data) {
  * 获取所有资源列表
  */
 export function getResourceList(data) {
-  let url = '/api/v1/resource/page'
+  let url = `${baseUrl}resource/page`
   return commonsAjax(url, '', 'get')
 }
 
@@ -159,7 +198,7 @@ export function getResourceList(data) {
  * 添加小项
  */
 export function itemAdd(data) {
-  let url = '/api/v1/course/chapter/section/item'
+  let url = `${baseUrl}chapter/section/item`
   return commonsAjax(url, data, 'post')
 }
 
@@ -169,7 +208,7 @@ export function itemAdd(data) {
  * 添加成员方案名称
  */
 export function schemeAdd(data) {
-  let url = '/api/v1/course/scheme'
+  let url = `${baseUrl}scheme`
   return commonsAjax(url, data, 'post')
 }
 
@@ -178,7 +217,7 @@ export function schemeAdd(data) {
  * 根据课程id获取方案列表
  */
 export function schemeList(data) {
-  let url = `/api/v1/course/${data}/schemes`
+  let url = `${baseUrl}${data}/schemes`
   return commonsAjax(url, '', 'get')
 }
 
@@ -188,7 +227,7 @@ export function schemeList(data) {
  * 根据方案id获取方案成员列表
  */
 export function memberEditList(data) {
-  let url = `/api/v1/course/scheme/${data.schemeId}/teams`
+  let url = `${baseUrl}scheme/${data.schemeId}/teams`
   return commonsAjax(url, '', 'get')
 }
 
@@ -198,7 +237,7 @@ export function memberEditList(data) {
  * 新增组名
  */
 export function teamNameAdd(data) {
-  let url = `/api/v1/course/scheme/${data.schemeId}/team`
+  let url = `${baseUrl}scheme/${data.schemeId}/team`
   return commonsAjax(url, data, 'post')
 }
 
@@ -208,7 +247,7 @@ export function teamNameAdd(data) {
  */
 export function teamNameModify(data) {
   console.log(data)
-  let url = `http://120.36.137.90:9008/api/v1/course/scheme/${data.schemeId}/team/${data.teamId}`
+  let url = `${baseUrl}scheme/${data.schemeId}/team/${data.teamId}`
   return commonsAjax(url, {
     'teamName': data.teamName
   }, 'put')
@@ -220,7 +259,7 @@ export function teamNameModify(data) {
  * 根据方案id获取方案成员分配/未分配列表
  */
 export function memberMatchList(data) {
-  let url = `/api/v1/course/${data.courseId}/scheme/${data.schemeId}/team/user`
+  let url = `${baseUrl}${data.courseId}/scheme/${data.schemeId}/team/user`
   return commonsAjax(url, data, 'get')
 }
 
@@ -229,7 +268,7 @@ export function memberMatchList(data) {
  * 根据方案id提交小组分配方案
  */
 export function memberMatch(data) {
-  let url = `/api/v1/course/scheme/${data.schemeId}/team`
+  let url = `${baseUrl}scheme/${data.schemeId}/team`
   return commonsAjax(url, data, 'post')
 }
 
@@ -238,7 +277,7 @@ export function memberMatch(data) {
  * 删除小组方案
  */
 export function teamDelete(data) {
-  let url = `/api/v1/course/scheme/${data.schemeId}/team/${data.teamId}`
+  let url = `${baseUrl}scheme/${data.schemeId}/team/${data.teamId}`
   return commonsAjax(url, '', 'delete')
 }
 
@@ -247,7 +286,7 @@ export function teamDelete(data) {
  * 删除小组方案
  */
 export function delGroupMember(data) {
-  let url = `/api/v1/course/scheme/team/${data.teamId}/user/${data.userId}`
+  let url = `${baseUrl}scheme/team/${data.teamId}/user/${data.userId}`
   return commonsAjax(url, '', 'delete')
 }
 
@@ -256,7 +295,7 @@ export function delGroupMember(data) {
  * 修改方案名称
  */
 export function planNameModify(data) {
-  let url = `/api/v1/course/scheme/${data.schemeId}`
+  let url = `${baseUrl}scheme/${data.schemeId}`
   return commonsAjax(url, data.nameForm, 'put')
 }
 
@@ -265,84 +304,237 @@ export function planNameModify(data) {
  * 删除方案名称
  */
 export function groupDelete(data) {
-  let url = `/api/v1/course/scheme/${data.schemeId}`
+  let url = `${baseUrl}scheme/${data.schemeId}`
+  return commonsAjax(url, data, 'delete')
 }
 
 
 //============资源管理==================
 
-  /**
-   * 查询课程下资源列表
-   */
-  export function resourcePage(id, data) {
-    let url = '/api/v1/course/' + id + '/resource/page'
-    return commonsAjax(url, data, 'get')
-  }
+/**
+ * 查询课程下资源列表
+ */
+export function resourcePage(id, data) {
+  let url = `${baseUrl}${id}/resource/page`
+  return commonsAjax(url, data, 'get')
+}
 
-  /**
-   * 删除课程下资源
-   */
-  export function deletedResource(id, data) {
-    // resourceId
-    let url = '/api/v1/course/resource/' + id
-    return commonsAjax(url, data, 'delete')
-  }
+/**
+ * 删除课程下资源
+ */
+export function deletedResource(id, data) {
+  // resourceId
+  let url = `${baseUrl}resource/` + id
+  return commonsAjax(url, data, 'delete')
+}
 
-  // ===============试题管理===============
-  //
-  /**
-   * 上传试题模板
-   */
-  export function upQuiz(id, data) {
-    let url = `/api/v1/course/${id}/quiz`
-    // console.log('模板上传路径为：'+url)
-    return commonsAjax(url, data, 'post')
-  }
+// ===============试题管理===============
+//
+/**
+ * 上传试题模板
+ */
+export function upQuiz(id, data) {
+  let url = `${baseUrl}${id}/quiz`
+  // console.log('模板上传路径为：'+url)
+  return commonsAjax(url, data, 'post')
+}
 
-  /**
-   * 获取试题列表
-   */
+/**
+ * 获取试题列表
+ */
 
-  // export function quizPage (id, data) {
-  //   let url = '/api/v1/course/' + id + '/quiz/page'
-  //   return commonsAjax(url, data, 'get')
-  // }
+// export function quizPage (id, data) {
+//   let url = '${baseUrl}' + id + '/quiz/page'
+//   return commonsAjax(url, data, 'get')
+// }
 
-  /**
-   * 获取试题列表2
-   */
-  export function quizPage(data) {
-    let url = '/api/v1/library/quiz/page'
-    return commonsAjax(url, '', 'get')
-  }
-  /**
-   * 保存单个试题信息
-   */
-  export function saveQuiz(data) {
-    return commonsAjax('/api/v1/course/quiz', data, 'post')
-  }
+/**
+ * 获取试题列表2
+ */
+export function quizPage(data) {
+  let url = `${baseUrl}library/quiz/page`
+  return commonsAjax(url, '', 'get')
+}
+/**
+ * 保存单个试题信息
+ */
+export function saveQuiz(data) {
+  return commonsAjax(`${baseUrl}quiz`, data, 'post')
+}
 
-  /**
-   * 获取单个试题信息(包含选项)
-   */
-  export function quizInfo(id) {
-    let url = `/api/v1/course/quiz/${id}`
-    return commonsAjax(url, '', 'get')
-  }
+/**
+ * 获取单个试题信息(包含选项)
+ */
+export function quizInfo(id) {
+  let url = `${baseUrl}quiz/${id}`
+  return commonsAjax(url, '', 'get')
+}
 
-  /**
-   * 删除试题
-   */
-  export function deleteQuiz(data) {
-    let url = '/api/v1/course/quiz/' + data
-    return commonsAjax(url, '', 'delete')
-  }
+/**
+ * 删除试题
+ */
+export function deleteQuiz(data) {
+  let url = `${baseUrl}quiz/` + data
+  return commonsAjax(url, '', 'delete')
+}
 
 
-  /**
-   * 复制方案
-   */
-  export function groupCopy(data) {
-    let url = `/api/v1/course/scheme/${data.schemeId}`
-    return commonsAjax(url, '', 'post')
-  }
+/**
+ * 复制方案
+ */
+export function groupCopy(data) {
+  let url = `${baseUrl}scheme/${data.schemeId}`
+  return commonsAjax(url, '', 'post')
+}
+
+// ========测试=========
+
+
+/**
+ * 测试添加
+ */
+export function testAdd(data) {
+  let url = `${baseUrl}exam`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 测试列表
+ */
+export function testList(data) {
+  let url = `${baseUrl}exam/list/${data.courseId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 测试成绩
+ */
+export function testMark(data) {
+  let url = `${baseUrl}exam/submit/list/${data.courseId}/${data.examId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 成绩详情
+ */
+export function markDetail(data) {
+  let url = `${baseUrl}exam/submit/detail/${data.examId}/${data.examSubmissionId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 笔记列表
+ */
+export function noteList(data) {
+  let url = `${baseUrl}note/list/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 笔记删除
+ */
+export function noteDelete(data) {
+  let url = `${baseUrl}note`
+  return commonsAjax(url, data, 'delete')
+}
+
+
+/**
+ * 头脑风暴
+ */
+export function storm(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 作业详情
+ */
+export function homeWorkDetail(data) {
+  let url = `${baseUrl}homework/${data.homeworkId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 作业列表
+ */
+export function homeWorkList(data) {
+  let url = `${baseUrl}homeworksubmission/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 作业回答列表
+ */
+export function homeWorkAnswerList(data) {
+  let url = `${baseUrl}homeworksubmission/item/${data.courseId}/${data.homeworkId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+export function homeWorkRepulse(data) {
+  let url = `${baseUrl}homeworksubmission/repulse/${data.homeworkSubmissionId}`
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 作业评分
+ */
+export function homeWorkScore(data) {
+  let url = `${baseUrl}homeworksubmission`
+  return commonsAjax(url, data, 'post')
+}
+
+
+// ==========活动==========
+/**
+ * 活动列表
+ */
+export function interactList(data) {
+  let url = `${baseUrl}${data.courseId}/interactions`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 投票详情
+ */
+export function interactVote(data) {
+  let url = `${baseUrl}vote/${data.voteId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 保存投票
+ */
+export function voteSave(data) {
+  let url = `${baseUrl}vote`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 头脑风暴详情
+ */
+export function interactBS(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 测试详情
+ */
+export function interactExam(data) {
+  let url = `${baseUrl}exam/${data.examId}`
+  return commonsAjax(url, '', 'get')
+}

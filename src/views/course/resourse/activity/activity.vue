@@ -30,7 +30,7 @@
         //数据
         activityData:[
           {
-          courseId: "0608367675f54267aa6960fd0557cc1b",
+          courseId: this.$route.query.id,
           courseName: "马列主义",
           indeterminate: false,
           chapter: [
@@ -88,7 +88,7 @@
           selected: false
         },
           {
-            courseId: "0608367675f54267aa6960fd0557cc1b",
+            courseId: this.$route.query.id,
             courseName: "马列主义",
             indeterminate: false,
             chapter: [
