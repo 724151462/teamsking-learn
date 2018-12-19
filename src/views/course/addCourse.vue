@@ -327,7 +327,7 @@
         Course:{
           courseName:'',  //课程名称
           courseCategoryParent:'',  //课程分类
-          courseCategory:0,  //课程子分类
+          courseCategory:'',  //课程子分类
           courseTagIds:[], // 课程标签
           beginTime:'', //开课时间
           endTime:'', //结课时间
@@ -429,8 +429,7 @@
       //课程编辑时获取该课程的数据
       getUpData(e){
         courseInfo(e).then(res=>{
-          console.log('接收')
-          console.log(res.data)
+          console.log(res)
           //后台请求到的数据不完全适合展示，需要清洗
           let data = this.upDataFilter(res.data)
           console.log(data)
@@ -439,12 +438,16 @@
           this.CourseForm.instructor = data.instructor
           this.CourseForm.teacher = data.teacher
           this.CourseSetEntity = data.set
+          this.CourseInfoEntity = data.info
+          console.log(this.CourseInfoEntity)
+
           // 课程介绍
           this.editor1.txt.html(data.info.courseDescription)
           //教学目标
           this.editor2.txt.html(data.info.teachingTarget)
           //教学安排
           this.editor3.txt.html(data.info.teachingArrangement)
+          console.log(this.CourseInfoEntity)
         }).catch(error=>{
           console.log(error)
         })
@@ -494,7 +497,7 @@
         this.CourseForm.teacher.forEach((item)=>{
           this.teachersLists.forEach((list)=>{
             if(item === list.teacherName){
-              currnetteacher.push(list.teacherId)
+              currnetteacher.push(list.userId)
             }
           })
         })
@@ -762,8 +765,6 @@
         let redata = data,
             currentTags = [],
             curTeacher=[];
-        console.log('获取到的编辑数据')
-        console.log(data)
         //标签数据
         redata.course.courseTagIds.forEach((item)=>{
           this.tagsList.forEach((list)=>{
@@ -792,17 +793,21 @@
           teacher:this.CourseForm.teacher,
           instructor:this.CourseForm.instructor
         }
+
+        console.log(this.CourseInfoEntity)
+        console.log('清洗前的数据')
+        console.log(data)
+
         let currentTag = [],
             currnetteacher = [],
             currentinstructor = [];
         this.Course.courseTagIds.forEach((item)=>{
-          console.log(item)
           currentTag.push(item.tagId)
         })
         this.CourseForm.teacher.forEach((item)=>{
           this.teachersLists.forEach((list)=>{
             if(item === list.teacherName){
-              currnetteacher.push(list.teacherId)
+              currnetteacher.push(list.userId)
             }
           })
         })
@@ -816,14 +821,16 @@
         curData.teacher = currnetteacher
         curData.instructor = currentinstructor
         curData.course.dropCourse = this.Course.dropCourse ? 1 : 2
+        console.log(curData)
         return curData
       },
       //修改课程
       goPutCourse () {
         let data = this.goDataFilter()
+        console.log('请求发送前的数据')
         console.log(data)
-        return false
         putCourse(data).then(res=>{
+          console.log(res)
           if(Number(res.code) === 200) {
             this.$message.success('课程修改成功')
           }else if(Number(res.code) === 440){

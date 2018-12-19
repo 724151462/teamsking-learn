@@ -36,6 +36,12 @@
       overflow: hidden!important;
       white-space: nowrap!important;
       text-overflow: ellipsis!important;
+    .test
+      .el-tree-node__content
+        height 50px!important
+        border-bottom 1px solid #ccc
+      .el-tree-node__expand-icon
+        font-szie 17px!important
 </style>
   #app .courseCategory .el-table__expanded-cell
     padding:0 0 0 48px

@@ -6,6 +6,10 @@ const commonDevUrl = '/api/v1/' // 开发环境
 const commonProdUrl = 'http://120.36.137.90:8008/api/v1/' // 生产环境
 const commonBaseUrl = process.env.NODE_ENV === 'production' ? commonProdUrl : commonDevUrl
 
+const courseDev = '/api/v1/course' // 开发环境
+const courseProd = 'http://120.36.137.90:8008/api/v1/course' // 生产环境
+const courseUrl = process.env.NODE_ENV === 'production' ? courseProd : courseDev
+
 import {
   commonsAjax
 } from '../utils/requery'
@@ -85,7 +89,7 @@ export function addInstructor(data) {
  * 保存课程
  */
 export function saveCourse(data) {
-  return commonsAjax(`${baseUrl}`, data, 'post')
+  return commonsAjax(`${courseUrl}`, data, 'post')
 }
 
 
@@ -93,7 +97,7 @@ export function saveCourse(data) {
  * 修改课程
  */
 export function putCourse(data) {
-  return commonsAjax(`${baseUrl}`, data, 'put')
+  return commonsAjax(`${courseUrl}`, data, 'put')
 }
 
 

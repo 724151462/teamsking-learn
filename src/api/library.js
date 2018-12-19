@@ -6,7 +6,10 @@ import {
     commonsAjax
   } from '../utils/requery'  
 
-// ==========资源===========
+// ==============试题===========
+/**
+ * 获取试题列表
+ */
 export function getTestFileFold(data) {
   let url = `${baseUrl}quiz/quizzes`
   return commonsAjax(url, data, 'post')

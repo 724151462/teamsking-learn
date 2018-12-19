@@ -4,17 +4,18 @@
       <div>试题管理</div>
     </div>
 
-    <div>
+    <div style="display: flex;margin: 25px 0;">
       <div style="display: flex">
-        <el-input
-          placeholder="输入课程名称查询资源"
-          v-model="input">
-        </el-input>
+        <div style="width: 300px">
+          <el-input
+            placeholder="输入课程名称查询资源"
+            v-model="input">
+          </el-input>
+        </div>
         <div>
           <el-button icon="el-icon-search" class="search-btn"></el-button>
         </div>
       </div>
-
       <div style="" class="btn-warp">
         <div>
           <el-button type="success">下载模板</el-button>
@@ -25,67 +26,53 @@
             :http-request="upTestFile"
             action="string"
             :show-file-list="false">
-            <el-button >选择文件</el-button>
+            <el-button >导入</el-button>
           </el-upload>
-        </div>
-        <div>
-          <el-button type="primary" @click="toAddTest()">添加</el-button>
         </div>
       </div>
     </div>
-
-    <el-table
-      :data="tableData3"
-      :header-cell-style="{'background-color': '#fafafa',}"
-      height="85%"
-      border
-      highlight-current-row
-      class="test-table">
-      <el-table-column
-        label="序号"
-        type="index"
-        width="50">
-      </el-table-column>
-      <el-table-column
-        prop="date"
-        min-width="120px"
-        label="所属课程">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="所属章节">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="难度">
-      </el-table-column>
-      <el-table-column
-        prop="address"
-        width="200"
-        class="tigan"
-        show-overflow-tooltip
-        label="题干">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="题目类型"
-        min-width="120">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="答案"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        label="操作"
-        width="150">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="testView = true">查看</el-button>
-          <el-button type="text" size="small" @click="toEditTest">编辑</el-button>
-          <el-button type="text" size="small" @click="testDelete = true">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div class="test-warp">
+      <div class="test-title">
+        <!--全选-->
+        <div>
+          <el-checkbox v-model="isCheckAll">全选</el-checkbox>
+        </div>
+        <div>
+          <el-button type="primary" size="small">创建目录</el-button>
+          <el-button type="primary" size="small">移动到</el-button>
+          <el-button type="primary" size="small">删除</el-button>
+        </div>
+      </div>
+      <div class="test-body">
+        <el-tree
+          :data="catalogData.catalogList"
+          :props="{
+            label: 'catalogName'
+          }"
+          show-checkbox
+          accordion
+          node-key="id">
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+              <span><img :src="imgSrc.folder" alt="" class="folder-img"></span>
+              <span>{{ node.label }}</span>
+              <span>
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="() => append(data)">
+                  Append
+                </el-button>
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="() => remove(node, data)">
+                  Delete
+                </el-button>
+              </span>
+            </span>
+        </el-tree>
+      </div>
+    </div>
 
     <!--试题查看弹窗-->
     <el-dialog
@@ -123,84 +110,89 @@
 
 <script>
   // import uposs from '@/components/up-oss.vue'
-  import {upQuiz} from "../../../../api/course";
+  import {getTestFileFold} from "../../../../api/library";
 
   export default {
     // components:{uposs},
+    created (){
+      this.getTestList({})
+    },
     data() {
       return {
-        tableData3: [
-          {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区18 弄题干祭祀的计算机就iiii 计就就 计就i  cpu金沙江路 1518 弄'
-        }, {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普18 弄题干祭祀的计算机就iiii 计就就 计就i  cpu陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄题干祭祀的计算机就iiii 计就就 计就i  cpu'
-        }],
-        testList:[
-          {
-
-          }
-        ],
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
+        imgSrc: {
+          folder: require("../../../../assets/images/folder.png"),
+        },
+        catalogData: {
+          catalogList: [
+            {
+              id: 1,
+              catalogName: "默认文件夹",
+              parentId: 0,
+              catalogLevel: 1
+            }
+          ],
+          quizList: [{
+            title: '试题名称'
+          }]
+        },
+        isCheckAll: false,
         value:'',
         uploadDialog: false, //文件上传弹窗
         testView: false , //试题查看弹窗
         testDelete: false, //删除试题
         //courseId: '0608367675f54267aa6960fd0557cc1b',//如果指定课程的话，课程ID
         courseId: '',//如果指定课程的话，课程ID
+        catalogPros:{
+          label:'catalogName'
+        }
       }
     },
-    methods:{
-      toEditTest () {
+    methods: {
+      // 获取所有试题列表数据
+      getTestList(data){
+        getTestFileFold(data).then(res => {
+          if (Number(res.code) === 200) {
+            console.log(res.data)
+            this.catalogData = res.data
+          } else {
+            this.$message({
+              message: "试题列表数据获取失败",
+              type: "error"
+            });
+          }
+        })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+      toEditTest() {
         this.$router.push('/course/resource/edittest/1');
       },
-      toAddTest () {
+      toAddTest() {
         this.$router.push('/course/resource/addtest');
       },
       // 导入试题模板
-      upTestFile (item) {
+      upTestFile(item) {
         this.beforTestUpload()
         console.log(item)
         let fileFormData = new FormData();
         fileFormData.append('file', item.file);
         console.log(fileFormData)
-        upQuiz(this.courseId, fileFormData).then(res=>{
+        upQuiz(this.courseId, fileFormData).then(res => {
           this.$notify({
             title: '试题导入成功',
-            message: '新增'+res.data.totalCount+'个试题',
+            message: '新增' + res.data.totalCount + '个试题',
             type: 'success',
             duration: 0
           });
-        }).catch(error=>{
+        }).catch(error => {
           console.log(error)
         })
       },
       //文件上传验证
-      beforTestUpload(file){
+      beforTestUpload(file) {
 
-        if(!this.courseId){
+        if (!this.courseId) {
           this.$notify.error({
             title: '错误',
             message: '请先搜索相关课程，再导入该课程的试题模板'
@@ -208,7 +200,7 @@
           return false
         }
 
-        console.log(file,'文件');
+        console.log(file, '文件');
         this.files = file;
         const extension = file.name.split('.')[1] === 'xls'
         const extension2 = file.name.split('.')[1] === 'xlsx'
@@ -225,13 +217,25 @@
         return false // 返回false不会自动上传
       },
       //选择试题章节查询
-      getChapterQuiz(){
+      getChapterQuiz() {
         alert("按章节查询")
       },
       // 删除该课程全部试题
-      delAllQuiz(){
+      delAllQuiz() {
 
-      }
+      },
+      // renderContent(h, { node, data, store }) {
+      //   return (
+      //     <span class="custom-tree-node">
+      //       <span> {node.label} </span>
+      //       <span>
+      //         <el-button size="mini"  on-click={ () => alert('append') }>Append</el-button>
+      //         <el-button size="mini"  on-click={ () => alert('delete') }>Delete</el-button>
+      //       </span>
+      //       <span>{quizList.title}</span>
+      //   </span>
+      // );
+      // }
     }
   }
 </script>
@@ -264,24 +268,25 @@
         margin 0 10px
       & div:last-child
         margin-right 0
-    .test-table
-      width 100%
-      margin 0 auto
-      margin-top 40px
-    .test-body
-      padding 40px
-      font-size 15px
-      .options
-        & span
-          margin-right 30px
-        & span:last-chid
-          margin-right 0
-    .dialog-footer
-      & p
-        color red
+  .test-warp
+    .img-span
+      display inline-block
+      .img-icon
+        width 48px
+        height 48px
+        margin 0 10px
+    .test-title
+      display flex
+      height 50px
+      align-items center
+      background-color #f4f4f4
+      & div:first-child
+        flex 1
+        padding-left 25px
+      & div:last-child
         padding-right 40px
-        padding-left 20px
-        & span
-          color black
+    .test-body
+      .folder-img
+        width: 20px;margin: -5px 10px;
 </style>
 
