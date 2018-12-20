@@ -201,7 +201,6 @@
                   suffix-icon="el-icon-search"
                   :fetch-suggestions="teacherSearch"
                   placeholder="输入名字进行搜索"
-                  :trigger-on-focus="false"
                   @select="yesTeacher"
           ></el-autocomplete>
         <div>
@@ -220,7 +219,7 @@
         :visible.sync="isSysTem"
         style="z-index: 10002"
         class="isSystem"
-        width="70%">
+        width="750px">
       <el-row>
         <div class="top">
           <span>满分：100分</span>
@@ -264,19 +263,6 @@
                 </td>
               </tr>
             </table>
-          </div>
-        </div>
-        <div style="overflow: hidden;">
-          <div style="float: left;">
-            视频完成度:
-          </div>
-          <div style="float: left">
-            <p>
-              观看完单个视屏的
-              <el-input v-model="CourseSetEntity.seeVideo" style="width:50px"></el-input>%
-              即可视为学生已完成该视频
-            </p>
-            <p>(请谨慎设置，一旦有学生已开始学习，完成度规则将无法再更改)</p>
           </div>
         </div>
         <div class="norm">
@@ -365,7 +351,7 @@
           // 投票成绩占比
           votePercent : 0,
           // 视频进度判定
-          seeVideo:  90,
+          // seeVideo:  90,
         },
         //课程相关
         CourseInfoEntity:{
@@ -461,7 +447,8 @@
       },
       //教师
       yesTeacher (e) {
-        this.CourseForm.teacher = e
+        this.CourseForm.teacher.push(e.teacherName)
+        console.log(this.CourseForm.teacher)
       },
       //讲师
       yesInstructor (e) {
@@ -591,6 +578,7 @@
         //后台返回所有标签列表，前端进行模糊查询匹配
         tags().then(res=>{
           if(Number(res.code) === 200){
+            console.log(res)
             let data = [],
                 rsdata = [];
             //临时填充value用于组件值的展示
@@ -643,11 +631,16 @@
         teachersList().then(res=>{
           if(Number(res.code) === 200){
             //给查询到的值加入value字段，用于搜索组件值的显示，数据提交时需将value字段删除
-            let data = []
+            let data = [],
+              rsdata = [];
             res.data.forEach((item)=>{
               item.value = item.teacherName
-              data.push(item)
+
+              if(item.teacherName.indexOf(queryString) != -1){
+                data.push(item)
+              }
             })
+            console.log(data)
             // 调用 callback 返回建议列表的数据
             cb(data)
           }else{
@@ -832,7 +825,8 @@
         putCourse(data).then(res=>{
           console.log(res)
           if(Number(res.code) === 200) {
-            this.$message.success('课程修改成功')
+            this.$message.success('课程信息修改成功')
+            this.$router.push('/course/list')
           }else if(Number(res.code) === 440){
             let msgs = JSON.parse(res.msg)
             this.$message({
@@ -916,6 +910,7 @@
     .top
       padding-bottom:10px
       overflow:hidden
+      width 672px
     .center
       .left
         display:inline-block
@@ -976,7 +971,7 @@
       padding-top:10px
       padding-bottom:10px
       text-indent:10px
-
+      width 672px
       .norm-right
         font-size:12px
         color:#59C2BB
@@ -988,6 +983,7 @@
       border-bottom:1px solid #E4E4E6
       text-indent:10px
       margin-bottom:10px
+      width 672px
 
       .list
         padding-top:10px

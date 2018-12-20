@@ -18,7 +18,6 @@ export function loginDebug (data) {
   return commonsAjax(`${baseUrl}login/debug`, data, 'post')
 }
 
-
 /**
  * 菜单
  * */

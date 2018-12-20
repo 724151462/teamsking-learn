@@ -27,10 +27,10 @@
             <img :src="require('../../assets/images/user.png')" alt=""> <span>123</span>   <i class="el-icon-caret-bottom"></i></span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
-              <div @click="jumpTo('/user/profile')"><span style="color: #555;font-size: 14px;">个人信息</span></div>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <div @click="jumpTo('/user/changepwd')"><span style="color: #555;font-size: 14px;">修改密码</span></div>
+              <router-link to="/user/index">
+                个人中心
+              </router-link>
+              <!--<div ><span style="color: #555;font-size: 14px;"></span></div>-->
             </el-dropdown-item>
             <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
@@ -87,6 +87,10 @@
     methods:{
 		navChange() {
 			this.storeNav = this.$store.state.navHeader
+    },
+    jumpTo(url){
+		  console.log(url)
+      this.$router.push(url)
     },
     logout() {
       removeToken()

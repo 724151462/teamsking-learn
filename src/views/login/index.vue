@@ -2,8 +2,19 @@
   <div class="login">
     <div class="login-center">
       <el-form :model="data" :rules="rules" ref="data" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="所属学校：" prop="tenantId">
+          <el-select v-model="data.tenantId" placeholder="请选择">
+            <el-option
+              v-for="item in options2"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="账号：" prop="userName">
-          <el-input placeholder="请输入账号" v-model="data.userName" style="width: 300px;"></el-input>
+          <el-input placeholder="请输入/用户名/工号/邮箱" v-model="data.userName" style="width: 300px;"></el-input>
         </el-form-item>
         <el-form-item label="密码：" prop="password">
           <el-input placeholder="请输入密码" v-model="data.password" style="width:300px;"></el-input>
@@ -22,11 +33,21 @@
   export default {
     data () {
       return {
+        options2: [{
+          value: '选项1',
+          label: '黄金糕'
+        }, {
+          value: '选项2',
+          label: '双皮奶',
+          disabled: true
+        }],
         data: {
           userName: '',
-          password: ''
+          password: '',
+          tenantId: ''
         },
         rules: {
+          tenantId:[{required: true, message: '请选择所属学校', trigger: 'blur'}],
           userName: [
             { required: true, message: '请输入账号', trigger: 'blur' }
           ],
