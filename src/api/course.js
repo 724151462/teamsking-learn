@@ -397,6 +397,16 @@ export function storm(data) {
 
 
 /**
+ * 头脑风暴删除
+ */
+export function stormDelete(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+
+
+/**
  * 作业发起
  */
 export function homeWorkSave(data) {
@@ -446,6 +456,24 @@ export function homeWorkScore(data) {
 }
 
 
+/**
+ * 作业修改
+ */
+export function homeworkPut(data) {
+  let url = `${baseUrl}homework/${data.homeworkId}`
+  return commonsAjax(url, data, 'put')
+}
+
+
+/**
+ * 作业删除
+ */
+export function homeworkDelete(data) {
+  let url = `${baseUrl}homework/${data.homeworkId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+
 // ==========活动==========
 /**
  * 活动列表
@@ -471,6 +499,23 @@ export function interactVote(data) {
 export function voteSave(data) {
   let url = `${baseUrl}vote`
   return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 投票删除
+ */
+export function voteDelete(data) {
+  let url = `${baseUrl}vote/${data.voteId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+
+/**
+ * 投票修改
+ */
+export function votePut(data) {
+  let url = `${baseUrl}vote/${data.voteId}`
+  return commonsAjax(url, data, 'put')
 }
 
 
@@ -509,9 +554,18 @@ export function interactExam(data) {
   return commonsAjax(url, '', 'get')
 }
 
+
+/**
+ * 测试删除
+ */
+export function examDelete(data) {
+  let url = `${baseUrl}exam/${data.examId}`
+  return commonsAjax(url, '', 'delete')
+}
+
 // ========课程附件=========
 /**
- * 测试详情
+ * 新增附件实例
  */
 export function assetCreate(data) {
   let url = `${baseUrl}asset`

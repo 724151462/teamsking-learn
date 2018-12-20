@@ -13,10 +13,12 @@
       <div><el-button>签到</el-button></div>
     </div>
     <div class="interact-radio">
-      <el-radio label="全部" value="全部"></el-radio>
-      <el-radio label="未开始" value="未开始"></el-radio>
-      <el-radio label="进行中" value="进行中"></el-radio>
-      <el-radio label="已开始" value="已开始"></el-radio>
+      <el-radio-group v-model="interactParams.interactionStatus" @change="handleSelect">
+        <el-radio label="">全部</el-radio>
+        <el-radio label="10">未开始</el-radio>
+        <el-radio label="20">已开始</el-radio>
+        <el-radio label="30">已结束</el-radio>
+      </el-radio-group>
     </div>
     <div class="collapse-container">
       <el-collapse>
@@ -24,8 +26,8 @@
           <template slot="title">
             <span style="margin-left: 20px">{{item.chapterName}}</span>
           </template>
-          <div class="collapse-layout" v-for="interact in item.interactions" :key="interact.interactionId" @click="toDetail(interact)">
-            <div class="collapse-layout interact-left">
+          <div class="collapse-layout" v-for="interact in item.interactions" :key="interact.interactionId">
+            <div class="collapse-layout interact-left" @click="toDetail(interact)">
               <img width="60px" :src="interactImg(interact.interactionType)" alt="">
               <div class="item-detail">
                 <div>
@@ -48,6 +50,10 @@
                   <span>开始互动</span>
                 </div>
               </el-tooltip>
+              <div>
+                <span @click="editInteraction(interact)">编辑</span>
+                <span @click="deleteInteraction(interact)" style="margin-left:10px">删除</span>
+              </div>
             </div>
           </div>
         </el-collapse-item>
@@ -69,26 +75,43 @@
         <el-button type="primary" @click="setEndTimeDialog = false">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      title="确认删除"
+      :visible.sync="deleteDialog"
+      top="40vh"
+      width="30%">
+      <span>确认删除？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="deleteDialog = false">取 消</el-button>
+        <el-button type="primary" @click="deleteEnsure">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {
-  interactList
+  interactList,
+  stormDelete,
+  homeworkDelete,
+  voteDelete,
+  examDelete
 } from '@/api/course'
 export default {
   data() {
     return {
       interactParams: {
         courseId: this.$route.query.id,
-        interactionSearch: {}
+        interactionStatus: ''
       },
       setEndTimeDialog: false,
       endTimeForm: {
         date: '',
         time: ''
       },
-      interactList: []
+      interactList: [],
+      deleteDialog: false,
+      delParams: {}
     }
   },
   mounted() {
@@ -145,6 +168,93 @@ export default {
           break;
       }
       
+    },
+    handleSelect(value) {
+      this.interactParams.interactionStatus = value
+      console.log(this.interactParams)
+      interactList(this.interactParams)
+      .then(response=> {
+        this.interactList = response.data
+      })
+    },
+    editInteraction(item) {
+      console.log(item)
+      let routerParams = {
+        id: this.interactParams.courseId,
+        interactId: item.interactionId,
+        operation: 'edit'
+      }
+      switch (item.interactionType) {
+        case 30:
+          this.$router.push({name: '发布测试',query:routerParams})
+          break;
+        case 40:
+          this.$router.push({name: '作业/小组任务',query:routerParams})
+          break;
+        case 50:
+          this.$router.push({name: '发布头脑风暴',query:routerParams})
+          break;
+        case 60:
+          this.$router.push({name: '发布投票',query:routerParams})
+          break;
+      }
+    },
+    deleteInteraction(item) {
+      this.delParams.delId = item.interactionId
+      this.delParams.delType = item.interactionType
+      this.deleteDialog = true
+      console.log(item)
+    },
+    deleteEnsure() {
+      console.log(this.delParams)
+      switch (this.delParams.delType) {
+        case 30:
+          examDelete({examId: this.delParams.delId})
+          .then(response=> {
+            if(response.code === 200) {
+              this.deleteHandle(this.delParams.delId)
+            }
+          })
+          break;
+        case 40:
+          homeworkDelete({homeworkId: this.delParams.delId})
+          .then(response=> {
+            if(response.code === 200) {
+              this.deleteHandle(this.delParams.delId)
+            }
+          })
+          break;
+        case 50:
+          stormDelete({stormId: this.delParams.delId})
+          .then(response=> {
+            if(response.code === 200) {
+              this.deleteHandle(this.delParams.delId)
+            }
+          })
+          break;
+        case 60:
+          voteDelete({voteId: this.delParams.delId})
+          .then(response=> {
+            if(response.code === 200) {
+              this.deleteHandle(this.delParams.delId)
+            }
+          })
+          break;
+      }
+    },
+    deleteHandle(id) {
+      this.interactList.forEach(element=> {
+        element.interactions.forEach((interact, i)=> {
+          if(interact.interactionId === id) {
+            element.interactions.splice(i, 1)
+          }
+        })
+      })
+      this.$message({
+        message: '删除成功',
+        type: 'success'
+      })
+      this.deleteDialog = false
     }
   },
   filters: {

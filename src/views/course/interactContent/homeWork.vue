@@ -67,7 +67,7 @@
           <div v-for="(item, index) in homeWork.homeworkMarks" :key="index" class="margin-sides">
             <el-input v-model="item.markPoint" style="width: 400px" placeholder="输入评分点内容"></el-input>
             <el-input v-model="item.markScore" style="width: 60px;margin-left:20px"></el-input>分
-            <span>占作业分值 {{item.score+'%'}}</span>
+            <span>占作业分值 {{item.markScore+'%'}}</span>
             <span class="delBtn" @click="delScorePoint(index)">删除</span>
           </div>
         </div>
@@ -91,6 +91,8 @@
 import upOss from "@/components/up-oss";
 import {
   assetCreate,
+  homeWorkDetail,
+  homeworkPut,
   chaptersListSimple,
   homeWorkSave,
   schemeList
@@ -110,7 +112,12 @@ export default {
         assets: [],
         pubTime: "",
         markType: 10,
-        homeworkMarks: [],
+        homeworkMarks: [
+          // {
+          //   markPoint: "",
+          //   markScore: 0
+          // }
+        ],
         schemeId: ""
       },
       groupList: [
@@ -151,6 +158,14 @@ export default {
     schemeList(this.$route.query.id).then(response => {
       this.groupList = response.data;
     });
+    if (this.$route.query.operation === "edit") {
+      homeWorkDetail({ homeworkId: this.$route.query.interactId }).then(
+        response => {
+          this.homeWork = response.data;
+          // console.log(this.voteObj)
+        }
+      );
+    }
   },
   methods: {
     // 添加评分点
@@ -179,21 +194,32 @@ export default {
       });
     },
     hwSave() {
-      homeWorkSave(this.homeWork).then(response => {
-        if (response.code === 200) {
-          this.$message({
-            message: "成功",
-            type: "success"
-          });
-        }
-      });
+      if (this.$route.query.operation === "edit") {
+        homeworkPut(this.homeWork).then(response => {
+          if (response.code === 200) {
+            this.$message({
+              message: "修改作业成功",
+              type: "success"
+            });
+          }
+        });
+      } else {
+        homeWorkSave(this.homeWork).then(response => {
+          if (response.code === 200) {
+            this.$message({
+              message: "添加作业成功",
+              type: "success"
+            });
+          }
+        });
+      }
     }
   },
   computed: {
     scoreTotal() {
       let total = 0;
       this.homeWork.homeworkMarks.forEach(element => {
-        total += Number(element.score);
+        total += Number(element.markScore);
       });
       if (total > 100) {
         this.overScore = true;

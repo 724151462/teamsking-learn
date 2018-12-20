@@ -72,6 +72,9 @@ export default {
     };
   },
   mounted() {
+    if(this.$route.query.operation === 'edit') {
+      
+    }
     chaptersListSimple({ courseId: this.$route.query.id }).then(response => {
       this.chapterList = response.data;
     })
