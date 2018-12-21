@@ -1,7 +1,7 @@
 <template>
   <div>
     <span style="display:inline-block;margin: 10px 0">
-      <router-link :to="{name: '互动'}">互动</router-link>> 发布测试
+      <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 发布测试
     </span>
     <div>
       <el-button size="small" @click="addTab(testContentArrValue)">添加题目</el-button>

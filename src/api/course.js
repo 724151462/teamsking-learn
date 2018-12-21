@@ -152,6 +152,16 @@ export function sectionAdd(data) {
 
 
 /**
+ * 删除节
+ */
+
+export function sectionDelete(data) {
+  let url = `${baseUrl}chapter/section`
+  return commonsAjax(url, data, 'delete')
+}
+
+
+/**
  * 根据课程id获取成员
  */
 export function memberList(data) {
@@ -370,6 +380,16 @@ export function markDetail(data) {
 
 
 /**
+ * 成绩详情
+ */
+export function markStudentInfo(data) {
+  let url = `${baseUrl}${data.courseId}/student/${data.userId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+
+/**
  * 笔记列表
  */
 export function noteList(data) {
@@ -404,6 +424,14 @@ export function stormDelete(data) {
   return commonsAjax(url, '', 'delete')
 }
 
+
+/**
+ * 头脑风暴
+ */
+export function interactStorm(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, data, 'get')
+}
 
 
 /**
@@ -545,6 +573,14 @@ export function stormAddScore(data) {
   return commonsAjax(url, '', 'get')
 }
 
+/**
+ * 头脑风暴修改
+ */
+export function stormPut(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, data, 'put')
+}
+
 
 /**
  * 测试详情
@@ -570,4 +606,32 @@ export function examDelete(data) {
 export function assetCreate(data) {
   let url = `${baseUrl}asset`
   return commonsAjax(url, data, 'post')
+}
+
+
+// =========成绩===========
+/**
+ * 成绩列表
+ */
+export function scoreList(data) {
+  let url = `${baseUrl}coursescore/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 成绩权重
+ */
+export function scoreRight(data) {
+  let url = `${baseUrl}coursescore/set/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 线下成绩模板
+ */
+export function scoreModel() {
+  let url = `http://192.168.10.48:9008/api/v1/sys/course/score/excel`
+  return commonsAjax(url, '', 'get', {responseType: 'blob'})
 }

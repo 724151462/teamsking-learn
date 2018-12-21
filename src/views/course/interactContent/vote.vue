@@ -1,7 +1,7 @@
 <template>
   <div>
     <span style="display:inline-block;margin: 10px 0">
-      <router-link :to="{name: '互动'}">互动</router-link>> 发起投票
+      <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 发起投票
     </span>
     <div>
       <el-button size="small" @click="addTab(voteQuizzesValue)">添加题目</el-button>
@@ -124,7 +124,6 @@ export default {
           element.title = `第${i+1}题`
         })
         this.voteObj = response.data
-        // console.log(this.voteObj)
       })
     }
     chaptersListSimple({ courseId: this.voteObj.courseId }).then(response => {

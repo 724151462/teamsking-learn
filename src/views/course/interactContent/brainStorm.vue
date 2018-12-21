@@ -1,7 +1,7 @@
 <template>
   <div>
     <span style="display:inline-block;margin: 10px 0">
-      <router-link :to="{name: '互动'}">互动</router-link>> 头脑风暴
+      <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 头脑风暴
     </span>
     <div>
       <el-input
@@ -41,7 +41,13 @@
 
 <script>
 import upOss from "@/components/up-oss";
-import { assetCreate, chaptersListSimple, stormSave } from "@/api/course";
+import { 
+  interactStorm,
+  assetCreate, 
+  chaptersListSimple, 
+  stormSave,
+  stormPut
+} from "@/api/course";
 export default {
   data() {
     return {
@@ -73,7 +79,10 @@ export default {
   },
   mounted() {
     if(this.$route.query.operation === 'edit') {
-      
+      interactStorm({stormId: this.$route.query.interactId})
+      .then(response=> {
+        this.brainStorm = response.data
+      })
     }
     chaptersListSimple({ courseId: this.$route.query.id }).then(response => {
       this.chapterList = response.data;
@@ -90,7 +99,17 @@ export default {
       });
     },
     brainStormSave() {
-      stormSave(this.brainStorm).then(response => {
+      if(this.$route.query.operation === 'edit'){
+        stormPut(this.brainStorm).then(response => {
+          if (response.code === 200) {
+            this.$message({
+              message: "修改投票成功",
+              type: "success"
+            });
+          }
+        });
+      }else{
+        stormSave(this.brainStorm).then(response => {
         if (response.code === 200) {
           this.$message({
             message: "成功",
@@ -98,6 +117,8 @@ export default {
           });
         }
       });
+      }
+      
     }
   },
   components: { upOss }

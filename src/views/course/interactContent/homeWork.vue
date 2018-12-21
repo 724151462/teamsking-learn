@@ -1,7 +1,7 @@
 <template>
   <div>
     <span style="display:inline-block;margin: 10px 0">
-      <router-link :to="{name: '互动'}">互动</router-link>> 作业/小组任务
+      <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 作业/小组任务
     </span>
     <div>
       <el-input

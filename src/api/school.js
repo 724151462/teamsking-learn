@@ -185,6 +185,14 @@ export function sysStudentAdd(data){
 
 
 /***
+ * 获取学生信息
+ */
+export function sysStudentInfo(data){
+  return commonsAjax(`${baseUrl}student/${data.studentId}`, '', 'get')
+}
+
+
+/***
  * 修改学生信息
  */
 export function sysStudentModify(data){
