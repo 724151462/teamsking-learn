@@ -24,7 +24,7 @@
       </div>
         <el-dropdown class="avator">
           <span class="el-dropdown-link userinfo-inner">
-            <img :src="require('../../assets/images/user.png')" alt=""> <span>123</span>   <i class="el-icon-caret-bottom"></i></span>
+            <img :src="require('../../assets/images/user.png')" alt=""> <span>{{this.realName}}</span>   <i class="el-icon-caret-bottom"></i></span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
               <router-link to="/user/index">
@@ -32,16 +32,18 @@
               </router-link>
               <!--<div ><span style="color: #555;font-size: 14px;"></span></div>-->
             </el-dropdown-item>
-            <el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
+            <el-dropdown-item divided @click.native="doLogout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
     </div>
 </template>
 
 <script>
-  import {menuList} from '@/api/login'
+  import {menuList, logout} from '@/api/login'
   import {constantRouterMap} from '@/router/index'
-  import { removeToken } from '@/utils/auth'
+  import { removeToken , getUserId, removeUserId} from '@/utils/auth'
+  import {getUserInfo} from "../../api/user";
+
   export default {
     props:['navs'],
     data(){
@@ -69,6 +71,7 @@
             isNav:'system'
           }
         ],
+        realName:'',
         menuList: constantRouterMap
       }
     },
@@ -77,12 +80,7 @@
       //   console.log(this.storeNav, '``````', response.data)
 		this.$store.commit('setAllMenu',this.menuList)
     this.fetchNavData();
-        // response.data.forEach(element => {
-        //   if(element.name === this.storeNav) {
-        //     this.menuList = element
-        //   }
-        // });
-      // })
+		this.getUserInfo();
     },
     methods:{
 		navChange() {
@@ -92,8 +90,11 @@
 		  console.log(url)
       this.$router.push(url)
     },
-    logout() {
+    //退出登录
+    doLogout() {
       removeToken()
+      removeUserId()
+      this.$router.push('/login')
     },
 		handleSelect(index){
 			this.defaultActiveIndex = index;
@@ -133,11 +134,30 @@
 			console.log('nav_type',nav_type,'nav_name', nav_name)
 			this.defaultActiveIndex = "/" + nav_name;
 		},
+    //根据Cookie获取用户信息
+    getUserInfo(){
+      let data = getUserId()
+      getUserInfo(data).then(res=>{
+        console.log(res)
+        if(Number(res.code) === 200) {
+          this.realName = res.data.realName
+        }else if(Number(res.code) === 440){
+          let msgs = JSON.parse(res.msg)
+          this.$message({
+            message:msgs[0].message,
+            type:'error'
+          })
+        }
+      }).catch(error=>{
+        console.log(error)
+      })
+    }
 	},
 	watch: {
       '$route': function(to, from){ // 路由改变时执行
         //console.info("to.path:" + to.path);
         this.fetchNavData();
+        this.getUserInfo();
       }
     }
   }

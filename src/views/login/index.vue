@@ -1,15 +1,14 @@
 <template>
   <div class="login">
     <div class="login-center">
-      <el-form :model="data" :rules="rules" ref="data" label-width="100px" class="demo-ruleForm">
+      <el-form :model="data" :rules="rules" ref="data" label-width="100px">
         <el-form-item label="所属学校：" prop="tenantId">
           <el-select v-model="data.tenantId" placeholder="请选择">
             <el-option
-              v-for="item in options2"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled">
+              v-for="item in schoolList"
+              :key="item.tenantId"
+              :label="item.tenantName"
+              :value="item.tenantId">
             </el-option>
           </el-select>
         </el-form-item>
@@ -21,6 +20,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" style="margin-left: 100px" @click="goLogin">登陆</el-button>
+          <el-button type="primary" style="margin-left: 100px" @click="goLoginDebug">测试登陆</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -28,19 +28,12 @@
 </template>
 
 <script>
-  import { logins, loginDebug } from '@/api/login'
-  import { setToken, getToken } from '@/utils/auth'
+  import { logins, loginDebug, getTenant} from '@/api/login'
+  import { setToken, getToken, twoWeeksExchange, twoWeeksGetExchange, saveUserInfo} from '@/utils/auth'
   export default {
     data () {
       return {
-        options2: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶',
-          disabled: true
-        }],
+        schoolList: [],   //租户列表
         data: {
           userName: '',
           password: '',
@@ -53,46 +46,57 @@
           ],
           password: [
             { required: true, message: '请输入密码', trigger: 'blur' },
-            { min: 8, message: '不得小于 8 字符', trigger: 'blur' }
           ]
         }
       }
     },
+    created () {
+      getTenant().then(res => {
+        console.log(res)
+        if (res.code === 200) {
+          this.schoolList = res.data
+        }else{
+          this.$message.error('获取学校信息失败，请重试')
+        }
+      }).catch(error => {
+        console.log(error)
+      })
+    },
     methods: {
       goLogin () {
-/*
-        for (let i in this.data) {
-          if (JSON.stringify(this.data[i]) === '""') {
+        let data = {
+          tenantId: this.data.tenantId,
+          loginAccount: this.data.userName,
+          passwd: this.data.password
+        }
+        //账户：090729
+        logins(data).then(res => {
+          console.log(res)
+          if (res.code === 200) {
+            twoWeeksExchange(res.data.token)
+            saveUserInfo(res.data.userId)
+            this.$router.replace('/course')
+          } else {
             this.$message({
-              message: '请输入完整',
+              message: '用户名密码错误，请重新输入',
               type: 'error'
             })
-            return false
           }
+        }).catch(error => {
+          console.log(error)
+        })
+      },
+      goLoginDebug(){
+        let data = {
+          userName: 'admin',
+          password: 'admin'
         }
-*/
-        loginDebug(this.data).then(res => {
+        loginDebug(data).then(res => {
           console.log(res)
           if (res.code === 200) {
             setToken(res.data.token)
             console.log(getToken())
             this.$router.replace('/course')
-/*
-            let url = window.location.href.toString()
-            let urls = (url.split('#'))[0] + '#/course'
-            console.log(urls)
-            window.location.href = urls
-*/
-            // console.log(url.split('#'))
-
-/*
-            let self = this
-            setTimeout(function(){
-              self.$router.push({
-                path:'/course'
-              })
-            },1000)
-*/
           } else {
             this.$message({
               message: '用户名密码错误，请重新输入',

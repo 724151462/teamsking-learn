@@ -5,12 +5,12 @@
       <el-button plain style="float:right">返回</el-button>
     </div>
     <div class="addCourse-center">
-      <el-form :model="Course" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+      <el-form :model="Course" ref="postForm" label-width="100px">
         <el-form-item label="课程名称" required>
           <el-input v-model="Course.courseName" style="width: 220px;"></el-input>
         </el-form-item>
 
-        <el-form-item label="课程分类" required>
+        <el-form-item label="课程分类"  required>
           <el-select v-model="Course.courseCategoryParent" placeholder="课程一级分类" @change="yesCategories">
             <el-option
               v-for="(item , index) in categoriesList"
@@ -50,16 +50,17 @@
             </el-date-picker>
           </div>
         </el-form-item>
+
         <el-form-item label="课程封面" required>
           <div class="avatar-uploader" @click="coverPreviewShow = true">
             <img v-if="Course.courseCover" :src="Course.courseCover" class="avatar" >
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </div>
         </el-form-item>
+
         <cover-preview :show="coverPreviewShow"
                        @closeCoverPreview="closeCoverPreview"
                        @chooseCover="chooseCover"></cover-preview>
-
         <el-form-item label="课程价格" required>
           <el-radio v-model="Course.payMode" :label="10">免费</el-radio>
 <!--          <el-radio v-model="Course.payMode" label="20">收费</el-radio>
@@ -393,6 +394,10 @@
         instructorLists:[],
         //教师列表
         teachersLists:[],
+        //表单提交验证
+        courseRules:{
+          CourseName: [{ required: true, message: '请输入活动名称', trigger: 'blur' }]
+        }
       }
     },
     watch:{
@@ -474,39 +479,7 @@
       },
       //创建课程
       goUpCourseResource(){
-        let currentTag = [],
-            currnetteacher = [],
-            currentinstructor = [];
-        this.Course.courseTagIds.forEach((item)=>{
-          console.log(item)
-          currentTag.push(item.tagId)
-        })
-        this.CourseForm.teacher.forEach((item)=>{
-          this.teachersLists.forEach((list)=>{
-            if(item === list.teacherName){
-              currnetteacher.push(list.userId)
-            }
-          })
-        })
-        this.CourseForm.instructor.forEach((item)=>{
-          currentinstructor.push(item.instructorId)
-        })
-        this.Course.courseTagIds = currentTag
-        this.CourseForm.teacher = currnetteacher
-        this.CourseForm.instructor = currentinstructor
-        // 数据处理
-        let data = {
-          course:this.Course,
-          info:this.CourseInfoEntity,
-          set:this.CourseSetEntity,
-          teacher:this.CourseForm.teacher,
-          instructor:this.CourseForm.instructor
-        }
-
-        data.course.dropCourse = data.course.dropCourse ? 1 : 2
-        let fun = null
-        delete data.set.seeVideo  //后台需要补上的接口
-
+        let data = this.goDataFilter()
         console.log('要上传的数据')
         console.log(data)
 
@@ -786,11 +759,6 @@
           teacher:this.CourseForm.teacher,
           instructor:this.CourseForm.instructor
         }
-
-        console.log(this.CourseInfoEntity)
-        console.log('清洗前的数据')
-        console.log(data)
-
         let currentTag = [],
             currnetteacher = [],
             currentinstructor = [];
@@ -814,7 +782,6 @@
         curData.teacher = currnetteacher
         curData.instructor = currentinstructor
         curData.course.dropCourse = this.Course.dropCourse ? 1 : 2
-        console.log(curData)
         return curData
       },
       //修改课程

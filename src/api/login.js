@@ -2,13 +2,36 @@ const devUrl = '/api/v1/sys/' // 开发环境
 const prodUrl = 'http://120.36.137.90:9008/api/v1/sys/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
+const tenantDev = '/api/v1/login/tenant' // 开发环境
+const tenantProd = 'http://120.36.137.90:9008/api/v1/login/tenant' // 生产环境
+const tenantUrl = process.env.NODE_ENV === 'production' ? tenantProd : tenantDev
+
+
+
+
+
+
 import { commonsAjax } from '@/utils/requery'
+
+/**
+ * 获取租户列表用于登录
+ * */
+export function getTenant (data) {
+  return commonsAjax(`${tenantUrl}`, data, 'get')
+}
 
 /**
  * 登陆
  * */
 export function logins (data) {
-  return commonsAjax(`${baseUrl}login`, data, 'post')
+  return commonsAjax(`${baseUrl}user/login`, data, 'post')
+}
+
+/**
+ *退出登陆
+ **/
+export function logout (data) {
+  return commonsAjax(`${baseUrl}/logout`, data, 'post')
 }
 
 /**

@@ -15,10 +15,24 @@ export function removeToken () {
 }
 
 // 一个两周有效的cookie
-export function twoWeeksExchange () {
-  return Cookie.set('timeCookie', '14', { expires: 14 })
+export function twoWeeksExchange (token) {
+  return Cookie.set(TokenKey, token, { expires: 14 })
+}
+// 用户登录后保存用户信息
+export function saveUserInfo (data) {
+  //保存用户ID和真实姓名
+  return Cookie.set('userId', data, { expires: 14 })
+}
+
+//获取用户名ID
+export function getUserId () {
+  return Cookie.get('userId')
+}
+//退出登录时移除用户ID
+export function removeUserId () {
+  return Cookie.remove('userId')
 }
 
 export function twoWeeksGetExchange () {
-  return Cookie.get('timeCookie')
+  return Cookie.get(TokenKey)
 }

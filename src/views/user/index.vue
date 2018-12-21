@@ -27,26 +27,26 @@
               </el-form-item>
             </el-form>
           </div>
+          <div  style="padding-left: 55px;width: 280px">
+            <el-form :inline="true" :model="infoForm" style="padding-left:38px;width: 450px;">
+              <el-form-item label="邮箱">
+                <el-input v-model="infoForm.email" class="input-width"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="text" class="red-text" style="display: inline-block">修改邮箱>>></el-button>
+              </el-form-item>
+            </el-form>
+            <el-form :inline="true" :model="infoForm" style="padding-left:25px;width: 450px;">
+              <el-form-item label="手机号">
+                <el-input v-model="infoForm.phoneNumber" class="input-width"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="text" class="red-text" style="display: inline-block">绑定手机>>></el-button>
+              </el-form-item>
+            </el-form>
+            <el-form-item label="证书添加"></el-form-item>
+          </div>
           <div style="text-align: right"><el-button type="primary" >保存</el-button></div>
-        </div>
-        <div  style="padding-left: 55px;width: 280px">
-          <el-form :inline="true" :model="infoForm" style="padding-left:38px;width: 450px;">
-            <el-form-item label="邮箱">
-              <el-input v-model="infoForm.email" class="input-width"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="text" class="red-text" style="display: inline-block">修改邮箱>>></el-button>
-            </el-form-item>
-          </el-form>
-          <el-form :inline="true" :model="infoForm" style="padding-left:25px;width: 450px;">
-            <el-form-item label="手机号">
-              <el-input v-model="infoForm.phoneNumber" class="input-width"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="text" class="red-text" style="display: inline-block">绑定手机>>></el-button>
-            </el-form-item>
-          </el-form>
-          <el-form-item label="证书添加"></el-form-item>
         </div>
 
         <!--电话号码等修改。-->
@@ -60,30 +60,44 @@
                 <el-input type="password" v-model="jobForm.jobTear" :placeholder="jobForm.jobTear"></el-input>
               </el-form-item>
               <el-form-item label="所属院">
-                <el-input v-model="jobForm.yuan" :placeholder="infoForm.userName"></el-input>
+                <el-select v-model="jobForm.yuan" placeholder="请选择">
+                  <el-option
+                    v-for="item in collegeList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
               </el-form-item>
               <el-form-item label="所属系">
-                <el-input v-model="jobForm.xi" :placeholder="infoForm.userName"></el-input>
+                <el-select v-model="jobForm.xi" placeholder="请选择">
+                  <el-option
+                    v-for="item in departmentList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
               </el-form-item>
             </el-form>
           </div>
           <div style="text-align: right"><el-button type="primary" >保存</el-button></div>
         </div>
-
+        <!--密码修改-->
         <div class="form-warp">
           <p>修改密码</p>
           <div style="padding-left:55px;width: 300px">
-            <el-form :model="passForm" label-width="100px">
+            <el-form :model="passForm" :rules="rules" ref="passForm" label-width="100px">
 
-              <el-form-item label="当前密码">
+              <el-form-item label="当前密码" prop="oldPasswd">
                 <el-input type="text" v-model="passForm.oldPasswd"></el-input>
               </el-form-item>
 
-              <el-form-item label="新密码">
+              <el-form-item label="新密码" prop="newPasswd">
                 <el-input type="password" v-model="passForm.newPasswd"></el-input>
               </el-form-item>
 
-              <el-form-item label="确认密码">
+              <el-form-item label="确认密码" prop="checking">
                 <el-input type="password" v-model="passForm.checking"></el-input>
               </el-form-item>
             </el-form>
@@ -124,13 +138,36 @@
           newPasswd: "",
           oldPasswd: ""
         },
+        rules:{
+          checking: { required: true, message: '请再次输入密码', trigger: 'blur' },
+          newPasswd: { required: true, message: '请输入新密码', trigger: 'blur' },
+          oldPasswd: { required: true, message: '请输入旧密码', trigger: 'blur' },
+        },
         collegeList:"", //院列表
         departmentList:"", //系列表
       };
     },
     methods:{
-      //初始时获取院系信息
-      initInfo(){
+      //获取用户信息
+      initUserInfo(){
+        let data = getUserId()
+        getUserInfo(data).then(res=>{
+          console.log(res)
+          if(Number(res.code) === 200) {
+            this.realName = res.data.realName
+          }else if(Number(res.code) === 440){
+            let msgs = JSON.parse(res.msg)
+            this.$message({
+              message:msgs[0].message,
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
+      //获取院列表
+      initCollege(){
         sysCollegeList().then(res=>{
           console.log(res)
           if(Number(res.code) === 200) {
@@ -146,11 +183,7 @@
           console.log(error)
         })
       },
-      //获取院信息
-      initCollege(){
-
-      },
-      //获取系信息
+      //获取系列表
       initDepartment(){
 
       },
@@ -161,17 +194,26 @@
       },
       // 修改密码
       changePassword(){
-        let data  = this.passForm
+        let data  = {
+          checking: String(this.passForm.checking),
+          newPasswd: String(this.passForm.newPasswd),
+          oldPasswd: String(this.passForm.oldPasswd)
+        }
         changeUserPassword(data).then(res=>{
           console.log(res)
           if(Number(res.code) === 200) {
             this.$message.success('密码修改成功')
+            this.$notify.success({
+              title: '成功',
+              message:'密码修改成功'
+            });
+
           }else if(Number(res.code) === 440){
             let msgs = JSON.parse(res.msg)
-            this.$message({
-              message:msgs[0].message,
-              type:'error'
-            })
+            this.$notify.error({
+              title: '错误',
+              message:msgs[0].message
+            });
           }
         }).catch(error=>{
           console.log(error)
