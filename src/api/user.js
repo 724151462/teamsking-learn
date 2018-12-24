@@ -36,7 +36,9 @@ export function bindMobile (data) {
  * 发送绑定手机号的验证码
  * */
 export function getBindCode (data) {
-  return commonsAjax(`${baseUrl}user/mobile/captcha`, data, 'get')
+  console.log(data)
+  let url = `${baseUrl}user/mobile/captcha`
+  return commonsAjax(url, data, 'get')
 }
 /**
  * 发送取消绑定手机号的验证码

@@ -45,29 +45,25 @@
       </div>
       <div class="test-body">
         <el-tree
-          :data="catalogData.catalogList"
+          :data="catalogData"
           :props="{
-            label: 'catalogName'
+            label: treeProp.name,
+            children: treeProp.child
           }"
+          @node-click="shownode"
           show-checkbox
           accordion
           node-key="id">
-            <span class="custom-tree-node" slot-scope="{ node, data }">
-              <span><img :src="imgSrc.folder" alt="" class="folder-img"></span>
-              <span>{{ node.label }}</span>
+            <span class="test-tree-node" slot-scope="{ node, data }">
               <span>
-                <el-button
-                  type="text"
-                  size="mini"
-                  @click="() => append(data)">
-                  Append
-                </el-button>
-                <el-button
-                  type="text"
-                  size="mini"
-                  @click="() => remove(node, data)">
-                  Delete
-                </el-button>
+                <img :src="imgSrc.folder" alt="" class="folder-img"><span>{{ node.label }}</span>
+              </span>
+              <!--<span>{{node.data}}</span>-->
+              <!--<span>{{ node.label }}</span>-->
+              <!--<span>12354646 <span>asds</span> </span>-->
+              <span>
+                <el-button size="mini" @click="() => append(data)"> 编辑 </el-button>
+                <el-button size="mini" @click="() => remove(node, data)">删除</el-button>
               </span>
             </span>
         </el-tree>
@@ -110,30 +106,72 @@
 
 <script>
   // import uposs from '@/components/up-oss.vue'
-  import {getTestFileFold} from "../../../../api/library";
+  import {getTestFileFold, newTestFileFold , deleteTestFileFold} from "../../../../api/library";
 
   export default {
     // components:{uposs},
     created (){
-      this.getTestList({})
+      // this.getTestList({quizType: 0})
     },
     data() {
       return {
         imgSrc: {
           folder: require("../../../../assets/images/folder.png"),
         },
-        catalogData: {
+        catalogData: [{
+          catalogId: 0,
+          parentId: 0,
+          catalogName: "默认文件夹",
           catalogList: [
             {
               id: 1,
-              catalogName: "默认文件夹",
+              catalogName: "子文件夹",
               parentId: 0,
               catalogLevel: 1
             }
           ],
           quizList: [{
-            title: '试题名称'
+            quizTitle: '试题名称',
           }]
+        }],
+        catalogData2:[
+          {
+            "catalogId": 0,
+            "catalogLevel": 0,
+            "catalogList": [
+              {}
+            ],
+            "catalogName": "string",
+            "count": 0,
+            "parentId": 0,
+            "quizList": [
+              {
+                "catalogId": 0,
+                "difficulty": 0,
+                "displayOrder": 0,
+                "quizAnalysis": "string",
+                "quizId": 0,
+                "quizOption": [
+                  {
+                    "correctFlag": 0,
+                    "optionId": 0,
+                    "optionTitle": "string",
+                    "quizId": 0
+                  }
+                ],
+                "quizTitle": "string",
+                "quizType": 0,
+                "skillPoint": 0,
+                "updateTime": "2018-12-19 12:00:00",
+                "useCount": 0
+              }
+            ]
+          }
+        ],
+        //节点树的结构配置
+        treeProp:{
+          name: 'catalogName' ? 'catalogName' : 'quizTitle',
+          child:'catalogList' ?'catalogList' : 'quizList',
         },
         isCheckAll: false,
         value:'',
@@ -148,12 +186,24 @@
       }
     },
     methods: {
+      shownode(data){
+        console.log('被点击')
+        console.log(data)
+      },
       // 获取所有试题列表数据
       getTestList(data){
+        console.log(data)
         getTestFileFold(data).then(res => {
+          console.log(res)
           if (Number(res.code) === 200) {
-            console.log(res.data)
+            //如果试题库为空，则初始化新建一个默认的文件夹
+            if(res.data.length === 0){
+              console.log('新建默认文件夹')
+              this.newFileFold(0,'默认文件夹')
+            }
             this.catalogData = res.data
+            console.log('现在的试题数据为')
+            console.log(this.catalogData)
           } else {
             this.$message({
               message: "试题列表数据获取失败",
@@ -161,9 +211,30 @@
             });
           }
         })
+        .catch(error => {
+          console.log(error);
+        });
+      },
+      //新建文件夹
+      newFileFold(parentId, catalogName){
+        let data = {
+          catalogId: parentId,
+          catalogName
+        }
+
+        newTestFileFold(data).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            //如果试题库为空，则初始化新建一个默认的文件夹
+            this.$message.success('文件夹新建成功');
+          } else {
+            this.$message.error('文件夹新建失败');
+          }
+        })
           .catch(error => {
             console.log(error);
           });
+
       },
       toEditTest() {
         this.$router.push('/course/resource/edittest/1');
@@ -288,5 +359,12 @@
     .test-body
       .folder-img
         width: 20px;margin: -5px 10px;
+      .test-tree-node
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        padding-right: 8px;
 </style>
 

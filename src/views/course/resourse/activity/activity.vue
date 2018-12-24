@@ -41,52 +41,18 @@
         </div>
       </div>
       <div>
-        <el-collapse accordion>
-          <el-collapse-item v-for="(course,courseIndex) in activityData" :key="course.id">
-            <template slot="title">
-              <!--课程选择框-->
-              <el-checkbox
-                :indeterminate="course.indeterminate"
-                v-model="course.selected"
-                style="padding-left: 25px"
-                @change="checkCourseAll(courseIndex, $event)"></el-checkbox>
-              <div style="display: inline-flex;width: calc(100% - 100px)">
-                <div style="display: inline-block"><img :src="imgSrc.folder" style="width: 20px;margin: 0 10px;"/></div>
-                <div style="display: inline-block">{{course.chapterName}}</div>
-                <!--<div style="flex: 1">1</div>-->
-                <!--<div>-->
-                  <!--<el-button type="primary" icon="el-icon-upload2" size="small" @click.stop="fileUpload">上传</el-button>-->
-                <!--</div>-->
-              </div>
-            </template>
-            <!--章节-->
-            <el-collapse v-for="(chapter) in course.chapter" :key="chapter.id" style="padding-left: 50px;">
-              <el-collapse-item :title="chapter.chapterName">
-                <div style="display: flex">
-                  <div>单选框</div>
-                  <div style="flex: 1">测试：Word的基础操作 查看></div>
-                  <div>2018-6-31 12:00</div>
-                </div>
-              </el-collapse-item>
-            </el-collapse>
-            <!--<div v-for="(chapter, chapterIndex) in course.chapter" :key="chapter.id" style="padding-left: 80px;">-->
-              <!--<div style="display: inline-flex;width: calc(100% - 100px)">-->
-                <!--<div style="display: inline-block">{{chapter.chapterName}}</div>-->
-                <!--<div style="flex: 1"></div>-->
-                <!--<div>-->
-                  <!--2018-6-31 12:00-->
-                <!--</div>-->
-              <!--</div>-->
-            <!--</div>-->
-          </el-collapse-item>
-        </el-collapse>
+        <simple-tree></simple-tree>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+  import simpleTree from '@/views/course/resourse/simple-vue'
   export default {
+    components:{
+      simpleTree
+    },
     data () {
       return {
         imgSrc: {folder: require("../../../../assets/images/folder.png"),},

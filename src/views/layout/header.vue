@@ -157,7 +157,7 @@
       '$route': function(to, from){ // 路由改变时执行
         //console.info("to.path:" + to.path);
         this.fetchNavData();
-        this.getUserInfo();
+        // this.getUserInfo();
       }
     }
   }
