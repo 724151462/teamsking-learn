@@ -118,7 +118,6 @@
                         :key="item.specialityId" 
                         :label="item.specialityName"
                         :value="item.specialityId"></el-option>
-                    </el-select>
                 </el-select>
             </el-form-item>
             <el-form-item label="班级">

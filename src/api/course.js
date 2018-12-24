@@ -632,6 +632,28 @@ export function scoreRight(data) {
  * 线下成绩模板
  */
 export function scoreModel() {
-  let url = `http://192.168.10.48:9008/api/v1/sys/course/score/excel`
+  let url = `${baseUrl}score/excel`
   return commonsAjax(url, '', 'get', {responseType: 'blob'})
+}
+
+
+/**
+ * 上传成绩模板
+ */
+export function scoreUpload(data) {
+  console.log(data)
+  let url = `http://192.168.10.48:9008/api/v1/sys/course/${data.get('courseId')}/score/excel`
+  // let url = `${baseUrl}${data.get('courseId')}/score/excel`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 确认上传
+ */
+export function scoreModify(data) {
+  console.log(data)
+  // let url = `http://192.168.10.48:9008/api/v1/sys/course/0608367675f54267aa6960fd0557cc1b/score/excel`
+  let url = `http://192.168.10.48:9008/api/v1/sys/course/${data.courseId}/score/excel`
+  return commonsAjax(url, '', 'put')
 }
