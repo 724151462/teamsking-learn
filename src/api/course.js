@@ -1,13 +1,13 @@
 const devUrl = '/api/v1/course/' // 开发环境
-const prodUrl = 'http://120.36.137.90:8008/api/v1/course/' // 生产环境
+const prodUrl = 'http://120.36.137.90:9008/api/v1/course/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
 const commonDevUrl = '/api/v1/' // 开发环境
-const commonProdUrl = 'http://120.36.137.90:8008/api/v1/' // 生产环境
+const commonProdUrl = 'http://120.36.137.90:9008/api/v1/' // 生产环境
 const commonBaseUrl = process.env.NODE_ENV === 'production' ? commonProdUrl : commonDevUrl
 
 const courseDev = '/api/v1/course' // 开发环境
-const courseProd = 'http://120.36.137.90:8008/api/v1/course' // 生产环境
+const courseProd = 'http://120.36.137.90:9008/api/v1/course' // 生产环境
 const courseUrl = process.env.NODE_ENV === 'production' ? courseProd : courseDev
 
 import {
