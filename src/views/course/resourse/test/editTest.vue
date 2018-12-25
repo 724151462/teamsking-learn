@@ -52,7 +52,7 @@
         </el-form-item>
       </el-form>
       <div class="btn-groud">
-        <el-button type="primary" style="margin-right: 40px" @click="put">保存</el-button>
+        <el-button type="primary" style="margin-right: 40px" @click="goPut">修改</el-button>
         <el-button>取消</el-button>
       </div>
     </div>
@@ -62,15 +62,15 @@
 <script>
   import E from 'wangeditor'
   import editor from '@/views/course/resourse/test/myEditor'
-  import {quizInfo, putQuiz} from '@/api/course'
+  import {quizInfo, putQuiz} from '@/api/library'
   export default {
     name: "editTest",
     components:{editor},
     created () {
-      // if(this.$route.query.courseid && this.$route.query.courseid !== ''){
-      //   this.courseid = this.$route.query.courseid
-      // }
-      // this.getQuizInfo()
+      if(this.$route.query.courseid && this.$route.query.courseid !== ''){
+        this.courseid = this.$route.query.courseid
+      }
+      this.getQuizInfo()
       // setTimeout(this.getQuizInfo,5000)
     },
     data () {
@@ -81,7 +81,6 @@
           "courseId": "string",
           "creatorName": "string",
           "difficulty": 0,
-          displayOrder: 1,
           quizAnalysis: "",
           "quizId": 0,
           quizOption: [
@@ -113,11 +112,8 @@
           ],
           // quizTitle: "",
           quizType: 0, // 10 为单选，20为多选，30为判断，40为主观
-          "skillPoint": "string",
-          "updateId": 0,
-          "updateTime": "2018-11-28T03:10:25.082Z",
           "useCount": 0,
-          "userId": 0
+          userId: 0
         },
         rules2: '',
         optionItem:["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"]
@@ -145,7 +141,7 @@
       ]
       this.editor.create()
       //获取数据
-      this.getQuizInfo()
+      // this.getQuizInfo()
     },
     methods:{
       //获取试题信息
@@ -188,7 +184,7 @@
       },
       //设为正确答案
       setCurrent(optionIndex){
-        if(this.quizData.quizType === 2){
+        if(this.quizData.quizType === 20){
           this.quizData.quizOption[optionIndex].correctFlag === 1 ? this.quizData.quizOption[optionIndex].correctFlag = 2 :this.quizData.quizOption[optionIndex].correctFlag = 1
         }else{
           //单选和判断自能有一个答案
@@ -225,9 +221,9 @@
         console.log(e)
       },
       //修改试题
-      put(){
-        console.log('修改试题')
+      goPut(){
         let data = this.quizData
+        delete data.updateTime
         console.log(data)
         putQuiz(data).then(res=>{
           if(Number(res.code) === 200){

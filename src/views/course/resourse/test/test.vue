@@ -4,6 +4,18 @@
       <div>试题管理</div>
     </div>
 
+    <div>
+      <el-row>
+        <el-button>默认按钮</el-button>
+        <el-button type="primary" @click="goEdit(1)">编辑试题默认quizId为1</el-button>
+        <el-button type="success">成功按钮</el-button>
+        <el-button type="info">信息按钮</el-button>
+        <el-button type="warning">警告按钮</el-button>
+        <el-button type="danger">危险按钮</el-button>
+      </el-row>
+    </div>
+
+
     <div style="display: flex;margin: 25px 0;">
       <div style="display: flex">
         <div style="width: 300px">
@@ -50,7 +62,6 @@
             label: treeProp.name,
             children: treeProp.child
           }"
-          @node-click="shownode"
           show-checkbox
           accordion
           node-key="id">
@@ -59,12 +70,16 @@
                 <img :src="imgSrc.folder" alt="" class="folder-img"><span>{{ node.label }}</span>
               </span>
               <!--<span>{{node.data}}</span>-->
-              <!--<span>{{ node.label }}</span>-->
-              <!--<span>12354646 <span>asds</span> </span>-->
-              <span>
+              <span v-if="data.catalogLevel">
                 <el-button size="mini" @click="() => append(data)"> 编辑 </el-button>
                 <el-button size="mini" @click="() => remove(node, data)">删除</el-button>
               </span>
+              <span v-else>
+                <el-button size="mini" @click="() => append(data)"> 创建子目录 </el-button>
+                <el-button size="mini" @click="() => append(data)"> 编辑 </el-button>
+                <el-button size="mini" @click="() => remove(node, data)">删除</el-button>
+              </span>
+              <span v-show="data.updataTime"></span>
             </span>
         </el-tree>
       </div>
@@ -111,7 +126,7 @@
   export default {
     // components:{uposs},
     created (){
-      // this.getTestList({quizType: 0})
+      this.getTestList(0)
     },
     data() {
       return {
@@ -132,6 +147,7 @@
           ],
           quizList: [{
             quizTitle: '试题名称',
+            parentId: 0,
           }]
         }],
         catalogData2:[
@@ -170,8 +186,8 @@
         ],
         //节点树的结构配置
         treeProp:{
-          name: 'catalogName' ? 'catalogName' : 'quizTitle',
-          child:'catalogList' ?'catalogList' : 'quizList',
+          name: 'catalogName',
+          child:'catalogList'
         },
         isCheckAll: false,
         value:'',
@@ -190,8 +206,9 @@
         console.log('被点击')
         console.log(data)
       },
-      // 获取所有试题列表数据
-      getTestList(data){
+      // 获取所有试题列表
+      getTestList(id){
+        let data = {quizType: id}
         console.log(data)
         getTestFileFold(data).then(res => {
           console.log(res)
@@ -295,6 +312,10 @@
       delAllQuiz() {
 
       },
+      //编辑试题
+      goEdit(quizId){
+        this.$router.push({ path: `/course/resource/edittest/${quizId}` })
+      }
       // renderContent(h, { node, data, store }) {
       //   return (
       //     <span class="custom-tree-node">

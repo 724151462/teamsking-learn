@@ -30,3 +30,18 @@ export function deleteTestFileFold(data) {
   let url = `${baseUrl}quiz/catalog`
   return commonsAjax(url, data, 'delete')
 }
+/**
+ * 获取单个试题的信息，包含选项
+ */
+export function quizInfo(data) {
+  let url = `${baseUrl}quiz/${data}`
+  return commonsAjax(url, data, 'get')
+}
+/**
+ * 修改试题信息
+ */
+export function putQuiz(data) {
+  let url = `${baseUrl}quiz`
+  return commonsAjax(url, data, 'put')
+}
+
