@@ -73,6 +73,7 @@
         logins(data).then(res => {
           console.log(res)
           if (res.code === 200) {
+            console.log('登录成功')
             twoWeeksExchange(res.data.token)
             saveUserInfo(res.data.userId)
             this.$router.replace('/course')
