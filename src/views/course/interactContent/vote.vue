@@ -1,7 +1,7 @@
 <template>
   <div>
     <span style="display:inline-block;margin: 10px 0">
-      <router-link :to="{name: '互动'}">互动</router-link>> 发起投票
+      <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 发起投票
     </span>
     <div>
       <el-button size="small" @click="addTab(voteQuizzesValue)">添加题目</el-button>
@@ -68,7 +68,12 @@
 </template>
 
 <script>
-import { voteSave, chaptersListSimple } from "@/api/course";
+import { 
+  voteSave,
+  votePut,
+  chaptersListSimple,
+  interactVote,
+} from "@/api/course";
 export default {
   data() {
     return {
@@ -76,7 +81,6 @@ export default {
       voteObj: {
         courseId: this.$route.query.id,
         voteTitle: "",
-        quizTitle: "",
         chapterId: "",
         interactionStatus: 10,
         showResult: "2",
@@ -111,6 +115,17 @@ export default {
     };
   },
   mounted() {
+    if(this.$route.query.operation === 'edit') {
+      interactVote({voteId: this.$route.query.interactId})
+      .then(response=> {
+        this.voteQuizzesValue = String(response.data.voteQuizzes.length - 1)
+        response.data.voteQuizzes.forEach((element,i)=>{
+          element.quizType = String(element.quizType)
+          element.title = `第${i+1}题`
+        })
+        this.voteObj = response.data
+      })
+    }
     chaptersListSimple({ courseId: this.voteObj.courseId }).then(response => {
       this.chapterList = response.data;
     });
@@ -166,15 +181,26 @@ export default {
       });
     },
     saveVoteArr() {
-      console.log(this.voteObj);
-      voteSave(this.voteObj).then(response => {
-        if (response.code === 200) {
-          this.$message({
-            message: "发起投票成功",
-            type: "success"
-          });
-        }
-      });
+      console.log(this.$route.query.operation);
+      if(this.$route.query.operation === 'edit'){
+        votePut(this.voteObj).then(response => {
+          if (response.code === 200) {
+            this.$message({
+              message: "修改投票成功",
+              type: "success"
+            });
+          }
+        });
+      }else{
+        voteSave(this.voteObj).then(response => {
+          if (response.code === 200) {
+            this.$message({
+              message: "发起投票成功",
+              type: "success"
+            });
+          }
+        });
+      }
     },
     handleClick(tab, event) {},
     // 添加答案

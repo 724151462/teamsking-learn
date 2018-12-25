@@ -47,12 +47,13 @@
 
 <script>
 import {
-    interactExam
+    testMark
 }from '@/api/course'
 export default {
     data() {
         return {
             examParams:{
+                courseId: this.$route.query.id,
                 examId: this.$route.query.interactId
             },
             students: [
@@ -104,7 +105,7 @@ export default {
         }
     },
     mounted() {
-        interactExam(this.examParams)
+        testMark(this.examParams)
         .then(response=> {
             
         })

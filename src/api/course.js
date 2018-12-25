@@ -1,13 +1,13 @@
 const devUrl = '/api/v1/course/' // 开发环境
-const prodUrl = 'http://120.36.137.90:8008/api/v1/course/' // 生产环境
+const prodUrl = 'http://120.36.137.90:9008/api/v1/course/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
 const commonDevUrl = '/api/v1/' // 开发环境
-const commonProdUrl = 'http://120.36.137.90:8008/api/v1/' // 生产环境
+const commonProdUrl = 'http://120.36.137.90:9008/api/v1/' // 生产环境
 const commonBaseUrl = process.env.NODE_ENV === 'production' ? commonProdUrl : commonDevUrl
 
 const courseDev = '/api/v1/course' // 开发环境
-const courseProd = 'http://120.36.137.90:8008/api/v1/course' // 生产环境
+const courseProd = 'http://120.36.137.90:9008/api/v1/course' // 生产环境
 const courseUrl = process.env.NODE_ENV === 'production' ? courseProd : courseDev
 
 import {
@@ -152,6 +152,16 @@ export function chaptersDelete(data) {
 export function sectionAdd(data) {
   let url = `${baseUrl}chapter/section`
   return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 删除节
+ */
+
+export function sectionDelete(data) {
+  let url = `${baseUrl}chapter/section`
+  return commonsAjax(url, data, 'delete')
 }
 
 
@@ -374,6 +384,16 @@ export function markDetail(data) {
 
 
 /**
+ * 成绩详情
+ */
+export function markStudentInfo(data) {
+  let url = `${baseUrl}${data.courseId}/student/${data.userId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+
+/**
  * 笔记列表
  */
 export function noteList(data) {
@@ -397,6 +417,33 @@ export function noteDelete(data) {
 export function storm(data) {
   let url = `${baseUrl}storm/${data.stormId}`
   return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 头脑风暴删除
+ */
+export function stormDelete(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+
+/**
+ * 头脑风暴
+ */
+export function interactStorm(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 作业发起
+ */
+export function homeWorkSave(data) {
+  let url = `${baseUrl}homework`
+  return commonsAjax(url, data, 'post')
 }
 
 
@@ -441,6 +488,24 @@ export function homeWorkScore(data) {
 }
 
 
+/**
+ * 作业修改
+ */
+export function homeworkPut(data) {
+  let url = `${baseUrl}homework/${data.homeworkId}`
+  return commonsAjax(url, data, 'put')
+}
+
+
+/**
+ * 作业删除
+ */
+export function homeworkDelete(data) {
+  let url = `${baseUrl}homework/${data.homeworkId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+
 // ==========活动==========
 /**
  * 活动列表
@@ -468,13 +533,56 @@ export function voteSave(data) {
   return commonsAjax(url, data, 'post')
 }
 
+/**
+ * 投票删除
+ */
+export function voteDelete(data) {
+  let url = `${baseUrl}vote/${data.voteId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+
+/**
+ * 投票修改
+ */
+export function votePut(data) {
+  let url = `${baseUrl}vote/${data.voteId}`
+  return commonsAjax(url, data, 'put')
+}
+
+
+/**
+ * 头脑风暴发起
+ */
+export function stormSave(data) {
+  let url = `${baseUrl}storm`
+  return commonsAjax(url, data, 'post')
+}
+
 
 /**
  * 头脑风暴详情
  */
 export function interactBS(data) {
-  let url = `${baseUrl}storm/${data.stormId}`
+  let url = `${baseUrl}storm/record/${data.stormId}`
   return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 头脑风暴加分
+ */
+export function stormAddScore(data) {
+  let url = `${baseUrl}storm/bonus/${data.recordId}`
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 头脑风暴修改
+ */
+export function stormPut(data) {
+  let url = `${baseUrl}storm/${data.stormId}`
+  return commonsAjax(url, data, 'put')
 }
 
 
@@ -484,4 +592,72 @@ export function interactBS(data) {
 export function interactExam(data) {
   let url = `${baseUrl}exam/${data.examId}`
   return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 测试删除
+ */
+export function examDelete(data) {
+  let url = `${baseUrl}exam/${data.examId}`
+  return commonsAjax(url, '', 'delete')
+}
+
+// ========课程附件=========
+/**
+ * 新增附件实例
+ */
+export function assetCreate(data) {
+  let url = `${baseUrl}asset`
+  return commonsAjax(url, data, 'post')
+}
+
+
+// =========成绩===========
+/**
+ * 成绩列表
+ */
+export function scoreList(data) {
+  let url = `${baseUrl}coursescore/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 成绩权重
+ */
+export function scoreRight(data) {
+  let url = `${baseUrl}coursescore/set/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 线下成绩模板
+ */
+export function scoreModel() {
+  let url = `${baseUrl}score/excel`
+  return commonsAjax(url, '', 'get', {responseType: 'blob'})
+}
+
+
+/**
+ * 上传成绩模板
+ */
+export function scoreUpload(data) {
+  console.log(data)
+  let url = `http://192.168.10.48:9008/api/v1/sys/course/${data.get('courseId')}/score/excel`
+  // let url = `${baseUrl}${data.get('courseId')}/score/excel`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 确认上传
+ */
+export function scoreModify(data) {
+  console.log(data)
+  // let url = `http://192.168.10.48:9008/api/v1/sys/course/0608367675f54267aa6960fd0557cc1b/score/excel`
+  let url = `http://192.168.10.48:9008/api/v1/sys/course/${data.courseId}/score/excel`
+  return commonsAjax(url, '', 'put')
 }

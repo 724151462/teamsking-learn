@@ -1,11 +1,23 @@
 <template>
   <div>
     <div class="grade-head">
-      <div>
+      <div class="import-btn">
         <span>学生人数: 55人</span>
-        <el-button type="success">导入线下成绩</el-button>
-        <el-button type="success">下载导入模板</el-button>
+        <el-upload
+          ref="upload"
+          accept=".xls, .xlsx"
+          action
+          :on-change="upload"
+          :show-file-list="false"
+          :auto-upload="false"
+          id="file"
+        >
+          <el-button type="success">导入线下成绩</el-button>
+        </el-upload>
+
+        <el-button type="success" @click="downloadModel">下载导入模板</el-button>
       </div>
+
       <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
         <el-form-item label="输入搜索：">
           <el-input v-model="form.search"></el-input>
@@ -18,150 +30,285 @@
     <el-table
       :data="tableData"
       style="width: 100%"
-      :default-sort = "{prop: 'totalGrade', order: 'descending'}"
-      >
-      <el-table-column
-        prop="realName"
-        label="学生"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="totalGrade"
-        label="总成绩"
-        sortable
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="vedioGrade"
-        label="视频成绩"
-        sortable
-        width="180">
-        <template slot="header" slot-scope="header">
-            <span>视频成绩</span>
-            <br>
-            <span style="font-size:12px">(权重{{right}}%)</span>
+      :default-sort="{prop: 'score', order: 'descending'}"
+    >
+      <el-table-column label="姓名" width="180">
+        <template slot-scope="scope">
+          <el-popover trigger="hover" @show="getStudentId(scope.row)" placement="bottom-end">
+            <div>学生信息：</div>
+            <p>姓名: {{ scope.row.studentInfo.realName || '' }}</p>
+            <p>手机: {{ scope.row.studentInfo.mobile || '' }}</p>
+            <p>院系: {{ scope.row.studentInfo.collegeName || '' }}</p>
+            <p>专业: {{ scope.row.studentInfo.specialityName || '' }}</p>
+            <p>班级: {{ scope.row.studentInfo.className || '' }}</p>
+            <p>学校: {{ scope.row.studentInfo.tenantName || '' }}</p>
+            <div slot="reference" class="name-wrapper">
+              <el-tag size="medium">{{ scope.row.realName }}</el-tag>
+            </div>
+          </el-popover>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="testGrade"
-        label="测试成绩"
-        sortable>
+      <el-table-column prop="score" label="总成绩" sortable width="180"></el-table-column>
+      <el-table-column prop="videoScore" label="视频成绩" sortable width="180">
         <template slot="header" slot-scope="header">
-            <span>测试成绩</span>
-            <br>
-            <span style="font-size:12px">(权重{{right}}%)</span>
+          <span>视频成绩</span>
+          <br>
+          <span style="font-size:12px">(权重{{scoreRight.videoPercent}}%)</span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="homeworkGrade"
-        label="作业成绩"
-        sortable>
+      <el-table-column prop="quizScore" label="测试成绩" sortable>
         <template slot="header" slot-scope="header">
-            <span>作业成绩</span>
-            <br>
-            <span style="font-size:12px">(权重{{right}}%)</span>
+          <span>测试成绩</span>
+          <br>
+          <span style="font-size:12px">(权重{{scoreRight.quizPercent}}%)</span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="stormGrade"
-        label="头脑风暴成绩"
-        sortable>
+      <el-table-column prop="homeworkScore" label="作业成绩" sortable>
         <template slot="header" slot-scope="header">
-            <span>头脑风暴成绩</span>
-            <br>
-            <span style="font-size:12px">(权重{{right}}%)</span>
+          <span>作业成绩</span>
+          <br>
+          <span style="font-size:12px">(权重{{scoreRight.homeworkPercent}}%)</span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="quesGrade"
-        label="投票问卷成绩"
-        sortable>
+      <el-table-column prop="stormScore" label="头脑风暴成绩" sortable>
         <template slot="header" slot-scope="header">
-            <span>投票问卷成绩</span>
-            <br>
-            <span style="font-size:12px">(权重{{right}}%)</span>
+          <span>头脑风暴成绩</span>
+          <br>
+          <span style="font-size:12px">(权重{{scoreRight.stormPercent}}%)</span>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="xxGrade"
-        label="线下成绩"
-        sortable>
+      <el-table-column prop="voteScore" label="投票问卷成绩" sortable>
         <template slot="header" slot-scope="header">
-            <span>线下成绩</span>
-            <br>
-            <span style="font-size:12px">(权重{{right}}%)</span>
+          <span>投票问卷成绩</span>
+          <br>
+          <span style="font-size:12px">(权重{{scoreRight.votePercent}}%)</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="offlineScore" label="线下成绩" sortable>
+        <template slot="header" slot-scope="header">
+          <span>线下成绩</span>
+          <br>
+          <span style="font-size:12px">(权重{{scoreRight.offlinePercent}}%)</span>
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog title="导入结果" :visible.sync="dialogShow" :data="resData" width="50%">
+      <el-table :data="resData">
+        <el-table-column prop="studentNo" label="学号"></el-table-column>
+        <el-table-column prop="realName" label="姓名"></el-table-column>
+        <el-table-column prop="score" label="成绩"></el-table-column>
+        <el-table-column prop="tenantName" label="租户名称"></el-table-column>
+        <el-table-column prop="errorData" label="错误信息"></el-table-column>
+      </el-table>
+      <el-button @click="ensureImport">确认导入</el-button>
+    </el-dialog>
   </div>
-  
 </template>
 
 <script>
+import axios from "axios";
+import { getToken } from "@/utils/auth";
+import XLSX from "xlsx";
+import {
+  scoreList,
+  scoreRight,
+  scoreModel,
+  markStudentInfo,
+  scoreUpload,
+  scoreModify
+} from "@/api/course";
+import { sysStudentInfo } from "@/api/school";
 export default {
   data() {
     return {
+      file: "",
+      dialogShow: false,
+      scoreParams: {
+        courseId: this.$route.query.id
+      },
       right: 20,
       form: {
-        search: '',
+        search: ""
       },
-      tableData: [{
-        totalGrade: '78',
-        realName: '王小虎1',
-        vedioGrade: '43',
-        testGrade: '42',
-        homeworkGrade: '17',
-        stormGrade: '15',
-        quesGrade: '23',
-        xxGrade: '33'
-      }, {
-        totalGrade: '98',
-        realName: '王小虎2',
-        vedioGrade: '40',
-        testGrade: '34',
-        homeworkGrade: '11',
-        stormGrade: '44',
-        quesGrade: '31',
-        xxGrade: '23'
-      }, {
-        totalGrade: '77',
-        realName: '王小虎3',
-        vedioGrade: '54',
-        testGrade: '21',
-        homeworkGrade: '15',
-        stormGrade: '34',
-        quesGrade: '32',
-        xxGrade: '55'
-      }, {
-        totalGrade: '88',
-        realName: '王小虎4',
-        vedioGrade: '31',
-        testGrade: '10',
-        homeworkGrade: '13',
-        stormGrade: '55',
-        quesGrade: '45',
-        xxGrade: '22'
-      }]
-    }
+      // 权重
+      scoreRight: {},
+      //数据
+      tableData: [
+        {
+          score: "78",
+          realName: "王小虎1",
+          videoScore: "43",
+          quizScore: "42",
+          homeworkScore: "17",
+          stormScore: "15",
+          voteScore: "23",
+          offlineScore: "33",
+          studentInfo: {}
+        }
+      ],
+      // 导入后返回的data
+      resData: []
+    };
   },
-  created(){
-    this.$emit('teachingNav','grade')
+  created() {
+    this.$emit("teachingNav", "grade");
+  },
+  mounted() {
+    // 成绩列表
+    scoreList(this.scoreParams).then(response => {
+      response.data.pageData.forEach(element => {
+        element.studentInfo = {
+          realName: ""
+        };
+      });
+      this.tableData = response.data.pageData;
+    });
+    // 成绩权重
+    scoreRight(this.scoreParams).then(response => {
+      this.scoreRight = response.data;
+    });
   },
   methods: {
-    studentSearch() {
-
+    getStudentId(item) {
+      markStudentInfo({ userId: item.userId, courseId: item.courseId }).then(
+        response => {
+          this.tableData.forEach(element => {
+            if (element.userId === item.userId) {
+              // element = Object.assign(element, response.data)
+              this.$set(element, "studentInfo", response.data);
+            }
+          });
+          console.log("data", this.tableData);
+          // this.
+        }
+      );
     },
+    studentSearch() {},
     formatter(row, column) {
       return row.address;
+    },
+    downloadModel() {
+      var oReq = new XMLHttpRequest();
+      oReq.open(
+        "GET",
+        "http://192.168.10.48:9008/api/v1/sys/course/score/excel",
+        true
+      );
+      oReq.setRequestHeader("token", getToken());
+      oReq.responseType = "blob";
+      oReq.onload = function(oEvent) {
+        var content = oReq.response;
+        console.log(oReq);
+        var elink = document.createElement("a");
+        elink.download = "成绩模板.xls";
+        elink.style.display = "none";
+
+        var blob = new Blob([content]);
+        elink.href = URL.createObjectURL(blob);
+
+        document.body.appendChild(elink);
+        elink.click();
+
+        document.body.removeChild(elink);
+      };
+      oReq.send();
+    },
+    export2Excel() {
+      require.ensure([], () => {
+        const { export_json_to_excel } = require("@/vendor/Export2Excel");
+        const tHeader = ["序号", "IMSI", "MSISDN", "证件号码", "姓名"];
+        const filterVal = ["ID", "imsi", "msisdn", "address", "name"];
+        const list = this.tableData;
+        const data = this.formatJson(filterVal, list);
+        export_json_to_excel(tHeader, data, "列表excel");
+      });
+    },
+    upload(file, fileList) {
+      let formData = new FormData();
+      formData.append("file", file.raw);
+      formData.append("courseId", "0608367675f54267aa6960fd0557cc1b");
+      scoreUpload(formData).then(response => {
+        response.data.forEach(element => {
+          if (element.errorData) {
+            this.resData = response.data;
+            console.log(element.errorData);
+            this.dialogShow = true;
+          }
+        });
+      });
+      console.log(formData.get("file"));
+      console.log("file", file);
+      console.log("fileList", fileList);
+
+      let files = { 0: file.raw };
+      this.readExcel1(files);
+    },
+    readExcel1(files) {
+      //表格导入
+      var that = this;
+      console.log(files);
+      if (files.length <= 0) {
+        //如果没有文件名
+        return false;
+      } else if (!/\.(xls|xlsx)$/.test(files[0].name.toLowerCase())) {
+        this.$Message.error("上传格式不正确，请上传xls或者xlsx格式");
+        return false;
+      }
+
+      const fileReader = new FileReader();
+      fileReader.onload = ev => {
+        try {
+          const data = ev.target.result;
+          const workbook = XLSX.read(data, {
+            type: "binary"
+          });
+          const wsname = workbook.SheetNames[0]; //取第一张表
+          const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); //生成json表格内容
+          console.log(ws.slice(1));
+          // that.peopleArr = [];//清空接收数据
+          // if(that.peopleArr.length == 1 && that.peopleArr[0].roleName == "" && that.peopleArr[0].enLine == ""){
+          //     that.peopleArr = [];
+          // }
+          //重写数据
+          try {
+          } catch (err) {
+            console.log(err);
+          }
+
+          this.$refs.upload.value = "";
+        } catch (e) {
+          return false;
+        }
+      };
+      fileReader.readAsBinaryString(files[0]);
+    },
+    // 确认导入
+    ensureImport(items) {
+      let data = {};
+      data.courseId = this.scoreParams.courseId;
+      scoreModify(data).then(response => {
+        if (response.code === 400005) {
+          this.$message({
+            message: "导入成功",
+            type: "success"
+          });
+        }
+        this.dialogShow = false;
+      });
     }
   }
-}
+};
 </script>
 
 <style lang="stylus" scoped>
-.grade-head
-  display flex
-  align-items center
-  justify-content space-between
+.grade-head 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .import-btn
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 400px;
 </style>
 

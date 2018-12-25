@@ -5,6 +5,7 @@
       <el-button type="primary" @click="searchMember">搜索</el-button>
       <el-button type="primary"><router-link :to="{name: '成员方案管理', query: {id: $route.query.id}}">成员小组方案管理</router-link></el-button>
       <el-button type="primary">导入成员</el-button>
+      <el-button type="success" @click="downloadModel">下载导入模板</el-button>
     </div>
     <item-table :tables="tables" :tableData="tableData" @showComponentInfo="showComponentInfo" :buttonStylus="buttonType"></item-table>
     <el-pagination
@@ -37,6 +38,7 @@ import {
   unsetAssistant,
   deleteUser  
 } from '@/api/course'
+import { getToken } from "@/utils/auth";
 export default {
   components:{
     itemTable,
@@ -180,6 +182,32 @@ export default {
         default:
           break;
       }
+    },
+    downloadModel() {
+      var oReq = new XMLHttpRequest();
+      oReq.open(
+        "GET",
+        "http://120.36.137.90:9008/api/v1/sys/course/user/excel",
+        true
+      );
+      oReq.setRequestHeader("token", getToken());
+      oReq.responseType = "blob";
+      oReq.onload = function(oEvent) {
+        var content = oReq.response;
+        console.log(oReq);
+        var elink = document.createElement("a");
+        elink.download = "成员模板.xls";
+        elink.style.display = "none";
+
+        var blob = new Blob([content]);
+        elink.href = URL.createObjectURL(blob);
+
+        document.body.appendChild(elink);
+        elink.click();
+
+        document.body.removeChild(elink);
+      };
+      oReq.send();
     },
     handleCurrentChange(index) {
       this.pageParmas.pageIndex = index

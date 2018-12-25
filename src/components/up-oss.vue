@@ -76,7 +76,7 @@
           })
           Number(self.isError) !== 2 ? (self.isError = 2) : ''
           let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
-          self.$emit('ossUp', url)
+          self.$emit('ossUp', url, name)
         }).catch(error=>{
           console.log(error)
           //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
