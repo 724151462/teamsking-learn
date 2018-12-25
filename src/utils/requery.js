@@ -70,6 +70,7 @@ export function commonsAjax (url, data, method, headers) {
     if( data !== '' && method === 'put'){
       date.data = data
     }
+
     axios(date).then(res => {
       reject(res.data)
     }).catch(error => {

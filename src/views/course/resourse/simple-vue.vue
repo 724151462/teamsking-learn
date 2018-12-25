@@ -1,0 +1,110 @@
+<template>
+  <div class="simole-vue">
+    <ul>
+      <li></li>
+    </ul>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: "simple-vue",
+    data () {
+      return {
+        data: [{
+          title: "目录",
+          chidren: [{
+            title: "我的音乐",
+            chidren: [{
+              title: "周杰伦",
+              chidren: [{
+                title: "发如雪"
+              }]
+            }, {
+              title: "王杰",
+              chidren: [{
+                title: "一场游戏一场梦"
+              }]
+            }]
+          }, {
+            title: "我的照片"
+          }]
+        }]
+      }
+    },
+    methods:{
+      foldFn(item){
+        this.fold = !this.fold;
+      }
+    }
+  }
+</script>
+
+<style scoped>
+
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .tree-menu {
+    width: 360px;
+    height: 100%;
+    padding: 0px 12px;
+    border-right: 1px solid #e6e9f0;
+  }
+
+  .tree-menu-comm span {
+    display: block;
+    font-size: 12px;
+    position: relative;
+  }
+
+  .tree-contro .ico {
+    background-position: 3px -92px;
+  }
+
+  .tree-title .ico {
+    position: absolute;
+    left: -13px;
+    top: 0;
+    width: 15px;
+    height: 26px;
+    /*background: url(./folder-tree.png) no-repeat 4px -43px;*/
+    opacity: 0.8;
+  }
+
+  .tree-menu-comm span strong {
+    display: block;
+    width: 82%;
+    position: relative;
+    line-height: 22px;
+    padding: 2px 0;
+    padding-left: 5px;
+    color: #161719;
+    font-weight: normal;
+  }
+
+  .tree-nav {
+    background: #e7f2fe;
+    border: 1px solid #bfdaf4;
+    padding-left: 14px;
+    margin-left: 0px;
+  }
+
+  .tree-title {
+    border: 1px solid #fff;
+    margin-top: 1px;
+  }
+  /*无箭头*/
+
+  .tree-contro-none .ico {
+    background-position: -999px -99px;
+  }
+  /*箭头朝下*/
+
+  .tree-contro .ico {
+    background-position: 3px -92px;
+  }
+</style>

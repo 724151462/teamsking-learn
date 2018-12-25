@@ -6,8 +6,27 @@ import {
     commonsAjax
   } from '../utils/requery'  
 
-// ==========资源===========
+// ==============试题===========
+/**
+ * 获取试题列表
+ */
 export function getTestFileFold(data) {
   let url = `${baseUrl}quiz/quizzes`
   return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 新建试题文件夹
+ */
+export function newTestFileFold(data) {
+  let url = `${baseUrl}quiz/catalog`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 批量删除试题文件夹
+ */
+export function deleteTestFileFold(data) {
+  let url = `${baseUrl}quiz/catalog`
+  return commonsAjax(url, data, 'delete')
 }

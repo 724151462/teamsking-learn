@@ -162,7 +162,7 @@
 </template>
 
 <script>
-  import {getResourceList} from "../../../../api/course";
+  import {getTestFileFold} from "@/api/library";
 
   export default {
     name: "resource",
