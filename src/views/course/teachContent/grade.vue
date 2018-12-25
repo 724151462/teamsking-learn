@@ -188,23 +188,6 @@ export default {
       return row.address;
     },
     downloadModel() {
-      //---发送请求 获取二进制流
-      // axios.get("http://192.168.10.48:9008/api/v1/sys/course/score/excel",
-      //       //--headers和responseType一定要在一起设置，否则会导致 获取到的二进制文件流 格式不正确
-      //     {
-      //       headers: {
-      //         'content-type': 'application/json; charset=utf-8',
-      //         "Accept": "application/octet-stream",
-      //         'token':getToken(),
-      //       },
-      //       responseType: 'blob'      //--设置请求数据格式
-      //     })
-      //     .then((res)=>{
-      //      console.log('fgwsgw', res);
-      //       // this.downloadFile(res.data);  //---调用函数
-      //     }).catch((erro)=>{
-      //       console.log("erro-----",erro);
-      //   })
       var oReq = new XMLHttpRequest();
       oReq.open(
         "GET",
