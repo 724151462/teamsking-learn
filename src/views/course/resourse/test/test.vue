@@ -8,13 +8,12 @@
       <el-row>
         <el-button>默认按钮</el-button>
         <el-button type="primary" @click="goEdit(1)">编辑试题默认quizId为1</el-button>
-        <el-button type="success">成功按钮</el-button>
+        <el-button type="success" >新建目录</el-button>
         <el-button type="info">信息按钮</el-button>
         <el-button type="warning">警告按钮</el-button>
         <el-button type="danger">危险按钮</el-button>
       </el-row>
     </div>
-
 
     <div style="display: flex;margin: 25px 0;">
       <div style="display: flex">
@@ -62,6 +61,7 @@
             label: treeProp.name,
             children: treeProp.child
           }"
+          @node-click="getNodeData"
           show-checkbox
           accordion
           node-key="id">
@@ -122,6 +122,7 @@
 <script>
   // import uposs from '@/components/up-oss.vue'
   import {getTestFileFold, newTestFileFold , deleteTestFileFold} from "../../../../api/library";
+  import {logins} from "../../../../api/login";
 
   export default {
     // components:{uposs},
@@ -133,6 +134,7 @@
         imgSrc: {
           folder: require("../../../../assets/images/folder.png"),
         },
+        curCatalogData:[],
         catalogData: [{
           catalogId: 0,
           parentId: 0,
@@ -202,25 +204,27 @@
       }
     },
     methods: {
-      shownode(data){
-        console.log('被点击')
+      //文件夹被点击，异步加载数据
+      getNodeData(data){
         console.log(data)
+        let id = data.catalogId
+        let lv = data.catalogLevel
+        let redata =  this.filterCatalogId(this.curCatalogData,id,lv)
+        console.log(redata.catalogName)
       },
       // 获取所有试题列表
       getTestList(id){
         let data = {quizType: id}
-        console.log(data)
         getTestFileFold(data).then(res => {
           console.log(res)
           if (Number(res.code) === 200) {
             //如果试题库为空，则初始化新建一个默认的文件夹
             if(res.data.length === 0){
-              console.log('新建默认文件夹')
               this.newFileFold(0,'默认文件夹')
             }
-            this.catalogData = res.data
-            console.log('现在的试题数据为')
-            console.log(this.catalogData)
+            let data = JSON.parse(JSON.stringify(res.data))
+            this.catalogData = data
+            this.curCatalogData = data
           } else {
             this.$message({
               message: "试题列表数据获取失败",
@@ -310,24 +314,19 @@
       },
       // 删除该课程全部试题
       delAllQuiz() {
-
       },
       //编辑试题
       goEdit(quizId){
         this.$router.push({ path: `/course/resource/edittest/${quizId}` })
+      },
+      //点击默认文件夹，获取文件夹下的数据
+      filterCatalogId(data,id,lv){
+
+      },
+      //将拿到的数据处理，进行渲染
+      getShowData(data, id ){
+
       }
-      // renderContent(h, { node, data, store }) {
-      //   return (
-      //     <span class="custom-tree-node">
-      //       <span> {node.label} </span>
-      //       <span>
-      //         <el-button size="mini"  on-click={ () => alert('append') }>Append</el-button>
-      //         <el-button size="mini"  on-click={ () => alert('delete') }>Delete</el-button>
-      //       </span>
-      //       <span>{quizList.title}</span>
-      //   </span>
-      // );
-      // }
     }
   }
 </script>
