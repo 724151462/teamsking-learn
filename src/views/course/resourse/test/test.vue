@@ -35,12 +35,12 @@
       <div class="test-title">
         <!--全选-->
         <div>
-          <el-checkbox v-model="isCheckAll">全选</el-checkbox>
+          <el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>
         </div>
         <div>
           <el-button type="primary" size="small" @click="goCreateCatalog(0)">创建目录</el-button>
           <el-button type="primary" size="small">移动到</el-button>
-          <el-button type="primary" size="small">删除</el-button>
+          <el-button type="primary" size="small" @click="deleteCatalog">删除</el-button>
         </div>
       </div>
       <div class="test-body">
@@ -53,7 +53,9 @@
           @node-click="getNodeData"
           show-checkbox
           accordion
-          node-key="id">
+          @check="nodeCheck"
+          node-key="catalogId"
+          ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
               <span class="test-info">
                 <img :src="imgSrc.folder" alt="" class="folder-img" v-show="!data.quizId">
@@ -64,9 +66,9 @@
               <span style="margin-right: 10px" v-show="data.updateTime">{{data.updateTime}}</span>
               <span v-if="data.catalogLevel">
                 <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click="goCreateCatalog(data.catalogId)"> 创建子目录 </el-button>
-                <el-button size="mini" type="primary" @click="() => append(data)"> 添加 </el-button>
-                <el-button size="mini" type="primary" @click="() => append(data)"> 编辑 </el-button>
-                <el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>
+                <el-button size="mini" type="primary" @click="() => append(data)"> 重命名 </el-button>
+                <el-button size="mini" type="primary" @click="() => append(data)"> 添加试题 </el-button>
+                <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
               </span>
               <span v-else>
                 <el-button size="mini" type="primary" @click="() => append(data)"> 编辑 </el-button>
@@ -76,7 +78,6 @@
         </el-tree>
       </div>
     </div>
-
     <!--试题查看弹窗-->
     <el-dialog
       title="试题查看"
@@ -162,6 +163,7 @@
           catalogId: 0,
           catalogName: ""
         },
+        deleteArr:[],//需要删除的文件夹的数值
         uploadDialog: false, //文件上传弹窗
         createCatalog: false, //新建目录弹窗
         testView: false , //试题查看弹窗
@@ -175,10 +177,27 @@
     },
     methods: {
       //点击弹出新建目录的弹窗
-      goCreateCatalog(id){
+      goCreateCatalog(id) {
         console.log(id)
         this.newCatalog.catalogId = id
         this.createCatalog = true
+      },
+      //全选操作
+      checkAll(){
+        //获取所有文件夹节点的id用于全选
+        let idArr = []
+        this.catalogData.forEach((item)=>{
+          idArr.push(item.catalogId)
+        })
+
+        this.isCheckAll ? idArr : idArr=[]
+        this.deleteArr= idArr
+
+        this.$refs.tree.setCheckedKeys(idArr)
+      },
+      nodeCheck(data, checked){
+        console.log('被点击')
+        console.log(data)
       },
       //文件夹被点击
       getNodeData(data){
@@ -287,6 +306,11 @@
       },
       // 删除该课程全部试题
       delAllQuiz() {
+      },
+      //删除文件夹
+      deleteCatalog(){
+        console.log('要删除的数组为')
+        console.log(this.deleteArr)
       },
       //编辑试题
       goEdit(quizId){
