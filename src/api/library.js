@@ -15,6 +15,13 @@ export function getTestFileFold(data) {
   return commonsAjax(url, data, 'post')
 }
 
+
+export function getAnswer(data) {
+  let url = `${baseUrl}quiz/${data.quizId}/options`
+  return commonsAjax(url, '', 'get')
+}
+
+
 /**
  * 新建试题文件夹
  */
