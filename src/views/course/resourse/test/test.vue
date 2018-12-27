@@ -220,6 +220,7 @@
           if (Number(res.code) === 200) {
             this.$message.success('文件夹新建成功');
             this.createCatalog = false
+            //更新页面数据
             this.getTestList(0)
           } else {
             this.$message.error('文件夹新建失败');
