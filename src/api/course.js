@@ -537,6 +537,15 @@ export function interactList(data) {
 
 
 /**
+ * 活动状态更改
+ */
+export function interactStatus(data) {
+  let url = `${baseUrl}interaction/${data.interactionId}`
+  return commonsAjax(url, data, 'put')
+}
+
+
+/**
  * 投票详情
  */
 export function interactVote(data) {

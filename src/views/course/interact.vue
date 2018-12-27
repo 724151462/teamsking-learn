@@ -43,7 +43,7 @@
             </div>
             <div class="interact-right">
               <el-tooltip placement="bottom" effect="light" v-if="interact.interactionStatus === 10">
-                <div slot="content" style="margin-bottom:5px;cursor: pointer" @click="click123">直接开始</div>
+                <div slot="content" style="margin-bottom:5px;cursor: pointer" @click="start(interact)">直接开始</div>
                 <div slot="content" style="cursor: pointer" @click="setEndTime">设置结束时间并开始</div>
                 <div>
                   <i class="el-icon-caret-right"></i>
@@ -97,7 +97,8 @@ import {
   stormDelete,
   homeworkDelete,
   voteDelete,
-  examDelete
+  examDelete,
+  interactStatus
 } from '@/api/course'
 export default {
   data() {
@@ -129,8 +130,13 @@ export default {
     })
   },
   methods: {
-    click123() {
-      alert(123)
+    start(item) {
+      console.log(item)
+      interactStatus({
+        interactionId: item.interactionId,
+        interactionType: item.interactionType,
+        action: 1
+      })
     },
     toDetail(val) {
       console.log(val.interactionStatus)

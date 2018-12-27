@@ -114,79 +114,57 @@
     <el-dialog title="提示" :visible.sync="dialogVisible" width="60%">
       <el-tabs v-model="activeName2" :stretch="true" type="card" @tab-click="handleClick">
         <el-tab-pane label="视频" name="first">
-          <el-form v-model="videoForm">
-            <el-form-item label="视频标题" required>
-              <el-input v-model="videoForm.itemName" style="width: 220px;"></el-input>
-            </el-form-item>
-            <el-form-item label="视频" required>
-              <el-input v-model="videoForm.video" style="width: 220px;display: none"></el-input>
-              <el-button @click="showVedioDialog">+添加视频</el-button>
-            </el-form-item>
-          </el-form>
+          <div class="searchContainer">
+            <span>从资源库导入</span>
+            <el-input
+              style="width: 300px"
+              type="text"
+              placeholder="输入视频名称查找"
+              suffix-icon="el-icon-search"
+            ></el-input>
+          </div>
+          <div class="courseSelect">
+            <el-select v-model="value" placeholder="请选择">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </div>
+          <el-tree :data="fileList" ref="tree" show-checkbox node-key="id" :props="defaultProps">
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+              <img
+                :width="15"
+                v-if="data.catalogId"
+                style="margin-right: 3px"
+                :src="require('@/assets/images/folder.png')"
+                alt
+              >
+              <span>{{ node.label }}</span>
+            </span>
+          </el-tree>
+          <p v-for="(v,index) in vedioCheckedList" :key="index">{{v.catalogName}}</p>
         </el-tab-pane>
         <el-tab-pane label="文档" name="second">
-          <el-form v-model="docForm">
-            <el-form-item label="文档标题" required>
-              <el-input v-model="docForm.itemName" style="width: 220px;"></el-input>
-            </el-form-item>
-            <el-form-item label="视频" required>
-              <el-input v-model="docForm.document" style="width: 220px;display: none"></el-input>
-              <el-button @click="showVedioDialog">+添加文档</el-button>
-            </el-form-item>
-          </el-form>
+          <el-tree :data="docList" ref="tree1" show-checkbox node-key="id" :props="defaultDocProps">
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+              <img
+                :width="15"
+                v-if="data.catalogId"
+                style="margin-right: 3px"
+                :src="require('@/assets/images/folder.png')"
+                alt
+              >
+              <span>{{ node.label }}</span>
+            </span>
+          </el-tree>
         </el-tab-pane>
       </el-tabs>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addItem">确 定</el-button>
-      </span>
-    </el-dialog>
-
-    <!-- 添加资源对话框 -->
-    <el-dialog :visible.sync="vedioDialog" :title="addTitle">
-      <div class="searchContainer">
-        <span>从资源库导入</span>
-        <el-input
-          style="width: 300px"
-          type="text"
-          placeholder="输入视频名称查找"
-          suffix-icon="el-icon-search"
-        ></el-input>
-      </div>
-      <div class="courseSelect">
-        <el-select v-model="value" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-      </div>
-      <div>
-        <el-collapse>
-          <el-collapse-item v-for="(chapter, chapterIndex) in uploadSource" :key="chapterIndex">
-            <template slot="title">
-              <span>{{chapter.chapterName}}</span>
-              <div class="operate">
-                <!-- <i class="el-icon-circle-check"></i><span @click="selectAll(chapter)">全选</span> -->
-                <span>{{chapter.createTime}}</span>
-              </div>
-            </template>
-            <div
-              class="radioContainer"
-              v-for="(jie, jieIndex) in chapter.catalogSection"
-              :key="jieIndex"
-            >
-              <el-radio v-model="radio" :label="jie.jid">{{jie.sectionName}}</el-radio>
-              <span>{{jie.resourceLength|timeTransfer}}</span>
-            </div>
-          </el-collapse-item>
-        </el-collapse>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="vedioDialog = false">取 消</el-button>
-        <el-button type="primary" @click="vedioDialog = false">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -280,6 +258,8 @@ import {
   studyModeModify,
   courseBaseInfo
 } from "@/api/course";
+import { getResList } from "@/api/library";
+
 export default {
   data() {
     return {
@@ -391,91 +371,13 @@ export default {
           ]
         }
       ],
-      uploadSource: [
-        {
-          chapterName: "第一章",
-          cid: "1",
-          fold: "",
-          createTime: "2018-11-22",
-          catalogSection: [
-            {
-              sectionName: "资料1",
-              resourceLength: 4200,
-              jid: "1.1",
-              fold: false,
-              catalogItem: [
-                {
-                  itemName: "1.1"
-                },
-                {
-                  itemName: "1.2"
-                }
-              ]
-            },
-            {
-              sectionName: "资料2",
-              resourceLength: 3400,
-              jid: "1.2",
-              fold: false,
-              catalogItem: [
-                {
-                  itemName: "2.1"
-                },
-                {
-                  itemName: "2.2"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          chapterName: "第二章",
-          fold: false,
-          cid: "2",
-          createTime: "2018-11-22",
-          catalogSection: [
-            {
-              sectionName: "资料1",
-              resourceLength: 300,
-              jid: "2.1",
-              fold: false,
-              catalogItem: [
-                {
-                  itemName: "1.1",
-                  resourceLength: 300
-                },
-                {
-                  itemName: "1.2",
-                  resourceLength: 300
-                }
-              ]
-            },
-            {
-              sectionName: "资料2",
-              resourceLength: 300,
-              jid: "2.2",
-              fold: false,
-              catalogItem: [
-                {
-                  itemName: "2.1",
-                  resourceLength: 300
-                },
-                {
-                  itemName: "2.2",
-                  resourceLength: 300
-                }
-              ]
-            }
-          ]
-        }
-      ],
 
       addTitle: "",
       // 添加视频
       videoForm: {
         itemName: "",
         itemType: 10,
-        video: "",
+        contentId: "",
         contentType: 10,
         courseId: this.$route.query.id
       },
@@ -491,7 +393,6 @@ export default {
         contentType: 20,
         courseId: this.$route.query.id
       },
-      vedioDialog: false,
       // 添加题目对话框
       subjectVisible: false,
       subjectList: [
@@ -515,7 +416,19 @@ export default {
       // 添加题目缓存的下标
       sourceSubListIndex: "",
       // 选项model
-      subjPick: ""
+      subjPick: "",
+      // =====资源=====
+      defaultProps: {
+        children: "childCatalogList",
+        label: "catalogName"
+      },
+      defaultDocProps: {
+        children: "childCatalogList",
+        label: "catalogName"
+      },
+      vedioCheckedList: [],
+      fileList: [],
+      docList: []
     };
   },
   created() {
@@ -607,34 +520,33 @@ export default {
     },
     // 删除节
     delSection(section) {
-        let delArr = [];
-        delArr.push(section.sectionId);
-        this.tempChapter = section.chapterId
-        this.delDialogParm = {};
-        this.delDialogParm.info = "确认删除节？";
-        this.delDialogParm.type = "delSection";
-        this.delDialogParm.sectionIds = delArr;
-        this.delDialog = true;
+      let delArr = [];
+      delArr.push(section.sectionId);
+      this.tempChapter = section.chapterId;
+      this.delDialogParm = {};
+      this.delDialogParm.info = "确认删除节？";
+      this.delDialogParm.type = "delSection";
+      this.delDialogParm.sectionIds = delArr;
+      this.delDialog = true;
     },
     sectionDeleteEnsure() {
-        sectionDelete(this.delDialogParm.sectionIds)
-        .then(response=> {
-            this.sourceData.forEach(element => {
-                if(element.chapterId === this.tempChapter) {
-                    console.log(element.catalogSection)
-                    element.catalogSection.forEach((item, i)=> {
-                        if(item.sectionId === this.delDialogParm.sectionIds[0]) {
-                            element.catalogSection.splice(i, 1)
-                        }
-                    })
-                }
+      sectionDelete(this.delDialogParm.sectionIds).then(response => {
+        this.sourceData.forEach(element => {
+          if (element.chapterId === this.tempChapter) {
+            console.log(element.catalogSection);
+            element.catalogSection.forEach((item, i) => {
+              if (item.sectionId === this.delDialogParm.sectionIds[0]) {
+                element.catalogSection.splice(i, 1);
+              }
             });
-            this.$message({
-                message: "删除节成功",
-                type: "success"
-            });
-            this.delDialog = false;
-        })
+          }
+        });
+        this.$message({
+          message: "删除节成功",
+          type: "success"
+        });
+        this.delDialog = false;
+      });
     },
     // 删除事件
     delEvent() {
@@ -665,6 +577,12 @@ export default {
     // 添加内容弹窗
     addContentBtn(data) {
       console.log(data);
+      getResList({ resourceType: 10 }).then(response => {
+        this.fileList = this.filterData(response.data);
+      });
+      getResList({ resourceType: 20 }).then(response => {
+        this.docList = this.filterData(response.data);
+      });
       this.videoForm.chapterId = data.chapterId;
       this.videoForm.sectionId = data.sectionId;
       this.docForm.chapterId = data.chapterId;
@@ -674,16 +592,35 @@ export default {
     // 添加内容对话框确认按钮
     addItem() {
       console.log(this.contentType);
-      let formType = "";
+      let formType = {};
+      let resource;
       if (this.contentType === "视频") {
         formType = this.videoForm;
+        resource = this.fileNumberCheck(this.$refs.tree)
       } else {
         formType = this.docForm;
+        resource = this.fileNumberCheck(this.$refs.tree1)
       }
+      if(!resource) return
+      formType.contentId = resource[0].resourceId
+      this.dialogVisible = false
       console.log("ft", formType);
       itemAdd(formType).then(response => {
         console.log(response.data);
       });
+    },
+    fileNumberCheck(treeName) {
+      let checkedList =treeName.getCheckedNodes().filter(element => {
+        return element.catalogId === undefined;
+      });
+      if (checkedList.length > 1) {
+        this.$message({
+          message: "请选择单个文件",
+          type: "warning"
+        });
+        return false;
+      }
+      return checkedList
     },
     addJie(jieName) {
       console.log("jiename", jieName);
@@ -693,15 +630,15 @@ export default {
         courseId: this.courseId,
         sectionName: jieName
       }).then(response => {
-            this.sourceData.forEach((element, i) => {
-                if(element.chapterId === this.tempChapter) {
-                    element.catalogSection.push(response.data)
-                }
-            });
-            this.$message({
-                message: "添加章成功",
-                type: "success"
-            });
+        this.sourceData.forEach((element, i) => {
+          if (element.chapterId === this.tempChapter) {
+            element.catalogSection.push(response.data);
+          }
+        });
+        this.$message({
+          message: "添加章成功",
+          type: "success"
+        });
       });
       // this.sourceData.push({chapter: chapterName})
     },
@@ -749,9 +686,43 @@ export default {
       this.subjectList = [];
       this.subjectVisible = true;
     },
-    // 点击添加视频弹出视频列表弹窗
-    showVedioDialog() {
-      this.vedioDialog = true;
+    filterData(data) {
+      let getFilter = data => {
+        data.forEach(item => {
+          // 文件夹处理
+          if (!item.childCatalogList.length !== 0) {
+            getFilter(item.childCatalogList);
+          }
+          // 文件处理
+          if (item.resourceList.length !== 0) {
+            item.resourceList.forEach(list => {
+              item.childCatalogList.push({
+                catalogName: list.resourceTitle,
+                resourceId: list.resourceId
+              });
+            });
+          }
+        });
+        console.log(data);
+        return data;
+      };
+      let curData = getFilter(data);
+      return curData;
+    },
+    // 选中的资源id
+    ensureAdd() {
+      let checkedList = this.$refs.tree.getCheckedNodes().filter(element => {
+        return element.catalogId === undefined;
+      });
+      if (checkedList.length > 1) {
+        this.$message({
+          message: "请选择单个文件",
+          type: "warning"
+        });
+        return;
+      }
+      console.log(checkedList);
+      this.vedioCheckedList = checkedList;
     },
     // 添加时间点
     addTime() {
