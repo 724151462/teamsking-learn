@@ -259,6 +259,26 @@ export function memberEditList(data) {
 }
 
 
+/**
+ * 上传成绩模板
+ */
+export function memberUpload(data) {
+  console.log(data)
+  let url = `http://192.168.10.48:9008/api/v1/sys/course/${data.get('courseId')}/user/excel`
+  // let url = `${baseUrl}${data.get('courseId')}/score/excel`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 确认上传
+ */
+export function userModify(data) {
+  // let url = `http://192.168.10.48:9008/api/v1/sys/course/0608367675f54267aa6960fd0557cc1b/score/excel`
+  let url = `http://192.168.10.48:9008/api/v1/sys/course/${data.courseId}/user/excel`
+  return commonsAjax(url, '', 'put')
+}
+
 
 /**
  * 新增组名
@@ -552,6 +572,23 @@ export function votePut(data) {
 
 
 /**
+ * 视频列表
+ */
+export function videoList(data) {
+  let url = `${baseUrl}coursevideorecord/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 视频详情
+ */
+export function videoDetail(data) {
+  let url = `${baseUrl}coursevideorecord/info/${data.itemId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
  * 头脑风暴发起
  */
 export function stormSave(data) {
@@ -592,6 +629,16 @@ export function stormPut(data) {
 export function interactExam(data) {
   let url = `${baseUrl}exam/${data.examId}`
   return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 测试修改
+ */
+export function examPut(data) {
+  console.log(data)
+  let url = `${baseUrl}exam/${data.examId}`
+  return commonsAjax(url, data, 'put')
 }
 
 
@@ -661,3 +708,5 @@ export function scoreModify(data) {
   let url = `http://192.168.10.48:9008/api/v1/sys/course/${data.courseId}/score/excel`
   return commonsAjax(url, '', 'put')
 }
+
+

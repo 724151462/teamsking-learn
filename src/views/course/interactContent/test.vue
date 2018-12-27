@@ -4,7 +4,7 @@
       <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 发布测试
     </span>
     <div>
-      <el-button size="small" @click="addTab(testContentArrValue)">添加题目</el-button>
+      <el-button size="small" @click="dialogVisible=true" type="primary">添加题目</el-button>
       <div>
         <el-tabs
           v-model="testContentArrValue"
@@ -14,13 +14,17 @@
           @tab-remove="removeTab"
         >
           <el-tab-pane
-            v-for="item in testObj.quizIds"
-            :key="item.name"
+            v-for="item in testObj.quizList"
+            :key="item.quizId"
             :label="item.title"
             :name="item.name"
           >
             <div style="display:inline-block; height:100px;width:50%;">
-              <el-button size="small" style="margin: 20px 50px" @click="addTestBtn">点击添加试题</el-button>
+              <!-- <el-button size="small" style="margin: 20px 50px" @click="addTestBtn">点击添加试题</el-button> -->
+              <span>{{item.quizTitle}}</span>
+              <div style="margin-top:20px">
+                <p style="margin-bottom:5px" v-for="option in item.option" :key="option.optionId">{{option.optionTitle}}</p>
+              </div>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -69,7 +73,7 @@
         <el-radio v-model="testObj.showAnswer" label="20">交卷后查看答案</el-radio>
       </div>
     </div>
-    <el-button @click="savetestArr">保存</el-button>
+    <el-button type="primary" @click="savetestArr">保存</el-button>
     <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
       <el-collapse v-model="activeNames" @change="handleClick">
         <!-- <div v-for="item in testLibrary.catalogList" :key="item.catalogId" style="display:flex; align-items:center"> -->
@@ -82,84 +86,45 @@
                     </template>
         </el-collapse-item>-->
         <el-tree
-          :data="data2"
+          :data="fileList"
+          ref="tree"
           show-checkbox
+          @check-change="checkItem"
           node-key="id"
-          :default-expanded-keys="[1,2, 3]"
-          :default-checked-keys="[5]"
           :props="defaultProps"
         ></el-tree>
+        <!-- @node-expand="nodeExpand" -->
         <!-- </div> -->
       </el-collapse>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="ensureAdd">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { testAdd, chaptersListSimple } from "@/api/course";
-import { getTestFileFold } from "@/api/library";
+import { 
+  testAdd,
+  chaptersListSimple,
+  interactExam,
+  examPut
+} from "@/api/course";
+import { 
+  getTestFileFold,
+  getAnswer,
+} from "@/api/library";
+import { log } from "util";
 export default {
   data() {
     return {
-      data2: [
-        {
-          id: 1,
-          label: "一级 1",
-          children: [
-            {
-              id: 4,
-              label: "二级 1-1",
-              children: [
-                {
-                  id: 9,
-                  label: "三级 1-1-1"
-                },
-                {
-                  id: 10,
-                  label: "三级 1-1-2"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 2,
-          label: "一级 2",
-          children: [
-            {
-              id: 5,
-              label: "二级 2-1"
-            },
-            {
-              id: 6,
-              label: "二级 2-2"
-            }
-          ]
-        },
-        {
-          id: 3,
-          label: "一级 3",
-          children: [
-            {
-              id: 7,
-              label: "二级 3-1"
-            },
-            {
-              id: 8,
-              label: "二级 3-2"
-            }
-          ]
-        }
-      ],
+      fileList: [],
       defaultProps: {
-        children: "children",
-        label: "label"
+        children: "catalogList",
+        label: "catalogName"
       },
-      dialogVisible: true,
+      dialogVisible: false,
       activeNames: [0],
       chapterList: [],
       testContentArrValue: "1",
@@ -171,19 +136,12 @@ export default {
         repeatTimes: "",
         testHour: "",
         testMinute: "",
-        quizIds: [
-          {
-            title: `第1题`,
-            name: "1",
-            examTitle: "",
-            typeCheck: ""
-          }
-        ],
+        quizList: [],
         list: "",
         examTitle: "",
         showAnswer: "10"
       },
-      tabIndex: 1,
+      tabIndex: 0,
       testLibrary: {}
     };
   },
@@ -192,21 +150,49 @@ export default {
       this.chapterList = response.data;
     });
     getTestFileFold({ parentId: 0, searchKey: "" }).then(response => {
-      this.testLibrary = response.data;
+      this.fileList = this.filterData(response.data);
     });
+    if(this.$route.query.operation === 'edit') {
+      interactExam({examId: this.$route.query.interactId})
+      .then(response=> {
+        let subject = []
+        response.data.libraryQuizVOS.forEach((element,i)=>{
+          console.log(element)
+          subject.push({
+            quizTitle: element.quizTitle,
+            quizId: element.quizId,
+            title: `第${i+1}题`,
+            name: String(i+1),
+            option: element.quizOption
+          })
+        })
+        response.data.showAnswer = String(response.data.showAnswer)
+        response.data.testHour = Math.floor(response.data.limitTime/60)
+        response.data.testMinute = response.data.limitTime % 60
+        response.data.quizList = subject
+        response.data.courseId = this.$route.query.id
+        console.log(response.data)
+        this.testObj = response.data
+      })
+    }
   },
   methods: {
-    addTab(targetName) {
-      let newTabName = ++this.tabIndex + "";
-      this.testObj.quizIds.push({
-        title: `第${this.testObj.quizIds.length + 1}题`,
-        name: newTabName,
+    addTab(params) {
+      console.log(params)
+      let newTabName = (++this.tabIndex-1) + "";
+      this.testObj.quizList.push({
+        quizId: params.quizId,
+        title: `第${this.testObj.quizList.length + 1}题`,
+        quizTitle: params.catalogName,
+        option: params.option,
+        name: String(this.testObj.quizList.length),
         content: "New Tab content"
       });
+      console.log('ttt',newTabName)
       this.testContentArrValue = newTabName;
     },
     removeTab(targetName) {
-      let tabs = this.testObj.quizIds;
+      let tabs = this.testObj.quizList;
       let activeName = this.testContentArrValue;
       if (activeName === targetName) {
         tabs.forEach((tab, index) => {
@@ -220,24 +206,102 @@ export default {
       }
 
       this.testContentArrValue = activeName;
-      this.testObj.quizIds = tabs.filter(tab => tab.name !== targetName);
-      this.testObj.quizIds.forEach((tab, index) => {
+      console.log(targetName)
+      this.testObj.quizList = tabs.filter(tab => tab.name !== targetName);
+      this.testObj.quizList.forEach((tab, index) => {
         tab.title = `第${index + 1}题`;
       });
     },
     savetestArr() {
-      let minute =
-        Number(this.testObj.testHour) * 60 + Number(this.testObj.testMinute);
-      this.testObj.limitTime = minute;
-      console.log(this.testObj);
-      testAdd(this.testObj).then(response => {
-        console.log(response.data);
-      });
+      console.log(this.$route.query.operation)
+      if(this.$route.query.operation === 'edit'){
+        let minute =
+          Number(this.testObj.testHour) * 60 + Number(this.testObj.testMinute);
+        this.testObj.limitTime = minute;
+        let idArr = []
+        this.testObj.quizList.forEach(element=> {
+          idArr.push(element.quizId)
+        })
+        this.testObj.quizIds = idArr
+        examPut(this.testObj).then(response => {
+          console.log(response.data);
+          if(response.code === 200) {
+            this.$message({
+              message: '修改测试成功',
+              type: 'success'
+            })
+          }
+        });
+      }else{
+        let minute =
+          Number(this.testObj.testHour) * 60 + Number(this.testObj.testMinute);
+        this.testObj.limitTime = minute;
+        let idArr = []
+        this.testObj.quizList.forEach(element=> {
+          idArr.push(element.quizId)
+        })
+        this.testObj.quizIds = idArr
+        console.log(this.testObj);
+        testAdd(this.testObj).then(response => {
+          console.log(response.data);
+          if(response.code === 200) {
+            this.$message({
+              message: '添加测试成功',
+              type: 'success'
+            })
+          }
+        });
+      }
     },
     handleClick(value) {
       console.log(value);
     },
-    addTestBtn() {}
+    addTestBtn() {
+      this.dialogVisible = true
+    },
+
+    filterData(data) {
+      let getFilter = data => {
+        data.forEach(item => {
+          // 文件夹处理
+          if (!item.catalogList.length !== 0) {
+            getFilter(item.catalogList);
+          }
+          // 文件处理
+          if (item.quizList.length !== 0) {
+            item.quizList.forEach(list => {
+              item.catalogList.push({
+                catalogName: list.quizTitle,
+                quizId: list.quizId
+              });
+            });
+          }
+        });
+        return data;
+      };
+      let curData = getFilter(data);
+      return curData;
+    },
+    // 选中题目
+    checkItem(...params) {
+      console.log(params);
+    },
+    ensureAdd() {
+      let checkedList = this.$refs.tree.getCheckedNodes().filter(element => {
+        return element.catalogId === undefined;
+      });
+      checkedList.forEach(element => {
+        let option = []
+        getAnswer({quizId: element.quizId})
+        .then(response=> {
+          response.data.forEach(ele=> {
+            option.push(ele)
+          })
+        })
+        element.option = option
+        this.addTab(element);
+      });
+    }
   }
 };
 </script>

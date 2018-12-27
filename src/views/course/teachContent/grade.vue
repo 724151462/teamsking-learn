@@ -226,22 +226,11 @@ export default {
     upload(file, fileList) {
       let formData = new FormData();
       formData.append("file", file.raw);
-      formData.append("courseId", "0608367675f54267aa6960fd0557cc1b");
+      formData.append("courseId", this.$route.query.id);
       scoreUpload(formData).then(response => {
-        response.data.forEach(element => {
-          if (element.errorData) {
-            this.resData = response.data;
-            console.log(element.errorData);
-            this.dialogShow = true;
-          }
-        });
+        this.resData = response.data;
+        this.dialogShow = true;
       });
-      console.log(formData.get("file"));
-      console.log("file", file);
-      console.log("fileList", fileList);
-
-      let files = { 0: file.raw };
-      this.readExcel1(files);
     },
     readExcel1(files) {
       //表格导入

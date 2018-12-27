@@ -16,7 +16,7 @@
       <el-radio-group v-model="interactParams.interactionStatus" @change="handleSelect">
         <el-radio label="">全部</el-radio>
         <el-radio label="10">未开始</el-radio>
-        <el-radio label="20">已开始</el-radio>
+        <el-radio label="20">进行中</el-radio>
         <el-radio label="30">已结束</el-radio>
       </el-radio-group>
     </div>
@@ -42,7 +42,7 @@
               </div>
             </div>
             <div class="interact-right">
-              <el-tooltip placement="bottom" effect="light">
+              <el-tooltip placement="bottom" effect="light" v-if="interact.interactionStatus === 10">
                 <div slot="content" style="margin-bottom:5px;cursor: pointer" @click="click123">直接开始</div>
                 <div slot="content" style="cursor: pointer" @click="setEndTime">设置结束时间并开始</div>
                 <div>
@@ -50,8 +50,10 @@
                   <span>开始互动</span>
                 </div>
               </el-tooltip>
+              <span v-else-if="interact.interactionStatus === 20">结束互动</span>
+              <span v-else>已结束</span>
               <div>
-                <span @click="editInteraction(interact)">编辑</span>
+                <span @click="editInteraction(interact)" v-if="interact.interactionStatus === 10">编辑</span>
                 <span @click="deleteInteraction(interact)" style="margin-left:10px">删除</span>
               </div>
             </div>
@@ -117,12 +119,12 @@ export default {
   mounted() {
     interactList(this.interactParams)
     .then(response=> {
-      // response.data.forEach(element => {
-      //   console.log(element)
-      //   element.interactions.forEach(item=> {
-      //     item.interactionStatus = 30
-      //   }) 
-      // });
+      response.data.forEach(element => {
+        // console.log(element)
+        // element.interactions.forEach(item=> {
+        //   item.interactionStatus = 20
+        // }) 
+      });
       this.interactList = response.data
     })
   },
@@ -131,6 +133,10 @@ export default {
       alert(123)
     },
     toDetail(val) {
+      console.log(val.interactionStatus)
+      if(val.interactionStatus === 10) {
+        return
+      }
       switch (val.interactionType) {
         case 30:
           return this.$router.push({path: '/course/list/interact/testresult', query: {id: this.$route.query.id, interactId: val.interactionId}})
@@ -265,7 +271,7 @@ export default {
           return '未开始'
           break;
         case 20:
-          return '已开始'
+          return '进行中'
           break;
         case 30:
           return '已结束'
