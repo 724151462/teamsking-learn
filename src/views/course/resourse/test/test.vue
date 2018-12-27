@@ -38,7 +38,7 @@
           <el-checkbox v-model="isCheckAll">全选</el-checkbox>
         </div>
         <div>
-          <el-button type="primary" size="small">创建目录</el-button>
+          <el-button type="primary" size="small" @click="goCreateCatalog(0)">创建目录</el-button>
           <el-button type="primary" size="small">移动到</el-button>
           <el-button type="primary" size="small">删除</el-button>
         </div>
@@ -47,23 +47,30 @@
         <el-tree
           :data="catalogData"
           :props="{
-            label: treeProp.name,
-            children: treeProp.child
+            label: 'catalogName',
+            children: 'catalogList'
           }"
-          @node-click="shownode"
+          @node-click="getNodeData"
           show-checkbox
           accordion
           node-key="id">
             <span class="test-tree-node" slot-scope="{ node, data }">
-              <span>
-                <img :src="imgSrc.folder" alt="" class="folder-img"><span>{{ node.label }}</span>
+              <span class="test-info">
+                <img :src="imgSrc.folder" alt="" class="folder-img" v-show="!data.quizId">
+                <span class="quiz-tag" v-show="data.quizType == 10">单选题</span>
+                <span class="quiz-tag" v-show="data.quizType == 20">多选题</span>
+                <span>{{ node.label }}</span>
               </span>
-              <!--<span>{{node.data}}</span>-->
-              <!--<span>{{ node.label }}</span>-->
-              <!--<span>12354646 <span>asds</span> </span>-->
-              <span>
-                <el-button size="mini" @click="() => append(data)"> 编辑 </el-button>
-                <el-button size="mini" @click="() => remove(node, data)">删除</el-button>
+              <span style="margin-right: 10px" v-show="data.updateTime">{{data.updateTime}}</span>
+              <span v-if="data.catalogLevel">
+                <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click="goCreateCatalog(data.catalogId)"> 创建子目录 </el-button>
+                <el-button size="mini" type="primary" @click="() => append(data)"> 添加 </el-button>
+                <el-button size="mini" type="primary" @click="() => append(data)"> 编辑 </el-button>
+                <el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>
+              </span>
+              <span v-else>
+                <el-button size="mini" type="primary" @click="() => append(data)"> 编辑 </el-button>
+                <el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>
               </span>
             </span>
         </el-tree>
@@ -101,17 +108,30 @@
     <el-button type="primary">确 定</el-button>
     </span>
     </el-dialog>
+    <!--创建目录弹窗-->
+    <el-dialog
+      title="创建目录"
+      :visible.sync="createCatalog"
+      width="40%">
+      <el-input v-model="newCatalog.catalogName" placeholder="请输入文件夹的名字"></el-input>
+
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="testDelete = false">取 消</el-button>
+          <el-button type="primary" @click="newFileFold">确 定</el-button>
+        </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   // import uposs from '@/components/up-oss.vue'
   import {getTestFileFold, newTestFileFold , deleteTestFileFold} from "../../../../api/library";
+  import {logins} from "../../../../api/login";
 
   export default {
     // components:{uposs},
     created (){
-      // this.getTestList({quizType: 0})
+      this.getTestList(0)
     },
     data() {
       return {
@@ -132,50 +152,18 @@
           ],
           quizList: [{
             quizTitle: '试题名称',
+            parentId: 0,
           }]
         }],
-        catalogData2:[
-          {
-            "catalogId": 0,
-            "catalogLevel": 0,
-            "catalogList": [
-              {}
-            ],
-            "catalogName": "string",
-            "count": 0,
-            "parentId": 0,
-            "quizList": [
-              {
-                "catalogId": 0,
-                "difficulty": 0,
-                "displayOrder": 0,
-                "quizAnalysis": "string",
-                "quizId": 0,
-                "quizOption": [
-                  {
-                    "correctFlag": 0,
-                    "optionId": 0,
-                    "optionTitle": "string",
-                    "quizId": 0
-                  }
-                ],
-                "quizTitle": "string",
-                "quizType": 0,
-                "skillPoint": 0,
-                "updateTime": "2018-12-19 12:00:00",
-                "useCount": 0
-              }
-            ]
-          }
-        ],
-        //节点树的结构配置
-        treeProp:{
-          name: 'catalogName' ? 'catalogName' : 'quizTitle',
-          child:'catalogList' ?'catalogList' : 'quizList',
-        },
         isCheckAll: false,
         value:'',
+        //创建新文件夹的表单
+        newCatalog:{
+          catalogId: 0,
+          catalogName: ""
+        },
         uploadDialog: false, //文件上传弹窗
+        createCatalog: false, //新建目录弹窗
         testView: false , //试题查看弹窗
         testDelete: false, //删除试题
         //courseId: '0608367675f54267aa6960fd0557cc1b',//如果指定课程的话，课程ID
@@ -186,23 +174,32 @@
       }
     },
     methods: {
-      shownode(data){
-        console.log('被点击')
-        console.log(data)
+      //点击弹出新建目录的弹窗
+      goCreateCatalog(id){
+        console.log(id)
+        this.newCatalog.catalogId = id
+        this.createCatalog = true
       },
-      // 获取所有试题列表数据
-      getTestList(data){
-        console.log(data)
+      //文件夹被点击
+      getNodeData(data){
+        // console.log(data)
+        let id = data.catalogId
+        let lv = data.catalogLevel
+        let redata =  this.filterCatalogId(this.curCatalogData,id,lv)
+        // console.log(redata.catalogName)
+      },
+      // 获取所有试题列表
+      getTestList(id){
+        let data = {quizType: id}
         getTestFileFold(data).then(res => {
           console.log(res)
           if (Number(res.code) === 200) {
             //如果试题库为空，则初始化新建一个默认的文件夹
             if(res.data.length === 0){
-              console.log('新建默认文件夹')
               this.newFileFold(0,'默认文件夹')
             }
-            this.catalogData = res.data
-            console.log('现在的试题数据为')
+            let data = JSON.parse(JSON.stringify(res.data))
+            this.catalogData = this.filterData(data)
             console.log(this.catalogData)
           } else {
             this.$message({
@@ -216,17 +213,14 @@
         });
       },
       //新建文件夹
-      newFileFold(parentId, catalogName){
-        let data = {
-          catalogId: parentId,
-          catalogName
-        }
+      newFileFold(){
+        let data = this.newCatalog
 
         newTestFileFold(data).then(res => {
-          console.log(res)
           if (Number(res.code) === 200) {
-            //如果试题库为空，则初始化新建一个默认的文件夹
             this.$message.success('文件夹新建成功');
+            this.createCatalog = false
+            this.getTestList(0)
           } else {
             this.$message.error('文件夹新建失败');
           }
@@ -234,7 +228,6 @@
           .catch(error => {
             console.log(error);
           });
-
       },
       toEditTest() {
         this.$router.push('/course/resource/edittest/1');
@@ -293,25 +286,48 @@
       },
       // 删除该课程全部试题
       delAllQuiz() {
-
       },
-      // renderContent(h, { node, data, store }) {
-      //   return (
-      //     <span class="custom-tree-node">
-      //       <span> {node.label} </span>
-      //       <span>
-      //         <el-button size="mini"  on-click={ () => alert('append') }>Append</el-button>
-      //         <el-button size="mini"  on-click={ () => alert('delete') }>Delete</el-button>
-      //       </span>
-      //       <span>{quizList.title}</span>
-      //   </span>
-      // );
-      // }
+      //编辑试题
+      goEdit(quizId){
+        this.$router.push({ path: `/course/resource/edittest/${quizId}` })
+      },
+      //清洗数据
+      filterData(data){
+        let getFilter = (data)=>{
+         data.forEach((item)=>{
+            if(!item.catalogList.length!==0){
+              getFilter(item.catalogList)
+            }
+            if(item.quizList.length !==0){
+              item.quizList.forEach((list)=>{
+                item.catalogList.push({catalogName: list.quizTitle,
+                    quizId: list.quizId,
+                    updateTime:list.updateTime,
+                    quizType:list.quizType})
+              })
+            }
+          })
+          return data
+        }
+        let curData = getFilter(data)
+        return curData
+      },
+      //将拿到的数据处理，进行渲染
+      getShowData(data, id ){
+
+      }
     }
   }
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+  //单选，多选，徽章
+  .quiz-tag
+    display inline-block
+    padding 0 5px
+    margin 0 5px
+    color cornflowerblue
+    border 1px solid cornflowerblue
   .el-table .cell
     overflow: hidden
     white-space: nowrap
@@ -354,8 +370,6 @@
       & div:first-child
         flex 1
         padding-left 25px
-      & div:last-child
-        padding-right 40px
     .test-body
       .folder-img
         width: 20px;margin: -5px 10px;
@@ -365,6 +379,15 @@
         align-items: center;
         justify-content: space-between;
         font-size: 14px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         padding-right: 8px;
+        .test-info
+          flex: 1;
+          overflow: hidden;
+          padding-right: 30px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
 </style>
 

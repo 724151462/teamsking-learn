@@ -42,7 +42,7 @@
   import {menuList, logout} from '@/api/login'
   import {constantRouterMap} from '@/router/index'
   import { removeToken , getUserId, removeUserId} from '@/utils/auth'
-  import {getUserInfo} from "../../api/user";
+  import {getUserInfo,getMeInfo} from "../../api/user";
 
   export default {
     props:['navs'],
@@ -137,7 +137,7 @@
     //根据Cookie获取用户信息
     getUserInfo(){
       let data = getUserId()
-      getUserInfo(data).then(res=>{
+      getMeInfo().then(res=>{
         console.log(res)
         if(Number(res.code) === 200) {
           this.realName = res.data.realName

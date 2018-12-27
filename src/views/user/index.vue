@@ -127,9 +127,28 @@
       </el-form>
 
       <span slot="footer" class="dialog-footer">
-    <el-button @click="this.changeMobileDialog = false">取 消</el-button>
-    <el-button type="primary" @click="bindMobile">确 定</el-button>
-  </span>
+        <el-button @click="this.changeMobileDialog = false">取 消</el-button>
+        <el-button type="primary" @click="bindMobile">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!--绑定邮箱弹窗-->
+    <el-dialog
+      title="绑定邮箱"
+      :visible.sync="changeMobileDialog"
+      width="30%">
+      <el-form :model="changeEmailForm" :rules="rules" ref="changePassForm" label-width="100px">
+        <el-form-item label="邮箱" prop="changeMobile">
+          <el-input type="text" v-model="changeEmailForm.changeEmail"></el-input>
+        </el-form-item>
+        <el-form-item label="验证码" prop="captcha">
+          <el-input type="password" v-model="changeEmailForm.captcha"></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="this.changeMobileDialog = false">取 消</el-button>
+        <el-button type="primary" @click="bindMobile">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -169,6 +188,10 @@
           changeMobile:'',
           captcha:''
         },
+        changeEmailForm:{
+          changeEmail:'',
+          captcha:''
+        },
         rules:{
           checking: { required: true, message: '请再次输入密码', trigger: 'blur' },
           newPasswd: { required: true, message: '请输入新密码', trigger: 'blur' },
@@ -186,7 +209,7 @@
       //获取用户信息
       initUserInfo(){
         let data = getUserId()
-        userApi.getUserInfo(data).then(res=>{
+        userApi.getMeInfo().then(res=>{
           console.log(res)
           if(Number(res.code) === 200) {
             this.realName = res.data.realName

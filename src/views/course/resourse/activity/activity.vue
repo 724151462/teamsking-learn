@@ -40,18 +40,13 @@
           <el-button icon="el-icon-delete" size="small">删除</el-button>
         </div>
       </div>
-      <div>
-        <simple-tree></simple-tree>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-  import simpleTree from '@/views/course/resourse/simple-vue'
   export default {
     components:{
-      simpleTree
     },
     data () {
       return {

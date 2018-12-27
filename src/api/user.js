@@ -13,12 +13,22 @@ import { commonsAjax } from '@/utils/requery'
 /**
  * 获取用户信息
  * */
-export function getUserInfo (data) {
+export function getUserInfo (id) {
 
-  let url = `${infoUrl}${data}`
+  let url = `${infoUrl}${id}`
+  let data = {userId: id}
   // return commonsAjax(url, '', 'get')
   return commonsAjax(url, '', 'get')
 }
+/**
+ * 获取用户信息(不需要权限)
+ * */
+export function getMeInfo (id) {
+  let url = `${baseUrl}/user/info/me`
+  // return commonsAjax(url, '', 'get')
+  return commonsAjax(url, '', 'get')
+}
+
 
 /**
  * 修改本人的用户信息，密码、身份证和电话号码除外
@@ -58,4 +68,29 @@ export function resetMobile (data) {
  * */
 export function changeUserPassword (data) {
   return commonsAjax(`${baseUrl}user/passwd`, data, 'post')
+}
+
+/**
+ * 绑定邮箱
+ * */
+export function bindEmail (data) {
+  return commonsAjax(`${baseUrl}user/mail/captcha/replace`, data, 'post')
+}
+/**
+ * 发送绑定邮箱验证码
+ * */
+export function getEmailBindCode (data) {
+  return commonsAjax(`${baseUrl}user/mail/captcha`, data, 'get')
+}
+/**
+ * 获取换邮箱绑口令
+ * */
+export function getResetEmailCode (data) {
+  return commonsAjax(`${baseUrl}user/mail/captcha/replace`, data, 'get')
+}
+/**
+ * 验证邮箱换绑口令
+ * */
+export function checkEmailResetCode (data) {
+  return commonsAjax(`${baseUrl}user/mail/captcha`, data, 'post')
 }
