@@ -33,11 +33,10 @@
     </div>
     <div class="test-warp">
       <div class="test-title">
-        <!--全选-->
         <div>
-          <el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>
-        </div>
-        <div>
+          <!--全选-->
+          <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
+          <el-button type="primary" size="small" @click="checkAll(true)">清空库</el-button>
           <el-button type="primary" size="small" @click="goCreateCatalog(0)">创建目录</el-button>
           <el-button type="primary" size="small">移动到</el-button>
           <el-button type="primary" size="small" @click="deleteCatalog">删除</el-button>
@@ -50,10 +49,9 @@
             label: 'catalogName',
             children: 'catalogList'
           }"
-          @node-click="getNodeData"
           show-checkbox
+          @check-change	="nodeCheck"
           accordion
-          @check="nodeCheck"
           node-key="catalogId"
           ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
@@ -65,14 +63,14 @@
               </span>
               <span style="margin-right: 10px" v-show="data.updateTime">{{data.updateTime}}</span>
               <span v-if="data.catalogLevel">
-                <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click="goCreateCatalog(data.catalogId)"> 创建子目录 </el-button>
-                <el-button size="mini" type="primary" @click="() => append(data)"> 重命名 </el-button>
-                <el-button size="mini" type="primary" @click="() => append(data)"> 添加试题 </el-button>
+                <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
+                <el-button size="mini" type="primary" @click.stop="() => append(data)"> 重命名 </el-button>
+                <el-button size="mini" type="primary" @click.stop="goAddTest(data,data.catalogId)"> 添加试题 </el-button>
                 <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
               </span>
               <span v-else>
-                <el-button size="mini" type="primary" @click="() => append(data)"> 编辑 </el-button>
-                <el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>
+                <el-button size="mini" type="primary" @click.stop="goEditTest(data.catalogId, data.quizId)"> 编辑 </el-button>
+                <el-button size="mini" type="primary" @click.stop="() => remove(node, data)">删除</el-button>
               </span>
             </span>
         </el-tree>
@@ -100,13 +98,16 @@
     </el-dialog>
     <!--删除确认框-->
     <el-dialog
-      title="删除试题"
-      :visible.sync="testDelete"
+      title="清空资源"
+      :visible.sync="allDelete"
+      :show-close="false"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
       width="40%">
-      <span style="font-size: 16px">确认删除该试题？</span>
+      <span style="font-size: 16px">此操作会清空资源库下的所有试题，请慎重！</span>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="testDelete = false">取 消</el-button>
-    <el-button type="primary">确 定</el-button>
+    <el-button @click="checkAll(false)">取 消</el-button>
+    <el-button type="danger" @click="deleteCatalog">确 定</el-button>
     </span>
     </el-dialog>
     <!--创建目录弹窗-->
@@ -117,7 +118,7 @@
       <el-input v-model="newCatalog.catalogName" placeholder="请输入文件夹的名字"></el-input>
 
       <span slot="footer" class="dialog-footer">
-          <el-button @click="testDelete = false">取 消</el-button>
+          <el-button @click="createCatalog = false">取 消</el-button>
           <el-button type="primary" @click="newFileFold">确 定</el-button>
         </span>
     </el-dialog>
@@ -167,7 +168,7 @@
         uploadDialog: false, //文件上传弹窗
         createCatalog: false, //新建目录弹窗
         testView: false , //试题查看弹窗
-        testDelete: false, //删除试题
+        allDelete: false, //删除试题
         //courseId: '0608367675f54267aa6960fd0557cc1b',//如果指定课程的话，课程ID
         courseId: '',//如果指定课程的话，课程ID
         catalogPros:{
@@ -177,35 +178,44 @@
     },
     methods: {
       //点击弹出新建目录的弹窗
-      goCreateCatalog(id) {
-        console.log(id)
+      goCreateCatalog(data,id) {
         this.newCatalog.catalogId = id
         this.createCatalog = true
+
+        //创建子目录时目录不折叠
+        // console.log(data)
+        // const newChild = { catalogId: 101 , catalogName: "计算机网络--第一章" };
+        // if (!data.catalogList) {
+        //   this.$set(data, 'children', []);
+        // }
+        // data.catalogList.push(newChild);
       },
       //全选操作
-      checkAll(){
+      checkAll(flag){
         //获取所有文件夹节点的id用于全选
         let idArr = []
         this.catalogData.forEach((item)=>{
           idArr.push(item.catalogId)
         })
-
+        this.isCheckAll = flag
         this.isCheckAll ? idArr : idArr=[]
         this.deleteArr= idArr
 
-        this.$refs.tree.setCheckedKeys(idArr)
+        this.allDelete = flag
+        console.log(this.deleteArr)
+        // this.$refs.tree.setCheckedKeys(idArr)
       },
+      //节点复选框被选
       nodeCheck(data, checked){
-        console.log('被点击')
-        console.log(data)
-      },
-      //文件夹被点击
-      getNodeData(data){
-        // console.log(data)
-        let id = data.catalogId
-        let lv = data.catalogLevel
-        let redata =  this.filterCatalogId(this.curCatalogData,id,lv)
-        // console.log(redata.catalogName)
+        if(checked){
+          this.deleteArr.push(data.catalogId)
+        }else{
+          let index = this.deleteArr.indexOf(data.catalogId)
+          this.deleteArr.splice(index,1)
+        }
+        this.deleteArr =this.deleteArr.filter((item)=>{
+          return item != undefined
+        })
       },
       // 获取所有试题列表
       getTestList(id){
@@ -215,7 +225,11 @@
           if (Number(res.code) === 200) {
             //如果试题库为空，则初始化新建一个默认的文件夹
             if(res.data.length === 0){
-              this.newFileFold(0,'默认文件夹')
+              this.newCatalog = {
+                  catalogId: 0,
+                  catalogName: "默认文件夹"
+              }
+              this.newFileFold()
             }
             let data = JSON.parse(JSON.stringify(res.data))
             this.catalogData = this.filterData(data)
@@ -234,26 +248,26 @@
       //新建文件夹
       newFileFold(){
         let data = this.newCatalog
-
         newTestFileFold(data).then(res => {
+          console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('文件夹新建成功');
             this.createCatalog = false
+            this.newCatalog.catalogName = ''
             //更新页面数据
             this.getTestList(0)
           } else {
             this.$message.error('文件夹新建失败');
           }
         })
-          .catch(error => {
-            console.log(error);
-          });
       },
-      toEditTest() {
-        this.$router.push('/course/resource/edittest/1');
+      goEditTest() {
+        this.$router.push('/course/resource/edittest/12/43`');
       },
-      toAddTest() {
-        this.$router.push('/course/resource/addtest');
+      goAddTest(data,catalogId) {
+        console.log(data)
+        alert(catalogId)
+        // this.$router.push({path: `/course/resource/addtest/${catalogId}` });
       },
       // 导入试题模板
       upTestFile(item) {
@@ -309,8 +323,18 @@
       },
       //删除文件夹
       deleteCatalog(){
-        console.log('要删除的数组为')
-        console.log(this.deleteArr)
+        let catalogIds = [...this.deleteArr]
+        console.log(catalogIds)
+        deleteTestFileFold(this.deleteArr).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.$message.success('删除成功');
+            this.allDelete = false
+            this.getTestList(0)
+          } else {
+            this.$message.error('删除失败');
+          }
+        })
       },
       //编辑试题
       goEdit(quizId){
@@ -392,9 +416,6 @@
       height 50px
       align-items center
       background-color #f4f4f4
-      & div:first-child
-        flex 1
-        padding-left 25px
     .test-body
       .folder-img
         width: 20px;margin: -5px 10px;

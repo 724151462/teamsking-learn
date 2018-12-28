@@ -65,6 +65,14 @@
 
   export default {
     name: "addTest",
+    created () {
+      console.log(this.$route.query)
+
+      if(this.$route.query.courseid && this.$route.query.courseid !== ''){
+        this.courseid = this.$route.query.courseid
+      }
+
+    },
     data () {
       return {
         testData:{
