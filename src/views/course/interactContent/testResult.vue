@@ -13,10 +13,10 @@
         </div>
         
         <div class="main">
-            <div style="margin-top: 20px">
+            <!-- <div style="margin-top: 20px">
                 <span>题目1：在以下能有效防控欠款产生的措施中，。。。。。。</span>
                 <span style="color:rgb(130,178,198)">(单选题)</span>
-            </div>
+            </div> -->
             <div class="answer-container">
                 <span>排名</span>
                 <span>姓名</span>
@@ -47,7 +47,7 @@
 
 <script>
 import {
-    testMark
+    testRes
 }from '@/api/course'
 export default {
     data() {
@@ -105,7 +105,7 @@ export default {
         }
     },
     mounted() {
-        testMark(this.examParams)
+        testRes(this.examParams)
         .then(response=> {
             
         })

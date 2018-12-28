@@ -89,9 +89,8 @@
                     </div>
                   </div>
                   <div class="operate">
-                    <span @click="addSubjectBtn(content)">+题目</span>
-                    <span>编辑</span>
-                    <span>删除</span>
+                    <span v-if="content.contentType===10" @click="addSubjectBtn(content)">+内嵌题</span>
+                    <span @click="delItem(content, jie.catalogItem, contentIndex)">删除</span>
                   </div>
                 </div>
               </div>
@@ -145,7 +144,6 @@
               <span>{{ node.label }}</span>
             </span>
           </el-tree>
-          <p v-for="(v,index) in vedioCheckedList" :key="index">{{v.catalogName}}</p>
         </el-tab-pane>
         <el-tab-pane label="文档" name="second">
           <el-tree :data="docList" ref="tree1" show-checkbox node-key="id" :props="defaultDocProps">
@@ -206,7 +204,7 @@
     </el-dialog>
 
     <!-- 编辑题目对话框 -->
-    <el-dialog title="编辑题目" top="40vh" :visible.sync="editSubjectVisible" width="35%">
+    <el-dialog title="编辑题目" top="40vh" :visible.sync="editSubjectVisible" width="55%">
       <div>
         <div>
           <span style="color:rgb(85, 200, 255)">资源库导入</span>
@@ -221,12 +219,9 @@
           <el-button>查询</el-button>
         </div>
         <div class="subjRadio">
-          <el-radio
-            v-for="item in sourceSubList"
-            :key="item.id"
-            :label="item.title"
-            v-model="subjPick"
-          ></el-radio>
+          <Tree :sourceData="fileList" @checkedList="test" :props="defaultProps">
+
+          </Tree>
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -248,6 +243,7 @@
 <script>
 import adialog from "@/components/dialog";
 import videoPlayer from "@/components/video-pay";
+import Tree from "@/components/fileTree"
 import {
   chaptersList,
   chaptersAdd,
@@ -256,7 +252,8 @@ import {
   sectionDelete,
   itemAdd,
   studyModeModify,
-  courseBaseInfo
+  courseBaseInfo,
+  itemDelete
 } from "@/api/course";
 import { getResList } from "@/api/library";
 
@@ -428,7 +425,11 @@ export default {
       },
       vedioCheckedList: [],
       fileList: [],
-      docList: []
+      docList: [],
+      tempSection: [],
+      // 删除小项
+      tempItems: [],
+      tempItemIndex: ''
     };
   },
   created() {
@@ -437,6 +438,12 @@ export default {
     });
     courseBaseInfo(this.courseId).then(response => {
       this.patternId = String(response.data.studyMode);
+    });
+    getResList({ resourceType: 10 }).then(response => {
+        this.fileList = this.filterData(response.data);
+    });
+    getResList({ resourceType: 20 }).then(response => {
+      this.docList = this.filterData(response.data);
     });
   },
   methods: {
@@ -548,6 +555,31 @@ export default {
         this.delDialog = false;
       });
     },
+    // 删除小项
+    delItem(content, item, contentIndex) {
+      this.tempItems = item
+      this.tempItemIndex = contentIndex
+      let delArr = [];
+      delArr.push(content.itemId);
+      this.delDialogParm = {};
+      this.delDialogParm.info = "确认删除小项？";
+      this.delDialogParm.type = "delItem";
+      this.delDialogParm.itemIds = delArr;
+      this.delDialog = true;
+    },
+    delItemEnsure() {
+      console.log(this.delDialogParm)
+      itemDelete(this.delDialogParm.itemIds).then(response => {
+        if (response.code === 200) {
+          this.tempItems.splice(this.tempItemIndex, 1)
+          this.$message({
+            message: "删除内容成功",
+            type: "success"
+          });
+          this.delDialog = false;
+        }
+      });
+    },
     // 删除事件
     delEvent() {
       console.log("删除对象的参数", this.delDialogParm);
@@ -557,6 +589,8 @@ export default {
           break;
         case "delChapter":
           this.delChapterEnsure();
+        case "delItem":
+          this.delItemEnsure();
         default:
           break;
       }
@@ -576,13 +610,8 @@ export default {
     },
     // 添加内容弹窗
     addContentBtn(data) {
+      this.tempSection = data
       console.log(data);
-      getResList({ resourceType: 10 }).then(response => {
-        this.fileList = this.filterData(response.data);
-      });
-      getResList({ resourceType: 20 }).then(response => {
-        this.docList = this.filterData(response.data);
-      });
       this.videoForm.chapterId = data.chapterId;
       this.videoForm.sectionId = data.sectionId;
       this.docForm.chapterId = data.chapterId;
@@ -592,6 +621,7 @@ export default {
     // 添加内容对话框确认按钮
     addItem() {
       console.log(this.contentType);
+      console.log('缓存节', this.tempSection.catalogItem);
       let formType = {};
       let resource;
       if (this.contentType === "视频") {
@@ -602,11 +632,19 @@ export default {
         resource = this.fileNumberCheck(this.$refs.tree1)
       }
       if(!resource) return
+      formType.itemName = resource[0].catalogName
       formType.contentId = resource[0].resourceId
       this.dialogVisible = false
       console.log("ft", formType);
       itemAdd(formType).then(response => {
         console.log(response.data);
+        if(response.code === 200) {
+          this.tempSection.catalogItem.push(formType)
+          this.$message({
+            message: "添加内容成功",
+            type: "success"
+          })
+        }
       });
     },
     fileNumberCheck(treeName) {
@@ -616,6 +654,12 @@ export default {
       if (checkedList.length > 1) {
         this.$message({
           message: "请选择单个文件",
+          type: "warning"
+        });
+        return false;
+      }else if(checkedList.length < 1) {
+        this.$message({
+          message: "尚未选择文件",
           type: "warning"
         });
         return false;
@@ -758,6 +802,9 @@ export default {
     saveAllSubj() {
       console.log(this.subjectList);
       this.subjectVisible = false;
+    },
+    test(value) {
+      console.log(value)
     }
   },
   filters: {
@@ -787,7 +834,8 @@ export default {
   },
   components: {
     adialog,
-    videoPlayer
+    videoPlayer,
+    Tree
   }
 };
 </script>

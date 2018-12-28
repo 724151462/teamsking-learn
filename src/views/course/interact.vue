@@ -26,7 +26,7 @@
           <template slot="title">
             <span style="margin-left: 20px">{{item.chapterName}}</span>
           </template>
-          <div class="collapse-layout" v-for="interact in item.interactions" :key="interact.interactionId">
+          <div class="collapse-layout" v-for="(interact,interactIndex) in item.interactions" :key="interact.interactionId">
             <div class="collapse-layout interact-left" @click="toDetail(interact)">
               <img width="60px" :src="interactImg(interact.interactionType)" alt="">
               <div class="item-detail">
@@ -43,14 +43,14 @@
             </div>
             <div class="interact-right">
               <el-tooltip placement="bottom" effect="light" v-if="interact.interactionStatus === 10">
-                <div slot="content" style="margin-bottom:5px;cursor: pointer" @click="start(interact)">直接开始</div>
-                <div slot="content" style="cursor: pointer" @click="setEndTime">设置结束时间并开始</div>
+                <div slot="content" style="margin-bottom:5px;cursor: pointer" @click="start(interact,item,interactIndex)">直接开始</div>
+                <div slot="content" style="cursor: pointer" @click="saveInteract(interact)">设置结束时间并开始</div>
                 <div>
                   <i class="el-icon-caret-right"></i>
                   <span>开始互动</span>
                 </div>
               </el-tooltip>
-              <span v-else-if="interact.interactionStatus === 20">结束互动</span>
+              <span v-else-if="interact.interactionStatus === 20" @click="end(interact,item,interactIndex )">结束互动</span>
               <span v-else>已结束</span>
               <div>
                 <span @click="editInteraction(interact)" v-if="interact.interactionStatus === 10">编辑</span>
@@ -67,14 +67,15 @@
       :visible.sync="setEndTimeDialog"
       top="40vh"
       width="30%">
-      <el-form v-model="endTimeForm">
-        <el-input style="width:200px" v-model="endTimeForm.date" type="date"></el-input>
-        &nbsp;
-        <el-input style="width:200px" v-model="endTimeForm.time" type="time"></el-input>
-      </el-form>
+      <el-date-picker
+        v-model="endTimeForm"
+        type="datetime"
+        placeholder="选择日期时间"
+        value-format="yyyy-MM-dd HH:mm:ss">
+      </el-date-picker>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setEndTimeDialog = false">取 消</el-button>
-        <el-button type="primary" @click="setEndTimeDialog = false">确 定</el-button>
+        <el-button type="primary" @click="setEndTime">确 定</el-button>
       </span>
     </el-dialog>
     <el-dialog
@@ -108,13 +109,11 @@ export default {
         interactionStatus: ''
       },
       setEndTimeDialog: false,
-      endTimeForm: {
-        date: '',
-        time: ''
-      },
+      endTimeForm: '',
       interactList: [],
       deleteDialog: false,
-      delParams: {}
+      delParams: {},
+      temParams: {}
     }
   },
   mounted() {
@@ -130,17 +129,60 @@ export default {
     })
   },
   methods: {
-    start(item) {
+    saveInteract(item) {
+      this.temParams = {
+        interactionId: item.interactionId,
+        interactionType: item.interactionType,
+        action: 2
+      }
+      this.setEndTimeDialog = true
+    },
+    start(item, chapter, interactIndex) {
       console.log(item)
       interactStatus({
         interactionId: item.interactionId,
         interactionType: item.interactionType,
+        time: item.time || null,
         action: 1
+      }).then(response=> {
+        if(response.code === 200) {
+          chapter.interactions.splice(interactIndex, 1)
+          this.$message(
+            {
+              message: '活动已置为开始',
+              type: 'success'
+            }
+          )
+        }
+        this.setEndTimeDialog = false
       })
+    },
+    end(item, chapter, interactIndex) {
+      interactStatus({
+        interactionId: item.interactionId,
+        interactionType: item.interactionType,
+        action: 2
+      }).then(response=> {
+        if(response.code === 200) {
+          chapter.interactions.splice(interactIndex, 1)
+          this.$message(
+            {
+              message: '活动已置为结束',
+              type: 'success'
+            }
+          )
+        }
+      })
+    },
+    setEndTime() {
+      let endTime = this.endTimeForm
+      this.temParams.time = endTime
+      console.log(this.temParams)
+      this.start(this.temParams)
     },
     toDetail(val) {
       console.log(val.interactionStatus)
-      if(val.interactionStatus === 10) {
+      if(val.interactionStatus === 10|| val.interactionStatus === 20) {
         return
       }
       switch (val.interactionType) {
@@ -160,9 +202,6 @@ export default {
       // this.$router.push({path: '/course/list/interact/voteresult', query: {id: 123}})
       // this.$router.push({path: '/course/list/interact/brainresult', query: {id: 123}})
       // this.$router.push({path: '/course/list/interact/testresult', query: {id: 123}})
-    },
-    setEndTime() {
-      this.setEndTimeDialog = true
     },
     interactImg(value) {
       switch (value) {

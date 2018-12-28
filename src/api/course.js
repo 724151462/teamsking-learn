@@ -230,6 +230,15 @@ export function itemAdd(data) {
 }
 
 
+/**
+ * 删除小项
+ */
+
+export function itemDelete(data) {
+  let url = `${baseUrl}chapter/section/item`
+  return commonsAjax(url, data, 'delete')
+}
+
 
 /**
  * 添加成员方案名称
@@ -390,6 +399,14 @@ export function testList(data) {
  */
 export function testMark(data) {
   let url = `${baseUrl}exam/submit/list/${data.courseId}/${data.examId}`
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 测试结果
+ */
+export function testRes(data) {
+  let url = `${baseUrl}exam/submit/item/${data.examId}`
   return commonsAjax(url, '', 'get')
 }
 

@@ -49,7 +49,7 @@
         </el-select>
       </div>
       <div>
-        <el-checkbox v-model="testObj.disorderOrder" true-label="1" false-label="2">题目乱序</el-checkbox>
+        <el-checkbox v-model="testObj.disorderOrder" :true-label="1" :false-label="2">题目乱序</el-checkbox>
       </div>
       <div class="margin-sides">
         <span>测试时长</span>
@@ -132,7 +132,7 @@ export default {
         courseId: this.$route.query.id,
         belongTitle: "",
         chapterId: "",
-        disorderOrder: false,
+        disorderOrder: 2,
         repeatTimes: "",
         testHour: "",
         testMinute: "",
@@ -230,6 +230,11 @@ export default {
               message: '修改测试成功',
               type: 'success'
             })
+          }else if(response.code === 1000) {
+            this.$message({
+              message: response.msg,
+              type: 'warning'
+            })
           }
         });
       }else{
@@ -248,6 +253,11 @@ export default {
             this.$message({
               message: '添加测试成功',
               type: 'success'
+            })
+          }else if(response.code === 1000) {
+            this.$message({
+              message: response.msg,
+              type: 'warning'
             })
           }
         });
