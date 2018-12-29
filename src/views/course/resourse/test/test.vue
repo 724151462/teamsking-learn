@@ -33,14 +33,14 @@
     </div>
     <div class="test-warp">
       <div class="test-title">
-        <!--全选-->
+        <div style="flex: 1"></div>
         <div>
-          <el-checkbox v-model="isCheckAll">全选</el-checkbox>
-        </div>
-        <div>
+          <!--全选-->
+          <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
           <el-button type="primary" size="small" @click="goCreateCatalog(0)">创建目录</el-button>
           <el-button type="primary" size="small">移动到</el-button>
-          <el-button type="primary" size="small">删除</el-button>
+          <el-button type="info" size="small" @click="deleteCatalog">删除</el-button>
+          <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
         </div>
       </div>
       <div class="test-body">
@@ -50,10 +50,12 @@
             label: 'catalogName',
             children: 'catalogList'
           }"
-          @node-click="getNodeData"
           show-checkbox
+          @check-change	="nodeCheck"
+          :check-on-click-node="true"
           accordion
-          node-key="id">
+          node-key="catalogId"
+          ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
               <span class="test-info">
                 <img :src="imgSrc.folder" alt="" class="folder-img" v-show="!data.quizId">
@@ -61,22 +63,24 @@
                 <span class="quiz-tag" v-show="data.quizType == 20">多选题</span>
                 <span>{{ node.label }}</span>
               </span>
+              <span v-show="node.checked">
+                <span v-if="data.catalogLevel">
+                  <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
+                  <el-button size="mini" type="primary" @click.stop="() => append(data)"> 重命名 </el-button>
+                  <el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>
+                  <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
+                </span>
+                <span v-else>
+                  <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
+                  <el-button size="mini" type="primary" @click.stop="delQuiz()">删除</el-button>
+                </span>
+              </span>
+
               <span style="margin-right: 10px" v-show="data.updateTime">{{data.updateTime}}</span>
-              <span v-if="data.catalogLevel">
-                <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click="goCreateCatalog(data.catalogId)"> 创建子目录 </el-button>
-                <el-button size="mini" type="primary" @click="() => append(data)"> 添加 </el-button>
-                <el-button size="mini" type="primary" @click="() => append(data)"> 编辑 </el-button>
-                <el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>
-              </span>
-              <span v-else>
-                <el-button size="mini" type="primary" @click="() => append(data)"> 编辑 </el-button>
-                <el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>
-              </span>
             </span>
         </el-tree>
       </div>
     </div>
-
     <!--试题查看弹窗-->
     <el-dialog
       title="试题查看"
@@ -99,13 +103,16 @@
     </el-dialog>
     <!--删除确认框-->
     <el-dialog
-      title="删除试题"
-      :visible.sync="testDelete"
+      title="清空资源"
+      :visible.sync="allDelete"
+      :show-close="false"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
       width="40%">
-      <span style="font-size: 16px">确认删除该试题？</span>
+      <span style="font-size: 16px">此操作会清空试题库，请慎重！</span>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="testDelete = false">取 消</el-button>
-    <el-button type="primary">确 定</el-button>
+    <el-button @click="checkAll(false)">取 消</el-button>
+    <el-button type="danger" @click="deleteCatalog">确 定</el-button>
     </span>
     </el-dialog>
     <!--创建目录弹窗-->
@@ -116,7 +123,7 @@
       <el-input v-model="newCatalog.catalogName" placeholder="请输入文件夹的名字"></el-input>
 
       <span slot="footer" class="dialog-footer">
-          <el-button @click="testDelete = false">取 消</el-button>
+          <el-button @click="createCatalog = false">取 消</el-button>
           <el-button type="primary" @click="newFileFold">确 定</el-button>
         </span>
     </el-dialog>
@@ -125,8 +132,7 @@
 
 <script>
   // import uposs from '@/components/up-oss.vue'
-  import {getTestFileFold, newTestFileFold , deleteTestFileFold} from "../../../../api/library";
-  import {logins} from "../../../../api/login";
+  import {getTestFileFold, newTestFileFold , deleteTestFileFold, deleteQuiz} from "../../../../api/library";
 
   export default {
     // components:{uposs},
@@ -162,10 +168,12 @@
           catalogId: 0,
           catalogName: ""
         },
+        deleteArr:[],//需要删除的文件夹的数组
+        quizArr:[],//需要删除的试题数组
         uploadDialog: false, //文件上传弹窗
         createCatalog: false, //新建目录弹窗
         testView: false , //试题查看弹窗
-        testDelete: false, //删除试题
+        allDelete: false, //删除试题
         //courseId: '0608367675f54267aa6960fd0557cc1b',//如果指定课程的话，课程ID
         courseId: '',//如果指定课程的话，课程ID
         catalogPros:{
@@ -175,18 +183,51 @@
     },
     methods: {
       //点击弹出新建目录的弹窗
-      goCreateCatalog(id){
-        console.log(id)
+      goCreateCatalog(data,id) {
         this.newCatalog.catalogId = id
         this.createCatalog = true
-      },
-      //文件夹被点击
-      getNodeData(data){
+
+        //创建子目录时目录不折叠
         // console.log(data)
-        let id = data.catalogId
-        let lv = data.catalogLevel
-        let redata =  this.filterCatalogId(this.curCatalogData,id,lv)
-        // console.log(redata.catalogName)
+        // const newChild = { catalogId: 101 , catalogName: "计算机网络--第一章" };
+        // if (!data.catalogList) {
+        //   this.$set(data, 'children', []);
+        // }
+        // data.catalogList.push(newChild);
+      },
+      //全选操作
+      checkAll(flag){
+        //获取所有文件夹节点的id用于全选
+        let idArr = []
+        this.catalogData.forEach((item)=>{
+          idArr.push(item.catalogId)
+        })
+        this.isCheckAll = flag
+        this.isCheckAll ? idArr : idArr=[]
+        this.deleteArr= idArr
+
+        this.allDelete = flag
+        console.log(this.deleteArr)
+        // this.$refs.tree.setCheckedKeys(idArr)
+      },
+      //节点复选框被选
+      nodeCheck(data, checked){
+        if(checked){
+          this.deleteArr.push(data.catalogId)
+          this.quizArr.push(data.quizId)
+        }else{
+          let index = this.deleteArr.indexOf(data.catalogId)
+          this.deleteArr.splice(index,1)
+
+          let reindex = this.quizArr.indexOf(data.quizId)
+          this.quizArr.splice(index,1)
+        }
+        this.deleteArr =this.deleteArr.filter((item)=>{
+          return item != undefined
+        })
+        this.quizArr =this.quizArr.filter((item)=>{
+          return item != undefined
+        })
       },
       // 获取所有试题列表
       getTestList(id){
@@ -196,7 +237,11 @@
           if (Number(res.code) === 200) {
             //如果试题库为空，则初始化新建一个默认的文件夹
             if(res.data.length === 0){
-              this.newFileFold(0,'默认文件夹')
+              this.newCatalog = {
+                  catalogId: 0,
+                  catalogName: "默认文件夹"
+              }
+              this.newFileFold()
             }
             let data = JSON.parse(JSON.stringify(res.data))
             this.catalogData = this.filterData(data)
@@ -215,25 +260,24 @@
       //新建文件夹
       newFileFold(){
         let data = this.newCatalog
-
         newTestFileFold(data).then(res => {
+          console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('文件夹新建成功');
             this.createCatalog = false
+            this.newCatalog.catalogName = ''
+            //更新页面数据
             this.getTestList(0)
           } else {
             this.$message.error('文件夹新建失败');
           }
         })
-          .catch(error => {
-            console.log(error);
-          });
       },
-      toEditTest() {
-        this.$router.push('/course/resource/edittest/1');
+      goEditTest(id) {
+        this.$router.push(`/course/resource/edittest/${id}`);
       },
-      toAddTest() {
-        this.$router.push('/course/resource/addtest');
+      goAddTest(catalogId) {
+        this.$router.push({path: `/course/resource/addtest/${catalogId}` });
       },
       // 导入试题模板
       upTestFile(item) {
@@ -284,8 +328,32 @@
       getChapterQuiz() {
         alert("按章节查询")
       },
-      // 删除该课程全部试题
-      delAllQuiz() {
+      // 删除试题
+      delQuiz() {
+        deleteQuiz(this.quizArr).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.$message.success('试题删除成功');
+            this.getTestList(0)
+          } else {
+            this.$message.error('删除失败');
+          }
+        })
+      },
+      //删除文件夹
+      deleteCatalog(){
+        let catalogIds = [...this.deleteArr]
+        console.log(catalogIds)
+        deleteTestFileFold(this.deleteArr).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.$message.success('删除成功');
+            this.allDelete = false
+            this.getTestList(0)
+          } else {
+            this.$message.error('删除失败');
+          }
+        })
       },
       //编辑试题
       goEdit(quizId){
@@ -300,6 +368,7 @@
             }
             if(item.quizList.length !==0){
               item.quizList.forEach((list)=>{
+                list.quizTitle = list.quizTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
                 item.catalogList.push({catalogName: list.quizTitle,
                     quizId: list.quizId,
                     updateTime:list.updateTime,
@@ -312,10 +381,6 @@
         let curData = getFilter(data)
         return curData
       },
-      //将拿到的数据处理，进行渲染
-      getShowData(data, id ){
-
-      }
     }
   }
 </script>
@@ -328,6 +393,11 @@
     margin 0 5px
     color cornflowerblue
     border 1px solid cornflowerblue
+  //隐藏按钮
+  .hide-button
+    opacity  0
+    &:hover
+      opacity  1
   .el-table .cell
     overflow: hidden
     white-space: nowrap
@@ -367,9 +437,6 @@
       height 50px
       align-items center
       background-color #f4f4f4
-      & div:first-child
-        flex 1
-        padding-left 25px
     .test-body
       .folder-img
         width: 20px;margin: -5px 10px;

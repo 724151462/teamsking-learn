@@ -15,12 +15,17 @@ export function getTestFileFold(data) {
   return commonsAjax(url, data, 'post')
 }
 
-
 export function getAnswer(data) {
   let url = `${baseUrl}quiz/${data.quizId}/options`
   return commonsAjax(url, '', 'get')
 }
 
+//保存新试题
+export function saveQuiz(data) {
+  let url = `${baseUrl}quiz`
+  console.log(data)
+  return commonsAjax(url, data, 'post')
+}
 
 /**
  * 新建试题文件夹
@@ -38,13 +43,13 @@ export function deleteTestFileFold(data) {
   return commonsAjax(url, data, 'delete')
 }
 /**
- * 删除一个试题
+ * 批量删除试题
  */
-export function deleteQuiz(id) {
-  let url = `${baseUrl}quiz/${id}`
-  let data = {quizId: id}
+export function deleteQuiz(data) {
+  let url = `${baseUrl}quiz/`
   return commonsAjax(url, data, 'delete')
 }
+
 /**
  * 获取单个试题的信息，包含选项
  */
@@ -92,3 +97,12 @@ export function deleteResList(data) {
   return commonsAjax(url, data, 'delete')
 }
 
+// ==============活动相关===========
+
+/**
+ * 活动批量删除
+ */
+// export function delete(data) {
+//   let url = `${baseUrl}quiz/resource`
+//   return commonsAjax(url, data, 'delete')
+// }

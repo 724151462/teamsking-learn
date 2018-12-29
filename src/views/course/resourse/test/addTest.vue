@@ -4,22 +4,23 @@
       <div><span style="cursor: pointer" @click="toTest">试题管理</span> > 添加试题</div>
     </div>
     <div style="padding-right: 35%">
-      <el-form :model="testData" ref="testForm">
+      <el-form :model="testData" ref="testData" >
         <el-form-item label="题干" required>
           <br>
           <div ref="editor" style="text-align:left"></div>
         </el-form-item>
         <el-form-item label="题型" required>
           <el-radio-group v-model="testData.quizType" @change="quizTypeChange">
-            <el-radio :label="0">单选</el-radio>
-            <el-radio :label="1">多选</el-radio>
-            <el-radio :label="2">判断题</el-radio>
-            <el-radio :label="3">主观</el-radio>
+            <el-radio :label="10">单选</el-radio>
+            <el-radio :label="20">多选</el-radio>
+            <!-- 目前没有判断和主观题型-->
+            <!--<el-radio :label="30">判断题</el-radio>-->
+            <!--<el-radio :label="40">主观</el-radio>-->
           </el-radio-group>
         </el-form-item>
         <el-form-item label="选项" required>
           <br>
-          <div v-if="testData.quizType===3">
+          <div v-if="testData.quizType===40">
             <p style="padding-left: 40px">主观题无固定答案</p>
           </div>
           <div class="option-list"
@@ -38,21 +39,28 @@
             <div class="option-flag currect-flag" v-else @click="setCurrent(optionIndex)">正确答案</div>
             <div style="margin: 0 20px;color: red" @click="deleteOption(optionIndex)"><i class="el-icon-error"></i></div>
           </div>
-          <div v-show="testData.quizType !== 3"><el-button type="text" @click="addOption">+添加选项</el-button></div>
+          <div v-show="testData.quizType !== 40"><el-button type="text" @click="addOption">+添加选项</el-button></div>
         </el-form-item>
-        <el-form-item label="解析" required>
+        <el-form-item label="难度" required>
+          <el-radio-group v-model="testData.difficulty">
+            <el-radio :label="10">简单</el-radio>
+            <el-radio :label="20">中等</el-radio>
+            <el-radio :label="30">困难</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="解析">
           <br>
           <el-input
             type="textarea"
             :rows="5"
             class="ans-text"
-            placeholder="请输入内容"
+            placeholder="请输入题目解析"
             v-model="testData.quizAnalysis">
           </el-input>
         </el-form-item>
       </el-form>
       <div class="btn-groud">
-        <el-button type="primary" style="margin-right: 40px">保存</el-button>
+        <el-button type="primary" style="margin-right: 40px" @click="saveQuiz">保存</el-button>
         <el-button>取消</el-button>
       </div>
     </div>
@@ -61,54 +69,42 @@
 
 <script>
   import E from 'wangeditor'
-  import {saveQuiz} from '@/api/course'
+  import {saveQuiz} from '@/api/library'
 
   export default {
     name: "addTest",
+    created () {
+      this.testData.catalogId = Number(this.$route.params.catalog)
+    },
     data () {
       return {
         testData:{
-          "catalogId": 0,
-          "courseId": "string",
-          "creatorName": "string",
-          "difficulty": 0,
+          catalogId: 0,
+          // creatorName: "",
+          difficulty: 10, //难度 10:简单 20:中等 30:困难
           quizAnalysis: "",
           quizOption: [
             {
               "correctFlag": 0,
-              "optionId": 0,
               "optionTitle": "",
-              "quizId": 0
             },
 
             {
               "correctFlag": 0,
-              "optionId": 0,
               "optionTitle": "",
-              "quizId": 0
             },
             {
               "correctFlag": 0,
-              "optionId": 0,
               "optionTitle": "",
-              "quizId": 0
             },
             {
               "correctFlag": 0,
-              "optionId": 0,
               "optionTitle": "",
-              "quizId": 0
             },
           ],
-          quizTitle: "string",
-          quizType: 0, // 0 为单选，1为多选，2为判断，3为主观
-          "skillPoint": "string",
-          "updateId": 0,
-          "updateTime": "2018-11-28T03:10:25.082Z",
-          "useCount": 0,
-          "userId": 0
+          quizTitle: "",
+          quizType: 10, // 0 为单选，1为多选，2为判断，3为主观
         },
-        rules2: '',
         optionItem:["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"]
       }
     },
@@ -127,7 +123,7 @@
         'link',  // 插入链接
         'list',  // 列表
         'justify',  // 对齐方式
-        'image',  // 插入图片
+        // 'image',  // 插入图片，图片试题暂时不做
         'table',  // 表格
         'code',  // 插入代码
         'undo',  // 撤销
@@ -137,13 +133,13 @@
     methods:{
       // 题目类型改变
       quizTypeChange(e){
-        let data1 = [{"correctFlag": 0, "optionId": 0, "optionTitle": "主观题没有正确答案", "quizId": 0}],
+        let data1 = [{"correctFlag": 0, "optionTitle": "主观题没有正确答案"}],
           data2 = [
             // 单选和多选
-            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
-            {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
+            {"correctFlag": 0, "optionTitle": ""},
+            {"correctFlag": 0, "optionTitle": ""},
+            {"correctFlag": 0, "optionTitle": ""},
+            {"correctFlag": 0, "optionTitle": ""},
           ],
           data3 = [
             // 判断题
@@ -151,10 +147,10 @@
             {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
           ];
         //将数据组装为数组，若用push方法，会发生不可描述的错误
-        if(e === 3){
+        if(e === 40){
           this.testData.quizOption = []
           this.testData.quizOption = data1
-        } else if (e === 2){
+        } else if (e === 30){
           this.testData.quizOption = []
           this.testData.quizOption = data3
         }else{
@@ -164,7 +160,7 @@
       },
       //设为正确答案
       setCurrent(optionIndex){
-        if(this.testData.quizType === 1){
+        if(this.testData.quizType === 20){
           this.testData.quizOption[optionIndex].correctFlag === 0 ? this.testData.quizOption[optionIndex].correctFlag = 1 :this.testData.quizOption[optionIndex].correctFlag = 0
         }else{
           //单选和判断自能有一个答案
@@ -189,17 +185,66 @@
       addOption(){
         this.testData.quizOption.push({
           "correctFlag": 0,
-          "optionId": 0,
           "optionTitle": "",
-          "quizId": 0
         })
       },
       toTest(){
         this.$router.push('/course/resource/test');
       },
+      //保存试题前的验证
+      filterQuiz(){
+        let isEmpty = false, //是否存在标题为空的试题选项
+            flagArr = []  // 存放答案的数组
+
+        if(this.testData.quizTitle.length === 0){
+          this.$notify({
+            message: '请输入题干',
+            type: 'warning',
+          });
+          return false
+        }
+        this.testData.quizOption.forEach((item)=>{
+          flagArr.push(item.correctFlag)
+          if(item.optionTitle == ''){
+            isEmpty = true
+          }
+        })
+        if(isEmpty){
+          this.$notify({
+            message: '请将为空的试题选项删除',
+            type: 'warning',
+          });
+          return false
+        }
+
+        if(this.testData.quizType !== 3){
+          if(flagArr.indexOf(1) === -1){
+            this.$notify({
+              message: '请至少设置一个正确选项',
+              type: 'warning',
+            });
+            return false
+          }
+        }
+      },
       // 保存试题
       saveQuiz () {
+        this.filterQuiz() //保存试题前验证数据
 
+        let data = this.testData
+
+        saveQuiz(data).then(res=>{
+          console.log(res)
+          if(Number(res.code) === 200) {
+            this.$message.success('试题添加成功')
+          }else if(Number(res.code) === 440){
+            let msgs = JSON.parse(res.msg)
+            this.$message({
+              message:msgs[0].message,
+              type:'error'
+            })
+          }
+        })
       }
     }
   }
