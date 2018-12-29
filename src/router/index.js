@@ -238,7 +238,7 @@ export const constantRouterMap = [{
             name: '试题添加',
           },
           {
-            path: '/course/resource/edittest/:catalog/:quiz',
+            path: '/course/resource/edittest/:quiz',
             component: _import('course/resourse/test/editTest'),
             name: '试题编辑',
           }

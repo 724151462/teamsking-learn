@@ -33,13 +33,14 @@
     </div>
     <div class="test-warp">
       <div class="test-title">
+        <div style="flex: 1"></div>
         <div>
           <!--全选-->
           <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
-          <el-button type="primary" size="small" @click="checkAll(true)">清空库</el-button>
           <el-button type="primary" size="small" @click="goCreateCatalog(0)">创建目录</el-button>
           <el-button type="primary" size="small">移动到</el-button>
-          <el-button type="primary" size="small" @click="deleteCatalog">删除</el-button>
+          <el-button type="info" size="small" @click="deleteCatalog">删除</el-button>
+          <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
         </div>
       </div>
       <div class="test-body">
@@ -51,6 +52,7 @@
           }"
           show-checkbox
           @check-change	="nodeCheck"
+          :check-on-click-node="true"
           accordion
           node-key="catalogId"
           ref="tree">
@@ -61,17 +63,20 @@
                 <span class="quiz-tag" v-show="data.quizType == 20">多选题</span>
                 <span>{{ node.label }}</span>
               </span>
+              <span v-show="node.checked">
+                <span v-if="data.catalogLevel">
+                  <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
+                  <el-button size="mini" type="primary" @click.stop="() => append(data)"> 重命名 </el-button>
+                  <el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>
+                  <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
+                </span>
+                <span v-else>
+                  <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
+                  <el-button size="mini" type="primary" @click.stop="delQuiz()">删除</el-button>
+                </span>
+              </span>
+
               <span style="margin-right: 10px" v-show="data.updateTime">{{data.updateTime}}</span>
-              <span v-if="data.catalogLevel">
-                <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
-                <el-button size="mini" type="primary" @click.stop="() => append(data)"> 重命名 </el-button>
-                <el-button size="mini" type="primary" @click.stop="goAddTest(data,data.catalogId)"> 添加试题 </el-button>
-                <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
-              </span>
-              <span v-else>
-                <el-button size="mini" type="primary" @click.stop="goEditTest(data.catalogId, data.quizId)"> 编辑 </el-button>
-                <el-button size="mini" type="primary" @click.stop="() => remove(node, data)">删除</el-button>
-              </span>
             </span>
         </el-tree>
       </div>
@@ -104,7 +109,7 @@
       :close-on-press-escape="false"
       :close-on-click-modal="false"
       width="40%">
-      <span style="font-size: 16px">此操作会清空资源库下的所有试题，请慎重！</span>
+      <span style="font-size: 16px">此操作会清空试题库，请慎重！</span>
       <span slot="footer" class="dialog-footer">
     <el-button @click="checkAll(false)">取 消</el-button>
     <el-button type="danger" @click="deleteCatalog">确 定</el-button>
@@ -127,8 +132,7 @@
 
 <script>
   // import uposs from '@/components/up-oss.vue'
-  import {getTestFileFold, newTestFileFold , deleteTestFileFold} from "../../../../api/library";
-  import {logins} from "../../../../api/login";
+  import {getTestFileFold, newTestFileFold , deleteTestFileFold, deleteQuiz} from "../../../../api/library";
 
   export default {
     // components:{uposs},
@@ -164,7 +168,8 @@
           catalogId: 0,
           catalogName: ""
         },
-        deleteArr:[],//需要删除的文件夹的数值
+        deleteArr:[],//需要删除的文件夹的数组
+        quizArr:[],//需要删除的试题数组
         uploadDialog: false, //文件上传弹窗
         createCatalog: false, //新建目录弹窗
         testView: false , //试题查看弹窗
@@ -209,11 +214,18 @@
       nodeCheck(data, checked){
         if(checked){
           this.deleteArr.push(data.catalogId)
+          this.quizArr.push(data.quizId)
         }else{
           let index = this.deleteArr.indexOf(data.catalogId)
           this.deleteArr.splice(index,1)
+
+          let reindex = this.quizArr.indexOf(data.quizId)
+          this.quizArr.splice(index,1)
         }
         this.deleteArr =this.deleteArr.filter((item)=>{
+          return item != undefined
+        })
+        this.quizArr =this.quizArr.filter((item)=>{
           return item != undefined
         })
       },
@@ -261,13 +273,11 @@
           }
         })
       },
-      goEditTest() {
-        this.$router.push('/course/resource/edittest/12/43`');
+      goEditTest(id) {
+        this.$router.push(`/course/resource/edittest/${id}`);
       },
-      goAddTest(data,catalogId) {
-        console.log(data)
-        alert(catalogId)
-        // this.$router.push({path: `/course/resource/addtest/${catalogId}` });
+      goAddTest(catalogId) {
+        this.$router.push({path: `/course/resource/addtest/${catalogId}` });
       },
       // 导入试题模板
       upTestFile(item) {
@@ -318,8 +328,17 @@
       getChapterQuiz() {
         alert("按章节查询")
       },
-      // 删除该课程全部试题
-      delAllQuiz() {
+      // 删除试题
+      delQuiz() {
+        deleteQuiz(this.quizArr).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.$message.success('试题删除成功');
+            this.getTestList(0)
+          } else {
+            this.$message.error('删除失败');
+          }
+        })
       },
       //删除文件夹
       deleteCatalog(){
@@ -349,6 +368,7 @@
             }
             if(item.quizList.length !==0){
               item.quizList.forEach((list)=>{
+                list.quizTitle = list.quizTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
                 item.catalogList.push({catalogName: list.quizTitle,
                     quizId: list.quizId,
                     updateTime:list.updateTime,
@@ -361,10 +381,6 @@
         let curData = getFilter(data)
         return curData
       },
-      //将拿到的数据处理，进行渲染
-      getShowData(data, id ){
-
-      }
     }
   }
 </script>
@@ -377,6 +393,11 @@
     margin 0 5px
     color cornflowerblue
     border 1px solid cornflowerblue
+  //隐藏按钮
+  .hide-button
+    opacity  0
+    &:hover
+      opacity  1
   .el-table .cell
     overflow: hidden
     white-space: nowrap
