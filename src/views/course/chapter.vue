@@ -219,7 +219,7 @@
           <el-button>查询</el-button>
         </div>
         <div class="subjRadio">
-          <Tree :sourceData="fileList" @checkedList="test" :props="defaultProps">
+          <Tree :sourceData="fileList" @checkedList="checkedFiles" :props="defaultProps">
 
           </Tree>
         </div>
@@ -395,11 +395,13 @@ export default {
       subjectList: [
         {
           time: "",
-          title: ""
+          title: "",
+          ids: []
         }
       ],
       // 题目弹窗的视频地址
       vedioUrl: "",
+      temCheckedList: [],
       // 题目弹窗的视频封面
       coverUrl: "",
       // 添加题目的时间
@@ -747,7 +749,6 @@ export default {
             });
           }
         });
-        console.log(data);
         return data;
       };
       let curData = getFilter(data);
@@ -790,6 +791,7 @@ export default {
     editSubject(index) {
       console.log("当前点击的添加时间点", index);
       this.sourceSubListIndex = index;
+      this.checkedFiles(this.temCheckedList)
       this.editSubjectVisible = true;
     },
     // 选完题确认按钮
@@ -803,8 +805,24 @@ export default {
       console.log(this.subjectList);
       this.subjectVisible = false;
     },
-    test(value) {
-      console.log(value)
+    // 选中的文件
+    checkedFiles(checkedList) {
+      this.temCheckedList = checkedList
+      if (checkedList.length > 1) {
+        this.$message({
+          message: "请选择单个文件",
+          type: "warning"
+        });
+        return false;
+      }else if(checkedList.length < 1) {
+        this.$message({
+          message: "尚未选择文件",
+          type: "warning"
+        });
+        return false;
+      }
+      let ids = this.subjectList[this.sourceSubListIndex].ids = []
+      ids.push(checkedList[0])
     }
   },
   filters: {

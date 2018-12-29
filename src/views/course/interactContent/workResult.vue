@@ -69,12 +69,18 @@
 </template>
 
 <script>
+import {
+    homeWorkList
+}from '@/api/course'
 export default {
     data() {
         return {
             activeNames: ['1'],
             workType: '1'
         }
+    },
+    mounted() {
+        
     }
 
 }
