@@ -657,6 +657,14 @@ export function interactExam(data) {
   return commonsAjax(url, '', 'get')
 }
 
+/**
+ * 测试详情
+ */
+export function interactExamRes(data) {
+  let url = `${baseUrl}exam/interaction/list/${data.courseId}/${data.examId}`
+  return commonsAjax(url, '', 'get')
+}
+
 
 /**
  * 测试修改
@@ -736,3 +744,19 @@ export function scoreModify(data) {
 }
 
 
+/**
+ * 课程消息列表
+ */
+export function courseMessage(data) {
+  let url = `${baseUrl}${data.courseId}/message`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 课程消息新增
+ */
+export function courseMsgAdd(data) {
+  let url = `${baseUrl}message/course`
+  return commonsAjax(url, data, 'post')
+}

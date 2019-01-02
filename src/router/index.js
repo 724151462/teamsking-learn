@@ -319,8 +319,17 @@ export const constantRouterMap = [{
       },
       {
         path: 'controller',
-        component: _import('school/controller'),
-        name: 'school管理员'
+        component: Layout,
+        name: 'school管理员1',
+        redirect: '/school/notice',
+        children: [
+          {
+            path: '/school/notice',
+            component: _import('school/schoolNotice'),
+            name: '消息管理',
+            menuShow: true
+          },
+        ]
       },
       {
         path: 'portal',
@@ -395,7 +404,7 @@ export const constantRouterMap = [{
       {
         path: 'course',
         component: Layout,
-        name: 'school课程管理1',
+        name: 'school课程管理',
         redirect: "/school/course/course",
         children: [{
             path: '/school/course/course',
@@ -592,6 +601,12 @@ export const constantRouterMap = [{
             path: '/system/templates',
             component: _import('system/templates'),
             name: '模板管理',
+            menuShow: true
+          },
+          {
+            path: '/system/notice',
+            component: _import('system/sysNotice'),
+            name: '消息管理',
             menuShow: true
           },
         ]

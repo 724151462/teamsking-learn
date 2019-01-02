@@ -161,8 +161,9 @@
         </el-tab-pane>
       </el-tabs>
       <span slot="footer" class="dialog-footer">
+        <upOss></upOss>
+        <el-button type="primary" @click="addItem">确 认</el-button>
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addItem">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -244,6 +245,7 @@
 import adialog from "@/components/dialog";
 import videoPlayer from "@/components/video-pay";
 import Tree from "@/components/fileTree"
+import upOss from "@/components/up-oss"
 import {
   chaptersList,
   chaptersAdd,
@@ -299,74 +301,7 @@ export default {
       formData: [],
       tempChapter: "",
       sourceData: [
-        {
-          chapterName: "第一章",
-          cid: "1",
-          fold: "",
-          createTime: "2018-11-22",
-          catalogSection: [
-            {
-              sectionName: "第一节",
-              jid: "1.1",
-              fold: false,
-              catalogItem: [
-                {
-                  itemName: "1.1"
-                },
-                {
-                  itemName: "1.2"
-                }
-              ]
-            },
-            {
-              sectionName: "第二节",
-              jid: "1.2",
-              fold: false,
-              catalogItem: [
-                {
-                  itemName: "2.1"
-                },
-                {
-                  itemName: "2.2"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          chapterName: "第二章",
-          fold: false,
-          cid: "2",
-          createTime: "2018-11-22",
-          catalogSection: [
-            {
-              sectionName: "第一节",
-              jid: "2.1",
-              fold: false,
-              catalogItem: [
-                {
-                  itemName: "1.1"
-                },
-                {
-                  itemName: "1.2"
-                }
-              ]
-            },
-            {
-              sectionName: "第二节",
-              jid: "2.2",
-              fold: false,
-              catalogItem: [
-                {
-                  itemName: "2.1"
-                },
-                {
-                  itemName: "2.2"
-                }
-              ]
-            }
-          ]
-        }
+        
       ],
 
       addTitle: "",
@@ -853,7 +788,8 @@ export default {
   components: {
     adialog,
     videoPlayer,
-    Tree
+    Tree,
+    upOss
   }
 };
 </script>

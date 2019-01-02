@@ -54,11 +54,7 @@ export default {
     return {
       tables: [
         {
-          name: "作业名称",
-          prop: "title"
-        },
-        {
-          name: "学生名称",
+          name: "学生/小组",
           prop: "userName"
         },
         {
@@ -136,11 +132,6 @@ export default {
         eventType: "give a mark"
       },
       formData: [
-        {
-          key: "作业名称:",
-          inputType: "info",
-          value: "title"
-        },
         {
           key: "状态:",
           inputType: "info",

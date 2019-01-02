@@ -1,7 +1,8 @@
 <template>
-  <div>
-    <el-button type="primary" @click="goUp">上传</el-button>
-    <div>{{schedule}}</div>
+  <div style="display: inline-block;margin: 0 10px">
+    <el-button type="primary" @click="goUp" slot="btnText">上传</el-button>
+    <!-- <div>{{schedule}}</div> -->
+    <span slot="btnText">上传</span>
     <input type="file" id="inputs" @change="upInput"/>
   </div>
 </template>

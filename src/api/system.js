@@ -1,56 +1,98 @@
 import { commonsAjax } from '../utils/requery'
 
+const devUrl = 'api/v1/sys/' // 开发环境
+const prodUrl = 'http://120.36.137.90:9008/api/v1/sys/' // 生产环境
+const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
+
 
 /**
- * 请求角色列表    api/v1/sys/role/page
+ * 请求角色列表 
  * */
 export function sysRolePage (data) {
-  return commonsAjax('api/v1/sys/role/page',data,'get')
+  return commonsAjax(`${baseUrl}page`,data,'get')
 }
 
 /**
- * 添加角色   /api/v1/sys/role
+ * 添加角色 
  * */
 export function sysRoleAdd (data) {
-  return commonsAjax('api/v1/sys/role',data,'post')
+  return commonsAjax(`${baseUrl}role`,data,'post')
 }
 
 /**
- * 编辑角色   /api/v1/sys/role
+ * 编辑角色 
  * */
 export function sysRoleEdit (data) {
-  return commonsAjax('api/v1/sys/role',data,'put')
+  return commonsAjax(`${baseUrl}role`,data,'put')
 }
 
 /**
- * 删除角色   /api/v1/sys/role
+ * 删除角色
  * */
 export function sysRoleDelete (list) {
-  return commonsAjax('api/v1/sys/role',list,'delete')
+  return commonsAjax(`${baseUrl}role`,list,'delete')
 }
 
 
 /*
-*  查询用户权限菜单  /api/v1/sys/user/menu/list
+*  查询用户权限菜单 
 * */
 export function sysUserMenuList () {
-  return commonsAjax('api/v1/sys/user/menu/list',{},'get')
+  return commonsAjax(`${baseUrl}user/menu/list`,{},'get')
 }
 
 /**
- * 分页查询租户管理员  /api/v1/sys/tenant/manager/page
+ * 分页查询租户管理员 
  * */
 export function sysTenantManagerPage (data) {
-  return commonsAjax('api/v1/sys/tenant/manager/page',data,'get')
+  return commonsAjax(`${baseUrl}tenant/manager/page`,data,'get')
 }
 
 /**
- * 创建租户 api/v1/sys/tenant/manager
+ * 创建租户
  **/
 export function sysTenantManager (data) {
-  return commonsAjax('api/v1/sys/tenant/manager',data,'post')
+  return commonsAjax(`${baseUrl}tenant/manager`,data,'post')
 }
 
 
 
+/**
+ * 分页查询系统消息
+ * */
+export function sysManage (data) {
+  return commonsAjax(`${baseUrl}message`,'','get')
+}
 
+
+/**
+ * 管理员删除消息
+ * */
+export function sysMessageDel (data) {
+  return commonsAjax(`${baseUrl}message`,data.messageIds,'delete')
+}
+
+/**
+ * 课程消息新增
+ */
+export function courseMsgAdd(data) {
+  let url = `${baseUrl}message/course`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 系统消息新增
+ */
+export function sysMsgAdd(data) {
+  let url = `${baseUrl}message/user`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 校管信息列表
+ */
+export function schoolMsg(data) {
+  let url = `${baseUrl}tenant/message`
+  return commonsAjax(url, data, 'get')
+}

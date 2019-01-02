@@ -2,7 +2,9 @@
     <el-table
         :data="tableData"
         border
-        style="width: 100%">
+        style="width: 100%"
+        @selection-change="handleSelectionChange">
+        <el-table-column type="selection"></el-table-column>
       <template v-for="(list, tableIndex) in tables">
         <template v-if="list.popover">
           <template v-if="list.popover===true">
@@ -63,13 +65,17 @@
   export default {
     props:["tables","tableData","buttonStylus"],
     methods:{
-      returnData(e,type,buttonIndex){
+      returnData(e,type){
         // let data = {
         //   date:e,
         //   sys:type
         // }
         // console.log(data)
-        this.$emit('showComponentInfo',type,e,buttonIndex)
+        this.$emit('showComponentInfo',type,e)
+      },
+      handleSelectionChange(data) {
+        let type = 'selected'
+        this.$emit('showComponentInfo', type, data)
       }
     },
     mounted() {

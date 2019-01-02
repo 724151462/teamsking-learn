@@ -40,8 +40,7 @@
 
 <script>
 import itemTable from "@/components/table-no-header.vue";
-import { sysMessageDel,courseMsgAdd } from "@/api/system";
-import { courseMessage,  } from "@/api/course";
+import { schoolMsg, sysMessageDel,sysMsgAdd } from "@/api/system";
 export default {
   components: {
     itemTable
@@ -95,18 +94,22 @@ export default {
       isDialog: false,
       addUp: {
         title: "",
-        content: ""
+        content: "",
+        messageType: 20
       },
-      delArr: [],
+      delArr: []
     };
+  },
+  created() {
+    this.$emit("upCoursesNav", "notice");
   },
   mounted() {
     this.getMessageList()
   },
   methods: {
     getMessageList() {
-        courseMessage({courseId: this.$route.query.id}).then(response => {
-          this.tableData = response.data.pageData;
+        schoolMsg().then(response => {
+            this.tableData = response.data.pageData;
         });
     },
     typeFun(...params) {
@@ -121,7 +124,7 @@ export default {
           let delId = params[1].forEach(element => {
             this.delArr.push(element.messageId);
           });
-          console.log(this.delArr);
+          console.log(params[1]);
           break;
         default:
           break;
@@ -131,6 +134,7 @@ export default {
       this.delMsg()
     },
     delMsg() {
+        console.log(this.delArr)
         sysMessageDel({ messageIds: this.delArr })
         .then(response=> {
             if(response.code === 200) {
@@ -149,15 +153,15 @@ export default {
         });
     },
     ensureAdd() {
-      this.addUp.courseId = this.$route.query.id
-      courseMsgAdd(this.addUp)
-      .then(response=> {
+        this.addUp.courseId = this.$route.query.id
+        sysMsgAdd(this.addUp)
+        .then(response=> {
         if(response.code === 200) {
-          this.tableData.push(response.data)
-          this.$message({
+            this.tableData.push(response.data)
+            this.$message({
             message: '添加成功',
             type: 'success'
-          })
+            })
         }else if(response.code === 440){
             this.$message({
                 message: '标题或内容过短',
@@ -165,9 +169,9 @@ export default {
             })
         }
         this.isDialog = false
-      }) 
+    }) 
     }
-  }
+  },
 };
 </script>
 

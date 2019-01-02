@@ -13,26 +13,23 @@
         </div>
         
         <div class="main">
-            <div>
+            <!-- <div>
                 <span>题目1：金属货币制度下是不是就不会出现通货膨胀，。。。。。。</span>
                 <span style="color:rgb(130,178,198)">(单选题)</span>
-            </div>
+            </div> -->
             <div class="answer-container">
-                <div class="answer-item">
+                <div class="answer-item" v-for="(item,index) in stormList" :key="index">
                     <div style="display:flex; justify-content: space-between">
                         <div>
                             <img width="40" :src="require('@/assets/images/brainStorme.png')" alt="">
                             <div style="display: inline-block;margin-left:10px">
-                                <span style="display: block;margin-bottom: 5px">陈圣舒</span>
-                                <span>2018-10-13 16:03:33</span>
+                                <span style="display: block;margin-bottom: 5px">{{item.realName}}</span>
+                                <span>{{item.createTime}}</span>
                             </div>
-                        </div>
-                        <div class="pingfen">
-                            <span>评分</span>
                         </div>
                     </div>
                     <div  class="answer">
-                        <span>即使是在本金位置的货币制度下。。。。。。。。</span>
+                        <span>{{item.stormContent}}</span>
                     </div>
                 </div>
                 
@@ -50,13 +47,14 @@ export default {
         return {
             brainParams: {
                 stormId: this.$route.query.interactId
-            }
+            },
+            stormList: []
         }
     },
     mounted() {
         interactBS(this.brainParams)
         .then(response=> {
-
+            this.stormList = response.data
         })
     }
 }

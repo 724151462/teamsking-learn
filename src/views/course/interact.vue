@@ -54,7 +54,7 @@
               <span v-else>已结束</span>
               <div>
                 <span @click="editInteraction(interact)" v-if="interact.interactionStatus === 10">编辑</span>
-                <span @click="deleteInteraction(interact)" style="margin-left:10px">删除</span>
+                <span @click="deleteInteraction(interact)"  v-if="interact.interactionStatus !== 20" style="margin-left:10px">删除</span>
               </div>
             </div>
           </div>

@@ -20,10 +20,10 @@
       <div class="answer-container">
         <span>排名</span>
         <span>姓名</span>
-        <!-- <span>学号</span> -->
+        <span>学号</span>
         <!-- <span>正确题数</span> -->
         <!-- <span>正确率</span> -->
-        <span>用时</span>
+        <span>提交时间</span>
         <span>分数</span>
       </div>
       <div
@@ -37,18 +37,18 @@
           <img :src="item.avatar" width="30" alt>
           <span>{{item.realName}}</span>
         </div>
-        <!-- <span>{{item.studentNo}}</span> -->
+        <span>{{item.studentNo}}</span>
         <!-- <span>{{item.correctCount}}</span> -->
         <!-- <span>{{item.correctRate}}</span> -->
-        <span>{{item.time}}</span>
-        <span>{{item.grade}}</span>
+        <span>{{item.createTime}}</span>
+        <span>{{item.score}}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { testMark } from "@/api/course";
+import { interactExamRes } from "@/api/course";
 export default {
   data() {
     return {
@@ -110,8 +110,8 @@ export default {
     }
   },
   mounted() {
-    testMark(this.examParams).then(response => {
-      // this.students = response.data.pageData
+    interactExamRes(this.examParams).then(response => {
+      this.students = response.data.pageData
     });
   },
   methods: {
