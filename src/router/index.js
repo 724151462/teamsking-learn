@@ -457,19 +457,33 @@ export const constantRouterMap = [{
     name: 'learn',
     type: 'studyManage',
     menuShow: true,
-    redirect: '/learn/index',
+    redirect: '/learn/inclass',
     children: [{
-      path: '/learn/index',
-      leaf: true,
+      path: '/learn/inclass',
+      // leaf: true,
       component: Layout,
       name: 'learn学习管理',
       menuShow: true,
       children: [{
-        path: '/learn/index',
+        path: '/learn/inclass',
         leaf: true,
-        component: _import('learn/index'),
-        name: 'learn学习管理',
-
+        component: _import('learn/inClass'),
+        name: '课堂',
+        menuShow: true,
+      },
+      {
+        path: '/learn/afterclass',
+        leaf: true,
+        component: _import('learn/afterClass'),
+        name: '课后',
+        menuShow: true,
+      },
+      {
+        path: '/learn/teachdata',
+        leaf: true,
+        component: _import('learn/teachData'),
+        name: '教学数据',
+        menuShow: true,
       }]
     }]
   },
