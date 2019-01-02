@@ -10,8 +10,8 @@
           <span style="font-size: 16px">本地上传</span>
         </i>
       </div>
-      <div v-for="src in imgSrc" :key="src.id" class="cover-img-warp" style="margin-bottom: 20px;margin-right: 10px;position: relative">
-        <img :src="src.imgUrl" alt="" style="width: 280px;height: 160px;cursor: pointer;">
+      <div v-for="src in imgSrc" :key="src.assetId" class="cover-img-warp" style="margin-bottom: 20px;margin-right: 10px;position: relative">
+        <img :src="src.assetUrl" alt="" style="width: 280px;height: 160px;cursor: pointer;">
         <div class="img-mark" @click="cover(src.imgUrl)">设为封面</div>
       </div>
     </div>
@@ -59,8 +59,22 @@
 
 <script>
   import { VueCropper }  from 'vue-cropper'
-
+  import {coverList} from '@/api/course'
   export default {
+    created(){
+      coverList().then(res=>{
+        console.log(res)
+        if(Number(res.code) === 200) {
+          this.imgSrc = res.data
+        }else if(Number(res.code) === 440){
+          let msgs = JSON.parse(res.msg)
+          this.$message({
+            message:msgs[0].message,
+            type:'error'
+          })
+        }
+      })
+    },
     components:{
       VueCropper
     },
@@ -68,18 +82,7 @@
       return {
         visible: this.show,
         imgSrc:[
-          {imgUrl: require("@/assets/images/cover/1.jpg")},
-          {imgUrl: require("@/assets/images/cover/2.jpg")},
-          {imgUrl: require("@/assets/images/cover/3.jpg")},
-          {imgUrl: require("@/assets/images/cover/4.jpg")},
-          {imgUrl: require("@/assets/images/cover/5.jpg")},
-          {imgUrl: require("@/assets/images/cover/6.jpg")},
-          {imgUrl: require("@/assets/images/cover/7.jpg")},
-          {imgUrl: require("@/assets/images/cover/8.jpg")},
-          {imgUrl: require("@/assets/images/cover/9.jpg")},
-          {imgUrl: require("@/assets/images/cover/10.jpg")},
-          {imgUrl: require("@/assets/images/cover/11.jpg")},
-          {imgUrl: require("@/assets/images/cover/12.jpg")},
+          {assetId: 0, assetUrl: ''}
         ],
         innerVisible:false, // 图片裁剪框
         dialogImageUrl: '',
@@ -95,8 +98,6 @@
       };
     },
     props: ['show'],
-    created(){
-    },
     methods: {
       handleAvatarSuccess(res, file) {
         this.imageUrl = URL.createObjectURL(file.raw);

@@ -20,7 +20,12 @@ import {
 export function coursePage(data) {
   return commonsAjax(`${baseUrl}page`, data, 'get')
 }
-
+/**
+ * 获取默认的课程封面
+ */
+export function coverList(data) {
+  return commonsAjax(`${baseUrl}covers`, data, 'post')
+}
 /**
  * 发布课程
  */

@@ -179,25 +179,30 @@
           }"
             show-checkbox
             @check-change	="nodeCheck"
-            :check-on-click-node="true"
             accordion
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
               <span class="test-info">
                 <img :src="imgSrc.folder" alt="" class="folder-img" v-show="!data.resourceId">
-                <span class="quiz-tag" v-show="data.quizType == 10">单选题</span>
-                <span class="quiz-tag" v-show="data.quizType == 20">多选题</span>
-                <span>{{ node.label }}</span>
+                <img :src="imgSrc.mp4" alt="" class="folder-img" v-if="data.resourceType == 10">
+                <img :src="imgSrc.word" alt="" class="folder-img" v-else-if="data.resourceType == 20">
+                <img :src="imgSrc.pdf" alt="" class="folder-img" v-else-if="data.resourceType == 30">
+                <img :src="imgSrc.txt" alt="" class="folder-img" v-else-if="data.resourceType == 40">
+                <span class="tree-title">{{ node.label }}</span>
+                <span class="str-tag" v-if="data.srtUrl != undefined">字幕</span>
               </span>
-              <span v-show="node.checked">
-                <span v-if="data.catalogLevel">
+              <span>
+                <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="() => append(data)"> 重命名 </el-button>
+                  <el-button size="mini" type="primary" v-show="data.catalogLevel" @click.stop="()=>{}"><label for="inputs">上传</label></el-button>
+                  <input style="display: none" type="file" id="inputs" @change="upInput"/>
+                  <el-button size="mini" style="margin-left: 5px" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
                   <el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>
                   <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
                 </span>
-                <span v-else>
+                <span v-else class="hide-button">
+                  <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)" v-if="data.resourceType.type ==10 && !data.srtUrl"> 添加字幕 </el-button>
                   <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
                   <el-button size="mini" type="primary" @click.stop="delQuiz()">删除</el-button>
                 </span>
@@ -251,11 +256,14 @@
 
 <script>
   import {getResList, newResFileFold, reResFileFold, delResFileFold, deleteRes} from "@/api/library";
-
+  import oss from '@/components/up-oss'
   export default {
     name: "resource",
     created() {
         this.getResource(0);
+    },
+    components:{
+      oss
     },
     data() {
       return {
@@ -323,6 +331,7 @@
             searchKey: key
         }
         getResList(data).then(res => {
+          console.log(res)
             if (Number(res.code) === 200) {
                 //如果试题库为空，则初始化新建一个默认的文件夹
                 if(res.data.length === 0){
@@ -343,6 +352,18 @@
             }
         })
     },
+      //点击弹出重命名的弹窗
+      goRenameCatalog(data,id) {
+        this.newCatalog.catalogId = id
+        this.renameCatalog = true
+        //创建子目录时目录不折叠
+        // console.log(data)
+        // const newChild = { catalogId: 101 , catalogName: "计算机网络--第一章" };
+        // if (!data.catalogList) {
+        //   this.$set(data, 'children', []);
+        // }
+        // data.catalogList.push(newChild);
+      },
       //  文件下载
       fileDownload(url) {},
       fileUpload() {
@@ -443,6 +464,21 @@
               }
           })
       },
+      //重命名文件夹
+      reFileFold(){
+        let data = this.newCatalog
+        reResFileFold(data).then(res => {
+          if (Number(res.code) === 200) {
+            this.$message.success('重命名成功');
+            this.renameCatalog = false
+            this.newCatalog.catalogName = ''
+            //更新页面数据
+            this.getResource(0)
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+      },
       goEditTest(id) {
           this.$router.push(`/course/resource/edittest/${id}`);
       },
@@ -538,12 +574,15 @@
                   }
                   if(item.resourceList.length !==0){
                       item.resourceList.forEach((list)=>{
-                          list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
-                          item.childCatalogList.push({catalogName: list.resourceTitle,
+                        console.log()
+                        list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
+                          item.childCatalogList.push(
+                            {catalogName: list.resourceTitle,
                               resourceId: list.resourceId,
                               createTime:list.createTime,
+                              srtUrl: list.srtUrl,
                               resourceType:list.resourceType})
-                      })
+                        })
                   }
               })
               return data
@@ -556,6 +595,16 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+  .str-tag
+    display inline-block
+    padding 0 5px
+    margin 0 5px
+    color #218001
+    border 1px solid #218001
+  .hide-button
+    opacity  0
+    &:hover
+      opacity  1
   .resource
     padding: 0 5% 20px 50px
     .title
@@ -602,6 +651,13 @@
           & div
             margin 0 10px
     .test-warp
+      .tree-title
+        max-width: 500px;
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-right: 8px;
       .img-span
         display inline-block
         .img-icon

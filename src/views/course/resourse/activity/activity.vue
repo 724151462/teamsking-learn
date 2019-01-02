@@ -38,6 +38,12 @@
             show-checkbox
             @check-change = "nodeCheck"
             accordion
+            draggable
+            @node-drag-enter="handleDragEnter"
+            @node-drag-leave="handleDragLeave"
+            @node-drag-over="handleDragOver"
+            @node-drag-end="handleDragEnd"
+            @node-drop="handleDrop"
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
@@ -49,6 +55,7 @@
                 <span class="quiz-tag" v-else-if="data.interactionType == 60">投票问卷</span>
                 <span class="quiz-tag" v-else-if="data.interactionType == 70">讨论</span>
                 <span>{{ node.label }}</span>
+                <span v-if="data.interactionId" style="margin-left: 20px"> >查看</span>
               </span>
               <span v-show="node.checked">
                 <span v-if="data.catalogLevel">
@@ -152,6 +159,7 @@
         },
         deleteArr:[],
         interactionIdArr:[],
+        dragArr:[],
         createCatalog : false,
         renameCatalog : false,
         allDelete:false
@@ -326,6 +334,50 @@
             let curData = getFilter(data)
             return curData
         },
+        // handleDragStart(node, ev) {
+        //   console.log('拖拽开始', node);
+        // },
+        handleDragEnter(draggingNode, dropNode, ev) {
+          let data = {
+            catalogId: dropNode.data.catalogId,
+            ids: [draggingNode.data.catalogId]
+          }
+          // console.log(data)
+        },
+        // handleDragLeave(draggingNode, dropNode, ev) {
+        //   console.log(dropNode.data.catalogId)
+        //   console.log(dropNode.data)
+        //   this.dragArr.push(dropNode.data.catalogId)
+        //   console.log('tree drag leave: ', dropNode.label);
+        // },
+        // handleDragOver(draggingNode, dropNode, ev) {
+        //   console.log('tree drag over: ', dropNode.label);
+        // },
+        handleDragEnd(draggingNode, dropNode, dropType, ev) {
+          console.log(draggingNode.label)
+          console.log(dropNode.label)
+          let data = {
+            catalogId: dropNode.data.catalogId,
+            ids: [draggingNode.data.catalogId]
+          }
+          this.remove(data)
+        },
+        // handleDrop(draggingNode, dropNode, dropType, ev) {
+        //   console.log('tree drop: ', dropNode.label, dropType);
+        // },
+        //移动资源
+        //移动文件夹、
+        remove(data){
+          removeAc(data).then(res => {
+            console.log(res)
+            if (Number(res.code) === 200) {
+              this.$message.success('移动成功');
+              // this.getTestList(0)
+            } else {
+              this.$message.error(res.data.message);
+            }
+          })
+        }
     }
   }
 </script>

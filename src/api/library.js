@@ -124,6 +124,7 @@ export function deleteAc(data) {
  * 活动移动到另外的文件夹
  */
 export function removeAc(data) {
+  console.log(data)
     let url = `${baseUrl}interaction/catalog`
     return commonsAjax(url, data, 'patch')
 }
