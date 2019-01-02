@@ -30,13 +30,25 @@
         cursor pointer
 
     /*试题管理*/
-    .test .cell
+    .test .cell,.resource .cell
       text-align center
-    .test .cell span div
+    .test .cell span div,.resource .cell span div
       overflow: hidden!important;
       white-space: nowrap!important;
       text-overflow: ellipsis!important;
-    .test
+    .test, .resource
+      .el-tree-node__content
+        height 50px!important
+        border-bottom 1px solid #ccc
+      .el-tree-node__expand-icon
+        font-szie 17px!important
+    .activity .cell
+      text-align center
+    .activity .cell span div
+      overflow: hidden!important;
+      white-space: nowrap!important;
+      text-overflow: ellipsis!important;
+    .activity
       .el-tree-node__content
         height 50px!important
         border-bottom 1px solid #ccc
