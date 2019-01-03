@@ -97,6 +97,14 @@ export function deleteResList(data) {
   return commonsAjax(url, data, 'delete')
 }
 
+/**
+ * 资源本地上传
+ */
+export function localUpload(data) {
+  let url = `${baseUrl}resource`
+  return commonsAjax(url, data, 'post')
+}
+
 // ==============活动相关===========
 
 /**

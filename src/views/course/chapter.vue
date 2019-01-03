@@ -58,7 +58,7 @@
                     <img :src="typeIcon(content)" width="40" alt style="margin-right: 10px">
                     <span>{{content.itemName}}</span>
                     <div
-                      class="vedio-info"
+                      class="video-info"
                       v-if="content.resourceType === 10 || content.resourceType === 30"
                     >
                       <span style="margin-left: 15px">时长：{{content.resourceLength | timeTransfer}}</span>
@@ -113,7 +113,7 @@
     <el-dialog title="提示" :visible.sync="dialogVisible" width="60%">
       <el-tabs v-model="activeName2" :stretch="true" type="card" @tab-click="handleClick">
         <el-tab-pane label="视频" name="first">
-          <div class="searchContainer">
+          <!-- <div class="searchContainer">
             <span>从资源库导入</span>
             <el-input
               style="width: 300px"
@@ -131,7 +131,7 @@
                 :value="item.value"
               ></el-option>
             </el-select>
-          </div>
+          </div> -->
           <el-tree :data="fileList" ref="tree" show-checkbox node-key="id" :props="defaultProps">
             <span class="custom-tree-node" slot-scope="{ node, data }">
               <img
@@ -161,7 +161,9 @@
         </el-tab-pane>
       </el-tabs>
       <span slot="footer" class="dialog-footer">
-        <upOss></upOss>
+        <el-button v-if="contentType === '视频'" type="primary" @click="localVideoDialog = true">本地上传视频</el-button>
+        <upOss v-else style="margin: 0px 10px 10px 0px" :btnText="'本地上传文档'" @ossUp="getDocUrl">
+        </upOss>
         <el-button type="primary" @click="addItem">确 认</el-button>
         <el-button @click="dialogVisible = false">取 消</el-button>
       </span>
@@ -171,8 +173,8 @@
     <el-dialog title="添加题目" top="30vh" :visible.sync="subjectVisible" width="65%">
       <div class="subject-container">
         <div class="subject-left">
-          <!-- <video :src="vedioUrl"></video> -->
-          <videoPlayer :isMp4="vedioUrl" :poster="coverUrl"></videoPlayer>
+          <!-- <video :src="videoUrl"></video> -->
+          <videoPlayer :isMp4="videoUrl" :poster="coverUrl"></videoPlayer>
         </div>
         <div class="subject-right">
           <div class="row-container">
@@ -238,6 +240,34 @@
         <el-button type="primary" @click="delEvent">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 本地上传视频弹窗 -->
+    <el-dialog title="添加视频" :visible.sync="localVideoDialog" top="30vh" :modal="false">
+      <div style="display: flex;width: 100%">
+        <div style="display: flex;flex-direction: column;justify-content: space-around;height: 300px">
+          <div style="display: flex;flex-direction: column;">
+            <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频'" @ossUp="getVideoUrl">
+            </upOss>
+            <span>请上传格式为mp4或flv格式，且小于2GB的视频</span>
+          </div>
+            <div style="display: flex;flex-direction: column;">
+              <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频字幕'">
+              </upOss>
+              <span>请上传srt格式的字幕</span>
+            </div>
+            
+        </div>
+        <videoPlayer style="width:500px" v-if="videoUrl !== ''" :isMp4.sync="videoUrl" :poster="coverUrl"></videoPlayer>
+        <div v-else style="width: 500px;background: rgb(192,199,204);text-align:center">
+          <span style="display:inline-block; margin-top:140px;">请先上传视频</span>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="localVideoDialog = false">取 消</el-button>
+        <el-button type="primary" @click="localVideoUpload">确 定</el-button>
+      </span>
+      
+      
+    </el-dialog>
   </div>
 </template>
 
@@ -255,9 +285,9 @@ import {
   itemAdd,
   studyModeModify,
   courseBaseInfo,
-  itemDelete
+  itemDelete,
 } from "@/api/course";
-import { getResList } from "@/api/library";
+import { getResList, localUpload } from "@/api/library";
 
 export default {
   data() {
@@ -308,7 +338,6 @@ export default {
       // 添加视频
       videoForm: {
         itemName: "",
-        itemType: 10,
         contentId: "",
         contentType: 10,
         courseId: this.$route.query.id
@@ -317,14 +346,13 @@ export default {
       // 添加内容类型tab
       contentType: "视频",
       // 添加文档
-      // 添加视频
       docForm: {
         itemName: "",
-        itemType: 10,
-        document: "",
         contentType: 20,
         courseId: this.$route.query.id
       },
+      // 添加本地视频弹窗
+      localVideoDialog: true,
       // 添加题目对话框
       subjectVisible: false,
       subjectList: [
@@ -335,7 +363,11 @@ export default {
         }
       ],
       // 题目弹窗的视频地址
-      vedioUrl: "",
+      videoUrl: "",
+      // 课程资源
+      resource: {
+        courseId: this.$route.query.id,
+      },
       temCheckedList: [],
       // 题目弹窗的视频封面
       coverUrl: "",
@@ -360,7 +392,7 @@ export default {
         children: "childCatalogList",
         label: "catalogName"
       },
-      vedioCheckedList: [],
+      videoCheckedList: [],
       fileList: [],
       docList: [],
       tempSection: [],
@@ -603,6 +635,25 @@ export default {
       }
       return checkedList
     },
+    foldNumberCheck(treeName) {
+      let checkedList =treeName.getCheckedNodes().filter(element => {
+        return element.catalogId !== undefined;
+      });
+      if (checkedList.length > 1) {
+        this.$message({
+          message: "请选择单个文件夹",
+          type: "warning"
+        });
+        return false;
+      }else if(checkedList.length < 1) {
+        this.$message({
+          message: "尚未选择文件夹",
+          type: "warning"
+        });
+        return false;
+      }
+      return checkedList
+    },
     addJie(jieName) {
       console.log("jiename", jieName);
       console.log("zhangID", this.tempChapter);
@@ -662,7 +713,7 @@ export default {
     },
     addSubjectBtn(subject) {
       console.log("题目所在的内容", subject);
-      this.vedioUrl = subject.resourceUrl;
+      this.videoUrl = subject.resourceUrl;
       this.coverUrl = subject.coverUrl;
       this.subjectList = [];
       this.subjectVisible = true;
@@ -688,21 +739,6 @@ export default {
       };
       let curData = getFilter(data);
       return curData;
-    },
-    // 选中的资源id
-    ensureAdd() {
-      let checkedList = this.$refs.tree.getCheckedNodes().filter(element => {
-        return element.catalogId === undefined;
-      });
-      if (checkedList.length > 1) {
-        this.$message({
-          message: "请选择单个文件",
-          type: "warning"
-        });
-        return;
-      }
-      console.log(checkedList);
-      this.vedioCheckedList = checkedList;
     },
     // 添加时间点
     addTime() {
@@ -758,6 +794,58 @@ export default {
       }
       let ids = this.subjectList[this.sourceSubListIndex].ids = []
       ids.push(checkedList[0])
+    },
+    // 本地上传视频
+    getVideoUrl(...params) {
+      
+      this.resource.resourceTitle = params[1].substring(13);// 名称
+      this.resource.resourceUrl = params[0]; // 路径
+      this.resource.resourceType = 10; // 资源类型
+      let resource = this.foldNumberCheck(this.$refs.tree)
+      if(!resource) return
+      let start = params[0].lastIndexOf(".");
+      let end = params[0].length
+      this.resource.contentType = params[0].substring(start+1, end)
+      this.resource.catalogId = resource[0].catalogId
+      console.log(resource)
+      localUpload(this.resource).then(response => {
+        this.videoForm.contentId = response.data.resourceId;
+        this.videoForm.itemName = response.data.resourceTitle;
+      });
+    },
+    getDocUrl(...params) {
+      console.log(params)
+      this.resource.resourceTitle = params[1].substring(13);// 名称
+      this.resource.resourceUrl = params[0]; // 路径
+      this.resource.resourceType = 20; // 资源类型
+      let resource = this.foldNumberCheck(this.$refs.tree1)
+      if(!resource) return
+      let start = params[0].lastIndexOf(".");
+      let end = params[0].length
+      this.resource.contentType = params[0].substring(start+1, end)
+      this.resource.catalogId = resource[0].catalogId
+      console.log(this.resource)
+      localUpload(this.resource).then(response => {
+        console.log(response.data)
+        this.docForm.contentId = response.data.resourceId;
+        this.docForm.itemName = this.resource.resourceTitle;
+        this.contentAdd(this.docForm)
+      });
+    },
+    localVideoUpload() {
+      this.contentAdd(this.videoForm)
+      this.localVideoDialog = false
+    },
+    contentAdd(formName) {
+      itemAdd(formName).then(response => {
+        console.log(response.data);
+        if(response.code === 200) {
+          this.$message({
+            message: "添加内容成功",
+            type: "success"
+          })
+        }
+      });
     }
   },
   filters: {
@@ -852,7 +940,7 @@ export default {
     border: 1px solid rgb(230, 230, 230);
     border-radius: 20px;
 
-    .vedio-info {
+    .video-info {
       display: flex;
       align-item: center;
 

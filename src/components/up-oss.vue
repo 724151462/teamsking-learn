@@ -1,8 +1,7 @@
 <template>
   <div style="display: inline-block;margin: 0 10px">
-    <el-button type="primary" @click="goUp" slot="btnText">上传</el-button>
+    <el-button type="primary" @click="goUp">{{btnText}}</el-button>
     <!-- <div>{{schedule}}</div> -->
-    <span slot="btnText">上传</span>
     <input type="file" id="inputs" @change="upInput"/>
   </div>
 </template>
@@ -18,6 +17,9 @@
       //可上传大小
       size:{
         default:2 * 1024 * 1024 * 1024
+      },
+      btnText: {
+        default: "上传"
       }
     },
     data(){

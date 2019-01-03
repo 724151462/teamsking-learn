@@ -50,6 +50,8 @@
     },
     methods: {
       onPlayerPlay(player) {
+        this.playerOptions.sources[0].src = this.isMp4
+        console.log('play', this.isMp4)
         // alert("play");
       },
       onPlayerPause(player){

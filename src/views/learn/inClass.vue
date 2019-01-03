@@ -1,7 +1,16 @@
 <template>
   <div>
+    <div style="margin-bottom: 20px">
+      <el-select>
+        <el-option>123</el-option>
+      </el-select>
+      <span>成员人数：65人</span>
+    </div>
     <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
-      <el-tab-pane label="关键指标" name="first">
+      <el-tab-pane label="关键指标" disabled name="first">
+        
+      </el-tab-pane>
+      <el-tab-pane label="课堂行为" name="second">
         <!--为echarts准备一个具备大小的容器dom-->
         <div id="chart1" style="width: 1000px;height: 400px;"></div>
         <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
@@ -10,15 +19,14 @@
           :tables="tables"
         ></tableNoHeader>
       </el-tab-pane>
-      <el-tab-pane label="课堂行为" name="second">
-        <div id="chart2" style="width: 1000px;height: 400px;"></div>
+      <el-tab-pane label="学情质量" name="third">
+         <div id="chart2" style="width: 1000px;height: 400px;"></div>
         <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
         <tableNoHeader
           :tableData="tableData1"
           :tables="tables1"
         ></tableNoHeader>
       </el-tab-pane>
-      <el-tab-pane label="学情质量" name="third">学情质量</el-tab-pane>
     </el-tabs>
     
   </div>
@@ -30,7 +38,7 @@ export default {
   name: "",
   data() {
     return {
-      activeName: 'first',
+      activeName: 'second',
       tables: [
         {
           name: "授课时间",
