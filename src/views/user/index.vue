@@ -33,7 +33,7 @@
                 <el-input v-model="infoForm.email" class="input-width"></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="text" class="red-text" style="display: inline-block" @click="bindEmail">修改邮箱>>></el-button>
+                <el-button type="text" class="red-text" style="display: inline-block" @click="goBindEmail">修改邮箱>>></el-button>
               </el-form-item>
             </el-form>
             <el-form :inline="true" :model="infoForm" style="padding-left:25px;width: 450px;">
@@ -79,6 +79,15 @@
                   </el-option>
                 </el-select>
               </el-form-item>
+              <el-form-item label="自我介绍">
+                <el-input
+                  type="textarea"
+                  :maxlength="500"
+                  :autosize="{ minRows: 4, maxRows: 6}"
+                  placeholder="请输入内容"
+                  v-model="selfInt">
+                </el-input>
+              </el-form-item>
             </el-form>
           </div>
           <div style="text-align: right"><el-button type="primary" >保存</el-button></div>
@@ -123,7 +132,6 @@
         <el-form-item label="验证码" prop="captcha">
           <el-input type="password" v-model="changePassForm.captcha"></el-input>
         </el-form-item>
-
       </el-form>
 
       <span slot="footer" class="dialog-footer">
@@ -134,7 +142,7 @@
     <!--绑定邮箱弹窗-->
     <el-dialog
       title="绑定邮箱"
-      :visible.sync="changeMobileDialog"
+      :visible.sync="changeEmailDialog"
       width="30%">
       <el-form :model="changeEmailForm" :rules="rules" ref="changePassForm" label-width="100px">
         <el-form-item label="邮箱" prop="changeMobile">
@@ -146,8 +154,8 @@
       </el-form>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="this.changeMobileDialog = false">取 消</el-button>
-        <el-button type="primary" @click="bindMobile">确 定</el-button>
+        <el-button @click="this.changeEmailDialog = false">取 消</el-button>
+        <el-button type="primary" @click="bindEmail">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -202,6 +210,7 @@
         collegeList:"", //院列表
         departmentList:"", //系列表
         changeMobileDialog: false, //跟换电话
+        changeEmailDialog: false, //更换邮箱
 
       };
     },
@@ -220,8 +229,6 @@
               type:'error'
             })
           }
-        }).catch(error=>{
-          console.log(error)
         })
       },
       //获取院列表
@@ -306,17 +313,22 @@
         })
       },
       //修改邮箱
-      bindEmail(){
-        userApi.bindMobile(data).then(res=>{
+      goBindEmail(){
+        let data = this.infoForm.email
+        console.log(data)
+
+        if(this.infoForm.email == 0){
+          return false
+        }
+        userApi.getEmailBindCode(data).then(res=>{
           console.log(res)
           if(Number(res.code) === 200) {
             this.$notify.success({
               title: '成功',
               message:'验证码已发送'
             });
-
-            this.changeMobileDialog = true
-            this.changePassForm.changeMobile = this.infoForm.mobile
+            this.changeEmailDialog = true
+            this.changeEmailForm.changeEmail = this.infoForm.mobile
 
           }else if(Number(res.code) === 440){
             let msgs = JSON.parse(res.msg)
@@ -325,8 +337,6 @@
               message:msgs[0].message
             });
           }
-        }).catch(error=>{
-          console.log(error)
         })
       },
       // 修改手机号

@@ -61,12 +61,13 @@
         <cover-preview :show="coverPreviewShow"
                        @closeCoverPreview="closeCoverPreview"
                        @chooseCover="chooseCover"></cover-preview>
-        <el-form-item label="课程价格" required>
-          <el-radio v-model="Course.payMode" :label="10">免费</el-radio>
-<!--          <el-radio v-model="Course.payMode" label="20">收费</el-radio>
-          <el-input v-model="Course.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;" v-show="Number(Course.payMode) === 20"></el-input>
-          <span v-show="Number(Course.payMode) === 20">元</span>-->
-        </el-form-item>
+
+        <!--<el-form-item label="课程价格" required>-->
+          <!--<el-radio v-model="Course.payMode" :label="10">免费</el-radio>-->
+          <!--<el-radio v-model="Course.payMode" label="20">收费</el-radio>-->
+          <!--<el-input v-model="Course.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;" v-show="Number(Course.payMode) === 20"></el-input>-->
+          <!--<span v-show="Number(Course.payMode) === 20">元</span>-->
+        <!--</el-form-item>-->
 
         <el-form-item label="课程标签" required>
           <div class="course-tag-warp">

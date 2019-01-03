@@ -80,6 +80,7 @@ export function bindEmail (data) {
  * 发送绑定邮箱验证码
  * */
 export function getEmailBindCode (data) {
+  console.log(data)
   return commonsAjax(`${baseUrl}user/mail/captcha`, data, 'get')
 }
 /**

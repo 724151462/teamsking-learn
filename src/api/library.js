@@ -4,7 +4,7 @@ const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
 import {
     commonsAjax
-  } from '../utils/requery'  
+  } from '../utils/requery'
 
 // ==============试题===========
 /**
@@ -90,9 +90,23 @@ export function newResFileFold(data) {
   return commonsAjax(url, data, 'post')
 }
 /**
+ * 修改资源文件夹名字
+ */
+export function reResFileFold(data) {
+    let url = `${baseUrl}resource/catalog`
+    return commonsAjax(url, data, 'put')
+}
+/**
+ * 删除资源文件夹
+ */
+export function delResFileFold(data) {
+    let url = `${baseUrl}resource/catalog`
+    return commonsAjax(url, data, 'delete')
+}
+/**
  * 资源删除(批量)
  */
-export function deleteResList(data) {
+export function deleteRes(data) {
   let url = `${baseUrl}quiz/resource`
   return commonsAjax(url, data, 'delete')
 }
@@ -110,7 +124,36 @@ export function localUpload(data) {
 /**
  * 活动批量删除
  */
-// export function delete(data) {
-//   let url = `${baseUrl}quiz/resource`
-//   return commonsAjax(url, data, 'delete')
-// }
+export function deleteAc(data) {
+  let url = `${baseUrl}interaction/catalog`
+  return commonsAjax(url, data, 'delete')
+}
+/**
+ * 活动移动到另外的文件夹
+ */
+export function removeAc(data) {
+  console.log(data)
+    let url = `${baseUrl}interaction/catalog`
+    return commonsAjax(url, data, 'patch')
+}
+/**
+ * 创建活动文件夹
+ */
+export function createAc(data) {
+    let url = `${baseUrl}interaction/catalog`
+    return commonsAjax(url, data, 'post')
+}
+/**
+ * 重命名文件夹
+ */
+export function renameAc(data) {
+    let url = `${baseUrl}interaction/catalog`
+    return commonsAjax(url, data, 'put')
+}
+/**
+ * 获取活动列表
+ */
+export function getAcList(data) {
+    let url = `${baseUrl}interaction/interactions`
+    return commonsAjax(url, data, 'post')
+}
