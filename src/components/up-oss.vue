@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-button type="primary" @click="goUp">上传</el-button>
-    <div>{{schedule}}</div>
+    <!--<div>{{schedule}}</div>-->
     <input type="file" id="inputs" @change="upInput"/>
   </div>
 </template>

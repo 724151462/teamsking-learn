@@ -95,8 +95,7 @@
         loginDebug(data).then(res => {
           console.log(res)
           if (res.code === 200) {
-            setToken(res.data.token)
-            console.log(getToken())
+            setToken('c15d157f0830e5c61957ed501987427c')
             this.$router.replace('/course')
           } else {
             this.$message({
