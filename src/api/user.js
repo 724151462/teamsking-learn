@@ -40,7 +40,7 @@ export function changeUserInfo (data) {
  * 绑定手机号
  * */
 export function bindMobile (data) {
-  return commonsAjax(`${baseUrl}user/mobile`, data, 'post')
+  return commonsAjax(`${baseUrl}user/mobile/form`, data, 'post')
 }
 /**
  * 发送绑定手机号的验证码
@@ -80,9 +80,25 @@ export function bindEmail (data) {
  * 发送绑定邮箱验证码
  * */
 export function getEmailBindCode (data) {
-  console.log(data)
   return commonsAjax(`${baseUrl}user/mail/captcha`, data, 'get')
 }
+
+/**
+ * 邮箱换绑时检查密码
+ * */
+export function checkMailPass (data) {
+
+  return commonsAjax(`${baseUrl}user/mail/captcha`, data, 'post')
+}
+
+/**
+ * 邮箱换绑时检查密码
+ * */
+export function checkMobilePass (data) {
+
+  return commonsAjax(`${baseUrl}user/mobile/captcha/replace/form`, data, 'post')
+}
+
 /**
  * 获取换邮箱绑口令
  * */

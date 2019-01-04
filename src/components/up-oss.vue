@@ -1,6 +1,6 @@
 <template>
   <div style="display: inline-block;margin: 0 10px">
-    <el-button type="primary" @click="goUp">{{btnText}}</el-button>
+    <el-button type="primary" @click="goUp" id="male">{{btnText}}</el-button>
     <!-- <div>{{schedule}}</div> -->
     <input type="file" id="inputs" @change="upInput"/>
   </div>
