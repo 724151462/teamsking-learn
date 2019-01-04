@@ -105,7 +105,7 @@
       console.log('curpath',cur_path)
       console.log('cookiepath',this.$store.state.leftNavState)
 			var routers = this.$router.options.routes; // 获取路由对象
-			var nav_type = "courseCenter", nav_name = "课程列表";
+			var nav_type = "courseCenter", nav_name = "course";
 			// console.log('routers', routers)
 			for (var i = 0; i < routers.length; i++) {
 			var children = routers[i].children;

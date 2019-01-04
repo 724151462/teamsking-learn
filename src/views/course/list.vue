@@ -35,6 +35,7 @@
               <a class="list">删除</a>
               <a class="list" @click="sell">售卖</a>
             </div>
+            <!-- <el-button type="primary" @click="goAddCourse(list.courseId)">课堂模式</el-button> -->
             <el-button type="primary" @click="goAddCourse(list.courseId)">教学管理</el-button>
           </div>
         </el-row>

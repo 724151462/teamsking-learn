@@ -7,7 +7,10 @@ import 'element-ui/lib/theme-chalk/index.css'
 import 'vue-video-player/src/custom-theme.css'
 import 'video.js/dist/video-js.css'
 import Cookie from 'js-cookie'
+import VueSocketio from 'vue-socket.io';
+import socketio from 'socket.io-client';
 
+// Vue.use(VueSocketio, socketio('localhost:8081'));
 Vue.use(ElementUI)
 
 

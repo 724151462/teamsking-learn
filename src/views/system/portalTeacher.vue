@@ -30,7 +30,7 @@
 
   import tableWjx from '../../components/table-wjx'
 
-  import { sysRecommenTeacherPage } from '../../api/school'
+  import { teacherRecList } from '../../api/system'
 
 
   export default {
@@ -48,7 +48,8 @@
           },
           {
             name:'老师头像',
-            prop:'teacherImg'
+            prop:'avatar',
+            imgList: {}
           },
           {
             name:'老师姓名',
@@ -56,7 +57,7 @@
           },
           {
             name:'老师简介',
-            prop:"jianshu"
+            prop:"synopsis"
           }
         ],
         operateList:[
@@ -91,9 +92,14 @@
       },
     },
     created:function(){
-      sysRecommenTeacherPage().then(
+      teacherRecList().then(
         res => {
           console.log('res',res);
+          res.data.page.pageData.forEach(element => {
+            console.log(element.avatar)
+            element.avatar = [{ imgUrl: element.avatar }];
+          });
+          this.tableData3 = res.data.page.pageData
         }
       ).catch();
     }

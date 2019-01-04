@@ -30,7 +30,7 @@
 
   import tableTheAgain from '../../components/table-theAgain'
 
-  import { sysRecommenTeacherPage } from '../../api/school'
+  import { courseRecList, recRemove } from '../../api/system'
 
 
   export default {
@@ -48,15 +48,15 @@
           },
           {
             name:'课程ID',
-            prop:'teacherImg'
+            prop:'courseId'
           },
           {
             name:'课程名称',
-            prop:'teacherName'
+            prop:'courseName'
           },
           {
             name:'讲师',
-            prop:"jianshu"
+            prop:"instructorName"
           }
         ],
         operateList:[
@@ -65,8 +65,8 @@
             type:'choose',
           },
           {
-            content:'操作',
-            type:'operate',
+            content:'删除',
+            type:'delete',
           },
         ],
         tableOperate:[]
@@ -78,26 +78,31 @@
       },
       showComponentInfo:function(type,info){
         // console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
-        // switch (type) {
-        //   case 'edit':
-        //     this.edit(info);
-        //     break;
-        //   case 'add':
-        //     this.appendNewAcademy(info);
-        //     break;
-        //   case 'deleteAll':
-        //     this.deleteAcademy('list',info);
-        //     break;
-        //   case 'delete':
-        //     this.deleteAcademy('one',info);
-        //     break;
-        // }
+        switch (type) {
+          case 'edit':
+            this.edit(info);
+            break;
+          case 'add':
+            this.appendNewAcademy(info);
+          case 'delete':
+            recRemove({removeDO:{recommendType: 10, recommendId: info.recommendId}})
+            .then(response=> {
+              if (response.code === 200) {
+                this.$message({
+                  message: "删除成功",
+                  type: "success"
+                });
+              }
+            })
+            break;
+        }
       },
     },
     created:function(){
-      sysRecommenTeacherPage().then(
+      courseRecList().then(
         res => {
           console.log('res',res);
+          this.tableData3 = res.data.page.pageData
         }
       ).catch();
     }

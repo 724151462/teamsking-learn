@@ -96,3 +96,72 @@ export function schoolMsg(data) {
   let url = `${baseUrl}tenant/message`
   return commonsAjax(url, data, 'get')
 }
+
+
+/**
+ * 设置平台信息
+ */
+export function platformInfo(data) {
+  let url = `${baseUrl}tenant/info`
+  return commonsAjax(url, data, 'put')
+}
+
+
+/**
+ * 设置平台信息
+ */
+export function bannerList(data) {
+  let url = `${baseUrl}tenant/carousel/list`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 添加轮播图
+ */
+export function addBanner(data) {
+  let url = `${baseUrl}tenant/carousel`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 删除轮播图
+ */
+export function delBanner(data) {
+  let url = `${baseUrl}tenant/carousel`
+  return commonsAjax(url, data, 'delete')
+}
+
+/**
+ * 修改轮播图
+ */
+export function modBanner(data) {
+  let url = `${baseUrl}tenant/carousel`
+  return commonsAjax(url, data, 'put')
+}
+
+
+/**
+ * 名师风采列表
+ */
+export function teacherRecList(data) {
+  let url = `${baseUrl}recommend/teacher/page`
+  return commonsAjax(url, data, 'get')
+}
+
+/**
+ * 推荐课程列表
+ */
+export function courseRecList(data) {
+  let url = `${baseUrl}recommend/course/page`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 推荐移除
+ */
+export function recRemove(data) {
+  let url = `${baseUrl}recommend`
+  return commonsAjax(url, data, 'delete')
+}

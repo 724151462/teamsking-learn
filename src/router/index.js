@@ -532,27 +532,6 @@ export const constantRouterMap = [{
       {path:'class',component:_import('school/class'),name:'user班级管理'},
     ]
   },
-  // {
-  //   path:'/school',
-  //   component:Layout,
-  //   name:'个人中心',
-  //   redirect:'/school/student',
-  //   meta:{
-  //     address:'school'
-  //   },
-  //   children:[
-  //     {path:'student',component:_import('school/student'),name:'user学生管理'},
-  //     {path:'teacher',component:_import('school/teacher'),name:'user教师管理'},
-  //     {path:'controller',component:_import('school/controller'),name:'user管理员'},
-  //     {path:'portal',component:_import('school/portal'),name:'user门户配置'},
-  //     {path:'course',component:_import('school/course'),name:'user课程管理'},
-  //     {path:'certificate',component:_import('school/certificate'),name:'user证书审核'},
-  //     {path:'academy',component:_import('school/academy'),name:'user院管理'},
-  //     {path:'department',component:_import('school/department'),name:'user系管理'},
-  //     {path:'speciality',component:_import('school/speciality'),name:'user专业管理'},
-  //     {path:'class',component:_import('school/class'),name:'user班级管理'},
-  //   ]
-  // },
   {
     path: '/system',
     component: Home,
@@ -797,6 +776,12 @@ export const constantRouterMap = [{
       //   ]
       // },
     ]
+  },
+  {
+    path: '/classModel',
+    component: _import('classModel/index'),
+    name: 'classIndex',
+    // type: 'systemManage',
   }
   // {
   //   path:'/*',

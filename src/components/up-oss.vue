@@ -2,7 +2,7 @@
   <div style="display: inline-block;margin: 0 10px">
     <el-button type="primary" @click="goUp">{{btnText}}</el-button>
     <!-- <div>{{schedule}}</div> -->
-    <input type="file" id="inputs" @change="upInput"/>
+    <input type="file" :id="inputs" @change="upInput"/>
   </div>
 </template>
 
@@ -20,6 +20,9 @@
       },
       btnText: {
         default: "上传"
+      },
+      inputs: {
+        default: "inputs"
       }
     },
     data(){
@@ -32,7 +35,11 @@
     },
     methods:{
       goUp () {
-        document.getElementById('inputs').click()
+        if(this.inputs === undefined) {
+          document.getElementById('inputs').click()
+        }else{
+          document.getElementById(this.inputs).click()
+        }
       },
       upInput (event) {
         console.log('1',event)
@@ -71,7 +78,7 @@
             self.schedule = (p.toFixed(2) * 100) + '%'
           }
         }).then((results) => {
-          // console.log('then返回',results)
+          console.log('then返回',results)
           //http://tskedu-course.oss-cn-beijing.aliyuncs.com/ + name = 完整的url
           self.$message({
             message:'上传成功',
@@ -124,6 +131,10 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+  #logo
+    display:none
+  #pic
+    display:none
   #inputs
     display:none
 </style>
