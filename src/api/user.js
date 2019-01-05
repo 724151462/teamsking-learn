@@ -131,3 +131,17 @@ export function delCertificate (data) {
 export function certificateList (data) {
     return commonsAjax(`${baseUrl}user/certificate`, data, 'get')
 }
+
+//============================教师相关===========================
+/**
+ * 获取我的教师信息
+ * */
+export function teacherInfo (data) {
+  return commonsAjax(`${baseUrl}user/teacher/me`, data, 'get')
+}
+/**
+ * 修改我的教师信息
+ * */
+export function saveTeacherInfo (data) {
+  return commonsAjax(`${baseUrl}user/teacher/me`, data, 'put')
+}

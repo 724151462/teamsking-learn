@@ -78,7 +78,13 @@ export function sysDepartmentPage(data){
 export function sysDepartmentList(){
   return commonsAjax(`${baseUrl}department/list`,{ collegeId : -1 },'get')
 }
-
+/**
+ * 获取全部的系
+ * ${baseUrl}department/list
+ * */
+export function DepartmentList(data){
+  return commonsAjax(`${baseUrl}department/list`,data,'get')
+}
 
 /***
  *添加系

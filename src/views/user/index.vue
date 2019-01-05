@@ -6,7 +6,9 @@
           <p>头像</p>
           <div  style="padding-left: 100px;width: 100px;margin: 25px 0;">
             <img src="" alt="" class="user-avatar">
-            <div style="text-align: center;font-size: 14px;"><el-button type="text" class="red-text">修改头像</el-button></div>
+            <div style="text-align: center;font-size: 14px;"><el-button type="text" class="red-text">              <label for="male">
+              修改头像
+            </label></el-button></div>
           </div>
         </div>
         <div class="form-warp">
@@ -37,45 +39,49 @@
             <el-input class="input-width" :placeholder="infoForm.mobile" v-model="newForm.mobile"> </el-input>
             <el-button type="text" class="red-text" style="display: inline-block;margin-left: 15px;" @click="goMobile">绑定手机>>></el-button>
           </div>
-          <div  style="padding-left: 55px;width: 400px;display: flex">
+          <div  style="padding-left: 55px;width: 400px;display: flex;align-items: center">
             <div><span class="span-label">证书添加</span></div>
-            <div><i class="el-icon-plus avatar-uploader-icon"></i></div>
+            <div><i class="el-icon-picture avatar-uploader-icon"></i></div>
             <div>
+              <!--<i class="el-icon-circle-plus-outline up-label" @click="uploadDialog = true"></i>-->
               <label for="male">
-              <i class="el-icon-circle-plus-outline up-label"></i>
-            </label>
+                 <i class="el-icon-circle-plus-outline up-label"></i>
+              </label>
               <up-oss style="display: none"></up-oss>
             </div>
           </div>
           <div style="text-align: right"><el-button type="primary" >保存</el-button></div>
         </div>
         <!--院系信息-->
-        <div class="form-warp">
-          <div  style="padding-left: 55px;width: 280px">
+        <div class="form-warp" v-show="jobForm">
+          <div  style="padding-left: 55px;width: 580px">
             <el-form :model="jobForm" label-width="100px">
               <el-form-item label="职称">
-                <el-input type="text" v-model="jobForm.jobTitle" :placeholder="jobForm.jobTitle"></el-input>
+                <el-input type="text" class="input-width" v-model="jobForm.positionalTitle" placeholder="请输入"></el-input>
               </el-form-item>
               <el-form-item label="职龄">
-                <el-input type="password" v-model="jobForm.jobTear" :placeholder="jobForm.jobTear"></el-input>
+                <input class="el-input__inner input-width"
+                       v-model="jobForm.schoolAge"
+                       placeholder="请输入">
+                <!--<el-input type="number" class="input-width"  v-model="jobForm.schoolAge" :placeholder="teacherInfo.schoolAge || '请输入' "></el-input>-->
               </el-form-item>
               <el-form-item label="所属院">
-                <el-select v-model="jobForm.yuan" placeholder="请选择">
+                <el-select v-model="jobForm.collegeId" placeholder="请选择">
                   <el-option
                     v-for="item in collegeList"
                     :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                    :label="item.collegeName"
+                    :value="item.collegeId">
                   </el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="所属系">
-                <el-select v-model="jobForm.xi" placeholder="请选择">
+                <el-select v-model="jobForm.departmentId" placeholder="请选择" @focus='changeDepartment(jobForm.collegeId)'>
                   <el-option
                     v-for="item in departmentList"
                     :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                    :label="item.departmentName"
+                    :value="item.departmentId">
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -84,13 +90,13 @@
                   type="textarea"
                   :maxlength="500"
                   :autosize="{ minRows: 4, maxRows: 6}"
-                  placeholder="请输入内容"
-                  v-model="jobForm.selfInt">
+                  placeholder="请输入"
+                  v-model="jobForm.synopsis">
                 </el-input>
               </el-form-item>
             </el-form>
           </div>
-          <div style="text-align: right"><el-button type="primary" >保存</el-button></div>
+          <div style="text-align: right"><el-button type="primary" @click="changeTeaInfo">保存</el-button></div>
         </div>
         <!--密码修改-->
         <div class="form-warp">
@@ -116,6 +122,7 @@
 
       </el-tab-pane>
       <el-tab-pane label="消息管理" name="second"></el-tab-pane>
+      <el-tab-pane label="我的证书" name="third"></el-tab-pane>
     </el-tabs>
 
     <!--绑定手机弹窗-->
@@ -164,7 +171,7 @@
           :disabled="emailBtn"
           size="small"
           type="primary" @click="getMailCode">获取验证码</el-button>
-      <span v-show="emailBtnTime != 0" style="margin-left: 10px"><span style="color:red">{{this.emailBtnTime}}</span>秒后可重新取验证码，验证码十分钟内有效</span>
+      <span v-show="emailBtnTime != 0" style="margin-left: 10px"><span style="color:red">{{this.emailBtnTime}}</span>秒后可重新获取验证码</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="()=>{changeEmailDialog = false;newForm.email=''}">取 消</el-button>
         <el-button type="primary" @click="changeMail">确 定</el-button>
@@ -207,15 +214,15 @@
     <el-button type="primary" @click="uploadDialog = false">确 定</el-button>
   </span>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-  import {sysCollegeList, sysDepartmentList} from '@/api/school'
+  import {sysCollegeList, DepartmentList} from '@/api/school'
   import Cookie from 'js-cookie'
   import * as userApi from '@/api/user'
   import UpOss from "../../components/up-oss";
+  import {teacherInfo} from "../../api/user";
 
   export default {
     name: "index",
@@ -224,6 +231,8 @@
     },
     mounted (){
       this.initUserInfo()
+      this.initTeaInfo()
+      this.initCollege()
     },
     data() {
       return {
@@ -243,11 +252,13 @@
           email: '',
         },
         jobForm:{
-          jobTitle:'',  // 职称
-          jobTear:'',  // 职龄
-          yuan:'', // 院
-          xi:'',  // 系
-          selfInt:''// 自我介绍
+          positionalTitle :'',  // 职称
+          schoolAge :'',  // 职龄
+          collegeId :'', // 院
+          departmentId :'',  // 系
+          synopsis :'', // 自我介绍,
+          teacherId:'',
+          realName:'',
         },
         passForm:{
           checking: "",
@@ -302,6 +313,16 @@
         }
       };
     },
+    watch:{
+      'jobForm.schoolAge': function (curVal, oldVal) {
+        if (!curVal) {
+          this.jobForm.schoolAge = ''
+          return false
+        }
+        // 实时把非数字的输入过滤掉
+        this.jobForm.schoolAge = curVal.match(/\d/ig) ? curVal.match(/\d/ig).join('') : ''
+      }
+    },
     methods:{
       //获取用户信息
       initUserInfo(){
@@ -328,12 +349,17 @@
           }
         })
       },
-      //获取院列表
-      initCollege(){
-        sysCollegeList().then(res=>{
-          console.log(res)
+      //获取教师信息
+      initTeaInfo(){
+        let data = Cookie.get('userId')
+        userApi.teacherInfo(data).then(res=>{
           if(Number(res.code) === 200) {
-            this.$message.success('密码修改成功')
+            console.log(res.data)
+            this.initDepartment(res.data.collegeId)
+            if(res.data){
+              // this.teacherInfo = JSON.parse(JSON.stringify(res.data))
+              this.jobForm = JSON.parse(JSON.stringify(res.data))
+            }
           }else if(Number(res.code) === 440){
             let msgs = JSON.parse(res.msg)
             this.$message({
@@ -343,9 +369,55 @@
           }
         })
       },
-      //获取系列表
-      initDepartment(){
-
+      //获取院列表
+      initCollege(){
+        sysCollegeList().then(res=>{
+          console.log('获取到的院列表')
+          if(Number(res.code) === 200) {
+            this.collegeList = JSON.parse(JSON.stringify(res.data))
+          }else if(Number(res.code) === 440){
+            let msgs = JSON.parse(res.msg)
+            this.$message({
+              message:msgs[0].message,
+              type:'error'
+            })
+          }
+        })
+      },
+      //获取系 列表
+      initDepartment(id){
+        let data = {collegeId:id}
+        console.log(data)
+        DepartmentList(data).then(res=>{
+          if(Number(res.code) === 200) {
+            console.log(res.data)
+            this.departmentList = JSON.parse(JSON.stringify(res.data))
+          }else if(Number(res.code) === 440){
+            let msgs = JSON.parse(res.msg)
+            this.$message({
+              message:msgs[0].message,
+              type:'error'
+            })
+          }
+        })
+      },
+      //当院列表改变时
+      changeDepartment(id){
+        this.jobForm.departmentId=''
+        let data = {collegeId:id}
+        console.log(data)
+        DepartmentList(data).then(res=>{
+          if(Number(res.code) === 200) {
+            console.log(res.data)
+            this.departmentList = JSON.parse(JSON.stringify(res.data))
+          }else if(Number(res.code) === 440){
+            let msgs = JSON.parse(res.msg)
+            this.$message({
+              message:msgs[0].message,
+              type:'error'
+            })
+          }
+        })
       },
       toMessage () {
         if(this.activeName === 'second'){
@@ -377,6 +449,22 @@
             });
           }
         })
+      },
+      //修改本人的教师信息
+      changeTeaInfo(){
+        let data = this.jobForm
+        console.log(data)
+        userApi.saveTeacherInfo(data).then(res=>{
+        console.log(res)
+        if(Number(res.code) === 200) {
+          this.$message.success('修改成功')
+          this.jobForm = {}
+          this.initTeaInfo()
+        }else if(Number(res.code) === 440){
+          let msgs = JSON.parse(res.msg)
+          this.$message.error(msgs[0]);
+        }
+      })
       },
       // 修改密码
       changePassword(){
@@ -428,7 +516,7 @@
       },
       //邮箱换绑时
       checkMailPass(){
-        let data = {email:this.mailPass}
+        let data = {passwd:this.mailPass}
         this.mailPass = ''
         let loading = this.$loading({
           lock: true,
@@ -460,37 +548,23 @@
       },
       //往邮箱发送验证码
       getMailCode(){
-        let loading = this.$loading({
-          lock: true,
-          text: '正在发送验证码',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
         let data = {mail:String(this.changeEmailForm.mail)}
-        console.log(data)
         userApi.getEmailBindCode(data).then(res=>{
-          console.log(res)
-          loading.close()
-          if(Number(res.code) === 200) {
-            this.$message.success('验证码已发送至邮箱，请查收');
-            //限时
-            this.emailBtn = true
-            this.emailBtnTime = 30
-            let time = setInterval(() =>{
-              if(this.emailBtnTime>0){
-                this.emailBtnTime -=1
-              }else{
-                this.emailBtn = false
-                clearInterval(time)
-                this.emailBtnTime = 0
-              }
-            }, 1000)
-          }else if(Number(res.code) === 1000){
-            this.$message.error(res.msg)
-          }
-        }).catch(error=>{
-          console.log(error)
+          if(Number(res.code) === 200) {}else if(Number(res.code) === 1000){this.$message.error(res.msg)}
         })
+        this.$message.success('验证码已发送至邮箱，请查收');
+        //限时
+        this.emailBtn = true
+        this.emailBtnTime = 60
+        let time = setInterval(() =>{
+          if(this.emailBtnTime>0){
+            this.emailBtnTime -=1
+          }else{
+            this.emailBtn = false
+            clearInterval(time)
+            this.emailBtnTime = 0
+          }
+        }, 1000)
       },
       //修改绑定邮箱
       changeMail(){
@@ -503,7 +577,7 @@
           loading.close()
           if(Number(res.code) === 200) {
             this.$message.success('邮箱绑定成功');
-            this.newForm.mail = ''
+            this.newForm.email = ''
             this.initUserInfo()
             this.changeEmailDialog = false
           }else if(Number(res.code) === 1000){
@@ -616,16 +690,15 @@
         padding: 0 12px 0 0;
         box-sizing: border-box;
       .up-label
-        width: 50px;
-        height: 50px;
-        font-size: 50px;
+        margin-left 10px
+        font-size: 40px;
         color: #409EFF
       .avatar-uploader-icon
         font-size: 28px
         color: #8c939d
-        width: 280px
-        height: 160px
-        line-height: 160px
+        width: 180px;
+        height: 120px;
+        line-height: 120px
         text-align: center
         border:1px solid #ded5d5
 
