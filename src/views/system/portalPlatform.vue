@@ -1,5 +1,5 @@
 <template>
-  <el-form class="" :model="platformData" ref="ruleForm" label-width="150px" class="demo-ruleForm">
+  <el-form class="" :model="platformData" ref="ruleForm" label-width="150px">
     <el-form-item label="平台名称" required>
       <el-input v-model="platformData.tenantName" style="width: 220px;"></el-input>
       <span>字数限制在36个汉字以内</span>

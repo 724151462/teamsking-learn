@@ -150,10 +150,26 @@ export function teacherRecList(data) {
 }
 
 /**
+ * 推荐教师选择列表
+ */
+export function teacherAllList(data) {
+  let url = `${baseUrl}recommend/tenant/teacher/page`
+  return commonsAjax(url, data, 'get')
+}
+
+/**
  * 推荐课程列表
  */
 export function courseRecList(data) {
   let url = `${baseUrl}recommend/course/page`
+  return commonsAjax(url, data, 'get')
+}
+
+/**
+ * 推荐课程列表
+ */
+export function courseAllList(data) {
+  let url = `${baseUrl}recommend/tenant/course/page`
   return commonsAjax(url, data, 'get')
 }
 
@@ -164,4 +180,20 @@ export function courseRecList(data) {
 export function recRemove(data) {
   let url = `${baseUrl}recommend`
   return commonsAjax(url, data, 'delete')
+}
+
+/**
+ * 添加推荐
+ */
+export function recAdd(data) {
+  let url = `${baseUrl}recommend`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 修改推荐
+ */
+export function recMod(data) {
+  let url = `${baseUrl}recommend`
+  return commonsAjax(url, data, 'put')
 }

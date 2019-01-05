@@ -112,7 +112,7 @@ export default {
       this.dialogVisible = true;
     },
     deleteBanner(item) {
-      delBanner({ carouselId: item.carouselId }).then(response => {
+      delBanner(item.carouselId).then(response => {
         if (response.code === 200) {
           bannerList();
           this.$message({

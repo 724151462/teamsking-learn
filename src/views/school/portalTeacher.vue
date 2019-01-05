@@ -1,199 +1,200 @@
 <template>
   <div class="portalTeacher">
-    <el-form ref="form" :inline="true" label-width="100px" class="form-query">
-      <el-form-item label="标题名称：">
-        <el-input  placeholder="请输入教师名称"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" >查询</el-button>
-      </el-form-item>
-    </el-form>
+    <div style="height: 70px">
+      <el-button style="float: right;margin-right: 50px" type="primary" @click="addTeacher">添加</el-button>
+    </div>
 
     <table-wjx
-        :tableTitle="tableTitle"
-        :tableOperate="tableOperate"
-        :columnNameList="columnNameList"
-        :tableData="tableData"
-        :operateList="operateList"
-        @showComponentInfo="showComponentInfo">
-    </table-wjx>
-
-
-    <el-dialog
-        title="所有老师"
-        :visible.sync="dialogVisible"
-        width="60%"
-        :before-close="handleClose"
-        style="min-width: 800px">
-
-
-        <table-the-again
-            :tableTitle="popData.tableTitle"
-            :tableOperate="popData.tableOperate"
-            :columnNameList="popData.columnNameList"
-            :tableData="popData.tableData"
-            :operateList="popData.operateList"
-            @showComponentInfo="showComponentInfo">
-        </table-the-again>
-
-
+      :tableTitle="tableTitle"
+      :tableOperate="tableOperate"
+      :columnNameList="columnNameList"
+      :tableData="tableData3"
+      :operateList="operateList"
+      @showComponentInfo="showComponentInfo"
+    ></table-wjx>
+    <el-dialog title="添加教师" :visible.sync="dialogVisible" width="30%">
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="选择教师">
+          <el-select v-model="form.sourceIds">
+            <el-option
+              v-for="item in options"
+              :key="item.teacherId"
+              :label="item.teacherName"
+              :value="item.teacherId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogVisible = false">保 存</el-button>
-        </span>
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="ensureBtn">确 定</el-button>
+      </span>
     </el-dialog>
-
-
-
-
-
   </div>
 </template>
 
 <script>
+import tableWjx from "../../components/table-wjx";
 
-  import tableWjx from '../../components/table-wjx'
-  import tableTheAgain from '../../components/table-theAgain'
+import { teacherRecList, teacherAllList, recAdd, recMod } from "../../api/system";
 
-  import { sysRecommenTeacherPage } from '../../api/school'
-  import { sysRecommenTenantTeacherPage } from '../../api/school'
-
-
-  export default {
-    components:{
-      tableWjx,
-      tableTheAgain
-    },
-    data() {
-      return {
-
-
-        dialogVisible:true,
-
-
-        activeIndex: '2',
-        tableTitle:'名师列表',
-        tableData:[],
-        columnNameList:[
-          {
-            type:"index"
-          },
-          {
-
-            name:'老师头像',
-            prop:'imgUrls',
-            imgList: {}
-          },
-          {
-            name:'老师姓名',
-            prop:'teacherName'
-          },
-          {
-            name:'老师简介',
-            prop:"synopsis"
-          }
-        ],
-        operateList:[
-          {
-            content:'重新选择',
-            type:'choose',
-          },
-        ],
-        tableOperate:[],
-        popData:{
-          tableTitle:'所有老师',
-          tableData:[],
-          tableOperate:[],
-          columnNameList:[
-            {
-              type:"index"
-            },
-            {
-              name:"老师姓名",
-              prop:"teacherName"
-            },
-            {
-              name:"老师简介",
-              prop:"teacherNumber"
-            },
-          ],
-          operateList:[
-            {
-              content:'替换',
-              type:'replace',
-            },
-          ]
+export default {
+  components: {
+    tableWjx
+  },
+  data() {
+    return {
+      dialogVisible: false,
+      activeIndex: "2",
+      tableTitle: "名师列表",
+      tableData3: [],
+      columnNameList: [
+        {
+          type: "index"
+        },
+        {
+          name: "老师头像",
+          prop: "avatar",
+          imgList: {}
+        },
+        {
+          name: "老师姓名",
+          prop: "teacherName"
+        },
+        {
+          name: "老师简介",
+          prop: "synopsis"
         }
-      };
-    },
-    methods: {
-      handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      showComponentInfo:function(type,info){
-        // console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
-        switch (type) {
-          case 'choose':
-            this.dialogVisible = true;
-            break;
-        //   case 'add':
-        //     this.appendNewAcademy(info);
-        //     break;
-        //   case 'deleteAll':
-        //     this.deleteAcademy('list',info);
-        //     break;
-        //   case 'delete':
-        //     this.deleteAcademy('one',info);
-        //     break;
+      ],
+      operateList: [
+        {
+          content: "重新选择",
+          type: "edit"
         }
+      ],
+      tableOperate: [],
+      form: {
+        recommendType: 20,
+        sourceIds: []
       },
-      handleClose(done) { done(); },
-
-
-
-
-
-
-
+      options: [],
+      btnType: "",
+      temId: ""
+    };
+  },
+  methods: {
+    handleSelect(key, keyPath) {
+      console.log(key, keyPath);
     },
-    created:function(){
-      sysRecommenTeacherPage().then(
-        res => {
-          console.log('res',res);
-          if(res.code === 200){
-            this.tableData = res.data.page.pageData;
-            if( this.tableData.length > 0 ){
-              for( let i = 0; i < this.tableData.length; i++ ){
-                this.tableData[i].imgUrls = [];
-                this.tableData[i].imgUrls.push({imgUrl:this.tableData[i].avatar});
-              }
+    showComponentInfo: function(type, info) {
+      // console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
+      switch (type) {
+        case 'edit':
+          this.edit(info);
+          break;
+      //   case 'add':
+      //     this.appendNewAcademy(info);
+      //     break;
+      //   case 'deleteAll':
+      //     this.deleteAcademy('list',info);
+      //     break;
+      //   case 'delete':
+      //     this.deleteAcademy('one',info);
+      //     break;
+      }
+    },
+    edit(info) {
+      this.btnType = 'edit'
+      this.temId = String(info.recommendId)
+      this.dialogVisible = true
+    },
+    addTeacher() {
+      this.btnType = 'add'
+      this.dialogVisible = true
+    },
+    ensureBtn() {
+      if (this.btnType === "add") {
+        console.log(this.form)
+        this.form.sourceIds = [this.form.sourceIds]
+        recAdd(this.form)
+          .then(response => {
+            if (response.code === 200) {
+              this.$message({
+                message: "添加成功",
+                type: "success"
+              });
+              this.getRecList()
+            } else if (response.code === 1000) {
+              this.$message({
+                message: response.msg,
+                type: "warning"
+              });
             }
-            // this.popData.tableData = this.tableData;
-            console.log('this.tableData ',this.tableData );
-          }
-
+            this.dialogVisible = false;
+          })
+          .catch(error => {
+            this.$message({
+              message: error,
+              type: "danger"
+            });
+          });
+      } else {
+        // 新值
+        let sourceId =Number(this.form.sourceIds)
+        // 旧值
+        let targetRecommendId = this.temId
+        let form = {
+          recommendType: 20,
+          sourceId,
+          targetRecommendId
         }
-      ).catch(
-
-      );
-
-      sysRecommenTenantTeacherPage({ pageIndex:1,pageSize:10 }).then(
-        res => {
-          console.log('获取的教师列表',res);
-          if( res.code === 200){
-            this.popData.tableData = res.data.pageData;
-          }
-        }
-      ).catch()
-
-
-
+        console.log(form)
+        recMod(form)
+          .then(response => {
+            if (response.code === 200) {
+              this.$message({
+                message: "修改成功",
+                type: "success"
+              });
+              this.getRecList()
+            } else if (response.code === 1000) {
+              this.$message({
+                message: response.msg,
+                type: "warning"
+              });
+            }
+            this.dialogVisible = false;
+          })
+          .catch(error => {
+            this.$message({
+              message: error,
+              type: "danger"
+            });
+          });
+      }
     },
-
+    getRecList() {
+      teacherRecList()
+      .then(res => {
+        console.log("res", res);
+        res.data.page.pageData.forEach(element => {
+          console.log(element.avatar);
+          element.avatar = [{ imgUrl: element.avatar }];
+        });
+        this.tableData3 = res.data.page.pageData;
+      })
+    }
+  },
+  created: function() {
+    this.getRecList()
+    teacherAllList().then(response => {
+      this.options = response.data.pageData;
+    });
   }
+};
 </script>
 <style scoped>
-  .portalTeacher{
-    margin-top: 20px;
-  }
+.portalTeacher {
+  margin-top: 20px;
+}
 </style>

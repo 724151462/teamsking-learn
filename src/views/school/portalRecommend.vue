@@ -1,106 +1,209 @@
 <template>
   <div class="portalTeacher">
-    <el-form ref="form" :inline="true" label-width="100px" class="form-query">
-      <el-form-item label="标题名称：">
-        <el-input  placeholder="请输入课程名称"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" >查询</el-button>
-      </el-form-item>
-    </el-form>
+    <div style="height: 70px">
+      <el-button style="float: right;margin-right: 50px" type="primary" @click="addCourse">添加</el-button>
+    </div>
 
     <table-the-again
-        :tableTitle="tableTitle"
-        :tableOperate="tableOperate"
-        :columnNameList="columnNameList"
-        :tableData="tableData3"
-        :operateList="operateList"
-        @showComponentInfo="showComponentInfo">
-    </table-the-again>
+      :tableTitle="tableTitle"
+      :tableOperate="tableOperate"
+      :columnNameList="columnNameList"
+      :tableData="tableData3"
+      :operateList="operateList"
+      @showComponentInfo="showComponentInfo"
+    ></table-the-again>
 
-
+    <el-dialog title="添加课程" :visible.sync="dialogVisible" width="30%">
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="选择课程">
+          <el-select v-model="form.sourceIds">
+            <el-option
+              v-for="item in options"
+              :key="item.courseId"
+              :label="item.courseName"
+              :value="item.courseId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="ensureBtn">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import tableTheAgain from "../../components/table-theAgain";
 
-  import tableTheAgain from '../../components/table-theAgain'
+import { courseRecList, courseAllList, recRemove, recAdd, recMod } from "../../api/system";
 
-  import { sysRecommenTeacherPage } from '../../api/school'
-
-
-  export default {
-    components:{
-      tableTheAgain
-    },
-    data() {
-      return {
-        activeIndex: '2',
-        tableTitle:'课程列表',
-        tableData3:[],
-        columnNameList:[
-          {
-            type:"index"
-          },
-          {
-            name:'课程ID',
-            prop:'teacherImg'
-          },
-          {
-            name:'课程名称',
-            prop:'teacherName'
-          },
-          {
-            name:'讲师',
-            prop:"jianshu"
-          }
-        ],
-        operateList:[
-          {
-            content:'重新选择',
-            type:'choose',
-          },
-          {
-            content:'操作',
-            type:'operate',
-          },
-        ],
-        tableOperate:[]
-      };
-    },
-    methods: {
-      handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      showComponentInfo:function(type,info){
-        // console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
-        // switch (type) {
-        //   case 'edit':
-        //     this.edit(info);
-        //     break;
-        //   case 'add':
-        //     this.appendNewAcademy(info);
-        //     break;
-        //   case 'deleteAll':
-        //     this.deleteAcademy('list',info);
-        //     break;
-        //   case 'delete':
-        //     this.deleteAcademy('one',info);
-        //     break;
-        // }
-      },
-    },
-    created:function(){
-      sysRecommenTeacherPage().then(
-        res => {
-          console.log('res',res);
+export default {
+  components: {
+    tableTheAgain
+  },
+  data() {
+    return {
+      dialogVisible: false,
+      activeIndex: "2",
+      tableTitle: "课程列表",
+      tableData3: [],
+      columnNameList: [
+        {
+          type: "index"
+        },
+        {
+          name: "课程ID",
+          prop: "courseId"
+        },
+        {
+          name: "课程名称",
+          prop: "courseName"
+        },
+        {
+          name: "讲师",
+          prop: "instructorName"
         }
-      ).catch();
+      ],
+      operateList: [
+        {
+          content: "重新选择",
+          type: "edit"
+        },
+        {
+          content: "删除",
+          type: "delete"
+        }
+      ],
+      tableOperate: [],
+      form: {
+        recommendType: 10,
+        sourceIds: ''
+      },
+      options: [],
+      btnType: "",
+      temId: ""
+    };
+  },
+  methods: {
+    handleSelect(key, keyPath) {
+      console.log(key, keyPath);
+    },
+    showComponentInfo: function(type, info) {
+      // console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
+      switch (type) {
+        case "edit":
+          this.edit(info);
+          break;
+        case "add":
+          this.appendNewAcademy(info);
+        case "delete":
+          recRemove({ recommendType: 10, recommendId: info.recommendId }).then(
+            response => {
+              if (response.code === 200) {
+                this.$message({
+                  message: "删除成功",
+                  type: "success"
+                });
+                this.getRecList()
+              }
+            }
+          );
+          break;
+      }
+    },
+    edit(info) {
+      this.btnType = "edit";
+      this.temId = String(info.recommendId);
+      this.dialogVisible = true;
+    },
+    addCourse() {
+      this.btnType = "add";
+      this.dialogVisible = true;
+    },
+    ensureBtn() {
+      if (this.btnType === "add") {
+        console.log(this.form);
+        let form = {
+          sourceIds: [this.form.sourceIds],
+          recommendType: 10
+        }
+        recAdd(form)
+          .then(response => {
+            if (response.code === 200) {
+              this.$message({
+                message: "添加成功",
+                type: "success"
+              });
+              this.getRecList()
+            } else if (response.code === 1000) {
+              this.$message({
+                message: response.msg,
+                type: "warning"
+              });
+            }
+            this.dialogVisible = false;
+          })
+          .catch(error => {
+            this.$message({
+              message: error,
+              type: "danger"
+            });
+          });
+      } else {
+        // 新值
+        let sourceId = this.form.sourceIds;
+        // 旧值
+        let targetRecommendId = this.temId;
+        let form = {
+          recommendType: 10,
+          sourceId,
+          targetRecommendId
+        };
+        console.log(this.form.sourceIds);
+        recMod(form)
+          .then(response => {
+            if (response.code === 200) {
+              this.$message({
+                message: "修改成功",
+                type: "success"
+              });
+              this.getRecList()
+            } else if (response.code === 1000) {
+              this.$message({
+                message: response.msg,
+                type: "warning"
+              });
+            }
+            this.dialogVisible = false;
+          })
+          .catch(error => {
+            this.$message({
+              message: error,
+              type: "danger"
+            });
+          });
+      }
+    },
+    getRecList() {
+      courseRecList()
+      .then(res => {
+        console.log("res", res);
+        this.tableData3 = res.data.page.pageData;
+      })
     }
+  },
+  created: function() {
+    this.getRecList()
+    courseAllList().then(response => {
+      this.options = response.data.pageData;
+    });
   }
+};
 </script>
 <style scoped>
-  .portalTeacher{
-    margin-top: 20px;
-  }
+.portalTeacher {
+  margin-top: 20px;
+}
 </style>

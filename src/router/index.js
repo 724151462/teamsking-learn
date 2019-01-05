@@ -778,7 +778,7 @@ export const constantRouterMap = [{
     ]
   },
   {
-    path: '/classModel',
+    path: '/course/classmodel',
     component: _import('classModel/index'),
     name: 'classIndex',
     // type: 'systemManage',
