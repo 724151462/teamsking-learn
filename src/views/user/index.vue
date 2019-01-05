@@ -196,6 +196,18 @@
         <el-button type="primary" @click="checkMailPass">确 定</el-button>
       </span>
     </el-dialog>
+    <!--证书上传弹窗-->
+    <el-dialog
+        title="上传证书"
+        :visible.sync="uploadDialog"
+        width="30%">
+      <span>这是一段信息</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="uploadDialog = false">取 消</el-button>
+    <el-button type="primary" @click="uploadDialog = false">确 定</el-button>
+  </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -261,22 +273,32 @@
         },
         collegeList:"", //院列表
         departmentList:"", //系列表
-        changeMobileDialog: false, //换电话
         mobileBtn: false,
         mobileBtnTime: 0,
         emailBtn: false,
         emailBtnTime: 0,
+        changeMobileDialog: false, //换电话
         changeEmailDialog: false, //更换邮箱
         checkMobileDialog:false,  //手机检查密码
         checkEmailDialog:false, //邮箱检查密码
+        uploadDialog:false, //上传证书弹窗
         password:'',
         mailPass:'',
         userInfo:{},
-        loading:{
-          lock: true,
-          text: 'Loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
+        certificate:{
+            "certificateId": 0,
+            "certificateName": "string",
+            "certificateNo": "string",
+            "imgUrls": [
+                {
+                    "certificateImgId": 0,
+                    "imgUrl": "string",
+                    "order": 0,
+                    "saveDate": "string"
+                }
+            ],
+            "issuingAuthority": "string",
+            "issuingDate": "2019-01-04T16:56:58.577Z"
         }
       };
     },
@@ -606,5 +628,5 @@
         line-height: 160px
         text-align: center
         border:1px solid #ded5d5
-        
+
 </style>

@@ -111,3 +111,23 @@ export function getResetEmailCode (data) {
 export function checkEmailResetCode (data) {
   return commonsAjax(`${baseUrl}user/mail/captcha`, data, 'post')
 }
+
+//============================证书相关==================================
+/**
+ * 保存证书
+ * */
+export function saveCertificate (data) {
+    return commonsAjax(`${baseUrl}certificate`, data, 'post')
+}
+/**
+ * 删除证书
+ * */
+export function delCertificate (data) {
+    return commonsAjax(`${baseUrl}user/certificate`, data, 'delete')
+}
+/**
+ * 获取用户证书列表
+ * */
+export function certificateList (data) {
+    return commonsAjax(`${baseUrl}user/certificate`, data, 'get')
+}
