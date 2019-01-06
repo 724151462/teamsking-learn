@@ -5,10 +5,11 @@
         <div>
           <p>头像</p>
           <div  style="padding-left: 100px;width: 100px;margin: 25px 0;">
-            <img src="" alt="" class="user-avatar">
-            <div style="text-align: center;font-size: 14px;"><el-button type="text" class="red-text">              <label for="male">
-              修改头像
-            </label></el-button></div>
+            <img :src="infoForm.avatar" alt="" class="user-avatar">
+            <div style="text-align: center;font-size: 14px;">
+              <el-button type="text" @ossUp="changeAvatar"><label for="male" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
+              <up-oss style="display: none" @ossUp="changeAvatar"></up-oss>
+            </div>
           </div>
         </div>
         <div class="form-warp">
@@ -29,28 +30,29 @@
               </el-form-item>
             </el-form>
           </div>
+          <div style="text-align: right"><el-button type="primary" @click="changeInfo">保存</el-button></div>
+        </div>
+        <div class="form-warp">
           <div  style="padding-left: 55px;margin-bottom:22px;width: 400px">
             <span class="span-label">邮箱</span>
             <el-input class="input-width" :placeholder="infoForm.email" v-model="newForm.email"> </el-input>
-            <el-button type="text" class="red-text" style="display: inline-block;margin-left: 15px;" @click="goBindEmail">修改邮箱>>></el-button>
+            <el-button type="text" style="display: inline-block;margin-left: 15px;" @click="goBindEmail">修改邮箱>>></el-button>
           </div>
           <div style="padding-left:55px;margin-bottom:22px;width: 400px">
             <span class="span-label">手机号</span>
             <el-input class="input-width" :placeholder="infoForm.mobile" v-model="newForm.mobile"> </el-input>
-            <el-button type="text" class="red-text" style="display: inline-block;margin-left: 15px;" @click="goMobile">绑定手机>>></el-button>
+            <el-button type="text" style="display: inline-block;margin-left: 15px;" @click="goMobile">绑定手机>>></el-button>
           </div>
           <div  style="padding-left: 55px;width: 400px;display: flex;align-items: center">
             <div><span class="span-label">证书添加</span></div>
             <div><i class="el-icon-picture avatar-uploader-icon"></i></div>
             <div>
-              <!--<i class="el-icon-circle-plus-outline up-label" @click="uploadDialog = true"></i>-->
-              <label for="male">
-                 <i class="el-icon-circle-plus-outline up-label"></i>
-              </label>
-              <up-oss style="display: none"></up-oss>
+              <i class="el-icon-circle-plus-outline up-label" @click="uploadDialog = true"></i>
+              <!--<label for="male">-->
+                <!--<i class="el-icon-circle-plus-outline up-label"></i>-->
+              <!--</label>-->
             </div>
           </div>
-          <div style="text-align: right"><el-button type="primary" >保存</el-button></div>
         </div>
         <!--院系信息-->
         <div class="form-warp" v-show="jobForm">
@@ -208,11 +210,22 @@
         title="上传证书"
         :visible.sync="uploadDialog"
         width="30%">
-      <span>这是一段信息</span>
+      <el-form :model="cerForm" label-width="100px">
+        <el-form-item label="编号">
+          <el-input type="text" class="input-width" v-model="cerForm.certificateNo" placeholder="请输入"></el-input>
+        </el-form-item>
+        <el-form-item label="名称">
+          <el-input type="text" class="input-width" v-model="cerForm.certificateName" placeholder="请输入"></el-input>
+        </el-form-item>
+        <el-form-item label="发证件单位">
+          <el-input type="text" class="input-width" v-model="cerForm.issuingAuthority" placeholder="请输入"></el-input>
+        </el-form-item>
+        <span>证书图片</span>
+      </el-form>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="uploadDialog = false">取 消</el-button>
-    <el-button type="primary" @click="uploadDialog = false">确 定</el-button>
-  </span>
+        <el-button @click="uploadDialog = false">取 消</el-button>
+        <el-button type="primary" @click="uploadDialog = false">提交</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -273,6 +286,14 @@
         changeEmailForm:{
           mail:'',
           captcha:''
+        },
+        //证书表单
+        cerForm:{
+          certificateName: "string",//证书名称
+          certificateNo: "string", //证书编号
+          imgUrls: [{"imgUrl": "string",}],
+          issuingAuthority: "string", //发证机关
+          //issuingDate: "2019-01-05T12:39:18.397Z" //发证日期
         },
         rules:{
           checking: { required: true, message: '请再次输入密码', trigger: 'blur' },
@@ -419,10 +440,26 @@
           }
         })
       },
-      toMessage () {
-        if(this.activeName === 'second'){
-          this.$router.push('message')
-        }
+      //更换头像
+      changeAvatar(url , name){
+          this.infoForm.avatar = url
+      },
+      //修改本人信息
+      changeInfo(){
+        let data = this.infoForm
+        console.log(data)
+        userApi.changeUserInfo(data).then(res=>{
+            if(Number(res.code) === 200) {
+                this.$message.success('修改成功')
+                this.initUserInfo()
+            }else if(Number(res.code) === 440){
+                let msgs = JSON.parse(res.msg)
+                this.$message({
+                    message:msgs[0].message,
+                    type:'error'
+                })
+            }
+        })
       },
       //修改本人的用户信息
       changeUserInfo(){
@@ -656,6 +693,15 @@
           }
         })
       },
+      //路由跳转
+      toMessage () {
+        if(this.activeName === 'second'){
+            this.$router.push('message')
+        }
+        if(this.activeName === 'third'){
+            this.$router.push('certificate')
+        }
+      },
     }
   }
 </script>
@@ -673,7 +719,7 @@
       height 100px
       display block
       border-radius 50%
-      background-color: aquamarine
+      /*background-color: aquamarine*/
     .input-width
       width 200px
     .form-warp

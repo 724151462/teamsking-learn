@@ -57,14 +57,14 @@
                 <span>{{ node.label }}</span>
                 <span v-if="data.interactionId" style="margin-left: 20px"> >查看</span>
               </span>
-              <span v-show="node.checked">
-                <span v-if="data.catalogLevel">
+              <span>
+                <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
                   <el-button size="mini" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
                   <el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>
                   <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
                 </span>
-                <span v-else>
+                <span v-else class="hide-button">
                   <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
                   <el-button size="mini" type="primary" @click.stop="delQuiz()">删除</el-button>
                 </span>

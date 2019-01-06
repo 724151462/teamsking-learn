@@ -52,7 +52,6 @@
           }"
           show-checkbox
           @check-change	="nodeCheck"
-          :check-on-click-node="true"
           accordion
           node-key="catalogId"
           ref="tree">
@@ -63,14 +62,14 @@
                 <span class="quiz-tag" v-show="data.quizType == 20">多选题</span>
                 <span>{{ node.label }}</span>
               </span>
-              <span v-show="node.checked">
+              <span class="hide-button">
                 <span v-if="data.catalogLevel">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
                   <el-button size="mini" type="primary" @click.stop="() => append(data)"> 重命名 </el-button>
                   <el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>
                   <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
                 </span>
-                <span v-else>
+                <span v-else class="hide-button">
                   <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
                   <el-button size="mini" type="primary" @click.stop="delQuiz()">删除</el-button>
                 </span>
@@ -402,7 +401,6 @@
     overflow: hidden
     white-space: nowrap
     text-overflow:ellipsis
-  .test
     padding:0 5% 20px 50px
     .search-btn
       border-left 0

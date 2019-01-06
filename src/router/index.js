@@ -509,7 +509,8 @@ export const constantRouterMap = [{
       {path: 'buy', component: _import('user/buy'), name: 'user购买记录'},
       {path: 'income', component: _import('user/income'), name: 'user收入记录'},
       {path: 'withdraw', component: _import('user/withdraw'), name: 'user申请提现'},
-      {path: 'feedback', component: _import('user/feedback'), name: 'user意见反馈'}],
+      {path: 'feedback', component: _import('user/feedback'), name: 'user意见反馈'},
+      {path: 'certificate', component: _import('user/certificate'), name: 'user我的证书'}],
   },
   {
     path:'/school',

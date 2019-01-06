@@ -36,7 +36,13 @@
       overflow: hidden!important;
       white-space: nowrap!important;
       text-overflow: ellipsis!important;
-    .test, .resource, .activity
+    .test,.resource,.activity
+      .el-tree-node__content
+        height 50px!important
+        border-bottom 1px solid #ccc
+        &:hover .hide-button
+          opacity 1
+    .test
       .el-tree-node__content
         height 50px!important
         border-bottom 1px solid #ccc
