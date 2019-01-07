@@ -277,7 +277,6 @@
           <div class="list">视频得分 = 完整观看视频 / 总视频数 * 100 分 * <span class="blue-text">{{CourseSetEntity.videoPercent}}</span>%</div>
           <div class="list">测试得分 = 测试得分总和 / 测验次数 * <span class="blue-text">{{CourseSetEntity.quizPercent}}</span>%</div>
           <div class="list">作业得分 = 作业得分总和 / 作业次数 * <span class="blue-text">{{CourseSetEntity.homeworkPercent}}</span>%</div>
-          <div class="list">讨论得分 = 获得分数的讨论数 / 讨论次数 * 100分 * <span class="blue-text">{{CourseSetEntity.topicPercent}}</span>%</div>
           <div class="list">线下得分 = 线下得分 * <span class="blue-text">{{CourseSetEntity.offlinePercent}}</span>%</div>
           <div class="list">投票问卷得分 = 投票问卷得分 * <span class="blue-text">{{CourseSetEntity.votePercent}}</span>%</div>
           <div class="list">头脑风暴得分 = 头脑风暴得分 * <span class="blue-text">{{CourseSetEntity.stormPercent}}</span>%</div>
