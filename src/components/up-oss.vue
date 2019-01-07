@@ -2,7 +2,7 @@
   <div style="display: inline-block;margin: 0 10px">
     <el-button type="primary" @click="goUp" id="male">{{btnText}}</el-button>
     <!-- <div>{{schedule}}</div> -->
-    <input type="file" id="inputs" @change="upInput"/>
+    <input type="file" :id="inputs" @change="upInput"/>
   </div>
 </template>
 
@@ -20,6 +20,9 @@
       },
       btnText: {
         default: "上传"
+      },
+      inputs: {
+        default: "inputs"
       }
     },
     data(){
@@ -32,7 +35,11 @@
     },
     methods:{
       goUp () {
-        document.getElementById('inputs').click()
+        if(this.inputs === undefined) {
+          document.getElementById('inputs').click()
+        }else{
+          document.getElementById(this.inputs).click()
+        }
       },
       upInput (event) {
         console.log('1',event)
@@ -131,6 +138,10 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+  #logo
+    display:none
+  #pic
+    display:none
   #inputs
     display:none
 </style>

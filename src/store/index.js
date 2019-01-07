@@ -10,7 +10,8 @@ const state = {
   allMenu: [],
   filterMenu: [],
   topNavState: 'course',
-  leftNavState: '课程列表' ,
+  leftNavState: 'course' ,
+  modelActive: Cookie.get('modelActive') || "1"
 }
 
 const mutations = {

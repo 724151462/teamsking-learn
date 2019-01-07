@@ -35,6 +35,7 @@
               <a class="list">删除</a>
               <a class="list" @click="sell">售卖</a>
             </div>
+            <el-button type="primary" @click="goCourseModel(list.courseId)">课堂模式</el-button>
             <el-button type="primary" @click="goAddCourse(list.courseId)">教学管理</el-button>
           </div>
         </el-row>
@@ -162,10 +163,15 @@ export default {
     sell () {
       this.isDialog = true
     },
+    goCourseModel(e) {
+      this.$router.push({
+        path: '/course/classmodel',
+        query: {id: e}
+      })
+    },
     goAddCourse (e) {
       this.$router.push({
-        path: '/course/list/chapter',
-        query: {id: e}
+        path: '/course/addcourse',
       })
     },
     release (val) {

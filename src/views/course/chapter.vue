@@ -59,7 +59,7 @@
                     <span>{{content.itemName}}</span>
                     <div
                       class="video-info"
-                      v-if="content.resourceType === 10 || content.resourceType === 30"
+                      v-if="content.contentType === 10"
                     >
                       <span style="margin-left: 15px">时长：{{content.resourceLength | timeTransfer}}</span>
                       <el-tooltip
@@ -340,7 +340,10 @@ export default {
         itemName: "",
         contentId: "",
         contentType: 10,
-        courseId: this.$route.query.id
+        courseId: this.$route.query.id,
+        itemResource: {
+
+        }
       },
       radio: "1.2",
       // 添加内容类型tab
@@ -349,10 +352,13 @@ export default {
       docForm: {
         itemName: "",
         contentType: 20,
-        courseId: this.$route.query.id
+        courseId: this.$route.query.id,
+        itemResource: {
+
+        }
       },
       // 添加本地视频弹窗
-      localVideoDialog: true,
+      localVideoDialog: false,
       // 添加题目对话框
       subjectVisible: false,
       subjectList: [
@@ -635,25 +641,6 @@ export default {
       }
       return checkedList
     },
-    foldNumberCheck(treeName) {
-      let checkedList =treeName.getCheckedNodes().filter(element => {
-        return element.catalogId !== undefined;
-      });
-      if (checkedList.length > 1) {
-        this.$message({
-          message: "请选择单个文件夹",
-          type: "warning"
-        });
-        return false;
-      }else if(checkedList.length < 1) {
-        this.$message({
-          message: "尚未选择文件夹",
-          type: "warning"
-        });
-        return false;
-      }
-      return checkedList
-    },
     addJie(jieName) {
       console.log("jiename", jieName);
       console.log("zhangID", this.tempChapter);
@@ -797,42 +784,32 @@ export default {
     },
     // 本地上传视频
     getVideoUrl(...params) {
-      
-      this.resource.resourceTitle = params[1].substring(13);// 名称
-      this.resource.resourceUrl = params[0]; // 路径
-      this.resource.resourceType = 10; // 资源类型
-      let resource = this.foldNumberCheck(this.$refs.tree)
-      if(!resource) return
+       
+      this.videoForm.itemResource.resourceTitle = params[1].substring(13);// 名称
+      this.videoForm.itemResource.resourceUrl = params[0]; // 路径
+      this.videoForm.itemResource.resourceType = 10; // 资源类型
       let start = params[0].lastIndexOf(".");
       let end = params[0].length
-      this.resource.contentType = params[0].substring(start+1, end)
-      this.resource.catalogId = resource[0].catalogId
-      console.log(resource)
-      localUpload(this.resource).then(response => {
-        this.videoForm.contentId = response.data.resourceId;
-        this.videoForm.itemName = response.data.resourceTitle;
-      });
+      this.videoForm.contentType = 10
+      this.videoForm.chapterId = this.tempSection.chapterId
+      this.videoForm.sectionId = this.tempSection.sectionId
+      this.videoForm.catalogId = null
+      this.videoForm.itemName = params[1].substring(13);
+      this.videoUrl = params[0]
     },
     getDocUrl(...params) {
-      console.log(params)
-      this.resource.resourceTitle = params[1].substring(13);// 名称
-      this.resource.resourceUrl = params[0]; // 路径
-      this.resource.resourceType = 20; // 资源类型
-      let resource = this.foldNumberCheck(this.$refs.tree1)
-      if(!resource) return
+      this.docForm.itemResource.resourceTitle = params[1].substring(13);// 名称
+      this.docForm.itemResource.resourceUrl = params[0]; // 路径
+      this.docForm.itemResource.resourceType = 20; // 资源类型
       let start = params[0].lastIndexOf(".");
       let end = params[0].length
-      this.resource.contentType = params[0].substring(start+1, end)
-      this.resource.catalogId = resource[0].catalogId
-      console.log(this.resource)
-      localUpload(this.resource).then(response => {
-        console.log(response.data)
-        this.docForm.contentId = response.data.resourceId;
-        this.docForm.itemName = this.resource.resourceTitle;
-        this.contentAdd(this.docForm)
-      });
+      this.docForm.contentType = 20
+      this.docForm.catalogId = null
+      this.docForm.itemName = params[1].substring(13);
+      this.contentAdd(this.docForm)
     },
     localVideoUpload() {
+      console.log(this.videoForm)
       this.contentAdd(this.videoForm)
       this.localVideoDialog = false
     },

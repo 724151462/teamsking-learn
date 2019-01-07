@@ -140,7 +140,7 @@ export default {
         assetMd5: "",
         assetSize: 0,
         assetTitle: "fileFold.png",
-        assetType: 20,
+        assetType: 10,
         assetUrl:
           "http://tskedu-course.oss-cn-beijing.aliyuncs.com/1545189072795fileFold.png",
         contentType: "",
@@ -162,7 +162,12 @@ export default {
       homeWorkDetail({ homeworkId: this.$route.query.interactId }).then(
         response => {
           this.homeWork = response.data;
-          // console.log(this.voteObj)
+          let assetArr = []
+          this.homeWork.assets.forEach(element => {
+            assetArr.push(element.assetId)
+          });
+          this.homeWork.assets = assetArr
+          console.log(this.homeWork.assets)
         }
       );
     }

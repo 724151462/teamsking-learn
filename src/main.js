@@ -7,7 +7,18 @@ import 'element-ui/lib/theme-chalk/index.css'
 import 'vue-video-player/src/custom-theme.css'
 import 'video.js/dist/video-js.css'
 import Cookie from 'js-cookie'
+import VueSocketIO from 'vue-socket.io';
+// import socketio from 'socket.io-client';
 
+// Vue.use(VueSocketIO , new VueSocketIO({
+//   debug: true,
+//   connection: 'http://120.36.137.90:9008/websocket',
+//   vuex: {
+//       store,
+//       actionPrefix: 'SOCKET_',
+//       mutationPrefix: 'SOCKET_'
+//   }
+// }));
 Vue.use(ElementUI)
 
 

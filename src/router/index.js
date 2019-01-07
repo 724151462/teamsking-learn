@@ -533,27 +533,6 @@ export const constantRouterMap = [{
       {path:'class',component:_import('school/class'),name:'user班级管理'},
     ]
   },
-  // {
-  //   path:'/school',
-  //   component:Layout,
-  //   name:'个人中心',
-  //   redirect:'/school/student',
-  //   meta:{
-  //     address:'school'
-  //   },
-  //   children:[
-  //     {path:'student',component:_import('school/student'),name:'user学生管理'},
-  //     {path:'teacher',component:_import('school/teacher'),name:'user教师管理'},
-  //     {path:'controller',component:_import('school/controller'),name:'user管理员'},
-  //     {path:'portal',component:_import('school/portal'),name:'user门户配置'},
-  //     {path:'course',component:_import('school/course'),name:'user课程管理'},
-  //     {path:'certificate',component:_import('school/certificate'),name:'user证书审核'},
-  //     {path:'academy',component:_import('school/academy'),name:'user院管理'},
-  //     {path:'department',component:_import('school/department'),name:'user系管理'},
-  //     {path:'speciality',component:_import('school/speciality'),name:'user专业管理'},
-  //     {path:'class',component:_import('school/class'),name:'user班级管理'},
-  //   ]
-  // },
   {
     path: '/system',
     component: Home,
@@ -798,7 +777,51 @@ export const constantRouterMap = [{
       //   ]
       // },
     ]
-  }
+  },
+  {
+    path: '/course/classmodel',
+    component: _import('classModel/index'),
+    name: 'classIndex',
+    leaf: true,
+  },
+  {
+    path: '/course/classchapter',
+    component: _import('classModel/modelMain'),
+    name: 'modelMain',
+    redirect: '/course/modelChapter',
+    children: [
+      {
+        path: '/course/modelChapter',
+        component: _import('classModel/modelContent/modelChapter'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelTest',
+        component: _import('classModel/modelContent/modelTest'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelStrome',
+        component: _import('classModel/modelContent/modelStrome'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelVote',
+        component: _import('classModel/modelContent/modelVote'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelChooseAns',
+        component: _import('classModel/modelContent/modelChooseAns'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelResource',
+        component: _import('classModel/modelContent/modelResource'),
+        name: 'modelMain',
+      },
+    ]
+  },
   // {
   //   path:'/*',
   //   redirect:'/login'
