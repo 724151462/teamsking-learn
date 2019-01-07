@@ -3,7 +3,7 @@
         <span>
             章节
         </span>
-        <el-button @click="connect">
+        <el-button @click="clickButton">
             连接
         </el-button>
     </div>
@@ -11,18 +11,19 @@
 
 <script>
 import Cookie from 'js-cookie'
+import {
+    connect
+} from '@/utils/socket'
 export default {
     created() {
         Cookie.set('modelActive', '1')
     },
-    sockets: {
-        connect: function () {
-            console.log('socket connected')
-        },
-        customEmit: function (data) {
-            console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
+    methods: {
+        clickButton: function (data) {
+            connect()
+
         }
-    },
+    }
 }
 </script>
 

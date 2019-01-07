@@ -13,11 +13,11 @@ import VueSocketIO from 'vue-socket.io';
 // Vue.use(VueSocketIO , new VueSocketIO({
 //   debug: true,
 //   connection: 'http://120.36.137.90:9008/websocket',
-//   vuex: {
-//       store,
-//       actionPrefix: 'SOCKET_',
-//       mutationPrefix: 'SOCKET_'
-//   }
+//   // vuex: {
+//   //     store,
+//   //     actionPrefix: 'SOCKET_',
+//   //     mutationPrefix: 'SOCKET_'
+//   // }
 // }));
 Vue.use(ElementUI)
 

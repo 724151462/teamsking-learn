@@ -765,3 +765,30 @@ export function courseMsgAdd(data) {
   let url = `${baseUrl}message/course`
   return commonsAjax(url, data, 'post')
 }
+
+
+/**
+ * 查询有无进行中的课堂
+ */
+export function classingInfo(data) {
+  let url = `${baseUrl}classroom/${data.courseId}/1`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 结束课堂
+ */
+export function classOver(data) {
+  let url = `${baseUrl}classroom/${data.classroomId}`
+  return commonsAjax(url, data, 'put')
+}
+
+
+/**
+ * 结束课堂
+ */
+export function classSave(data) {
+  let url = `${baseUrl}classroom/${data.courseId}`
+  return commonsAjax(url, data, 'post')
+}
