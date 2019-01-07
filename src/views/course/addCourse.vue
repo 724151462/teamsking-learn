@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="course">
     <div class="addCourse">
       <span>课程信息</span>
       <el-button plain style="float:right">返回</el-button>
@@ -69,9 +69,9 @@
           <!--<span v-show="Number(Course.payMode) === 20">元</span>-->
         <!--</el-form-item>-->
 
-        <el-form-item label="课程标签" required>
-          <div class="course-tag-warp">
-            <div v-show="Course.courseTagIds.length === 0" style="color: #b3b3b3">请选择课程标签</div>
+        <el-form-item label="课程标签">
+          <div class="course-tag-warp" v-show="Course.courseTagIds.length !== 0">
+            <!--<div v-show="Course.courseTagIds.length === 0" style="color: #b3b3b3">请选择课程标签</div>-->
             <el-tag
               size="small"
               v-for="tag in Course.courseTagIds"
@@ -93,9 +93,9 @@
           </el-row>
         </el-form-item>
 
-        <el-form-item label="讲师" required>
-          <div class="instructor-tag-warp">
-            <div v-show="CourseForm.instructor.length === 0" style="color: #b3b3b3">请选择讲师</div>
+        <el-form-item label="讲师">
+          <div class="instructor-tag-warp" v-show="CourseForm.instructor.length !== 0">
+            <!--<div v-show="CourseForm.instructor.length === 0" style="color: #b3b3b3">请选择讲师</div>-->
             <el-tag
               size="small"
               v-for="instructor in CourseForm.instructor"
@@ -121,7 +121,7 @@
           </el-row>
         </el-form-item>
 
-        <el-form-item label="教学课程授权" label-width="120px" required>
+        <el-form-item label="教学课程授权" label-width="120px">
             <el-button type="text" @click="isAccredit = true">设置</el-button>
         </el-form-item>
 
@@ -143,7 +143,7 @@
             <span class="courseExplanation" v-show="CourseSetEntity.videoPercent !=0" style="margin-right: 10px">视频{{CourseSetEntity.videoPercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.quizPercent !=0" style="margin-right: 10px">测试{{CourseSetEntity.quizPercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.homeworkPercent !=0" style="margin-right: 10px">作业{{CourseSetEntity.homeworkPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.topicPercent !=0" style="margin-right: 10px">讨论{{CourseSetEntity.topicPercent}}%</span>
+            <!--<span class="courseExplanation" v-show="CourseSetEntity.topicPercent !=0" style="margin-right: 10px">讨论{{CourseSetEntity.topicPercent}}%</span>-->
             <span class="courseExplanation" v-show="CourseSetEntity.offlinePercent !=0" style="margin-right: 10px">线下{{CourseSetEntity.offlinePercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.votePercent !=0" style="margin-right: 10px">投票{{CourseSetEntity.votePercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.stormPercent !=0" style="margin-right: 10px">头脑风暴{{CourseSetEntity.stormPercent}}%</span>
@@ -196,7 +196,9 @@
       </el-row>
     </div>
     <!--教学课程授权设置-->
-      <el-dialog title="教学课程授权" :visible.sync="isAccredit" width="50%" class="addCourse-dialog">
+      <el-dialog title="教学课程授权" :visible.sync="isAccredit"
+                 width="50%"
+                 class="addCourse-dialog teacher-dialog">
           <el-autocomplete
                   class="accredit-input"
                   v-model="accreditTeacher"
@@ -339,15 +341,15 @@
         //课程完成度设置
         CourseSetEntity: {
           // 视频成绩占比
-          videoPercent: 50,
+          videoPercent: 0,
           //作业占比
           homeworkPercent: 0,
           // 测试成绩占比
-          quizPercent :30,
+          quizPercent :0,
           // 线下成绩占比
           offlinePercent : 0,
           // 头脑风暴成绩占比
-          stormPercent : 20,
+          stormPercent : 0,
           // 讨论成绩占比
           topicPercent : 0,
           // 投票成绩占比
@@ -525,6 +527,7 @@
       //标签移除
       tagRemove(e){
         console.log(e.tagId)
+        this.tag = ''
         let data = this.Course.courseTagIds,
           newData = [];
         data.forEach((item)=>{
@@ -537,7 +540,8 @@
       },
       //讲师移除
       instructorRemove(e){
-        console.log(e.instructorId)
+        // console.log(e.instructorId)
+        this.instructor = ''
         let data = this.CourseForm.instructor,
             newData = [];
         data.forEach((item)=>{
@@ -995,7 +999,7 @@
 
   .accredit-input{
     margin-right 30px
-    margin-left 65%
+    margin-left: calc(100% - 220px);
     border-radius 30px
   }
 </style>

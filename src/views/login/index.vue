@@ -96,6 +96,7 @@
           console.log(res)
           if (res.code === 200) {
             twoWeeksExchange(res.data.token)
+            saveUserInfo(res.data.userId)
             this.$router.replace('/course')
           } else {
             this.$message({

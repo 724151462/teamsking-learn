@@ -1,6 +1,6 @@
 <template>
   <div style="display: inline-block;margin: 0 10px">
-    <el-button type="primary" @click="goUp">{{btnText}}</el-button>
+    <el-button type="primary" @click="goUp" id="male">{{btnText}}</el-button>
     <!-- <div>{{schedule}}</div> -->
     <input type="file" :id="inputs" @change="upInput"/>
   </div>
@@ -70,6 +70,12 @@
         this.forInputs(client,name,file)
       },
       forInputs (client,name,file) {
+        let loading = this.$loading({
+          lock: true,
+          text: '正在努力上传中',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         let self = this
         client.multipartUpload(name, file, {
           progress(p, checkpoint){
@@ -78,7 +84,8 @@
             self.schedule = (p.toFixed(2) * 100) + '%'
           }
         }).then((results) => {
-          console.log('then返回',results)
+          loading.close()
+          // console.log('then返回',results)
           //http://tskedu-course.oss-cn-beijing.aliyuncs.com/ + name = 完整的url
           self.$message({
             message:'上传成功',
