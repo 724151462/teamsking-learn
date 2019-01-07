@@ -2,24 +2,12 @@
   <div class="addTeacher">
     <el-form :model="data" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="padding-right: 13%">
       <el-form-item label="名师照片" required>
-<!--        <el-upload
-                class="avatar-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload">
-          <img v-if="data.courseCover" :src="data.courseCover" class="avatar">
-          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-        </el-upload>-->
-        <el-upload
-                class="upload-demo"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload"
-                :show-file-list="false">
-          <el-button size="small" type="success">点击上传</el-button>
+        <img :src="data.instructorAvatar" alt="" v-show="data.instructorAvatar" style="width: 75px;height: 100px">
+          <el-button size="small" type="success" style="margin-left: 25px;">
+            <label for="male">点击上传</label>
+          </el-button>
+          <up-oss style="display: none" @ossUp="getUrl"></up-oss>
           <span class="upload-tip">请上传不小于<span class="text-red">15kb</span>的<span class="text-red">jpg</span>或<span class="text-red">png</span>图片</span>
-        </el-upload>
       </el-form-item>
 
       <el-form-item label="老师姓名" required>
@@ -28,7 +16,7 @@
 
       <el-form-item label="老师头街" required class="type-warp">
         <el-input v-model="data.instructorType" maxlength="32" ></el-input>
-        <span class="type-num"><span class="text-red">{{instructorTypeNum}}</span>/32</span>
+        <span class="type-num"><span class="text-red">{{this.instructorTypeNum}}</span>/32</span>
       </el-form-item>
 
       <el-form-item label="老师介绍" required class="info-warp">
@@ -38,7 +26,7 @@
                 resize="none" :rows="5"
                 @keyup.native="infoChange($event)"
                 maxlength="1000"></el-input>
-        <span class="info-num"><span class="text-red">{{data.instructorInfoNum}}</span>/1000</span>
+        <span class="info-num"><span class="text-red">{{this.instructorInfoNum}}</span>/1000</span>
       </el-form-item>
 
 <!--
@@ -65,23 +53,32 @@
 </template>
 
 <script>
+  import upOss from '@/components/up-oss'
   import { addInstructor } from '../../../api/course'
   export default {
+    components:{
+      upOss
+    },
     data(){
       return{
         data:{
-          instructorAvatar:'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3534289497,3677101726&fm=27&gp=0.jpg',  //头像图片
+          instructorAvatar:'',  //头像图片
           instructorName:'',  //老师姓名
           instructorType:'',  //老师头衔
           instructorInfo:'',  //老师介绍
-          status:1,
-          instructorInfoNum: 0, //老师介绍的字数
-          // instructorTypeNum: 0, //老师头衔的字数
+          // status:1,
+
           // introduction:'',  //老师介绍
-        }
+        },
+        instructorInfoNum: 0, //老师介绍的字数
+        instructorTypeNum: 0, //老师头衔的字数
       }
     },
     methods:{
+      //上传封面
+      getUrl (url){
+        this.data.instructorAvatar = url
+      },
       returnFun () {
         this.$emit('goAddTeachersData')
       },
@@ -89,6 +86,13 @@
       yesGoInstructor () {
         addInstructor(this.data).then(res=>{
           if(Number(res.code) === 200){
+            this.$message.success('讲师创建成功')
+            this.data={
+                instructorAvatar:'',
+                instructorName:'',
+                instructorType:'',
+                instructorInfo:'',
+            }
             this.$emit('goAddTeachersData',res.data)
           }else{
             this.$message({
@@ -96,8 +100,6 @@
               type:'error'
             })
           }
-        }).catch(error=>{
-          console.log(error)
         })
       },
       //图片上传方法
@@ -128,11 +130,19 @@
         this.data.instructorInfoNum = event.path[0].value.length
       }
     },
+    watch:{
+      'data.instructorType': function (curVal, oldVal) {
+        this.instructorTypeNum = curVal.length
+      },
+      'data.instructorInfo':function (curVal) {
+        this.instructorInfoNum = curVal.length
+      }
+    },
     computed:{
       //老师头衔的字数
-      instructorTypeNum: function () {
-        return this.data.instructorType.length
-      }
+      // instructorTypeNum: function () {
+      //   return this.instructorType.length
+      // }
     }
   }
 </script>

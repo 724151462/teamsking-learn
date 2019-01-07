@@ -16,7 +16,7 @@
           <el-button icon="el-icon-search" class="search-btn"></el-button>
         </div>
       </div>
-      <div style="" class="btn-warp">
+      <div style="" class="btn-warp" >
         <div>
           <el-button type="success">下载模板</el-button>
         </div>
@@ -415,14 +415,14 @@
       & div:first-chilf
         height 45px;
         width 100px;
-    .btn-warp
-      flex 1
-      display flex
-      justify-content flex-end
-      & div
-        margin 0 10px
-      & div:last-child
-        margin-right 0
+  .btn-warp
+    flex 1
+    display flex
+    justify-content flex-end
+    & div
+      margin 0 10px
+    & div:last-child
+      margin-right 0
   .test-warp
     .img-span
       display inline-block

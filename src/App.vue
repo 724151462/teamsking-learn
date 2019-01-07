@@ -42,14 +42,9 @@
         border-bottom 1px solid #ccc
         &:hover .hide-button
           opacity 1
-    .test
-      .el-tree-node__content
-        height 50px!important
-        border-bottom 1px solid #ccc
-        &:hover .hide-button
-          opacity 1
-      .el-tree-node__expand-icon
-        font-szie 17px!important
+    .course .teacher-dialog
+      .el-dialog__body
+        min-height 300px;
 </style>
   #app .courseCategory .el-table__expanded-cell
     padding:0 0 0 48px

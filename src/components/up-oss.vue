@@ -63,6 +63,12 @@
         this.forInputs(client,name,file)
       },
       forInputs (client,name,file) {
+        let loading = this.$loading({
+          lock: true,
+          text: '正在努力上传中',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         let self = this
         client.multipartUpload(name, file, {
           progress(p, checkpoint){
@@ -71,6 +77,7 @@
             self.schedule = (p.toFixed(2) * 100) + '%'
           }
         }).then((results) => {
+          loading.close()
           // console.log('then返回',results)
           //http://tskedu-course.oss-cn-beijing.aliyuncs.com/ + name = 完整的url
           self.$message({
