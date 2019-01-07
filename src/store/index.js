@@ -11,6 +11,7 @@ const state = {
   filterMenu: [],
   topNavState: 'course',
   leftNavState: 'course' ,
+  modelActive: Cookie.get('modelActive') || "1"
 }
 
 const mutations = {

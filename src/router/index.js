@@ -781,8 +781,46 @@ export const constantRouterMap = [{
     path: '/course/classmodel',
     component: _import('classModel/index'),
     name: 'classIndex',
-    // type: 'systemManage',
-  }
+    leaf: true,
+  },
+  {
+    path: '/course/classchapter',
+    component: _import('classModel/modelMain'),
+    name: 'modelMain',
+    redirect: '/course/modelChapter',
+    children: [
+      {
+        path: '/course/modelChapter',
+        component: _import('classModel/modelContent/modelChapter'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelTest',
+        component: _import('classModel/modelContent/modelTest'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelStrome',
+        component: _import('classModel/modelContent/modelStrome'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelVote',
+        component: _import('classModel/modelContent/modelVote'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelChooseAns',
+        component: _import('classModel/modelContent/modelChooseAns'),
+        name: 'modelMain',
+      },
+      {
+        path: '/course/modelResource',
+        component: _import('classModel/modelContent/modelResource'),
+        name: 'modelMain',
+      },
+    ]
+  },
   // {
   //   path:'/*',
   //   redirect:'/login'
