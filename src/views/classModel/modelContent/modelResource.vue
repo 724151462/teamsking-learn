@@ -96,6 +96,7 @@ export default {
     },
     goCatalog(id,name){
       console.log('文件夹点击',id,name)
+      this.routerList.push({id,name})
       this.data = [
         {
           catalogId: 2,
