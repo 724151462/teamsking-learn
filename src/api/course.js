@@ -772,7 +772,7 @@ export function courseMsgAdd(data) {
  */
 export function classingInfo(data) {
   let url = `${baseUrl}classroom/${data.courseId}/1`
-  return commonsAjax(url, data, 'get')
+  return commonsAjax(url, '', 'get')
 }
 
 
@@ -786,9 +786,45 @@ export function classOver(data) {
 
 
 /**
- * 结束课堂
+ * 保存课堂
  */
 export function classSave(data) {
   let url = `${baseUrl}classroom/${data.courseId}`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 课堂章节列表
+ */
+export function classChapter(data) {
+  let url = `http://120.36.137.90:9008/api/v1/classroom/course/chapter/list/${data.courseId}`
+  return commonsAjax(url, '', 'get')
+}
+
+
+
+/**
+ * 课堂小项
+ */
+export function classItem(data) {
+  let url = `${baseUrl}chapter/section/${data.sectionId}/items`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 课堂测试
+ */
+export function classTest(data) {
+  let url = `http://120.36.137.90:9008/api/v1/classroom/course/chapter/exams`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 课堂保存测试
+ */
+export function classTestSave(data) {
+  let url = `http://120.36.137.90:9008/api/v1/classroom/course/exam`
   return commonsAjax(url, data, 'post')
 }

@@ -14,9 +14,8 @@
 
 <script>
 import { classingInfo, classOver, classSave } from "@/api/course";
-import {
-    connect
-} from '@/utils/socket'
+import { connect } from "@/utils/socket";
+import Cookie from "js-cookie";
 export default {
   created() {
     classingInfo({ courseId: this.$route.query.id }).then(response => {
@@ -27,28 +26,35 @@ export default {
           type: "warning"
         })
           .then(() => {
-            connect()
+            this.enterClass();
           })
           .catch(() => {
-            classOver({ classroomId: response.data.classroomId })
+            classOver({ classroomId: response.data.classroomId });
           });
       }
     });
   },
   methods: {
     enterClass() {
-        let that = this
-        new Promise(connect).then(function (result) {
-            console.log('成功：' + result);
-            classSave({courseId: that.$route.query.id})
-            that.$router.push({
+      let that = this;
+      new Promise(connect)
+        .then(function(result) {
+          console.log("成功：" + result);
+          classSave({ courseId: that.$route.query.id }).then(response => {
+            if (response.code === 200) {
+              that.$router.push({
                 path: "/course/classchapter",
-                query: { id: that.$route.query.id }
-            });
-        }).catch(function (reason) {
-            that.enterClass()
+                query: {
+                  id: that.$route.query.id,
+                  classroomId: response.data.classroomId
+                }
+              });
+            }
+          });
+        })
+        .catch(function(reason) {
+          that.enterClass();
         });
-   
     }
   }
 };

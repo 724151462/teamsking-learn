@@ -28,7 +28,7 @@ export function connect(resolve,reject) {
         },
         function errorCallBack (error) {
             // 连接失败时（服务器响应 ERROR 帧）的回调方法
-                reject(error);
+                reject('error');
             }
         )
     // } catch (error) {
