@@ -37,6 +37,7 @@
             </div>
             <el-button type="primary" @click="goCourseModel(list.courseId)">课堂模式</el-button>
             <el-button type="primary" @click="goCourseChapter(list.courseId)">教学管理</el-button>
+
           </div>
         </el-row>
         <div style="text-align:right;">
