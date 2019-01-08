@@ -96,7 +96,19 @@ export default {
     },
     goCatalog(id,name){
       console.log('文件夹点击',id,name)
-      this.routerList.push({id,name})
+      this.data = [
+        {
+          catalogId: 2,
+          catalogLevel: 1,
+          catalogName: "文件夹1",
+          childCatalogList: [{}],
+          resourceList: [{
+            contentType: "mp4",
+            resourceId: 7,
+            resourceTitle: "大数据hadoop",
+          }]
+        }
+        ]
     },
     routerClick(id){
       console.log('路由点击，要去往的文件夹')
