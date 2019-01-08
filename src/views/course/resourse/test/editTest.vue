@@ -72,7 +72,6 @@
   export default {
     name: "editTest",
     created () {
-      console.log()
       this.getQuizInfo()
     },
     data () {

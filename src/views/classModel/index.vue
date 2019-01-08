@@ -14,7 +14,7 @@
 export default {
     methods: {
         enterClass() {
-            this.$router.push({path: "/course/classchapter",query: {id: this.$route.query.id}})
+          this.$router.push({path: "/course/classchapter",query: {id: this.$route.query.id}})
         }
     }
 };

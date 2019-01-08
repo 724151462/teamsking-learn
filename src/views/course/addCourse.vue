@@ -128,9 +128,15 @@
         <el-form-item label="选课名单" required>
           <el-row>
             <span>开放范围：</span>
-            <el-radio v-model="Course.courseMode" :label="10">选课名单学员</el-radio>
-            <el-radio v-model="Course.courseMode" :label="20">本校学员</el-radio>
-            <el-radio v-model="Course.courseMode" :label="30">全部学员</el-radio>
+            <el-tooltip class="item" effect="dark" content="只对选课名单内的学生开放，需要导入选课学生名单" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="10">选课名单学员</el-radio>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="只对本校认证的学员开放，其他学员无法学习！" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="20">本校学员</el-radio>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="对所有学员开放！" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="30">全部学员</el-radio>
+            </el-tooltip>
           </el-row>
           <el-row>
             <span>退课权限：</span>
@@ -141,6 +147,7 @@
         <el-form-item label="成绩考核" required>
           <div style="display: inline-block">
             <span class="courseExplanation" v-show="CourseSetEntity.videoPercent !=0" style="margin-right: 10px">视频{{CourseSetEntity.videoPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.docPercent !=0" style="margin-right: 10px">文档{{CourseSetEntity.docPercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.quizPercent !=0" style="margin-right: 10px">测试{{CourseSetEntity.quizPercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.homeworkPercent !=0" style="margin-right: 10px">作业{{CourseSetEntity.homeworkPercent}}%</span>
             <!--<span class="courseExplanation" v-show="CourseSetEntity.topicPercent !=0" style="margin-right: 10px">讨论{{CourseSetEntity.topicPercent}}%</span>-->
@@ -235,17 +242,20 @@
               <tr class="tr-h no-tr">
                 <td>评分项</td>
                 <td>视频</td>
+                <td>文档</td>
                 <td>测验</td>
                 <td>作业</td>
-                <td>讨论</td>
-                <td>线下</td>
-                <td>投票问卷</td>
                 <td>头脑风暴</td>
+                <td>投票问卷</td>
+                <td>线下</td>
               </tr>
               <tr class="tr-h">
                 <td>权重共100%</td>
                 <td>
                   <el-input v-model="CourseSetEntity.videoPercent" style="width:50px;"></el-input>%
+                </td>
+                <td>
+                  <el-input v-model="CourseSetEntity.docPercent" style="width:50px;"></el-input>%
                 </td>
                 <td>
                   <el-input v-model="CourseSetEntity.quizPercent" style="width:50px"></el-input>%
@@ -254,16 +264,13 @@
                   <el-input v-model="CourseSetEntity.homeworkPercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.topicPercent" style="width:50px"></el-input>%
-                </td>
-                <td>
-                  <el-input v-model="CourseSetEntity.offlinePercent" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.stormPercent" style="width:50px"></el-input>%
                 </td>
                 <td>
                   <el-input v-model="CourseSetEntity.votePercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.stormPercent" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.offlinePercent" style="width:50px"></el-input>%
                 </td>
               </tr>
             </table>
@@ -275,11 +282,12 @@
         </div>
         <div class="score">
           <div class="list">视频得分 = 完整观看视频 / 总视频数 * 100 分 * <span class="blue-text">{{CourseSetEntity.videoPercent}}</span>%</div>
+          <div class="list">文档得分 = 完整观看文档 / 总文档数 * 100 分 * <span class="blue-text">{{CourseSetEntity.docPercent}}</span>%</div>
           <div class="list">测试得分 = 测试得分总和 / 测验次数 * <span class="blue-text">{{CourseSetEntity.quizPercent}}</span>%</div>
-          <div class="list">作业得分 = 作业得分总和 / 作业次数 * <span class="blue-text">{{CourseSetEntity.homeworkPercent}}</span>%</div>
+          <div class="list">作业得分 = 作业得分总和 / 作业次数 * <span class="blue-text">{{CourseSetEntity.homeworkPercent}}</span>%<span style="color: red;margin-left: 10px">(取最高分)</span></div>
           <div class="list">线下得分 = 线下得分 * <span class="blue-text">{{CourseSetEntity.offlinePercent}}</span>%</div>
-          <div class="list">投票问卷得分 = 投票问卷得分 * <span class="blue-text">{{CourseSetEntity.votePercent}}</span>%</div>
-          <div class="list">头脑风暴得分 = 头脑风暴得分 * <span class="blue-text">{{CourseSetEntity.stormPercent}}</span>%</div>
+          <div class="list">投票问卷得分 = 投票问卷得分 / 投票数 * 100 *<span class="blue-text">{{CourseSetEntity.votePercent}}</span>%</div>
+          <div class="list">头脑风暴得分 = 头脑风暴得分总和 / 头脑风暴数 * <span class="blue-text">{{CourseSetEntity.stormPercent}}</span>%</div>
         </div>
       </el-row>
       <el-row style="text-align: right;">
@@ -341,6 +349,8 @@
         CourseSetEntity: {
           // 视频成绩占比
           videoPercent: 0,
+          //文档占比
+          docPercent:0,
           //作业占比
           homeworkPercent: 0,
           // 测试成绩占比
@@ -353,8 +363,6 @@
           topicPercent : 0,
           // 投票成绩占比
           votePercent : 0,
-          // 视频进度判定
-          // seeVideo:  90,
         },
         //课程相关
         CourseInfoEntity:{
@@ -482,24 +490,24 @@
       //创建课程
       goUpCourseResource(){
         let data = this.goDataFilter()
-        console.log('要上传的数据')
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         console.log(data)
-
         saveCourse(data).then(res=>{
+          loading.close()
           console.log(res)
           if(Number(res.code) === 200) {
-            // this.$router.push({
-            //   path:'/course/upCourses/resource'
-            // })
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
-            this.$message({
-              message:msgs[0].message,
-              type:'error'
+            this.$message.success('课程创建成功')
+            this.$router.push({
+              path:'/course'
             })
+          }else{
+            this.$message.success('课程创建失败')
           }
-        }).catch(error=>{
-          console.log(error)
         })
       },
       //弹出设置
@@ -781,11 +789,32 @@
         })
 
         let curData =JSON.parse( JSON.stringify(data));
+        let curCourseSetEntity = {
+          // 视频成绩占比
+          videoPercent: Number(this.CourseSetEntity.videoPercent),
+          //文档占比
+          docPercent:Number(this.CourseSetEntity.docPercent),
+          //作业占比
+          homeworkPercent: Number(this.CourseSetEntity.homeworkPercent),
+          // 测试成绩占比
+          quizPercent :Number(this.CourseSetEntity.quizPercent),
+          // 线下成绩占比
+          offlinePercent : Number(this.CourseSetEntity.offlinePercent),
+          // 头脑风暴成绩占比
+          stormPercent : Number(this.CourseSetEntity.stormPercent),
+          // // 讨论成绩占比
+          // topicPercent : Number(this.CourseSetEntity.topicPercent),
+          // 投票成绩占比
+          votePercent : Number(this.CourseSetEntity.votePercent),
+          // 视频进度判定
+          // seeVideo:  90,videoPercent
+        }
 
         curData.course.courseTagIds = currentTag
         curData.teacher = currnetteacher
         curData.instructor = currentinstructor
         curData.course.dropCourse = this.Course.dropCourse ? 1 : 2
+        curData.set = curCourseSetEntity
         return curData
       },
       //修改课程
@@ -805,8 +834,6 @@
               type:'error'
             })
           }
-        }).catch(error=>{
-          console.log(error)
         })
       }
     },

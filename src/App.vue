@@ -9,11 +9,6 @@
 </script>
 <style lang="stylus" type="text/stylus">
   @import "assets/css/reset.styl"
-    body .el-tooltip__popper
-      max-width 200px
-      background rgb(250, 250, 250)!important
-      color black!important
-      border 1px solid black
     #app
       width: 100%
       height:100%
@@ -45,10 +40,22 @@
     .course .teacher-dialog
       .el-dialog__body
         min-height 300px;
+    .model-resource
+      .el-breadcrumb__inner
+        font-size: 18px;
+        cursor pointer
+        user-select none
+        &:hover
+          color: #409EFF
 </style>
   #app .courseCategory .el-table__expanded-cell
     padding:0 0 0 48px
 
+  <!--body .el-tooltip__popper-->
+    <!--max-width 200px-->
+    <!--background rgb(250, 250, 250)!important-->
+    <!--color black!important-->
+    <!--border 1px solid black-->
   /*创建课程-->添加授课老师*/
   .addTeacher .type-warp input{
     padding-right: 38px;

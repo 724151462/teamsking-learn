@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>webscoket例子</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
 <body>
 </body>
 <script>
-  let url = 'wss://echo.websocket.org'
+  let url = 'ws://120.36.137.90:9008/websocket'
   //链接上
   let ws = new WebSocket(url)
   ws.onopen = function (evt) {
