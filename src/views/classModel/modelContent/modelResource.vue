@@ -7,9 +7,10 @@
         <span>|</span>
       </div>
       <div class="nav-list">
+        <!--<div class="path">资源库<i class="el-breadcrumb__separator el-icon-arrow-right"></i></div>-->
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item class="path">资源库</el-breadcrumb-item>
-          <el-breadcrumb-item class="path" v-for="router in routerList" :key="router.id" @click="routerClick(router.id)">{{router.name}}</el-breadcrumb-item>
+          <el-breadcrumb-item class="path" v-for="router in routerList" :key="router.id" @click.native="routerClick(router.id)">{{router.name}}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <div class="nav-search">
@@ -38,7 +39,6 @@
           <p class="box-title">{{resource.resourceTitle}}</p>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -112,8 +112,10 @@ export default {
         ]
     },
     routerClick(id){
-      console.log('路由点击，要去往的文件夹')
-      console.log(id)
+      let arrIndex = this.routerList.findIndex((value, index)=>{
+          return value.id == id
+      })
+      this.routerList.splice(arrIndex)
     }
   }
 }

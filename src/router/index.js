@@ -820,6 +820,16 @@ export const constantRouterMap = [{
         component: _import('classModel/modelContent/modelResource'),
         name: 'modelMain',
       },
+      {
+        path: '/course/check',
+        component: _import('classModel/check'),
+        name: 'modelCheck',
+      },
+      {
+        path: '/course/checked',
+        component: _import('classModel/checked'),
+        name: 'modelChecked',
+      }
     ]
   },
   // {

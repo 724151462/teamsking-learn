@@ -6,15 +6,36 @@
             <div style="font-size: 2em">陈老师</div>
             <div style="font-size: 2.5em;cursor: pointer" @click="enterClass">进入课堂</div>
             <div style="display:flex; align-items: flex-start; width: 100%; font-size: 2em"><span style="margin-left:1em">课程号:56734</span></div>
+            <div class="fullScreen" @click="fullScreen">
+              <img :src="isFullScreen ? imgSrc.unfull : imgSrc.full" alt="">
+            </div>
         </div>
     </el-main>
 </template>
 
 <script>
 export default {
+    data(){
+      return {
+        isFullScreen: false,//是否全屏
+        imgSrc :{
+          full: require("@/assets/images/full.png"),
+          unfull: require("@/assets/images/unfull.png"),
+          }
+      }
+    },
     methods: {
         enterClass() {
           this.$router.push({path: "/course/classchapter",query: {id: this.$route.query.id}})
+        },
+        fullScreen(){
+          if (document.fullscreenElement) {
+            document.exitFullscreen()
+            this.isFullScreen = false
+          } else {
+            document.documentElement.requestFullscreen()
+            this.isFullScreen = true
+          }
         }
     }
 };
@@ -50,6 +71,10 @@ font-size: 15px!important;
             width 90%
             height 90%
             border 10px solid #fff
+            .fullScreen
+              position fixed
+              bottom 20px;
+              right 20px;
             
 </style>
 
