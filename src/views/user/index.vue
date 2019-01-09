@@ -217,13 +217,23 @@
         <el-form-item label="名称">
           <el-input type="text" class="input-width" v-model="cerForm.certificateName" placeholder="请输入"></el-input>
         </el-form-item>
+        <el-form-item label="发证时间" required>
+          <el-date-picker
+            v-model="cerForm.issuingDate"
+            type="datetime"
+            prefix-icon="el-icon-date"
+            placeholder="选择发证时间"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            default-time="12:00:00">
+          </el-date-picker>
+        </el-form-item>
         <el-form-item label="发证件单位">
           <el-input type="text" class="input-width" v-model="cerForm.issuingAuthority" placeholder="请输入"></el-input>
         </el-form-item>
-        <span>证书图片</span>
+        <span>证书图片</span><span><i class="el-icon-picture cre-uploader-icon"></i></span>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="uploadDialog = false">取 消</el-button>
+        <el-button @click="()=>{uploadDialog = false}">取 消</el-button>
         <el-button type="primary" @click="uploadDialog = false">提交</el-button>
       </span>
     </el-dialog>
@@ -293,7 +303,7 @@
           certificateNo: "string", //证书编号
           imgUrls: [{"imgUrl": "string",}],
           issuingAuthority: "string", //发证机关
-          //issuingDate: "2019-01-05T12:39:18.397Z" //发证日期
+          issuingDate: "" //发证日期
         },
         rules:{
           checking: { required: true, message: '请再次输入密码', trigger: 'blur' },
@@ -745,6 +755,14 @@
         width: 180px;
         height: 120px;
         line-height: 120px
+        text-align: center
+        border:1px solid #ded5d5
+      .cre-uploader-icon
+        font-size: 28px
+        color: #8c939d
+        width: 80px;
+        height: 100px;
+        line-height: 100px
         text-align: center
         border:1px solid #ded5d5
 

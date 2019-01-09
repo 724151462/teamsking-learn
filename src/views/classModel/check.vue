@@ -8,8 +8,19 @@
     <div>
       <el-button type="primary">结束签到并进入课堂</el-button>
     </div>
-    <div>12人签到</div>
-    <div>签到头像</div>
+    <div class="check-num"> <span style="color: #409EFF;">12</span>人已加入</div>
+    <div class="check-avatar-warp">
+      <div class="check-avatar-box first-check">
+        <img  :src="imgSrc.full" alt="" class="check-avatar">
+      </div>
+
+      <div class="check-avatar-box first-check">
+        <img  :src="imgSrc.full" alt="" class="check-avatar">
+      </div>
+      <div class="check-avatar-box first-check">
+        <img  :src="imgSrc.full" alt="" class="check-avatar">
+      </div>
+    </div>
     <div class="fullScreen" @click="fullScreen">
       <img :src="isFullScreen ? imgSrc.unfull : imgSrc.full" alt="">
     </div>
@@ -66,9 +77,37 @@
         .time-text
           height 100%
           width 100%
-          font-size:160px;
-          vertical-align: middle
-
+          font-size 160px
+    .check-num
+      height 30px
+      padding 5px 0
+      background #ccc
+      text-align left
+      padding-left 20px;
+      font-size 16px;
+    .check-avatar-warp
+      align-self: flex-start
+      text-align left
+      .check-avatar-box
+        margin 20px
+        .check-avatar
+          width 60px
+          height 60px
+          align-self: flex-start
+          border-radius 50%
+          display inline-block
+      .first-check
+        display inline-block
+        position relative
+        &::after
+          position absolute
+          content: ''
+          width 25px;
+          height 25px;
+          top -20px
+          left 18px;
+          background url("../../assets/images/tara.png")
+          background-size: 25px 25px;
     .fullScreen
       position fixed
       bottom 20px;

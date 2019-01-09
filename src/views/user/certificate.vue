@@ -30,13 +30,18 @@
                 </template>
             </el-table-column>
             <el-table-column label="操作" width="180">
-                <template slot-scope="scope">
-                <el-button type="text" v-show="scope.row.status==1">查看</el-button>
-                <el-button type="text" v-show="scope.row.status==3">修改</el-button>
-                <el-button type="text" v-show="scope.row.status==3 || scope.row.status==2">撤销</el-button>
-                <!--<el-button type="text">文字按钮</el-button>-->
-                <!--<el-button type="text">文字按钮</el-button>-->
-            </template>
+                <template slot-scope="scope" >
+                    <div v-show="scope.row.status==1">
+                        <el-button type="text">查看</el-button>
+                    </div>
+                    <div v-show="scope.row.status==2">
+                        <el-button type="text">修改</el-button>
+                        <el-button type="text">撤销</el-button>
+                    </div>
+                    <div v-show="scope.row.status==3">
+                        <el-button type="text">撤销</el-button>
+                    </div>
+                </template>
             </el-table-column>
         </el-table>
     </div>
