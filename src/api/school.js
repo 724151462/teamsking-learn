@@ -280,6 +280,13 @@ export function sysCertificatePage(data){
   return commonsAjax(`${baseUrl}certificate/page`,data,'get')
 }
 
+/***
+ * 保存证书
+ */
+export function sysSaveCertificate(data){
+  return commonsAjax(`${baseUrl}/certificate`,data,'post')
+}
+
 
 /***
  * 查看证书

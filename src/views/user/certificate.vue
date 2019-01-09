@@ -47,7 +47,7 @@
     </div>
 </template>
 <script>
-    import {certificateList} from '@/api/user'
+    import {certificateList, } from '@/api/user'
     export default {
         name: "certificate",
         mounted (){

@@ -39,8 +39,15 @@ export default {
       },
       enterClass() {
         let that = this;
+        let loading = this.$loading({
+          lock: true,
+          text: '正在进入课堂',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         new Promise(connect)
           .then(function(result) {
+            loading.close()
             console.log("成功：" + result);
             classSave({ courseId: that.$route.query.id }).then(response => {
               if (response.code === 200) {
@@ -58,23 +65,38 @@ export default {
             that.enterClass();
           });
       },
-    },
-    created() {
-      classingInfo({ courseId: this.$route.query.id }).then(response => {
-        if (response.data !== null) {
-          this.$confirm("存在未结束的课堂，是否继续？", "提示", {
-            confirmButtonText: "继续",
-            cancelButtonText: "结束",
-            type: "warning"
-          })
-            .then(() => {
-              this.enterClass();
+      getClass(){
+        console.log('getClass执行')
+        let loading = this.$loading({
+          lock: true,
+          text: '正在获取课堂信息',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        classingInfo({ courseId: this.$route.query.id }).then(response => {
+          loading.close()
+          if (response.data !== null) {
+            this.$confirm("存在未结束的课堂，是否继续？", "提示", {
+              confirmButtonText: "继续",
+              cancelButtonText: "结束",
+              type: "warning",
+              // showCancelButton:false
             })
-            .catch(() => {
-              classOver({ classroomId: response.data.classroomId });
-            });
-        }
-      });
+              .then(() => {
+                this.enterClass();
+              })
+              .catch(() => {
+                classOver({ classroomId: response.data.classroomId });
+              });
+          }
+        });
+      }
+    },
+    created(){
+      // this.getClass()
+    },
+    mounted() {
+      this.getClass()
     }
 };
 </script>

@@ -144,4 +144,6 @@
     display:none
   #inputs
     display:none
+  #creImg
+    display:none
 </style>

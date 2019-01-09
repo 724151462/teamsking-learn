@@ -100,6 +100,9 @@ export default {
             break;
         }
       },
+    },
+    mounted(){
+
     }
 }
 </script>
