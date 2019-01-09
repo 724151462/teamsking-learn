@@ -1,14 +1,14 @@
 <template>
     <el-aside style="width:280px; border: 1px solid gray; position: fixed;height:85%">
         <div style="margin: 20px 50px">
-          <el-button type="primary" style="width: 150px;font-size: 1.2em" @click="addTest">添加测验</el-button>
+          <el-button type="primary" style="width: 150px;font-size: 1.2em" @click="addEvent">添加测验</el-button>
           <p style="margin-top: 5px">点击题目查看详细情况</p>
         </div>
         <div
           :class="['test-container',item.examId===activeIndex?'test-active':'']"
-          v-for="item in testList"
+          v-for="(item, index) in sourceList"
           @click="activeTest(item)"
-          :key="item.examId"
+          :key="index"
         >
           <p
             style="width: 200px; display: -webkit-box;
@@ -29,7 +29,18 @@ overflow: hidden; font-size: 1.2em"
 
 <script>
 export default {
-
+    data() {
+        return {
+            
+        }
+    },
+    methods: {
+        addEvent() {
+            this.$emit('dialogShow', true)
+        }
+    },
+    props: ['sourceList','textObj',]
+        
 }
 </script>
 
