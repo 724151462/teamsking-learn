@@ -45,10 +45,10 @@
               </el-popover>
             </span>
             <template v-if="item.contentType === 10">
-                  <videoPlayer :isMp4="resourseVideo"></videoPlayer>
+                  <videoPlayer :isMp4="item.resourceUrl"></videoPlayer>
               </template>
                 <template v-else>
-                    <iframe style="height:100%;width:100%" :src="'https://api.idocv.com/view/url?url='+resourseDoc" frameborder="0"></iframe>
+                    <iframe style="height:100%;width:100%" :src="'https://api.idocv.com/view/url?url='+item.resourceUrl" frameborder="0"></iframe>
                 </template>
           </el-tab-pane>
         </el-tabs>

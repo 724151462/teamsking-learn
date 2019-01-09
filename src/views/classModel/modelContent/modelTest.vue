@@ -18,14 +18,21 @@
 -webkit-line-clamp: 2;
 overflow: hidden; font-size: 1.2em"
           >{{item.examTitle}}</p>
-          <el-button type="primary" @click="beginTest(item)">开始测试</el-button>
+          <el-button
+            v-if="item.interactionStatus === 10"
+            type="primary"
+            @click="beginTest(item)"
+          >开始测试</el-button>
+          <el-button v-else-if="item.interactionStatus === 20" type>进行中...</el-button>
+          <el-button v-else :disabled="true" style="background: rgb(158,167,180);color: #fff">已结束</el-button>
         </div>
       </el-aside>
       <el-main>
         <div v-if="testObj === ''">
           <span>请选择测试</span>
         </div>
-        <div v-else>
+        <div v-else-if="testObj.interactionStatus === 10 || testObj.interactionStatus === 20">
+          <!-- <div v-else-if="testObj.interactionStatus === 60 || testObj.interactionStatus === 70"> -->
           <!-- {{testObj}} -->
           <div class="count-down">
             <img :src="require('@/assets/images/clock.png')" width="25" alt>
@@ -38,7 +45,7 @@ overflow: hidden; font-size: 1.2em"
               第{{i+1}}题:
               <span
                 style="display: inline-block; margin-left: 10px"
-              >{{item.quizTitle}}</span>
+              >{{matchReg(item.quizTitle)}}</span>
             </p>
             <div v-for="(option,oid) in item.quizOption" :key="option.optionId">
               <p style="margin:5px">
@@ -49,7 +56,7 @@ overflow: hidden; font-size: 1.2em"
           </div>
           <el-button style="margin-left: 45%" type="primary">结束测试</el-button>
 
-          <el-collapse>
+          <el-collapse v-if="testObj.interactionStatus === 20">
             <el-collapse-item title="40/44位同学答题情况排名" name="1">
               <div class="answer-container">
                 <span>排名</span>
@@ -80,31 +87,48 @@ overflow: hidden; font-size: 1.2em"
             </el-collapse-item>
           </el-collapse>
         </div>
-        <el-dialog title="选择题目" top="40vh" :visible.sync="dialogVisible" width="55%">
-      <div>
-        <div>
-          <span style="color:rgb(85, 200, 255)">资源库导入</span>
+        <div v-show="testObj.interactionStatus === 30">
+          <div v-for="(item,i) in testObj.libraryQuizVOS" :key="item.quizId">
+            <div :id="'subject'+i" style="width: 1000px;height: 400px;"></div>
+            <p>
+              <span class="option-type" v-if="item.quizType === 10">单选1</span>
+              <span class="option-type" v-else>多选1</span>
+              第{{i+1}}题:
+              <span
+                style="display: inline-block; margin-left: 10px"
+              >{{matchReg(item.quizTitle)}}</span>
+            </p>
+            <div v-for="(option,oid) in item.quizOption" :key="option.optionId">
+              <p style="margin:5px">
+                <span style="margin-right: 5px">{{optionItem[oid]}}</span>
+                {{option.optionTitle}}
+              </p>
+            </div>
+          </div>
         </div>
-        <div style="float: right">
-          <el-input
-            type="text"
-            placeholder="请输入测试题名称"
-            suffix-icon="el-icon-search"
-            style="width: 300px"
-          ></el-input>
-          <el-button>查询</el-button>
-        </div>
-        <div class="subjRadio">
-          <Tree :sourceData="fileList" @checkedList="checkedFiles" :props="defaultProps">
-
-          </Tree>
-        </div>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="editSubjectVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addEnsure">确 定</el-button>
-      </span>
-    </el-dialog>
+        <el-dialog title="选择题目" top="30vh" :visible.sync="dialogVisible" width="55%">
+          <div>
+            <div>
+              <span style="color:rgb(85, 200, 255)">资源库导入</span>
+            </div>
+            <div style="float: right">
+              <el-input
+                type="text"
+                placeholder="请输入测试题名称"
+                suffix-icon="el-icon-search"
+                style="width: 300px"
+              ></el-input>
+              <el-button>查询</el-button>
+            </div>
+            <div class="subjRadio">
+              <Tree :sourceData="fileList" @checkedList="checkedFiles" :props="defaultProps"></Tree>
+            </div>
+          </div>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="editSubjectVisible = false">取 消</el-button>
+            <el-button type="primary" @click="addEnsure">确 定</el-button>
+          </span>
+        </el-dialog>
       </el-main>
     </el-container>
   </div>
@@ -113,9 +137,10 @@ overflow: hidden; font-size: 1.2em"
 <script>
 import Cookie from "js-cookie";
 import { testList, interactExam, interactExamRes } from "@/api/course";
-import { classTest,classTestSave } from "../../../api/course";
+import { classTest, classTestSave } from "../../../api/course";
 import { getTestFileFold } from "@/api/library";
-import Tree from "@/components/fileTree"
+import Tree from "@/components/fileTree";
+import echarts from "echarts";
 export default {
   data() {
     return {
@@ -156,12 +181,12 @@ export default {
         children: "catalogList",
         label: "catalogName"
       },
-      addTestParams:{
-        "chapterId": Cookie.get('chapterId'),
-        "classroomId": this.$route.query.classroomId,
-        "courseId": this.$route.query.id,
-        "examTitle": null,
-        "quizIds": [],
+      addTestParams: {
+        chapterId: Cookie.get("chapterId"),
+        classroomId: this.$route.query.classroomId,
+        courseId: this.$route.query.id,
+        examTitle: "课堂测试",
+        quizIds: []
       }
     };
   },
@@ -173,7 +198,7 @@ export default {
   mounted() {},
   created() {
     Cookie.set("modelActive", "2");
-    console.log(this.$route.query)
+    console.log(this.$route.query);
     classTest({
       classroomId: this.$route.query.classroomId,
       chapterId: Cookie.get("chapterId")
@@ -185,8 +210,8 @@ export default {
     });
   },
   methods: {
-      // 递归渲染试题
-      filterData(data) {
+    // 递归渲染试题
+    filterData(data) {
       let getFilter = data => {
         data.forEach(item => {
           // 文件夹处理
@@ -212,7 +237,67 @@ export default {
       this.activeIndex = item.examId;
       interactExam({ examId: item.examId }).then(response => {
         this.testObj = response.data;
+        if (this.testObj.interactionStatus === 30) {
+          // for (let index = 0; index < this.testObj.libraryQuizVOS.length; index++) {
+          //     console.log(this.testObj.libraryQuizVOS[index])
+
+          // }
+          this.$nextTick(function() {
+            this.drawPie(this.testObj.libraryQuizVOS);
+          });
+        }
       });
+    },
+    drawPie(items) {
+      console.log(items);
+      let num = 0;
+      items.forEach((element, i) => {
+        num += 1;
+        let chart = "chart" + num;
+        chart = echarts.init(document.getElementById(`subject${i}`));
+        console.log(chart);
+        chart.setOption({
+          title: {
+            text: "某站点用户访问来源",
+            subtext: "纯属虚构",
+            x: "center"
+          },
+          tooltip: {
+            trigger: "item",
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+          },
+          legend: {
+            orient: "vertical",
+            left: "left",
+            data: ["直接访问", "邮件营销", "联盟广告", "视频广告", "搜索引擎"]
+          },
+          series: [
+            {
+              name: "访问来源",
+              type: "pie",
+              radius: "55%",
+              center: ["50%", "60%"],
+              data: [
+                { value: 335, name: "直接访问" },
+                { value: 310, name: "邮件营销" },
+                { value: 234, name: "联盟广告" },
+                { value: 135, name: "视频广告" },
+                { value: 1548, name: "搜索引擎" }
+              ],
+              itemStyle: {
+                emphasis: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: "rgba(0, 0, 0, 0.5)"
+                }
+              }
+            }
+          ]
+        });
+      });
+
+      // let charts = echarts.init(document.getElementById(`subject1`));
+      // console.log(chart)
     },
     beginTest(item) {
       this.activeTest(item);
@@ -234,26 +319,44 @@ export default {
     },
     // 选中的文件
     checkedFiles(checkedList) {
-        let quizArr = []
-        checkedList.forEach(element => {
-            quizArr.push(element.quizId)
-        });
-      this.addTestParams.quizIds = quizArr
+      let quizArr = [];
+      checkedList.forEach(element => {
+        quizArr.push(element.quizId);
+      });
+      this.addTestParams.quizIds = quizArr;
+      this.addTestParams.interactionId = null;
     },
     // 添加测验按钮
     addTest() {
-        this.dialogVisible = true
+      this.dialogVisible = true;
     },
     // 确认添加试题
     addEnsure() {
-        classTestSave(this.addTestParams)
-        .then(response=> {
-
-        })
+      if (this.addTestParams.quizIds[0] === undefined) {
+        this.$message({
+          message: "请选择试题",
+          type: "warning"
+        });
+        return;
+      } else {
+        classTestSave(this.addTestParams).then(response => {
+          this.testList.push(response.data);
+          this.$message({
+            message: "添加成功",
+            type: "success"
+          });
+          this.dialogVisible = false;
+        });
+      }
+    },
+    // 去富文本HTML标签
+    matchReg(str) {
+      let reg = /<\/?.+?\/?>/g;
+      return str.replace(reg, "");
     }
   },
   components: {
-    Tree,
+    Tree
   }
 };
 </script>

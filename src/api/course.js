@@ -808,7 +808,7 @@ export function classChapter(data) {
  * 课堂小项
  */
 export function classItem(data) {
-  let url = `${baseUrl}chapter/section/${data.sectionId}/items`
+  let url = `${baseUrl}chapter/section/${data.sectionId}/item/resources`
   return commonsAjax(url, '', 'get')
 }
 
