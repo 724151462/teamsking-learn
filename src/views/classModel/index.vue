@@ -14,6 +14,9 @@
 </template>
 
 <script>
+import { classingInfo, classOver, classSave } from "@/api/course";
+import { connect } from "@/utils/socket";
+import Cookie from "js-cookie";
 export default {
     data(){
       return {
@@ -25,33 +28,69 @@ export default {
       }
     },
     methods: {
-        enterClass() {
-          this.$router.push({path: "/course/classchapter",query: {id: this.$route.query.id}})
-        },
-        fullScreen(){
-          if (document.fullscreenElement) {
-            document.exitFullscreen()
-            this.isFullScreen = false
-          } else {
-            document.documentElement.requestFullscreen()
-            this.isFullScreen = true
-          }
+      fullScreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen()
+          this.isFullScreen = false
+        } else {
+          document.documentElement.requestFullscreen()
+          this.isFullScreen = true
         }
+      },
+      enterClass() {
+        let that = this;
+        new Promise(connect)
+          .then(function(result) {
+            console.log("成功：" + result);
+            classSave({ courseId: that.$route.query.id }).then(response => {
+              if (response.code === 200) {
+                that.$router.push({
+                  path: "/course/classchapter",
+                  query: {
+                    id: that.$route.query.id,
+                    classroomId: response.data.classroomId
+                  }
+                });
+              }
+            });
+          })
+          .catch(function(reason) {
+            that.enterClass();
+          });
+      },
+    },
+    created() {
+      classingInfo({ courseId: this.$route.query.id }).then(response => {
+        if (response.data !== null) {
+          this.$confirm("存在未结束的课堂，是否继续？", "提示", {
+            confirmButtonText: "继续",
+            cancelButtonText: "结束",
+            type: "warning"
+          })
+            .then(() => {
+              this.enterClass();
+            })
+            .catch(() => {
+              classOver({ classroomId: response.data.classroomId });
+            });
+        }
+      });
     }
 };
 </script>
 
 <style lang="stylus" scoped>
-@media screen and (min-width:400px) and (max-width:700px) { 
-.el-main{
-font-size: 20px!important;
-} 
+@media screen and (min-width: 400px) and (max-width: 700px) {
+  .el-main {
+    font-size: 20px !important;
+  }
 }
-@media screen and (min-width:1500px) and (max-width:2000px) { 
-.el-main{
-font-size: 15px!important;
+
+@media screen and (min-width: 1500px) and (max-width: 2000px) {
+  .el-main {
+    font-size: 15px !important;
+  }
 }
-} 
     .el-main
         display flex
         align-items center
@@ -75,6 +114,5 @@ font-size: 15px!important;
               position fixed
               bottom 20px;
               right 20px;
-            
 </style>
 
