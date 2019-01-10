@@ -19,13 +19,12 @@ var userId='1';
 export function connect(resolve,reject) {
     var socket = new SockJS('http://120.36.137.90:9008/websocket');
     stompClient = Stomp.over(socket);
-    console.log(stompClient)
     // try {
         stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
             stompTopic();
             stompQueue();
-            resolve('200 OK')
-        },
+            resolve(stompClient)
+          },
         function errorCallBack (error) {
             // 连接失败时（服务器响应 ERROR 帧）的回调方法
                 reject('error');
@@ -34,9 +33,6 @@ export function connect(resolve,reject) {
     // } catch (error) {
     //     console.log(error)
     // }
-    
-    
-
     // var timeOut = Math.random() * 2;
     // console.log('set timeout to: ' + timeOut + ' seconds.');
     // setTimeout(function () {
@@ -80,7 +76,7 @@ function disconnect() {
 // function testPoint() {
 //     stompClient.send("/teamsking/testPoint",{'token': token},JSON.stringify({'name': $("#name").val()}));
 // }
-function sign() {
+export function sign() {
     stompClient.send("/teamsking/course/sign/start",{'token': token},
         JSON.stringify({
             "bean":50,
@@ -89,7 +85,7 @@ function sign() {
             "userId":1
         }));
 }
-function signClose() {
+export function signClose() {
     stompClient.send("/teamsking/course/sign/close",{'token': token},
         JSON.stringify({
             "bean":50,

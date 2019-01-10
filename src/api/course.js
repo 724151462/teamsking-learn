@@ -775,7 +775,6 @@ export function classingInfo(data) {
   return commonsAjax(url, '', 'get')
 }
 
-
 /**
  * 结束课堂
  */
@@ -783,7 +782,6 @@ export function classOver(data) {
   let url = `${baseUrl}classroom/${data.classroomId}`
   return commonsAjax(url, data, 'put')
 }
-
 
 /**
  * 保存课堂

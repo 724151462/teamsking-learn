@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import navHeader from './modules/navHeader'
+import socket from './modules/socket'
 import { stat } from 'fs';
 import Cookie from 'js-cookie'
 
@@ -53,5 +54,8 @@ export default new Vuex.Store({
   getters,
   actions: {
 
+  },
+  modules: {
+    socket
   }
 })

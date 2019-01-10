@@ -25,8 +25,8 @@
             width="100">
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.status==1">已通过</el-tag>
-                    <el-tag v-else-if="scope.row.status==2">审核中</el-tag>
-                    <el-tag v-else-if="scope.row.status == 3">未通过</el-tag>
+                    <el-tag v-else-if="scope.row.status==3">审核中</el-tag>
+                    <el-tag v-else-if="scope.row.status == 2">未通过</el-tag>
                 </template>
             </el-table-column>
             <el-table-column label="操作" width="180">
@@ -36,10 +36,10 @@
                     </div>
                     <div v-show="scope.row.status==2">
                         <el-button type="text">修改</el-button>
-                        <el-button type="text">撤销</el-button>
+                        <el-button type="text" @click="delCre(scope.row.certificateId)">撤销</el-button>
                     </div>
                     <div v-show="scope.row.status==3">
-                        <el-button type="text">撤销</el-button>
+                        <el-button type="text" @click="delCre(scope.row.certificateId)">撤销</el-button>
                     </div>
                 </template>
             </el-table-column>
@@ -47,7 +47,7 @@
     </div>
 </template>
 <script>
-    import {certificateList, } from '@/api/user'
+    import {certificateList, delCertificate} from '@/api/user'
     export default {
         name: "certificate",
         mounted (){
@@ -69,6 +69,27 @@
                         this.$message.error(msgs[0]);
                     }
                 })
+            },
+            delCre(id){
+              let loading = this.$loading({
+                lock: true,
+                text: 'loadingcc',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.7)'
+              });
+              console.log(typeof id)
+              let data = {certificateId:id}
+              console.log(data)
+              delCertificate(data).then(res=>{
+                console.log(res)
+                loading.close()
+                if(Number(res.code) === 200) {
+                  this.$message.error('撤销成功');
+                }else {
+                  this.$message.error('撤销失败');
+                }
+              })
+              // delCertificate()
             },
             handleEdit(index, row) {
                 console.log(index, row);

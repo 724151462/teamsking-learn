@@ -120,6 +120,12 @@ export function saveCertificate (data) {
     return commonsAjax(`${baseUrl}certificate`, data, 'post')
 }
 /**
+ * 修改证书
+ * */
+export function changeCer (data) {
+  return commonsAjax(`${baseUrl}certificate/info`, data, 'post')
+}
+/**
  * 删除证书
  * */
 export function delCertificate (data) {

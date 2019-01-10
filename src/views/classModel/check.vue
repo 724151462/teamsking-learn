@@ -7,6 +7,7 @@
     </div>
     <div>
       <el-button type="primary">结束签到并进入课堂</el-button>
+      <el-button type="primary" @click="startSign">开始签到</el-button>
     </div>
     <div class="check-num"> <span style="color: #409EFF;">12</span>人已加入</div>
     <div class="check-avatar-warp">
@@ -28,6 +29,11 @@
 </template>
 
 <script>
+  import { classingInfo, classOver, classSave } from "@/api/course";
+
+  import {sign,signClose, connect} from "../../utils/socket";
+  import Cookie from "js-cookie";
+
   export default {
     name: "check",
     data(){
@@ -40,9 +46,6 @@
       }
     },
     methods: {
-      enterClass() {
-        this.$router.push({path: "/course/classchapter",query: {id: this.$route.query.id}})
-      },
       fullScreen(){
         if (document.fullscreenElement) {
           document.exitFullscreen()
@@ -51,8 +54,79 @@
           document.documentElement.requestFullscreen()
           this.isFullScreen = true
         }
+      },
+      startSign(){
+        let that = this;
+        console.log(this.$store.state.socket.stompClient)
+        let tag = this.$store.state.socket.stompClient
+        tag.send("/teamsking/course/sign/start",{'token': '9647dd84abb76fe6d78480b55f69d323'},
+          JSON.stringify({
+            "bean":50,
+            "classroomId":1,
+            "courseId":"9647dd84abb76fe6d78480b55f69d323",
+            "userId":1
+          })
+          );
+        // tag.subscribe('/teamsking/helloWorld', function (result) {
+        //   console.log(result);
+        // },{'token': "9647dd84abb76fe6d78480b55f69d323"});
+        tag.subscribe('/user/' + 1 + '/teamsking/classroom',function(result){
+          console.log(result);
+        });
+      },
+      enter(){
+        console.log('执行')
+        var socket = new SockJS('http://120.36.137.90:9008/websocket');
+        stompClient = Stomp.over(socket);
+        console.log(stompClient)
+        stompClient.connect({'token': '9647dd84abb76fe6d78480b55f69d323','courseId':'1'}, function (frame) {
+            stompTopic();
+            stompQueue();
+            resolve('200 OK')
+          },
+          function errorCallBack (error) {
+            // 连接失败时（服务器响应 ERROR 帧）的回调方法
+            reject('error');
+          }
+        )
+      },
+      enterClass() {
+        let that = this;
+        let loading = this.$loading({
+          lock: true,
+          text: '正在进入课堂',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        new Promise(connect)
+          .then(function(result) {
+            loading.close()
+            console.log("成功：" + result);
+            classSave({ courseId: that.$route.query.id }).then(response => {
+              if (response.code === 200) {
+                that.$router.push({
+                  path: "/course/classchapter",
+                  query: {
+                    id: that.$route.query.id,
+                    classroomId: response.data.classroomId
+                  }
+                });
+              }
+            });
+          })
+          .catch(function(reason) {
+            that.enterClass();
+          });
       }
-    }
+    },
+    mounted(){
+      // this.startSign()
+      // this.getClass()
+    },
+    created(){
+      this.startSign()
+      // this.getClass()
+    },
 
   }
 </script>

@@ -688,7 +688,6 @@
         let data = {mobile:String(this.changeMobileForm.changeMobile)}
         userApi.getBindCode(data).then(res=>{
           loading.close()
-
           if(Number(res.code) === 200) {
             this.$message.success('验证码已发送');
 

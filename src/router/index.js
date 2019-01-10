@@ -785,6 +785,11 @@ export const constantRouterMap = [{
     leaf: true,
   },
   {
+    path: '/course/check',
+    component: _import('classModel/check'),
+    name: 'modelCheck',
+  },
+  {
     path: '/course/classchapter',
     component: _import('classModel/modelMain'),
     name: 'modelMain',
@@ -819,11 +824,6 @@ export const constantRouterMap = [{
         path: '/course/modelResource',
         component: _import('classModel/modelContent/modelResource'),
         name: 'modelMain',
-      },
-      {
-        path: '/course/check',
-        component: _import('classModel/check'),
-        name: 'modelCheck',
       },
       {
         path: '/course/checked',

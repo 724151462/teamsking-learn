@@ -42,7 +42,9 @@ export default {
     methods: {
         handleSelect(key, keyPath) {
         console.log(key, keyPath);
-        switch(key) {
+          console.log('当前链接状态',this.$store.state.socket.isConnect)
+
+          switch(key) {
             case '1':
             this.$router.push({
               path: '/course/modelChapter',
