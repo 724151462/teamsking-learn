@@ -426,7 +426,6 @@ export const constantRouterMap = [{
           },
         ]
       },
-
       {
         path: 'structure',
         component: Layout,
@@ -788,6 +787,11 @@ export const constantRouterMap = [{
     path: '/course/check',
     component: _import('classModel/check'),
     name: 'modelCheck',
+  },
+  {
+    path: '/course/classend',
+    component: _import('classModel/classOver'),
+    name: 'classEnd',
   },
   {
     path: '/course/classchapter',

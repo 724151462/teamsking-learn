@@ -77,7 +77,7 @@ function disconnect() {
 //     stompClient.send("/teamsking/testPoint",{'token': token},JSON.stringify({'name': $("#name").val()}));
 // }
 export function sign() {
-    stompClient.send("/teamsking/course/sign/start",{'token': token},
+    stompClient.send("/course/start",{'token': token},
         JSON.stringify({
             "bean":50,
             "classroomId":1,

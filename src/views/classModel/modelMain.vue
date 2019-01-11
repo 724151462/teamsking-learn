@@ -4,13 +4,17 @@
             <el-header>
                 <span class="course-name">{{courseName}}</span>
                 <div class="icon-div">
-                    <div class="icon-inner">
+                  <div class="icon-inner" style="cursor: pointer;" @click="goCheck">
+                    <img :src="require('@/assets/images/user1.png')" height="35px" alt="">
+                    <span>开始签到</span>
+                  </div>
+                    <div class="icon-inner" style="cursor: pointer;">
                         <img :src="require('@/assets/images/user1.png')" height="35px" alt="">
                         <span>成员</span>
                     </div>
-                    <div class="icon-inner">
+                    <div class="icon-inner" @click="closeClass" style="cursor: pointer;">
                         <img :src="require('@/assets/images/over.png')" height="35px" alt="">
-                        <span>结束课堂</span>
+                        <span >结束课堂</span>
                     </div>
                 </div>
             </el-header>
@@ -32,7 +36,8 @@
 </template>
 
 <script>
-export default {
+  import { classOver } from "@/api/course";
+  export default {
     data(){
         return{
             courseName: "国际服务贸易",
@@ -40,10 +45,9 @@ export default {
         }
     },
     methods: {
-        handleSelect(key, keyPath) {
+      handleSelect(key, keyPath) {
         console.log(key, keyPath);
           console.log('当前链接状态',this.$store.state.socket.isConnect)
-
           switch(key) {
             case '1':
             this.$router.push({
@@ -102,10 +106,39 @@ export default {
             break;
         }
       },
-    },
-    mounted(){
+      closeClass(){
+        let loading = this.$loading({
+          lock: true,
+          text: '正在结束课堂',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        // this.$store.state.socket.classroomId
+        classOver({ classroomId:  this.$route.query.classroomId}).then((res)=>{
+          loading.close()
+          console.log(res)
+          this.$message.success('课堂已结束')
+          this.$router.push({
+            path: "/course/classend",
+            query: {
+              id: this.$route.query.id,
+              classroomId: this.$store.state.socket.classroomId
+            }
+          });
+        })
+      },
+      goCheck(){
+        this.$router.push({
+          path: "/course/check",
+          query: {
+            id: this.$route.query.id,
+            classroomId: this.$store.state.socket.classroomId
+          }
+        });
+      },
 
-    }
+    },
+    mounted(){}
 }
 </script>
 

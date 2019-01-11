@@ -2,15 +2,14 @@
     <el-main>
         <div class="inner-container">
             <div style="font-size: 1.5em">课堂模式已开启，课程资源及课程活动将自动投至大屏幕。</div>
-            <div style="font-size: 3em">国际贸易服务</div>
+            <div style="font-size: 3em">{{this.courseName}}</div>
             <div style="font-size: 2em">陈老师</div>
             <div style="font-size: 2.5em;cursor: pointer" @click="enterClass">进入课堂</div>
-            <div style="display:flex; align-items: flex-start; width: 100%; font-size: 2em"><span style="margin-left:1em">课程号:56734</span></div>
+            <div style="display:flex; align-items: flex-start; width: 100%; font-size: 2em"><span style="margin-left:1em">课程号:{{this.courseCode}}</span></div>
             <div class="fullScreen" @click="fullScreen">
               <img :src="isFullScreen ? imgSrc.unfull : imgSrc.full" alt="">
             </div>
         </div>
-
         <el-dialog title="提示"
                   :visible.sync="dialogVisible"
                    :close-on-click-modal="false"
@@ -19,21 +18,23 @@
                    width="30%">
           <span>您有一个正在进行的课堂,是否继续该课堂？</span>
             <span slot="footer" class="dialog-footer">
-              <el-button @click="dialogVisible = false">结束</el-button>
-              <el-button type="primary" @click="dialogVisible = false">继续</el-button>
+              <el-button @click="closeClass">结束</el-button>
+              <el-button type="primary" @click="goBackClass">继续</el-button>
             </span>
         </el-dialog>
     </el-main>
 </template>
 
 <script>
-import { classingInfo, classOver, classSave } from "@/api/course";
-import { connect } from "@/utils/socket";
-import {startConect} from "@/utils/utils"
+import { classingInfo, classOver, classSave ,courseBaseInfo} from "@/api/course";
+import {connect} from "@/utils/utils"
 import Cookie from "js-cookie";
+import {reResFileFold} from "../../api/library";
 export default {
     data(){
       return {
+        courseName:'',
+        courseCode:'',
         isFullScreen: false,//是否全屏
         imgSrc :{
           full: require("@/assets/images/full.png"),
@@ -43,6 +44,15 @@ export default {
       }
     },
     methods: {
+      //获取课程信息
+      initCourse(){
+        courseBaseInfo(this.$route.query.id).then((res)=>{
+          this.courseName = res.data.courseName
+          this.courseCode = res.data.courseCode
+          this.$store.commit('SAVE_NAME',res.data.courseName)
+        })
+      },
+      //获取教师
       fullScreen() {
         if (document.fullscreenElement) {
           document.exitFullscreen()
@@ -53,90 +63,34 @@ export default {
         }
       },
       enterClass() {
-        let token = '9647dd84abb76fe6d78480b55f69d323',
-            courseId='0608367675f54267aa6960fd0557cc1b',
-            userId = '1';
-          startConect(token,courseId,userId).then(
-            (result)=>{
-              console.log(result)
-              classSave({ courseId: this.$route.query.id }).then(response => {
-                if (response.code === 200) {
-                  this.$router.push({
-                    path: "/course/classchapter",
-                    query: {
-                      id: this.$route.query.id,
-                      classroomId: response.data.classroomId
-                    }
-                  });
-                }
-              })
-            },
-            (error)=>{
-              console.log(error,'连接失败,尝试重新连接中')
-              startConect(token,courseId,userId)
-            }
-          ).catch((error)=>{
+        let loading = this.$loading({
+          lock: true,
+          text: '正在进入课堂',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        new Promise(connect)
+          .then((result)=>{
+            loading.close()
+            classSave({ courseId: this.$route.query.id }).then(response => {
+              if (response.code === 200) {
+                console.log(response)
+                this.$store.commit('SAVE_CLASSROME',response.data.classroomId)
+                this.$router.push({
+                  path: "/course/classchapter",
+                  query: {
+                    id: this.$route.query.id,
+                    classroomId: response.data.classroomId
+                  }
+                });
+              }
+            })
+          })
+          .catch((error)=>{
+            loading.close()
             console.log(error,'连接失败,尝试重新连接中')
-            // startConect(token,courseId,userId)
+            this.enterClass()
           });
-
-        // let that = this;
-        // let loading = this.$loading({
-        //   lock: true,
-        //   text: '正在进入课堂',
-        //   spinner: 'el-icon-loading',
-        //   background: 'rgba(0, 0, 0, 0.7)'
-        // });
-        // var socket = new SockJS('http://120.36.137.90:9008/websocket');
-        // let stompClient = Stomp.over(socket);
-        // // try {
-        // stompClient.connect({'token': '9647dd84abb76fe6d78480b55f69d323','courseId':'0608367675f54267aa6960fd0557cc1b'}, function (frame) {
-        //     that.$store.commit('NEW_SOCKET',stompClient)
-        //     console.log(this,'成功')
-        //     stompClient.subscribe('/teamsking/helloWorld', function (result) {
-        //       console.log(result);
-        //     },{'token': "9647dd84abb76fe6d78480b55f69d323"});
-        //     stompClient.subscribe('/user/' + 1 + '/teamsking/classroom',function(result){
-        //       console.log(result);
-        //     });
-        //     classSave({ courseId: that.$route.query.id }).then(response => {
-        //       loading.close()
-        //       if (response.code === 200) {
-        //         that.$router.push({
-        //           path: "/course/classchapter",
-        //           query: {
-        //             id: that.$route.query.id,
-        //             classroomId: response.data.classroomId
-        //           }
-        //         });
-        //       }
-        //     });
-        //   },
-        //   function errorCallBack (error) {
-        //     // 连接失败时（服务器响应 ERROR 帧）的回调方法
-        //     console.log('error');
-        //   }
-        // )
-        // new Promise(connect)
-        //   .then(function(result) {
-        //     loading.close()
-        //     console.log("成功：" + result);
-        //     that.$store.commit('NEW_SOCKET',result)
-        //     classSave({ courseId: that.$route.query.id }).then(response => {
-        //       if (response.code === 200) {
-        //         that.$router.push({
-        //           path: "/course/classchapter",
-        //           query: {
-        //             id: that.$route.query.id,
-        //             classroomId: response.data.classroomId
-        //           }
-        //         });
-        //       }
-        //     });
-        //   })
-        //   .catch(function(reason) {
-        //     that.enterClass();
-        //   });
       },
       getClass(){
         let loading = this.$loading({
@@ -146,24 +100,49 @@ export default {
           background: 'rgba(0, 0, 0, 0.7)'
         });
         classingInfo({ courseId: this.$route.query.id }).then( res => {
+          console.log(res)
           loading.close()
           if(res.data){
+            this.$store.commit('SAVE_CLASSROME',res.data.classroomId)
             this.dialogVisible = true
           }else{
             this.$store.commit('SAVE_INFO',{
               courseId : this.$route.query.id,
               userId: Cookie.get('userId'),
-              token: Cookie.get('token')
+              token: Cookie.get('token'),
             })
           }
         });
       },
       closeClass(){
-        classOver({ courseId: this.$route.query.id }).then((res)=>{
+        let loading = this.$loading({
+          lock: true,
+          text: '正在结束课堂',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        classOver({ classroomId: this.$store.state.socket.classroomId }).then((res)=>{
+          loading.close()
           console.log(res)
             this.$message.success('课堂已结束')
-            alert('跳转到课堂结束结束页面')
+            this.$router.push({
+              path: "/course/classend",
+              query: {
+                id: this.$route.query.id,
+                classroomId: this.$store.state.socket.classroomId
+              }
+            });
         })
+      },
+      //重新进入课堂
+      goBackClass(){
+        this.$router.push({
+          path: "/course/classchapter",
+          query: {
+            id: this.$route.query.id,
+            classroomId: this.$store.state.socket.classroomId
+          }
+        });
       }
     },
     created(){
@@ -171,6 +150,7 @@ export default {
     },
     mounted() {
       this.getClass()
+      this.initCourse()
     }
 };
 </script>
