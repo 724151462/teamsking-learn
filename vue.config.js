@@ -24,7 +24,7 @@ module.exports = {
     port: 8080,
     proxy: {
       '/api': {
-         // target: 'http://192.168.10.48:9008',
+        //  target: 'http://192.168.10.48:9008',
         target: 'http://120.36.137.90:9008',
         // target: 'http://192.168.1.233:9008',
         // target: 'https://wap.roobbc.com',

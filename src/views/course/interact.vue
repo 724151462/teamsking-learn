@@ -119,13 +119,10 @@ export default {
   mounted() {
     interactList(this.interactParams)
     .then(response=> {
-      response.data.forEach(element => {
-        // console.log(element)
-        // element.interactions.forEach(item=> {
-        //   item.interactionStatus = 20
-        // }) 
+      this.interactList = response.data.filter(element => {
+        return JSON.stringify(element.interactions) !== "[]"
       });
-      this.interactList = response.data
+      // this.interactList = response.data
     })
   },
   methods: {
@@ -225,7 +222,9 @@ export default {
       console.log(this.interactParams)
       interactList(this.interactParams)
       .then(response=> {
-        this.interactList = response.data
+        this.interactList = response.data.filter(element => {
+          return JSON.stringify(element.interactions) !== "[]"
+        });
       })
     },
     editInteraction(item) {

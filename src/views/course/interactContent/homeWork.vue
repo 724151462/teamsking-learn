@@ -12,9 +12,7 @@
         autofocus="autofocus"
       />
       <div class="margin-sides">
-        <i class="el-icon-picture"></i>
-        <span>添加图片</span>
-        <upOss @ossUp="getUrl"></upOss>
+        <upOss @ossUp="getUrl" :btnText="'添加附件'"></upOss>
       </div>
       <div>
         <span>标题</span>
@@ -27,10 +25,10 @@
           ></el-input>
         </div>
       </div>
-      <div>
-        <span>所属章节</span>
+      <div class="margin-sides">
+        <span>所属章</span>
         <div>
-          <el-select class="margin-sides" v-model="homeWork.chapterId">
+          <el-select v-model="homeWork.chapterId">
             <el-option
               v-for="item in chapterList"
               :key="item.chapterId"
@@ -41,8 +39,8 @@
         </div>
       </div>
 
-      <div>
-        <div>
+      <div class="margin-sides">
+        <div style="margin-top: 20px">
           <div>任务小组划分方式：学生以小组为单位完成此活动，并按小组提交结果</div>
         </div>
       </div>
@@ -55,8 +53,6 @@
             :value="group.schemeId"
           ></el-option>
         </el-select>
-        <span style="margin-left:100px">提交截止</span>
-        <el-input type="text" v-model="homeWork.pubTime" size="small" style="width: 60px;"></el-input>天后公布成绩
       </div>
       <div>
         <span>设置评分点（评分标准，助教评分可参考）</span>
@@ -156,6 +152,7 @@ export default {
       this.chapterList = response.data;
     });
     schemeList(this.$route.query.id).then(response => {
+      response.data.unshift({schemeId: null, schemeName: '不划分小组'})
       this.groupList = response.data;
     });
     if (this.$route.query.operation === "edit") {
@@ -238,6 +235,16 @@ export default {
     leftScore() {
       return Math.abs(100 - this.scoreTotal);
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    this.$confirm('跳转将丢失未保存数据，是否跳转', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      next()
+    }).catch(() => {      
+    });
   },
   components: { upOss }
 };

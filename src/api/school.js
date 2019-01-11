@@ -149,7 +149,7 @@ export function sysStudentPage(data){
   let studentInfo = data.studentInfo || ''
 
   //return commonsAjax('${baseUrl}student/page',{ studentId:1,pageIndex:1,pageSize:10  },'get')
-  let url = `${baseUrl}student/page?collegeId=${college}&departmentId=${department}&classId=${studentClass}&specialityId=${speciality}&pageSize=10&pageIndex=${data.pageIndex}`
+  let url = `${baseUrl}student/page?collegeId=${college}&departmentId=${department}&classId=${studentClass}&specialityId=${speciality}&pageSize=10&pageIndex=${data.pageIndex || 1}`
   return commonsAjax(url,'','get')
 }
 
@@ -329,7 +329,7 @@ export function sysCourseId(data){
 
 
 export function sysClassPage(data){
-  return commonsAjax('http://120.36.137.90:8008/api/v1/class/page',data,'get')
+  return commonsAjax(`${baseUrl}class/page`,data,'get')
 }
 
 /**

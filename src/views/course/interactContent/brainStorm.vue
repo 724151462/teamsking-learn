@@ -22,7 +22,7 @@
       <div class="margin-sides">标题</div>
       <el-input placeholder="请添加标题" v-model="brainStorm.stormDescribe" style="width:600px;"></el-input>
       <div class="margin-sides">
-        <span>所属章节</span>
+        <span>所属章</span>
       </div>
       <div class="margin-sides">
         <el-select v-model="brainStorm.chapterId">
@@ -34,6 +34,7 @@
           ></el-option>
         </el-select>
       </div>
+      <span style="color: red">提示：学生参与默认活动90分基础分</span>
     </div>
     <el-button @click="brainStormSave">保存</el-button>
   </div>
@@ -120,6 +121,16 @@ export default {
       }
       
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    this.$confirm('跳转将丢失未保存数据，是否跳转', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      next()
+    }).catch(() => {      
+    });
   },
   components: { upOss }
 };

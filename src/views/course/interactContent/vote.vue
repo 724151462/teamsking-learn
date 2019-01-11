@@ -30,12 +30,12 @@
               <el-radio v-model="item.quizType" label="10">单选</el-radio>
               <el-radio v-model="item.quizType" label="20">多选</el-radio>
             </div>
-            <el-button @click="addAnswer(item)">添加答案</el-button>
             <div v-for="(answer, index) in item.voteQuizOptions" :key="index" class="margin-sides">
               {{index|character}}
               <el-input v-model="answer.optionTitle" style="width:300px"></el-input>
               <span class="delBtn" @click="delAnswer(item,index)">删除</span>
             </div>
+            <el-button @click="addAnswer(item)">添加选项</el-button>
           </el-tab-pane>
         </el-tabs>
       </div>
@@ -46,7 +46,7 @@
         <el-input v-model="voteObj.voteTitle"></el-input>
       </div>
       <div class="margin-sides">
-        <span>所属章节</span>
+        <span>所属章</span>
       </div>
       <div>
         <el-select v-model="voteObj.chapterId" class="margin-sides">
@@ -237,7 +237,17 @@ export default {
           break;
       }
     }
-  }
+  },
+  beforeRouteLeave (to, from, next) {
+    this.$confirm('跳转将丢失未保存数据，是否跳转', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      next()
+    }).catch(() => {      
+    });
+  },
 };
 </script>
 
