@@ -1,9 +1,9 @@
 <template>
   <div class="course-tab-container">
-    <el-button style="margin-bottom: 20px;margin-left: 94%" @click="coursePublish" type="primary">发布课程</el-button>
     <div>
       <span class="shuxian">|</span>
       <span style="font-size:20px;font-weight: bold;margin-left: 10px">教学模式</span>
+      <el-button style="float: right" @click="coursePublish" type="primary">发布课程</el-button>
       <div class="radio">
         <el-radio
           @change="changeTModel"

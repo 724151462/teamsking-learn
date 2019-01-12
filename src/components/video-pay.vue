@@ -7,6 +7,7 @@
                      :options="playerOptions"
                      @play="onPlayerPlay($event)"
                      @pause="onPlayerPause($event)"
+                     @ended="onPlayerEnded($event)"
       >
       </video-player>
     </div>
@@ -57,6 +58,9 @@
       onPlayerPause(player){
         // alert("pause");
       },
+      onPlayerEnded(player) {
+        // alert()
+      }
     },
     computed: {
       player() {
