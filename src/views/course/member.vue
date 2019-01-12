@@ -6,6 +6,7 @@
       <el-button type="primary">
         <router-link :to="{name: '成员方案管理', query: {id: $route.query.id}}">成员小组方案管理</router-link>
       </el-button>
+      <el-button type="success" @click="deleteAll">批量移除成员</el-button>
       <div style="margin-top:10px">
         <el-upload
           style="display: inline-block;margin-right:10px"
@@ -41,7 +42,7 @@
       <groupPlans></groupPlans>
     </el-dialog>
     <el-dialog title="导入结果" :visible.sync="dialogShow" :data="resData" width="50%">
-      <el-table :data="resData">
+      <el-table :data="resData" :row-class-name="tableRowClassName">
         <el-table-column prop="studentNo" label="学号"></el-table-column>
         <el-table-column prop="realName" label="姓名"></el-table-column>
         <el-table-column prop="tenantName" label="租户名称"></el-table-column>
@@ -62,7 +63,7 @@ import {
   unsetAssistant,
   deleteUser,
   memberUpload,
-  userModify
+  userModify,
 } from "@/api/course";
 import { getToken } from "@/utils/auth";
 export default {
@@ -124,7 +125,6 @@ export default {
           name: "设为助教",
           type: "setSys",
           show: item => {
-            console.log(item);
             if (item.assistantStatus === 2) {
               return true;
             } else {
@@ -136,7 +136,6 @@ export default {
           name: "取消助教",
           type: "unsetSys",
           show: item => {
-            console.log(item);
             if (item.assistantStatus === 1) {
               return true;
             } else {
@@ -152,6 +151,7 @@ export default {
           }
         }
       ],
+      delArr: [],
       dialogShow: false,
       resData: [],
       isFa: false
@@ -164,16 +164,38 @@ export default {
     this.getPage();
   },
   methods: {
+    tableRowClassName({row, rowIndex}) {
+        if (JSON.stringify(row.errorData) === '[]') {
+          return 'success-row';
+        } else {
+          return 'warning-row';
+        }
+      },
     btnShow() {
       return false;
     },
+    deleteAll() {
+      console.log(this.delArr)
+      deleteUser(sysInfo).then(response => {
+        if (response.code === 200) {
+          tableData.splice(index, 1);
+        }
+      });
+    },
     showComponentInfo(type, info, index) {
+      
       console.log(type, info, index);
       var sysInfo = {
         courseId: this.courseId,
         userId: info.userId
       };
       switch (type) {
+        case "selected":
+          this.delArr = []
+          info.forEach(element => {
+            this.delArr.push(element.id)
+          });
+          console.log(this.delArr)
         case "setSys":
           console.log(sysInfo);
           setAssistant(sysInfo).then(response => {
@@ -212,7 +234,7 @@ export default {
       var oReq = new XMLHttpRequest();
       oReq.open(
         "GET",
-        "http://192.168.10.48:9008/api/v1/sys/course/user/excel",
+        "http://120.36.137.90:9008/api/v1/sys/course/user/excel",
         true
       );
       oReq.setRequestHeader("token", getToken());

@@ -345,7 +345,7 @@ import { setTimeout } from 'timers';
                 }
             })
             // 专业列表
-            sysSpecialityList()
+            sysSpecialityList({collegeId: -1, departmentId: -1})
             .then((response)=>{
                 if (response.code === 200){
                     this.specialityRows = response.data
@@ -356,7 +356,7 @@ import { setTimeout } from 'timers';
                 }
             })
             // 班级列表
-            sysClassList()
+            sysClassList({specialityId: -1})
             .then((response)=>{
                 console.log(response.data)
                 if (response.code === 200){

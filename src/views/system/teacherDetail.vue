@@ -8,7 +8,6 @@
             </el-form-item>
             <el-form-item label="工号">
                 <el-input v-model="form.teacherNo" class="input"></el-input>
-                <p style="color: red">提示：教师登录账号，密码默认为工号后6位</p>
             </el-form-item>
             <el-form-item label="教师姓名">
                 <el-input v-model="form.realName" class="input"></el-input>
@@ -47,21 +46,7 @@
             <el-form-item label="自我介绍">
                 <el-input class="input" type="textarea" v-model="form.introduct"></el-input>
             </el-form-item>
-            <el-form-item class="commit">
-                <el-button type="primary" @click="ensureBtn()">提交</el-button>
-                <el-button @click="dialogVisible = false">取消</el-button>
-            </el-form-item>
         </el-form>
-        <el-dialog
-            title="提示"
-            :visible.sync="dialogVisible"
-            width="30%">
-            <span>添加成功</span>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="backToList">返 回</el-button>
-                <el-button @click="resetFormData">继续添加</el-button>
-            </span>
-        </el-dialog>
     </div>
 </template>
 
@@ -69,39 +54,40 @@
 import {
     sysCollegeList,
     sysDepartmentList,
-    sysTeacherAdd
+    sysTeacherAdd,
+    sysTeacherId,
 } from '../../api/school';
 
 export default {
     data(){
         return{
             currentRoute: '',
-            dialogVisible: false,
             // 表单信息
-            form: {
-                userName: 'wjx',
-                teacherNo: '888888',
-                realName: '吴佳雄',
-                gender: '1',
-                mobile: 18459183928,
-                jobName: '前端菜鸟',
-                jobYear: '1',
-                collegeId: '',
-                departmentId: '',
-                introduct: '我是菜鸟我怕谁'
-            },
             // form: {
-            //     userName: '',
-            //     teacherNo: '',
-            //     realName: '',
-            //     gender: '',
-            //     mobile: '',
-            //     jobName: '',
-            //     jobYear: '',
+            //     userName: 'wjx',
+            //     teacherNo: '888888',
+            //     realName: '吴佳雄',
+            //     gender: '1',
+            //     mobile: 18459183928,
+            //     jobName: '前端菜鸟',
+            //     jobYear: '1',
             //     collegeId: '',
             //     departmentId: '',
-            //     introduct: ''
+            //     introduct: '我是菜鸟我怕谁'
             // },
+            form: {
+                userName: '',
+                teacherNo: '',
+                realName: '',
+                password: '',
+                gender: '',
+                mobile: '',
+                jobName: '',
+                jobYear: '',
+                collegeId: '',
+                departmentId: '',
+                introduct: ''
+            },
             // 院
             collegeList: [],
             searchCollegeList:[],
@@ -118,10 +104,25 @@ export default {
     },
     mounted() {
         this.currentRoute = this.$route.name
+        console.log(this.$route.params.id)
+        sysTeacherId({"id": this.$route.query.teacherId})
+        .then((response)=>{
+            let teacherInfo = response.data
+            this.form.collegeId = teacherInfo.collegeId
+            this.form.teacherNo = teacherInfo.teacherNumber
+            this.form.realName = teacherInfo.teacherName
+            this.form.userName = teacherInfo.userName
+            this.form.gender = String(teacherInfo.gender)
+            this.form.mobile = teacherInfo.mobile
+            this.form.jobName = teacherInfo.positionalTitle
+            this.form.jobYear = teacherInfo.schoolAge
+            this.form.collegeId = teacherInfo.collegeId
+            this.form.departmentId = teacherInfo.departmentId
+            this.form.introduct = teacherInfo.synopsis
+        })
         // 院列表
         sysCollegeList()
         .then((response)=>{
-            console.log(response.code)
             if (response.code === 200){
                 this.collegeList = response.data
                 this.searchCollegeList = response.data
@@ -171,49 +172,6 @@ export default {
             //     return item.departmentId == value || item.departmentId == -1
             // })
         },
-        // 提交
-        ensureBtn() {
-            let teacherForm = {
-                "collegeId": this.form.collegeId,
-                "departmentId": this.form.departmentId,
-                "gender": this.form.gender,
-                "positionalTitle": this.form.jobName,
-                "realName": this.form.realName,
-                "schoolAge": this.form.jobYear,
-                "synopsis": this.form.introduct,
-                "teacherNumber": this.form.teacherNo
-            }
-            sysTeacherAdd(teacherForm)
-            .then((response)=>{
-                if(response.code === 200){
-                    this.dialogVisible = true
-                }else{
-                    this.$message({
-                        type: 'error',
-                        message: response.msg
-                    })
-                }
-            })
-        },
-        backToList() {
-            this.dialogVisible = false
-            this.$router.go(-1);
-        },
-        resetFormData() {
-            this.form = {
-                userName: '',
-                teacherNo: '',
-                realName: '',
-                gender: '',
-                mobile: '',
-                jobName: '',
-                jobYear: '',
-                collegeId: '',
-                departmentId: '',
-                introduct: ''
-            }
-            this.dialogVisible = false
-        }
     }
 }
 </script>

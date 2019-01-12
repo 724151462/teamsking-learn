@@ -95,7 +95,7 @@ export function signClose() {
         }));
 }
 
-function exam() {
+export function exam() {
     stompClient.send("/teamsking/course/exam/start",{'token': token},
         JSON.stringify({
             "bean":16,

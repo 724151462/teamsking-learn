@@ -9,7 +9,7 @@
           <el-input v-model="listQuery.courseName" type="text" placeholder="请输入课程名称" style="width:180px;margin-left: 100px;"></el-input>
           <el-button type="primary" @click="getList">搜索</el-button>
         </div>
-        <el-button type="primary" round style="margin-left: 50px;" @click="goAddCourse">创建课程</el-button>
+        <el-button type="primary" round style="float: right" @click="goAddCourse">创建课程</el-button>
       </el-row>
 
       <el-row>
@@ -20,8 +20,7 @@
             <img :src="list.courseCover">
           </div>
           <div class="center">
-            <div class="title">{{list.courseName }}</div>
-            <div class="list">课程ID：{{list.courseId}}</div>
+            <div class="title" style="margin:20px 0;font-weight:bold">{{list.courseName }}</div>
             <div class="list">学生数：{{list.userCount}}人</div>
             <div class="list">课程时间：{{list.beginTime}} ~ {{list.endTime}}</div>
             <div class="list">所属学校：{{list.tenantName}}</div>
@@ -33,7 +32,6 @@
               <a class="list">复制</a>
               <a class="list" @click="release(list.courseId)">发布</a>
               <a class="list">删除</a>
-              <a class="list" @click="sell">售卖</a>
             </div>
             <el-button type="primary" @click="goCourseModel(list.courseId)">课堂模式</el-button>
             <el-button type="primary" @click="goCourseChapter(list.courseId)">教学管理</el-button>
@@ -262,6 +260,7 @@ export default {
       .title
         font-size:20px
         margin-top:5px
+        color: rgb(61, 61, 70)
 
       .list
         margin-top:5px
@@ -276,6 +275,6 @@ export default {
 
         .list
           margin-right:20px
-          color: #0EA5F0
+          color: rgb(116, 120,129)
           cursor: pointer
 </style>

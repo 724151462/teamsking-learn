@@ -64,8 +64,11 @@
             </div>
             <div class="all-img-list">
               <template v-for="(member,i) in item.userList">
-                <div class="img-list" :key="i">
-                  <img style="width:112px" :src="member.avatar" class="img">
+                <div :key="i" style="display: flex; flex-direction: column; align-items: center">
+                  <div class="img-list">
+                    <img style="width:112px" :src="member.avatar" class="img">
+                  </div>
+                  <span>{{member.realName}}</span>
                 </div>
                 <span :key="member.userId" class="delMember" @click="delMember(member,item.teamId)">×</span>
               </template>
@@ -73,12 +76,10 @@
             </div>
           </div>
         </div>
-        <div class="add">
-          <el-button type="primary" @click="newGroup">添加组</el-button>
-        </div>
         <div style="text-align: right;">
-          <el-button @click="isAddFa = false">取消</el-button>
+          <el-button type="primary" @click="newGroup">添加组</el-button>
           <el-button type="primary" @click="groupNameModify">确定</el-button>
+          <el-button @click="isAddFa = false">取消</el-button>
         </div>
       </el-form>
 
@@ -508,7 +509,7 @@ export default {
       .then(response=> {
         this.schemeList.push(item)
         this.$message({
-          message: '删除方案成功',
+          message: '复制方案成功',
           type: 'success'
         })
       })
@@ -563,12 +564,17 @@ export default {
 
   .center {
     padding-top: 10px;
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    align-content: flex-start;
 
     .list {
-      width: 50%;
-      display: inline-block;
       background: #F8F8F8;
-      padding: 10px 5px;
+      margin: 10px 2%;
+      padding: 10px;
+      box-sizing: border-box;
+      flex: 0 0 46%;
 
       .title {
         padding-bottom: 10px;

@@ -1,397 +1,705 @@
 <template>
-  <div class="student">
-    <header-the-again headerTitle="学生管理"></header-the-again>
+    <div class="student">
 
-    <el-form ref="form" :inline="true" label-width="100px" class="form-query">
-      <el-form-item label="输入搜索：">
-        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="老师名称/工号/手机"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="queryRoleList">查询</el-button>
-      </el-form-item>
-    </el-form>
+        <el-row>
+            <el-col :span="24">
+                <div class="grid-content bg-purple-dark">
+                    学生管理
+                </div>
+            </el-col>
+        </el-row>
 
-    <table-the-again
-         :tableTitle="tableTitle"
-         :tableOperate="tableOperate"
-         :columnNameList="columnNameList"
-         :tableData="tableData.pageData"
-         :operateList="operateList"
-         @showComponentInfo="showComponentInfo">
-    </table-the-again>
+        <el-form ref="form2" :model="searchForm" :inline="true" label-width="100px" class="form-query">
+            <el-form-item>
+                <el-select v-model="searchForm.college" :readonly="true" placeholder="院" @change="collegeChange">
+                    <el-option 
+                    v-for="(item, index) in searchCollegeList" 
+                    :key="index" 
+                    :label="item.collegeName"
+                    :value="item.collegeId">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="searchForm.department" :readonly="true" placeholder="系" @change="departmentChange">
+                    <el-option 
+                    v-for="(item, index) in searchDepartmentList" 
+                    :key="index" 
+                    :label="item.departmentName"
+                    :value="item.departmentId">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="searchForm.speciality" placeholder="专业" @change="specialityChange">
+                    <el-option 
+                    v-for="(item, index) in searchSpecialityList" 
+                    :key="index" 
+                    :label="item.specialityName"
+                    :value="item.specialityId"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="searchForm.studentClass" placeholder="班级">
+                    <el-option 
+                    v-for="(item, index) in classSearchList" 
+                    :key="index" 
+                    :label="item.className"
+                    :value="item.classId"></el-option>
+                </el-select>
+            </el-form-item>
+            <!-- <el-autocomplete
+            v-model="state4"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入班级"
+            value-key="className"
+            @select="handleSelect"
+            ></el-autocomplete> -->
+            <el-form-item>
+                <el-input v-model="searchForm.studentInfo" placeholder="选择输入姓名/学号">
+                </el-input>
+            </el-form-item>
+            <!-- <el-form-item label="系名称">
+                    <el-select v-model="departmentId" placeholder="系名称">
 
-    <el-pagination
-        background
-        layout="prev, pager, next"
-        :page-size="tableData.pageSize"
-        :page-count="tableData.totalPage"
-        :current-page="tableData.pageIndex"
-        @current-change="handleCurrentChange">
-    </el-pagination>
+                        <el-option value="-2" label="无系"></el-option>
+                        <el-option 
+                            v-for="item in departmentList" 
+                            :key="item.departmentId" 
+                            :label="item.departmentName"
+                            :value="item.departmentId"></el-option>
+                        </el-select>
+                </el-form-item> -->
 
-    <el-dialog
-        :title="addForm.title"
-        :visible.sync="dialogVisible"
-        width="60%"
-        :before-close="handleClose"
-        style="min-width: 800px">
+            <!-- <el-form-item label="院/系/专业">
+                <el-input v-model="mutilInfo" disabled></el-input>
+            </el-form-item>
+            <el-autocomplete
+            v-model="searchForm.searchClass"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入内容"
+            @select="handleSelect"
+            ></el-autocomplete> -->
 
-      <div class="pop-academy">
-        <div class="item-title">
-          <span class="color-red">*</span><span>请输入角色名：</span>
-        </div>
-        <div class="item-input">
-          <el-input class="input-pop"  v-model="addForm.data.roleName"  placeholder="学生名称" clearable></el-input>
-        </div>
-      </div>
+                <el-button type="primary" @click="searchStudent">查询</el-button>
 
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="save">确 定</el-button>
-      </span>
-    </el-dialog>
+        </el-form>
 
-    <el-dialog
-        :title="addForm.title"
-        :visible.sync="menuDialogVisible"
-        width="60%"
-        :before-close="handleClose"
-        style="min-width: 800px">
+        <table-the-again
+                :tableTitle="tableTitle"
+                :tableOperate="tableOperate"
+                :columnNameList="columnNameList"
+                :tableData="tableData3"
+                :operateList="operateList"
+                @showComponentInfo="showComponentInfo"
+                switchColumn='open'>
+        </table-the-again>
+        <el-dialog
+            :title="dialogTitle"
+            :visible.sync="dialogVisible"
+            width="50%"
+            >
+            <el-form ref="form1" :model="form" label-width="80px">
+                <el-form-item label="学号">
+                    <el-input v-model="form.studentNo"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名">
+                    <el-input v-model="form.realName"></el-input>
+                </el-form-item>
+                <!-- <el-form-item label="性别">
+                    <el-radio-group v-model="form.sex">
+                        <el-radio label="男"></el-radio>
+                        <el-radio label="女"></el-radio>
+                    </el-radio-group>
+                </el-form-item> -->
+                <el-form-item label="手机号码">
+                    <el-input v-model="form.mobile" :disabled="mobileEnable"></el-input>
+                </el-form-item>
+                <el-form-item label="院名称">
+                    <el-select v-model="collegeId" placeholder="院名称">
+                        <el-option value="-2" label="无院"></el-option>
+                        <el-option 
+                            v-for="(item, index) in collegeList" 
+                            :key="index" 
+                            :label="item.collegeName"
+                            :value="item.collegeId"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="系名称">
+                    <el-select v-model="departmentId" placeholder="系名称">
+                        <el-option value="-2" label="无系"></el-option>
+                        <el-option 
+                            v-for="(item, index) in departmentList" 
+                            :key="index" 
+                            :label="item.departmentName"
+                            :value="item.departmentId"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="专业">
+                    <el-select v-model="specialityId" placeholder="专业">
+                        <el-option value="-2" label="无专业"></el-option>
+                        <el-option 
+                            v-for="(item, index) in specialityList" 
+                            :key="index" 
+                            :label="item.specialityName"
+                            :value="item.specialityId"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="班级">
+                    <el-select v-model="classId" placeholder="班级">
+                        <el-option value="-1" label="请添加班级"></el-option>
+                        <el-option ref="class"
+                            v-for="(item, index) in classList" 
+                            :key="index" 
+                            :label="item.className"
+                            :value="item.classId"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="是否启用">
+                    <el-switch active-value=1
+                        inactive-value=2
+                        active-color="#13ce66"
+                        inactive-color="#ff4949"
+                        v-model="status"></el-switch>
+                </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="ensureBtn()">提交</el-button>
+                <el-button @click="dialogVisible = false">取消</el-button>
+            </el-form-item>
+            </el-form>
+        </el-dialog>
+        <el-pagination
+                background
+                layout="prev, pager, next"
+                :total="totalCount"
+                @current-change="pageChange">
+        </el-pagination>
 
-      <div class="pop-academy">
-
-        权限菜单列表: <br /><br /><br />
-
-        <el-tree
-            :data="data2"
-            show-checkbox
-            node-key="id"
-            :default-expanded-keys="[2, 3]"
-            :default-checked-keys="[5]"
-            :props="defaultProps">
-        </el-tree>
-
-
-        <!--{{ addForm.data.menuList }}-->
-
-      </div>
-
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="menuDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="menuDialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
-
-
-  </div>
+    </div>
 </template>
 
 <script>
-  import headerTheAgain from '@/components/header-theAgain'
-  import tableTheAgain from '@/components/table-theAgain'
-
-
-  import { sysRolePage } from '../../api/system'
-  import { sysRoleAdd } from '../../api/system'
-  import { sysRoleEdit } from '../../api/system'
-  import { sysRoleDelete } from '../../api/system'
-  import { sysUserMenuList } from '../../api/system'
-
-  export default {
-    name: "role",
-    components:{
-      tableTheAgain,
-      headerTheAgain
-    },
-    data(){
-      return {
-        addForm:{
-          title:'添加角色',
-          data:{
-            roleName:'',
-          }
+import tableTheAgain from '../../components/table-theAgain'
+import {
+    sysCollegeList,
+    sysStudentPage,
+    sysStudentSwitch,
+    sysDepartmentList,
+    sysSpecialityList, 
+    sysClassList,
+    sysStudentAdd,
+    sysStudentModify,
+    sysStudentDelete
+} from '../../api/school';
+import { setTimeout } from 'timers';
+    export default{
+        name:'',
+        data(){
+            return{
+                classSearchList: [],
+                state4: '',
+                timeout:  null,
+                searchForm: {
+                    college: '',
+                    department: '',
+                    speciality: '',
+                    studentInfo: '',
+                    studentClass: ''
+                },
+                searchCollegeList: [],
+                searchDepartmentList: [],
+                searchSpecialityList: [],
+                searchClassList: [],
+                searchStudentList: [],
+                tableTitle:'学生列表',
+                timeout: '',
+                tableOperate:[
+                    {
+                        content:'添加学生',
+                        type:'addStudent'
+                    },
+                    {
+                        content:'批量删除',
+                        type:'deleteAll'
+                    },
+                ],
+                columnNameList:[
+                    {
+                        type:'selection'
+                    },
+                    {
+                        name:'姓名',
+                        prop:'realName'
+                    },
+                    {
+                        name:'学号',
+                        prop:'studentNo'
+                    },
+                    {
+                        name:'系',
+                        prop:'departmentName',
+                        fit:true
+                    },
+                    {
+                        name:'专业',
+                        prop:'specialityName'
+                    },
+                    {
+                     name:'班级',
+                     prop:'className'
+                    },
+                  {
+                    name:'创建时间',
+                    prop:'createTime'
+                  }
+                ],
+                operateList:[
+                    {
+                        content:'编辑',
+                        type:'edit'
+                    },
+                    {
+                        content:'重置密码',
+                        type:'resetPassword'
+                    },
+                    {
+                        content:'删除',
+                        type:'delete'
+                    }
+                ],
+                tableData3: [
+                ],
+                selectOptions: [],
+                dialogVisible: false,
+                // 院列表
+                collegeList: [],
+                collegeSelected: '',
+                // 系列表
+                departmentList: [],
+                departmentRows: [],
+                // 专业列表
+                specialityList: [],
+                specialityRows: [],
+                // 班级列表
+                classList: [],
+                classRows: [],
+                // 表单信息
+                form: {
+                    studentNo: '',
+                    realName: '',
+                    sex: '',
+                    mobile: '',
+                    status: true
+                },
+                mobileEnable: true,
+                studentId: '',
+                status: false,
+                dialogTitle: '',
+                collegeId: '',
+                departmentId: '',
+                specialityId: '',
+                classId: '',
+                totalCount: 0,
+                pageIndex: 1,
+                formEvent: ''
+            }
         },
-        menuDialogVisible:false,
-        dialogVisible:false,
-        form:{
-          title:'添加学生',
+        components:{
+            tableTheAgain
         },
-        tableTitle:'学生管理列表',
-        tableOperate:[
-          {
-            content:'导出学生',
-            type:'created'
-          },
-         
-        ],
-        columnNameList:[
-          {
-            type:'selection'
-          },
-          {
-            name:'学校',
-            prop:'roleName'
-          },
-          {
-            name:'姓名',
-            prop:'createTime'
-          },
-          {
-            name:'学号',
-            prop:'createName'
-          },
-          {
-            name:'院',
-            prop:'createName'
-          },
-          {
-            name:'系',
-            prop:'createName'
-          },
-          {
-            name:'专业',
-            prop:'createName'
-          },
-          {
-            name:'班级',
-            prop:'createName'
-          },
-        ],
-        operateList:[
-          {
-            content:'查看',
-            type:'delete'
-          }
-        ],
-        tableData:'',
-
-
-
-        data2: [{
-          id: 1,
-          label: '一级 1',
-          children: [{
-            id: 4,
-            label: '二级 1-1',
-            children: [{
-              id: 9,
-              label: '三级 1-1-1'
-            }, {
-              id: 10,
-              label: '三级 1-1-2'
-            }]
-          }]
-        }, {
-          id: 2,
-          label: '一级 2',
-          children: [{
-            id: 5,
-            label: '二级 2-1'
-          }, {
-            id: 6,
-            label: '二级 2-2'
-          }]
-        }, {
-          id: 3,
-          label: '一级 3',
-          children: [{
-            id: 7,
-            label: '二级 3-1'
-          }, {
-            id: 8,
-            label: '二级 3-2'
-          }]
-        }],
-        defaultProps: {
-          children: 'children',
-          label: 'label'
-        }
-
-
-
-      }
-    },
-    created:function(){
-      this.queryRoleList();
-    },
-    mounted:function(){
-      sysUserMenuList().then(
-        res => {
-          console.log("权限菜单:",res);
-
-          let menuTree = res.data.filter(
-            element => {
-              return element.parentId === 0
+        mounted(){
+            // 学生列表
+            sysStudentPage({"pageIndex": this.pageIndex})
+            .then((response)=>{
+                console.log(response.data.pageData.status)
+                let dataArr = []
+                response.data.pageData.forEach(element => {
+                    element.status = String(element.status)
+                    console.log(typeof(element.status))
+                    dataArr.push(element)
+                });
+                this.totalCount = Number(response.data.totalCount)
+                this.tableData3 = dataArr
+            })
+            // 院列表
+            sysCollegeList()
+            .then((response)=>{
+                if (response.code === 200){
+                    this.collegeList = response.data
+                    this.searchCollegeList = response.data
+                    let all = {"collegeId": -1, "collegeName": "全部"}
+                    this.collegeList.unshift(all)
+                    // this.searchCollegeList.unshift(all)
+                    console.log(this.collegeList)
+                }
+            })
+            // 系列表
+            sysDepartmentList()
+            .then((response)=>{
+                if (response.code === 200){
+                    this.departmentRows = response.data
+                    this.searchDepartmentList = response.data
+                    let all = {"departmentId": -1, "departmentName": "全部"}
+                    // this.searchDepartmentList.unshift(all)
+                    this.departmentRows.unshift(all)
+                }
+            })
+            // 专业列表
+            sysSpecialityList()
+            .then((response)=>{
+                if (response.code === 200){
+                    this.specialityRows = response.data
+                    this.searchSpecialityList = response.data
+                    let all = {"specialityId": -1, "specialityName": "全部"}
+                    // this.searchSpecialityList.unshift(all)
+                    this.specialityRows.unshift(all)
+                }
+            })
+            // 班级列表
+            sysClassList()
+            .then((response)=>{
+                console.log(response.data)
+                if (response.code === 200){
+                    this.classRows = response.data
+                    this.classSearchList = response.data
+                    let all = {"classId": -1, "className": "全部"}
+                    // this.classSearchList.unshift(all)
+                    this.classRows.unshift(all)
+                }
+            })
+        },
+        watch:{
+            collegeId: function(val){
+                console.log(val)
+                if(val == -1 || val == -2 || val == '无院'){
+                    this.departmentList = this.departmentRows
+                }else{
+                    this.departmentList = this.departmentRows.filter(function (x) { return x.collegeId == val });
+                }
+                if (this.departmentList.length>0) {
+                    console.log(this.departmentId)
+                    if (this.departmentId) {
+                        this.departmentId = this.departmentId
+                        return
+                    }
+                    this.departmentId = this.departmentList[0].departmentId
+                }else{
+                    this.departmentId = ""
+                }
+            },
+            departmentId: function(val){
+                console.log('depid', val)
+                if(val == -1 || val == -2 || val == '无系'){
+                    this.specialityList = this.specialityRows
+                }else{
+                    this.specialityList = this.specialityRows.filter(function (x) { return x.departmentId == val });
+                }
+                if (this.specialityList.length>0) {
+                    if (this.specialityId) {
+                        this.specialityId = this.specialityId
+                        return
+                    }
+                    this.specialityId = this.specialityList[0].specialityId
+                }else{
+                    this.specialityId = ""
+                }
+            },
+            specialityId: function(val){
+                if(val == -1 || val == -2 || val == '无专业'){
+                    this.classList = this.classRows
+                }else{
+                    this.classList = this.classRows.filter(function (x) { return x.specialityId == val });
+                }
+                if (this.classList.length>0) {
+                    if (this.classId) {
+                        this.classId = this.classId
+                        return
+                    }
+                    this.classId = this.classList[0].classId
+                }else{
+                    this.classId = ""
+                }
             }
-          );
-
-          for( let i = 0; i < menuTree.length; i++  ){
-            menuTree[i].children = [];
-            menuTree[i].children.push( res.data.filter(
-              element => {
-                return element.parentId === menuTree[i].menuId
-              }
-            ) )
-          }
-
-
-          console.log( 'menuTree' , menuTree );
-
-        }
-      ).catch()
-
-    },
-    methods:{
-      showComponentInfo:function(type,info){
-        console.log('type',type,'info',info);
-        switch(type){
-          case 'created':
-            console.log('here is created');
-            this.appendRole();
-            break;
-          case 'edit':
-            console.log('here is edit');
-            this.editRole(info);
-            break;
-          case 'delete':
-            this.delete('one',info);
-            break;
-          case 'deleteList':
-            this.delete('list',info);
-            break;
-          case 'set':
-            this.editMenu(info);
-            break;
-        }
-      },
-      queryRoleList:function () {
-        console.log('this.form',this.form);
-        sysRolePage(this.form).then(
-          res => {
-            this.tableData=res.data;
-            console.log("tableData",this.tableData)
-          }
-        ).catch(
-          error => console.log('error',error)
-        )
-      },
-      appendRole:function(){
-        this.dialogVisible = true;
-        this.addForm.title = '添加角色';
-        this.addForm.data={ roleName:'' }
-      },
-      editRole:function(roleInfo){
-        this.dialogVisible = true;
-        this.addForm.title = '编辑角色';
-        this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data' , this.addForm.data );
-      },
-      editMenu:function(roleInfo){
-        this.menuDialogVisible = true;
-        this.addForm.title = '设置权限';
-        this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );
-      },
-      save:function(){
-        if( this.addForm.title === '添加角色'){
-          console.log( '添加角色的信息:', this.addForm.data);
-          sysRoleAdd( this.addForm.data).then(
-            res => {
-              console.log('添加角色:',res);
+        },
+        methods:{
+            // 院搜索值变化
+            collegeChange(value) {
+                // console.log(value)
+                // console.log('a',this.departmentRows)
+                if(value === -1){
+                    console.log('coid', this.departmentRows)
+                    this.searchDepartmentList = this.departmentRows
+                    this.searchForm.department = -1
+                }else{
+                    console.log('list', this.departmentRows)
+                    this.searchDepartmentList = this.departmentRows.filter((item)=>{
+                        console.log('coid', item.collegeId)
+                        return (item.collegeId == value || item.collegeId == -1)
+                    })
+                    console.log('121', this.searchDepartmentList)
+                    this.searchForm.department = -1   
+                }
+                         
+            },
+            // 系搜索值变化
+            departmentChange(value) {
+                console.log('dep', value)
+                if(value === -1){
+                    return this.specialityRows
+                }
+                this.searchForm.speciality = -1
+                this.searchSpecialityList = this.specialityRows.filter((item)=>{
+                    return item.departmentId == value || item.departmentId == -1
+                })
+            },
+            // 专业搜索值变化
+            specialityChange(value) {
+                console.log('spec', value)
+                if(value === -1){
+                    return this.classRows
+                }
+                this.searchForm.studentClass = -1
+                this.classSearchList = this.classRows.filter((item)=>{
+                    console.log(item)
+                    return item.specialityId == value || item.specialityId == -1
+                })
+                // console.log(this.classSearchList)
+            },
+            // 查找按钮事件
+            searchStudent() {
+                // let {studentClass, college, department, speciality , studentInfo} = this.searchForm
+                
+                console.log(this.classSearchList)
+                if(!this.searchForm.studentClass){
+                    this.searchForm.studentClass = -1
+                }
+                if(!this.searchForm.college){
+                    this.searchForm.college = -1
+                }
+                if(!this.searchForm.department){
+                    this.searchForm.department = -1
+                }
+                if(!this.searchForm.speciality){
+                    this.searchForm.speciality = -1
+                }
+                console.log('12344', this.searchForm)
+                this.searchForm.pageIndex = 1
+                sysStudentPage(this.searchForm).then((response)=>{
+                    console.log(response)
+                    let dataArr = []
+                    response.data.pageData.forEach(element => {
+                        element.status = String(element.status)
+                        console.log(typeof(element.status))
+                        dataArr.push(element)
+                    });
+                    this.tableData3 = dataArr
+                    this.totalCount = Number(response.data.totalCount)
+                })
+            },
+            showComponentInfo:function(type,info){
+                console.log( '父组件接收到的类型：' + type + '父组件接收到的信息：' + info );
+                switch (type) {
+                    case 'check':
+                        //console.log(info);
+                        this.check(info);
+                        break;
+                    case 'switch': 
+                        let switchInfo = {id: info.studentId,status: info.status} 
+                        sysStudentSwitch(switchInfo)
+                            .then((response)=>{
+                                console.log(response)
+                            })
+                        break;
+                    case 'delete':
+                        this.delStudent(info)
+                        break
+                    case 'deleteAll':
+                        this.delStudent(info)
+                        break
+                    case 'addStudent':
+                        this.dialogTitle = '添加学生'
+                        this.formEvent = 'addNewStudent'
+                        this.initStudent()
+                        this.mobileEnable = false
+                        console.log(this.mobileEnable)
+                        this.dialogVisible = true;
+                        break;
+                    case 'edit':
+                        this.dialogTitle = '编辑学生'
+                        this.initStudent(info)
+                        this.mobileEnable = true
+                        console.log(this.mobileEnable)
+                        this.formEvent = 'editStudent'
+                        this.dialogVisible = true
+                        break;
+                        
+                }
+            },
+            check:function() {
+                this.dialogVisible = !this.dialogVisible;
+            },
+            onSubmit:function() {
+                // this.specialityRows.forEach(element => {
+                //     console.log('---',element)
+                // });
+                console.log(123)
+            },
+            delStudent(student) {
+                console.log(student.length)
+                let delArr = []
+                if(student.length == undefined){
+                    delArr.push(student.studentId)
+                }else{
+                    student.forEach(element => {
+                        delArr.push(element.studentId)
+                    });
+                }
+                
+                this.$confirm('是否删除学生？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    sysStudentDelete(delArr).then((response)=>{
+                        if(response.code === 200) {
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                        }
+                    })
+                })
+                .catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });          
+                });
+            },
+            ensureBtn() {
+                if(this.formEvent == 'addNewStudent'){
+                    this.addNewStudent()
+                }else if (this.formEvent == 'editStudent'){
+                    this.editStudent()
+                }
+            },
+            // 添加新学生
+            addNewStudent:function() {
+                console.log(123,this.form.classId)
+                let sex = this.form.sex == "男" ? 1:2
+                let formData = {
+                    "classId": this.classId,
+                    "collegeId": this.collegeId,
+                    "realName": this.form.realName,
+                    "specialityId": this.specialityId,
+                    "gender": sex,
+                    "mobile": this.form.mobile,
+                    "studentNo": this.form.studentNo,
+                    "departmentId": this.departmentId,
+                    "status": this.status
+                }
+                sysStudentAdd(formData).then((response)=>{
+                    if(response.code === 200){
+                        this.$message({
+                            type: 'success',
+                            message: '添加成功！'
+                        });
+                        this.dialogVisible = false
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            message: JSON.parse(response.msg)[0].message
+                        });
+                    }
+                })
+            },
+            // 初始化修改表单的学生信息
+            initStudent(info) {
+                if(info){
+                    let sex = info.sex == "男" ? 1:2
+                    this.form.realName = info.realName
+                    this.collegeId = info.collegeId == null? '无院' : info.collegeId
+                    this.departmentId = info.departmentId == null? '无系' : info.departmentId
+                    this.specialityId = info.specialityId == null? '无专业' : info.specialityId
+                    this.classId = info.classId == null? '请添加班级' : info.classId
+                    this.form.mobile = info.mobile
+                    this.form.studentNo = info.studentNo
+                    this.form.sex = info.gender
+                    this.status = info.status 
+                    this.studentId = info.studentId
+                }else{
+                    this.form.realName = ''
+                    this.collegeId = ''
+                    this.departmentId = ''
+                    this.specialityId = ''
+                    this.classId = ''
+                    this.form.mobile = ''
+                    this.form.studentNo = ''
+                    this.form.sex = '男'
+                    this.status = 2
+                }
+                
+                
+            },
+            // 修改学生信息
+            editStudent() {
+                let sex = this.form.sex == "男" ? 1:2
+                let formData = {
+                    "studentId": this.studentId,
+                    "status": this.status,
+                    "classId": this.classId,
+                    "collegeId": this.collegeId == '无院' ? -1 : this.collegeId,
+                    "realName": this.form.realName,
+                    "specialityId": this.specialityId,
+                    "gender": sex,
+                    "mobile": this.form.mobile,
+                    "studentNo": this.form.studentNo,
+                    "departmentId": this.departmentId
+                }
+                sysStudentModify(formData).then((response)=>{
+                    if(response.code === 200){
+                        this.$message({
+                            type: 'success',
+                            message: '修改成功！'
+                        });
+                        this.dialogVisible = false
+                    }else{
+                        this.$message({
+                            type: 'error',
+                            message: JSON.parse(response.msg)[0].message
+                        });
+                    }
+                })
+            },
+            pageChange(pageNum) {
+                this.searchForm.pageIndex = pageNum
+                sysStudentPage(this.searchForm).then((response)=>{
+                    console.log(response)
+                    let dataArr = []
+                    response.data.pageData.forEach(element => {
+                        element.status = String(element.status)
+                        console.log(typeof(element.status))
+                        dataArr.push(element)
+                    });
+                    this.tableData3 = dataArr
+                })
             }
-          ).catch(
-            error => console.log('添加角色出错',error)
-          )
-        }else if( this.addForm.title === '编辑角色' ){
-          console.log('编辑提交的信息:',this.addForm.data);
-          sysRoleEdit( this.addForm.data ).then(
-            res =>{
-              console.log( '编辑的信息返回：',res);
-            }
-          ).catch(
-            error => {
-              console.log(error)
-            }
-          );
         }
-        this.dialogVisible = false;
-        setTimeout( ()=>{ this.queryRoleList() },300);
-      },
-      delete:function(type,list){
-        let roleIdList = [];
-        switch (type) {
-          case 'one':
-            roleIdList.push(list.roleId);
-            break;
-          case 'list':
-            list.filter(
-              element => {
-                roleIdList.push( element.roleId );
-                return true;
-              }
-            );
-            break;
-        }
-        sysRoleDelete(roleIdList).then(
-          res => {
-            console.log('删除成功的信息:',res);
-          }
-        ).catch(
-          error => {
-            console.log("删除失败:",error);
-          }
-        )
-        setTimeout( () => { this.queryRoleList() },300 );
-      },
-      handleCurrentChange:function( number ){
-        this.form.pageIndex = number;
-        this.queryRoleList();
-      },
-      handleClose(done) {
-        done();
-      },
     }
-  }
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
-  .student
-    .el-pagination
-      margin:20px 2.5% 0 0
-      display:flex
-      justify-content:flex-end
-      width:95%
+    .student
+        .el-pagination
+            margin:20px 2.5% 0 0
+            display:flex
+            justify-content flex-end
+            width:95%
 
-    .pop-academy
-      box-sizing:border-box
-      display:flex
-      justify-content:flex-start
-      align-items:left
-    .color-red
-      color:red
-    .item-title
-      box-sizing border-box
-      display:flex
-      justify-content:flex-end
-      flex-shrink:0
-      width:30%
-      span
-        line-height:40px
 
-    .item-input-list
-      box-sizing:border-box
-      display:flex
-      justify-content:flex-start
-      flex-direction:column
-      width:70%
-
-    .item-input
-      margin-bottom:20px
-      display:flex
-      justify-content:flex-start
-      align-items:center
-      line-height:40px
-
-    .input-pop
-      width:200px
 </style>
+
+
+
+
+

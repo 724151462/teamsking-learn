@@ -1,8 +1,9 @@
 <template>
   <div class="course-tab-container">
-    <div style="background:gray">
+    <el-button style="margin-bottom: 20px;margin-left: 94%" @click="coursePublish" type="primary">发布课程</el-button>
+    <div>
       <span class="shuxian">|</span>
-      <span>教学模式</span>
+      <span style="font-size:20px;font-weight: bold;margin-left: 10px">教学模式</span>
       <div class="radio">
         <el-radio
           @change="changeTModel"
@@ -37,7 +38,7 @@
             <template slot="title">
               <div
                 class="title-container"
-                style="margin-left: 40px; background-color: rgb(243,247,255)"
+                style="margin-left: 40px;"
               >
                 <span>{{jie.sectionName}}</span>
                 <div class="operate">
@@ -107,7 +108,6 @@
         :show.sync="show"
       ></adialog>
     </div>
-    <el-button type="text" @click="dialogVisible = true">点击打开 Dialog</el-button>
 
     <!-- 添加内容对话框 -->
     <el-dialog title="提示" :visible.sync="dialogVisible" width="60%">
@@ -256,7 +256,7 @@
             </div>
             
         </div>
-        <videoPlayer style="width:500px" v-if="videoUrl !== ''" :isMp4.sync="videoUrl" :poster="coverUrl"></videoPlayer>
+        <videoPlayer style="width:500px; margin-left:50px" v-if="videoUrl !== ''" :isMp4.sync="videoUrl" :poster="coverUrl"></videoPlayer>
         <div v-else style="width: 500px;background: rgb(192,199,204);text-align:center">
           <span style="display:inline-block; margin-top:140px;">请先上传视频</span>
         </div>
@@ -286,6 +286,7 @@ import {
   studyModeModify,
   courseBaseInfo,
   itemDelete,
+  publish
 } from "@/api/course";
 import { getResList, localUpload } from "@/api/library";
 
@@ -422,6 +423,18 @@ export default {
     });
   },
   methods: {
+    // 发布课程
+    coursePublish() {
+      publish(this.$route.query.id)
+      .then(response=> {
+        if(response.code === 200) {
+          this.$message({
+            message: '发布成功',
+            type: 'success'
+          })
+        }
+      })
+    },
     // 修改教学模式
     changeTModel(value) {
       this.studyMode.studyMode = value;
@@ -655,7 +668,7 @@ export default {
           }
         });
         this.$message({
-          message: "添加章成功",
+          message: "添加节成功",
           type: "success"
         });
       });
@@ -863,9 +876,9 @@ export default {
 .course-tab-container {
   div {
     .shuxian {
-      color: gold;
+      color: rgb(235,176,78);
       font-weight: bold;
-      font-size: 30px;
+      font-size: 20px;
     }
 
     .radio {
@@ -908,7 +921,9 @@ export default {
     padding: 0 10px;
     border-radius: 5px;
   }
-
+  .title-container:hover {
+    background-color: rgb(243,247,255)
+  }
   .itemTitleContainer {
     display: flex;
     align-items: center;
@@ -925,6 +940,9 @@ export default {
         cursor: pointer;
       }
     }
+  }
+  .itemTitleContainer:hover {
+    background-color: rgb(243,247,255)
   }
 
   .chapter-content {
@@ -957,6 +975,7 @@ export default {
     border-radius: 15px;
     text-align: center;
     cursor: pointer;
+    margin-top: 20px;
   }
 }
 

@@ -173,7 +173,7 @@
             padding-right: 10px
             position:absolute;
             top:4px
-            right:7.5%;
+            right:50px;
             display:inline-block
             z-index:1
 

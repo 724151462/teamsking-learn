@@ -1,6 +1,9 @@
 <template>
     <div>
-        <modelAside @dialogShow="dialogShow" :sourceList="testList"></modelAside>
+        <modelAside 
+        @dialogShow="dialogShow" 
+        :sourceList="testList" 
+        :textObj="textObj"></modelAside>
     </div>
 </template>
 
@@ -10,7 +13,11 @@ import modelAside from "@/components/modelAside"
 export default {
     data() {
         return{
-            testList: []
+            testList: [],
+            textObj: {
+                addBtn: "添加头脑风暴",
+                interactItemBtn: "开始活动"
+            }
         }
     },
     methods: {

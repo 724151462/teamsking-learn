@@ -6,8 +6,9 @@
             <span class="sizes">后台管理</span>
         </router-link>
         <el-menu :default-active="defaultActiveIndex" background-color="rgb(70,76,92)"
+          style="font-size:20px"
           text-color="#fff"
-          active-text-color="#ffd04b" 
+          active-text-color="#fff" 
           class="el-menu-demo" 
           mode="horizontal" 
           @select="handleSelect" 
@@ -161,6 +162,12 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+    .el-menu-item
+      text-align center
+      font-size 1em
+    .is-active
+      background rgb(94,98,110) !important
+      border none !important
     .header
         width:100%
         height:60px

@@ -15,16 +15,8 @@
     </div>
     <div>
       <div style="float: right" class="margin-sides">
-        <el-select v-model="filter.group" class="margin-sides">
-          <el-option v-for="(group, index) in groups" :key="index" :label="group.name" :value="group.value">
-          </el-option>
-        </el-select>
-        <el-select v-model="filter.status" class="margin-sides">
-          <el-option v-for="(group, index) in status" :key="index" :label="group.name" :value="group.value">
-          </el-option>
-        </el-select>
         <el-input suffix-icon="el-icon-search" style="width: 200px" placeholder="姓名/作业名称"></el-input>
-        <el-button>搜索</el-button>
+        <el-button type="primary">搜索</el-button>
       </div>
       <tableNoHeader
         :tableData="tableData" 
@@ -46,7 +38,7 @@
       return {
         tables:[
           {
-            name:'作业名称',
+            name:'作业题目',
             prop:'title',
           },
           {

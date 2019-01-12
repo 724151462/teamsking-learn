@@ -47,6 +47,13 @@
         user-select none
         &:hover
           color: #409EFF
+  .el-table .warning-row {
+    background: oldlace !important;
+  }
+
+  .el-table .success-row {
+    background: #f0f9eb !important;
+  }
 </style>
   #app .courseCategory .el-table__expanded-cell
     padding:0 0 0 48px

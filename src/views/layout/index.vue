@@ -11,10 +11,10 @@
           margin-top: 20px;
           margin-left:20px;
           margin-right:20px;">
-        <el-aside width="200px"
+        <el-aside width="220px"
           style="
             height:100%;
-            border-right:1px solid #D7D7D7;">
+            border-right:1px solid #fff;">
               <el-menu router @select="handleSelect">
         <template v-for="(issue,index) in $router.options.routes">
           <!-- issue.name:{{issue.name}}<br>leftNavState:{{$store.state.leftNavState}} -->
