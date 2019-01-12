@@ -134,9 +134,15 @@
     methods:{
       //获取试题信息
       getQuizInfo () {
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         let quizId = Number(this.$route.params.quiz)
         quizInfo(quizId).then(res=>{
-          console.log(res)
+          loading.close()
           this.quizData = res.data
           this.editor.txt.html(this.quizData.quizTitle)
         }).catch(error=>{
@@ -206,13 +212,10 @@
       //保存试题前的验证
       filterQuiz(){
         let isEmpty = false, //是否存在标题为空的试题选项
-          flagArr = []  // 存放答案的数组
+            flagArr = []  // 存放答案的数组
 
         if(this.quizData.quizTitle.length === 0){
-          this.$notify({
-            message: '请输入题干',
-            type: 'warning',
-          });
+          this.$message.warning('请输入题干')
           return false
         }
         this.quizData.quizOption.forEach((item)=>{
@@ -222,10 +225,7 @@
           }
         })
         if(isEmpty){
-          this.$notify({
-            message: '请将为空的试题选项删除',
-            type: 'warning',
-          });
+          this.$message.warning('请将为空的是试题删除')
           return false
         }
 

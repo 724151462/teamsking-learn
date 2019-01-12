@@ -120,15 +120,17 @@
 </template>
 
 <script>
+  import oss from 'ali-oss'
+  import { ossAliSts } from '@/api/oss'
   import {getResList, newResFileFold, reResFileFold, delResFileFold, deleteRes } from "@/api/library";
-  import oss from '@/components/up-oss'
+  // import oss from '@/components/up-oss'
   export default {
     name: "resource",
     created() {
       this.getResource(0);
     },
     components:{
-      oss
+      // oss
     },
     data() {
       return {
@@ -186,7 +188,11 @@
         resourceArr:[],
         createCatalog : false,
         renameCatalog : false,
-        allDelete:false
+        allDelete:false,
+        isError:3,
+        fileArr:[],
+        uploadArr:[],
+        ossData:null,
       };
     },
     methods: {
@@ -386,9 +392,16 @@
       },
       // 删除资源
       delRes(id) {
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         this.resourceArr.push(Number(id))
         let arr = [...this.resourceArr]
         deleteRes(arr).then(res => {
+          loading.close()
             console.log(res)
             if (Number(res.code) === 200) {
                 this.$message.success('资源删除成功');
@@ -435,16 +448,16 @@
                       getFilter(item.childCatalogList)
                   }
                   if(item.resourceList.length !==0){
-                      item.resourceList.forEach((list)=>{
-                        console.log()
-                        list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
-                          item.childCatalogList.push(
-                            {catalogName: list.resourceTitle,
-                              resourceId: list.resourceId,
-                              createTime:list.createTime,
-                              srtUrl: list.srtUrl,
-                              resourceType:list.resourceType})
-                        })
+                    item.resourceList.forEach((list)=>{
+                      console.log()
+                      list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
+                        item.childCatalogList.push(
+                          {catalogName: list.resourceTitle,
+                            resourceId: list.resourceId,
+                            createTime:list.createTime,
+                            srtUrl: list.srtUrl,
+                            resourceType:list.resourceType})
+                      })
                   }
               })
               return data
@@ -455,9 +468,79 @@
       goUp () {
         document.getElementById('inputs').click()
       },
-      //资源上传
+      //资源上传到OSS
       upInput(event){
+        this.fileArr = event
         console.log(event.target.files)
+        console.log('验签状态',this.isError)
+        if (Number(this.isError) === 0) {
+          this.errors()
+          return false
+        }
+        if (this.ossData === null && Number(this.isError) !== 0) {
+          this.ossCheck()
+          return false
+        }
+        // let loading = this.$loading({
+        //   lock: true,
+        //   text: '正在努力上传中',
+        //   spinner: 'el-icon-loading',
+        //   background: 'rgba(0, 0, 0, 0.7)'
+        // });
+        for(let i=0;i<event.target.files.length;i++){
+          console.log('执行')
+          let file = event.target.files[i]
+          let name = new Date().getTime() + event.target.files[i].name
+          let client = new oss(this.ossData)
+          this.forInputs(client,name,file)
+        }
+        console.log(this.uploadArr)
+      },
+      forInputs (client,name,file) {
+        let self = this
+        client.multipartUpload(name, file, {}).then((results) => {
+          let msg =  `${name}上传成功`;
+          self.$message({
+            message:msg,
+            type:'success'
+          })
+          Number(self.isError) !== 2 ? (self.isError = 2) : ''
+          let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
+          this.uploadArr.push(url)
+        }).catch(error=>{
+          //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
+          self.ossCheck('error')
+        })
+      },
+      inputNull () {
+        let dom = document.getElementById('inputs')
+        dom.value = ''
+        // dom.outerHTML = dom.outerHTML
+      },
+      ossCheck (e) {
+        // console.log('e的监控数据',e , this.isError)
+        if (Number(this.isError) === 0) {
+          this.errors()
+          return false
+        }
+        this.isError -= 1
+        ossAliSts().then(res => {
+          if (Number(res.code) === 200) {
+            this.ossData = JSON.parse(res.data)
+            console.log('给到', this.ossData)
+            this.upInput(this.fileArr)
+          } else {
+            console.log('执行')
+            this.ossCheck()
+          }
+        })
+      },
+      errors () {
+        this.$message({
+          message: '验签获取错误，请联系管理员',
+          type: 'error'
+        })
+        this.inputNull()
       }
   },
 };
