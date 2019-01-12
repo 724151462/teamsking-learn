@@ -1,6 +1,6 @@
 <template>
     <div>
-        <modelAside></modelAside>
+        <modelAside @dialogShow="dialogShow" :sourceList="testList"></modelAside>
     </div>
 </template>
 
@@ -10,7 +10,12 @@ import modelAside from "@/components/modelAside"
 export default {
     data() {
         return{
-
+            testList: []
+        }
+    },
+    methods: {
+        dialogShow(value) {
+            alert(value)
         }
     },
     created() {
