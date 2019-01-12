@@ -21,8 +21,8 @@
       </el-radio-group>
     </div>
     <div class="collapse-container">
-      <el-collapse>
-        <el-collapse-item v-for="item in interactList" :key="item.chapterId">
+      <el-collapse  v-model="activeNames" accordion @change="collapseChange">
+        <el-collapse-item v-for="(item, index) in interactList" :key="item.chapterId" :name="index">
           <template slot="title">
             <span style="margin-left: 20px">{{item.chapterName}}</span>
           </template>
@@ -36,7 +36,7 @@
                   <span style="margin-left: 10px">{{interact.interactionName}}</span>
                 </div>
                 <div>
-                  <span>共{{interact.quizCount}}道题目 | </span>
+                  <span v-if="interact.quizCount !== 0">共{{interact.quizCount}}道题目 | </span>
                   <span>共{{interact.userCount}}人作答 | {{interact.createTime}}</span>
                 </div>
               </div>
@@ -101,13 +101,15 @@ import {
   examDelete,
   interactStatus
 } from '@/api/course'
+import Cookie from 'js-cookie'
 export default {
   data() {
     return {
       interactParams: {
         courseId: this.$route.query.id,
-        interactionStatus: ''
+        interactionStatus: '20'
       },
+      activeNames: Number(Cookie.get('interactActiveIndex')) || '',
       setEndTimeDialog: false,
       endTimeForm: '',
       interactList: [],
@@ -126,6 +128,10 @@ export default {
     })
   },
   methods: {
+    // 折叠面板改变时触发
+    collapseChange(params) {
+      Cookie.set('interactActiveIndex', params)
+    },
     saveInteract(item) {
       this.temParams = {
         interactionId: item.interactionId,
@@ -179,7 +185,7 @@ export default {
     },
     toDetail(val) {
       console.log(val.interactionStatus)
-      if(val.interactionStatus === 10|| val.interactionStatus === 20) {
+      if(val.interactionStatus === 10) {
         return
       }
       switch (val.interactionType) {

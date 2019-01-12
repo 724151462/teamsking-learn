@@ -65,7 +65,10 @@ formData: [
         <slot name="header"></slot>
         <el-form ref="form" :model="form" :label-width="labelWidth">
             <el-form-item v-for="(item, index) in formData" :key="index" :label="item.key">
-                <el-input v-if="item.inputType==='string'" v-model="dataObj[item.value]"></el-input>
+                <template v-if="item.inputType==='string'">
+                    <el-input v-model="dataObj[item.value]" style="width: 200px"></el-input>
+                    <span v-if="item.remark" style="margin-left: 10px">{{item.remark}}</span>
+                </template>
                 <el-input type="textarea" v-else-if="item.inputType==='textarea'" v-model="dataObj[item.value]"></el-input>
                 <template v-else-if="item.inputType==='img'">
                     <img v-for="(img, i) in dataObj[item.value]" :key="i" :src="img.src" :width="item.imgWidth" style="margin-right: 15px"/>

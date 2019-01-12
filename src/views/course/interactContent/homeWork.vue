@@ -4,13 +4,17 @@
       <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 作业/小组任务
     </span>
     <div>
-      <el-input
-        type="textarea"
-        v-model="homeWork.describe"
-        placeholder="请输入题目"
-        style="width:600px;"
-        autofocus="autofocus"
-      />
+      <span>题目</span>
+      <div style="margin-top:10px">
+        <el-input
+          type="textarea"
+          v-model="homeWork.describe"
+          placeholder="请输入题目"
+          style="width:600px;"
+          autofocus="autofocus"
+        />
+      </div>
+      
       <div class="margin-sides">
         <upOss @ossUp="getUrl" :btnText="'添加附件'"></upOss>
       </div>

@@ -614,6 +614,12 @@ export const constantRouterMap = [{
             menuShow: true
           },
           {
+            path: '/system/teacher/teacherdetail',
+            component: _import('system/teacherDetail'),
+            name: '教师详情',
+            menuShow: true
+          },
+          {
             path: '/system/manager',
             component: _import('system/system'),
             name: 'system系统管理员',

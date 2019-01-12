@@ -1,5 +1,5 @@
 <template>
-  <el-form class="" :model="platformData" ref="ruleForm" label-width="150px">
+  <el-form style="margin-top: 30px;" :model="platformData" ref="ruleForm" label-width="150px">
     <el-form-item label="平台名称" required>
       <el-input v-model="platformData.tenantName" style="width: 220px;"></el-input>
       <span>字数限制在36个汉字以内</span>
@@ -20,7 +20,7 @@
     <el-form-item label="平台图片" required>
       <upOss :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic"></upOss>
     </el-form-item>
-    <el-button type="primary" @click="saveInfo">保存</el-button>
+    <el-button type="primary" @click="saveInfo" style="margin-left: 200px;margin-top: 20px">保存</el-button>
   </el-form>
 </template>
 

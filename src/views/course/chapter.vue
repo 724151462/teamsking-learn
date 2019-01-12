@@ -38,7 +38,7 @@
             <template slot="title">
               <div
                 class="title-container"
-                style="margin-left: 40px; background-color: rgb(243,247,255)"
+                style="margin-left: 40px;"
               >
                 <span>{{jie.sectionName}}</span>
                 <div class="operate">
@@ -921,7 +921,9 @@ export default {
     padding: 0 10px;
     border-radius: 5px;
   }
-
+  .title-container:hover {
+    background-color: rgb(243,247,255)
+  }
   .itemTitleContainer {
     display: flex;
     align-items: center;
@@ -938,6 +940,9 @@ export default {
         cursor: pointer;
       }
     }
+  }
+  .itemTitleContainer:hover {
+    background-color: rgb(243,247,255)
   }
 
   .chapter-content {

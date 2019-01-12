@@ -234,7 +234,7 @@ export default {
       var oReq = new XMLHttpRequest();
       oReq.open(
         "GET",
-        "http://192.168.10.48:9008/api/v1/sys/course/user/excel",
+        "http://120.36.137.90:9008/api/v1/sys/course/user/excel",
         true
       );
       oReq.setRequestHeader("token", getToken());

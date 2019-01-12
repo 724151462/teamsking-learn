@@ -278,7 +278,7 @@ export function memberEditList(data) {
  */
 export function memberUpload(data) {
   console.log(data)
-  let url = `${baseUrl}${data.get('courseId')}/user/excel`
+  let url = `http://120.36.137.90:9008/api/v1/sys/course/${data.get('courseId')}/user/excel`
   // let url = `${baseUrl}${data.get('courseId')}/score/excel`
   return commonsAjax(url, data, 'post')
 }
@@ -289,7 +289,7 @@ export function memberUpload(data) {
  */
 export function userModify(data) {
   // let url = `http://192.168.10.48:9008/api/v1/sys/course/0608367675f54267aa6960fd0557cc1b/score/excel`
-  let url = `${baseUrl}${data.courseId}/user/excel`
+  let url = `http://120.36.137.90:9008/api/v1/sys/course/${data.courseId}/user/excel`
   return commonsAjax(url, '', 'put')
 }
 

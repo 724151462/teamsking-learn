@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="float: right" class="margin-sides">
-      <el-select v-model="filter.group" class="margin-sides">
+      <!-- <el-select v-model="filter.group" class="margin-sides">
         <el-option
           v-for="(group, index) in groups"
           :key="index"
@@ -16,9 +16,9 @@
           :label="group.name"
           :value="group.value"
         ></el-option>
-      </el-select>
-      <el-input suffix-icon="el-icon-search" style="width: 200px" placeholder="姓名/作业名称"></el-input>
-      <el-button>搜索</el-button>
+      </el-select> -->
+      <el-input suffix-icon="el-icon-search" style="width: 200px" placeholder="学生姓名/小组名称/作业名称"></el-input>
+      <el-button type="primary">搜索</el-button>
     </div>
     <tableNoHeader
       :tableData="tableData"
@@ -150,7 +150,8 @@ export default {
         {
           key: "老师评分",
           inputType: "string",
-          value: "score"
+          value: "score",
+          remark: "总分：100分",
         },
         {
           key: "评分参照",
