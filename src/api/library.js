@@ -107,7 +107,8 @@ export function delResFileFold(data) {
  * 资源删除(批量)
  */
 export function deleteRes(data) {
-  let url = `${baseUrl}quiz/resource`
+  console.log('要删除的资源',data)
+  let url = `${baseUrl}/resource`
   return commonsAjax(url, data, 'delete')
 }
 

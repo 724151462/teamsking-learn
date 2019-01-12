@@ -20,7 +20,7 @@
       .interact .el-collapse-item__header
         background-color rgb(237,241,244)
       .interact .el-collapse-item__content
-        padding-bottom: 0px;
+        padding-bottom: 0;
       .interact .el-tooltip__popper
         cursor pointer
 
@@ -37,8 +37,8 @@
         border-bottom 1px solid #ccc
         &:hover .hide-button
           opacity 1
-    .course .teacher-dialog
-      .el-dialog__body
+    .teacher-dialog
+      & .el-dialog__body
         min-height 300px;
     .model-resource
       .el-breadcrumb__inner

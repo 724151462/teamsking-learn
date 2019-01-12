@@ -2,7 +2,7 @@
   <div>
     <div class="addCourse">
       <span>课程信息</span>
-      <el-button plain style="float:right">返回</el-button>
+      <el-button plain style="float:right" @click="$router.push('/course/list')">返回</el-button>
     </div>
     <div class="addCourse-center">
       <el-form :model="Course" ref="postForm" label-width="100px">
@@ -69,9 +69,8 @@
           <!--<span v-show="Number(Course.payMode) === 20">元</span>-->
         <!--</el-form-item>-->
 
-        <el-form-item label="课程标签" required>
-          <div class="course-tag-warp">
-            <div v-show="Course.courseTagIds.length === 0" style="color: #b3b3b3">请选择课程标签</div>
+        <el-form-item label="课程标签">
+          <div class="course-tag-warp" v-show="Course.courseTagIds.length !== 0">
             <el-tag
               size="small"
               v-for="tag in Course.courseTagIds"
@@ -81,6 +80,7 @@
               {{tag.tagName}}
             </el-tag>
           </div>
+
           <el-row>
             <el-autocomplete
               style="width: 305px;"
@@ -93,9 +93,8 @@
           </el-row>
         </el-form-item>
 
-        <el-form-item label="讲师" required>
-          <div class="instructor-tag-warp">
-            <div v-show="CourseForm.instructor.length === 0" style="color: #b3b3b3">请选择讲师</div>
+        <el-form-item label="讲师">
+          <div class="instructor-tag-warp" v-show="CourseForm.instructor.length !== 0">
             <el-tag
               size="small"
               v-for="instructor in CourseForm.instructor"
@@ -105,6 +104,7 @@
               {{instructor.instructorName}}
             </el-tag>
           </div>
+
           <el-row>
               <el-autocomplete
                 style="width: 300px;"
@@ -128,9 +128,15 @@
         <el-form-item label="选课名单" required>
           <el-row>
             <span>开放范围：</span>
-            <el-radio v-model="Course.courseMode" :label="10">选课名单学员</el-radio>
-            <el-radio v-model="Course.courseMode" :label="20">本校学员</el-radio>
-            <el-radio v-model="Course.courseMode" :label="30">全部学员</el-radio>
+            <el-tooltip class="item" effect="dark" content="只对选课名单内的学生开放，需要导入选课学生名单" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="10">选课名单学员</el-radio>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="只对本校认证的学员开放，其他学员无法学习！" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="20">本校学员</el-radio>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="对所有学员开放！" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="30">全部学员</el-radio>
+            </el-tooltip>
           </el-row>
           <el-row>
             <span>退课权限：</span>
@@ -141,9 +147,9 @@
         <el-form-item label="成绩考核" required>
           <div style="display: inline-block">
             <span class="courseExplanation" v-show="CourseSetEntity.videoPercent !=0" style="margin-right: 10px">视频{{CourseSetEntity.videoPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.docPercent !=0" style="margin-right: 10px">文档{{CourseSetEntity.docPercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.quizPercent !=0" style="margin-right: 10px">测试{{CourseSetEntity.quizPercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.homeworkPercent !=0" style="margin-right: 10px">作业{{CourseSetEntity.homeworkPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.topicPercent !=0" style="margin-right: 10px">讨论{{CourseSetEntity.topicPercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.offlinePercent !=0" style="margin-right: 10px">线下{{CourseSetEntity.offlinePercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.votePercent !=0" style="margin-right: 10px">投票{{CourseSetEntity.votePercent}}%</span>
             <span class="courseExplanation" v-show="CourseSetEntity.stormPercent !=0" style="margin-right: 10px">头脑风暴{{CourseSetEntity.stormPercent}}%</span>
@@ -196,8 +202,10 @@
       </el-row>
     </div>
     <!--教学课程授权设置-->
-      <el-dialog title="教学课程授权" :visible.sync="isAccredit" width="50%" class="addCourse-dialog">
-          <el-autocomplete
+    <el-dialog title="教学课程授权" :visible.sync="isAccredit"
+               width="50%"
+               class="addCourse-dialog teacher-dialog">
+    <el-autocomplete
                   class="accredit-input"
                   v-model="accreditTeacher"
                   suffix-icon="el-icon-search"
@@ -233,17 +241,20 @@
               <tr class="tr-h no-tr">
                 <td>评分项</td>
                 <td>视频</td>
+                <td>文档</td>
                 <td>测验</td>
                 <td>作业</td>
-                <td>讨论</td>
-                <td>线下</td>
-                <td>投票问卷</td>
                 <td>头脑风暴</td>
+                <td>投票问卷</td>
+                <td>线下</td>
               </tr>
               <tr class="tr-h">
                 <td>权重共100%</td>
                 <td>
                   <el-input v-model="CourseSetEntity.videoPercent" style="width:50px;"></el-input>%
+                </td>
+                <td>
+                  <el-input v-model="CourseSetEntity.docPercent" style="width:50px;"></el-input>%
                 </td>
                 <td>
                   <el-input v-model="CourseSetEntity.quizPercent" style="width:50px"></el-input>%
@@ -252,16 +263,13 @@
                   <el-input v-model="CourseSetEntity.homeworkPercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.topicPercent" style="width:50px"></el-input>%
-                </td>
-                <td>
-                  <el-input v-model="CourseSetEntity.offlinePercent" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.stormPercent" style="width:50px"></el-input>%
                 </td>
                 <td>
                   <el-input v-model="CourseSetEntity.votePercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.stormPercent" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.offlinePercent" style="width:50px"></el-input>%
                 </td>
               </tr>
             </table>
@@ -273,12 +281,12 @@
         </div>
         <div class="score">
           <div class="list">视频得分 = 完整观看视频 / 总视频数 * 100 分 * <span class="blue-text">{{CourseSetEntity.videoPercent}}</span>%</div>
+          <div class="list">文档得分 = 完整观看文档 / 总文档数 * 100 分 * <span class="blue-text">{{CourseSetEntity.docPercent}}</span>%</div>
           <div class="list">测试得分 = 测试得分总和 / 测验次数 * <span class="blue-text">{{CourseSetEntity.quizPercent}}</span>%</div>
-          <div class="list">作业得分 = 作业得分总和 / 作业次数 * <span class="blue-text">{{CourseSetEntity.homeworkPercent}}</span>%</div>
-          <div class="list">讨论得分 = 获得分数的讨论数 / 讨论次数 * 100分 * <span class="blue-text">{{CourseSetEntity.topicPercent}}</span>%</div>
+          <div class="list">作业得分 = 作业得分总和 / 作业次数 * <span class="blue-text">{{CourseSetEntity.homeworkPercent}}</span>%<span style="color: red;margin-left: 10px">(取最高分)</span></div>
           <div class="list">线下得分 = 线下得分 * <span class="blue-text">{{CourseSetEntity.offlinePercent}}</span>%</div>
-          <div class="list">投票问卷得分 = 投票问卷得分 * <span class="blue-text">{{CourseSetEntity.votePercent}}</span>%</div>
-          <div class="list">头脑风暴得分 = 头脑风暴得分 * <span class="blue-text">{{CourseSetEntity.stormPercent}}</span>%</div>
+          <div class="list">投票问卷得分 = 投票问卷得分 / 投票数 * 100 *<span class="blue-text">{{CourseSetEntity.votePercent}}</span>%</div>
+          <div class="list">头脑风暴得分 = 头脑风暴得分总和 / 头脑风暴数 * <span class="blue-text">{{CourseSetEntity.stormPercent}}</span>%</div>
         </div>
       </el-row>
       <el-row style="text-align: right;">
@@ -339,21 +347,21 @@
         //课程完成度设置
         CourseSetEntity: {
           // 视频成绩占比
-          videoPercent: 50,
+          videoPercent: 0,
+          //文档占比
+          docPercent:0,
           //作业占比
           homeworkPercent: 0,
           // 测试成绩占比
-          quizPercent :30,
+          quizPercent :0,
           // 线下成绩占比
           offlinePercent : 0,
           // 头脑风暴成绩占比
-          stormPercent : 20,
+          stormPercent : 0,
           // 讨论成绩占比
           topicPercent : 0,
           // 投票成绩占比
           votePercent : 0,
-          // 视频进度判定
-          // seeVideo:  90,
         },
         //课程相关
         CourseInfoEntity:{
@@ -431,7 +439,6 @@
           this.CourseForm.teacher = data.teacher
           this.CourseSetEntity = data.set
           this.CourseInfoEntity = data.info
-          console.log(this.CourseInfoEntity)
 
           // 课程介绍
           this.editor1.txt.html(data.info.courseDescription)
@@ -512,7 +519,7 @@
       },
       //标签移除
       tagRemove(e){
-        console.log(e.tagId)
+        this.tag = ''
         let data = this.Course.courseTagIds,
           newData = [];
         data.forEach((item)=>{
@@ -525,7 +532,7 @@
       },
       //讲师移除
       instructorRemove(e){
-        console.log(e.instructorId)
+        this.instructor = ''
         let data = this.CourseForm.instructor,
             newData = [];
         data.forEach((item)=>{
@@ -836,6 +843,7 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+
   .blue-text
     color #40caff
   .remind-text-color
@@ -983,7 +991,7 @@
 
   .accredit-input{
     margin-right 30px
-    margin-left 65%
+    margin-left: calc(100% - 220px);
     border-radius 30px
   }
 </style>

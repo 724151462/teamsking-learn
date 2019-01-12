@@ -5,19 +5,19 @@
     </div>
     <div class="radio-group">
       <div style="flex:1">
-        <el-radio v-model="radio" label="全部文件">全部文件</el-radio>
-        <el-radio v-model="radio" label="图片">图片</el-radio>
-        <el-radio v-model="radio" label="视频">视频</el-radio>
-        <el-radio v-model="radio" label="文档">文档</el-radio>
-        <el-radio v-model="radio" label="音频">音频</el-radio>
+        <el-radio v-model="radio" :label="0" @change="getResource(radio)">全部文件</el-radio>
+        <el-radio v-model="radio" :label="40" @change="getResource(radio)">图片</el-radio>
+        <el-radio v-model="radio" :label="10" @change="getResource(radio)">视频</el-radio>
+        <el-radio v-model="radio" :label="20" @change="getResource(radio)">文档</el-radio>
+        <el-radio v-model="radio" :label="30" @change="getResource(radio)">音频</el-radio>
       </div>
       <div style="display: flex">
         <el-input
-          placeholder="输入课程名称查询资源"
+          placeholder="搜索资源"
           v-model="input">
         </el-input>
         <div>
-          <el-button icon="el-icon-search" class="search-btn"></el-button>
+          <el-button icon="el-icon-search" class="search-btn" @click="getResource(0,input)"></el-button>
         </div>
       </div>
     </div>
@@ -29,7 +29,9 @@
           <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
           <el-button type="primary" size="small" @click="goCreateCatalog('',0)">创建目录</el-button>
           <el-button type="primary" size="small">移动到</el-button>
-          <el-button type="info" size="small" @click="deleteCatalog">删除</el-button>
+          <el-button type="info" size="small"
+                     v-bind:class="{ active: deleteArr.length>0}"
+                     @click="deleteCatalog" >删除</el-button>
           <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
         </div>
       </div>
@@ -51,30 +53,30 @@
                 <img :src="imgSrc.mp4" alt="" class="folder-img" v-if="data.resourceType == 10">
                 <img :src="imgSrc.word" alt="" class="folder-img" v-else-if="data.resourceType == 20">
                 <img :src="imgSrc.pdf" alt="" class="folder-img" v-else-if="data.resourceType == 30">
-                <img :src="imgSrc.txt" alt="" class="folder-img" v-else-if="data.resourceType == 40">
+                <img :src="imgSrc.img" alt="" class="folder-img" v-else-if="data.resourceType == 40">
                 <span class="tree-title">{{ node.label }}</span>
+                <!--<span v-if="data.srtUrl != undefined"> <el-tag type="success">字幕</el-tag></span>-->
                 <span class="str-tag" v-if="data.srtUrl != undefined">字幕</span>
               </span>
               <span>
                 <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
-                  <el-button size="mini" type="primary" v-show="data.catalogLevel" @click.stop="()=>{}"><label for="inputs">上传</label></el-button>
-                  <input style="display: none" type="file" id="inputs" @change="upInput"/>
+                  <el-button size="mini" type="primary" v-show="data.catalogLevel" @click.stop="goUp">上传</el-button>
+                  <!--<input style="display: none" type="file" id="inputs" @change="upInput"/>-->
                   <el-button size="mini" style="margin-left: 5px" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>
+                  <!--<el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>-->
                   <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
                 </span>
                 <span v-else class="hide-button">
-                  <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)" v-if="data.resourceType.type ==10 && !data.srtUrl"> 添加字幕 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="delQuiz()">删除</el-button>
+                  <el-button size="mini" type="primary" @click.stop="" v-if="data.resourceType.type ==10 && !data.srtUrl"> 添加字幕 </el-button>
+                  <el-button size="mini" type="primary" @click.stop="delRes(data.resourceId)">删除</el-button>
                 </span>
               </span>
-
               <span style="margin-right: 10px" v-show="data.updateTime">{{data.updateTime}}</span>
             </span>
         </el-tree>
       </div>
+      <input type="file" id="inputs" multiple @change="upInput"/>
     </div>
     <!--删除确认框-->
     <el-dialog
@@ -118,12 +120,12 @@
 </template>
 
 <script>
-  import {getResList, newResFileFold, reResFileFold, delResFileFold, deleteRes} from "@/api/library";
+  import {getResList, newResFileFold, reResFileFold, delResFileFold, deleteRes } from "@/api/library";
   import oss from '@/components/up-oss'
   export default {
     name: "resource",
     created() {
-        this.getResource(0);
+      this.getResource(0);
     },
     components:{
       oss
@@ -135,9 +137,10 @@
           pdf: require("../../../../assets/images/pdf.png"),
           mp4: require("../../../../assets/images/mp4.png"),
           word: require("../../../../assets/images/word.png"),
-          txt: require("../../../../assets/images/txt.png")
+          txt: require("../../../../assets/images/txt.png"),
+          img: require("../../../../assets/images/img.png")
         },
-        radio: '全部文件',
+        radio: 0,
         input: '',
         //多选框验证
         isCheckAll: false, // 是否全选(一级)
@@ -176,11 +179,11 @@
         }],
         //新文件夹数据
         newCatalog:{
-            catalogId:0,
-            catalogName:''
+          catalogId:0,
+          catalogName:''
         },
         deleteArr:[],
-        interactionIdArr:[],
+        resourceArr:[],
         createCatalog : false,
         renameCatalog : false,
         allDelete:false
@@ -193,8 +196,15 @@
             resourceType: id,
             searchKey: key
         }
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         getResList(data).then(res => {
-          console.log(res)
+          loading.close()
+          // console.log(res)
             if (Number(res.code) === 200) {
                 //如果试题库为空，则初始化新建一个默认的文件夹
                 if(res.data.length === 0){
@@ -232,6 +242,9 @@
       fileUpload() {
         alert("上传");
       },
+      change(value){
+        alert(value)
+      },
       //获取图片路径
       getImgSrc(type) {
         return this.imgSrc[type];
@@ -266,50 +279,24 @@
       },
       //节点复选框被选
       nodeCheck(data, checked){
+        console.log(data)
+        console.log(checked)
           if(checked){
               this.deleteArr.push(data.catalogId)
-              this.quizArr.push(data.quizId)
+              this.resourceArr.push(data.resourceId)
           }else{
               let index = this.deleteArr.indexOf(data.catalogId)
               this.deleteArr.splice(index,1)
 
-              let reindex = this.quizArr.indexOf(data.quizId)
-              this.quizArr.splice(index,1)
+              let reindex = this.resourceArr.indexOf(data.resourceId)
+              this.resourceArr.splice(index,1)
           }
           this.deleteArr =this.deleteArr.filter((item)=>{
               return item != undefined
           })
-          this.quizArr =this.quizArr.filter((item)=>{
+          this.resourceArr =this.resourceArr.filter((item)=>{
               return item != undefined
           })
-      },
-      // 获取所有试题列表
-      getTestList(id){
-          let data = {quizType: id}
-          getTestFileFold(data).then(res => {
-              console.log(res)
-              if (Number(res.code) === 200) {
-                  //如果试题库为空，则初始化新建一个默认的文件夹
-                  if(res.data.length === 0){
-                      this.newCatalog = {
-                          catalogId: 0,
-                          catalogName: "默认文件夹"
-                      }
-                      this.newFileFold()
-                  }
-                  let data = JSON.parse(JSON.stringify(res.data))
-                  this.catalogData = this.filterData(data)
-                  console.log(this.catalogData)
-              } else {
-                  this.$message({
-                      message: "试题列表数据获取失败",
-                      type: "error"
-                  });
-              }
-          })
-              .catch(error => {
-                  console.log(error);
-              });
       },
       //新建文件夹
       newFileFold(){
@@ -321,7 +308,7 @@
                   this.createCatalog = false
                   this.newCatalog.catalogName = ''
                   //更新页面数据
-                  this.getTestList(0)
+                  this.getResource(0)
               } else {
                   this.$message.error('文件夹新建失败');
               }
@@ -397,28 +384,40 @@
       getChapterQuiz() {
           alert("按章节查询")
       },
-      // 删除试题
-      delQuiz() {
-          deleteQuiz(this.quizArr).then(res => {
-              console.log(res)
-              if (Number(res.code) === 200) {
-                  this.$message.success('试题删除成功');
-                  this.getTestList(0)
-              } else {
-                  this.$message.error('删除失败');
-              }
+      // 删除资源
+      delRes(id) {
+        this.resourceArr.push(Number(id))
+        let arr = [...this.resourceArr]
+        deleteRes(arr).then(res => {
+            console.log(res)
+            if (Number(res.code) === 200) {
+                this.$message.success('资源删除成功');
+                this.getResource(0)
+            } else {
+                this.$message.error('删除失败');
+            }
           })
       },
       //删除文件夹
       deleteCatalog(){
           let catalogIds = [...this.deleteArr]
-          console.log(catalogIds)
-          deleteTestFileFold(this.deleteArr).then(res => {
-              console.log(res)
+          if(catalogIds.length == 0){
+            this.$message.warning('请选择要删除的文件夹')
+            return false
+          }
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        delResFileFold(this.deleteArr).then(res => {
+          loading.close()
+          console.log(res)
               if (Number(res.code) === 200) {
                   this.$message.success('删除成功');
                   this.allDelete = false
-                  this.getTestList(0)
+                  this.getResource(0)
               } else {
                   this.$message.error('删除失败');
               }
@@ -453,11 +452,24 @@
           let curData = getFilter(data)
           return curData
       },
+      goUp () {
+        document.getElementById('inputs').click()
+      },
+      //资源上传
+      upInput(event){
+        console.log(event.target.files)
+      }
   },
 };
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+  #inputs
+    display none
+  .active
+    color: #fff;
+    background-color: #409EFF;
+    border-color: #409EFF;
   .str-tag
     display inline-block
     padding 0 5px
