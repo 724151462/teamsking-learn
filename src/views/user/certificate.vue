@@ -45,6 +45,7 @@
             </el-table-column>
         </el-table>
     </div>
+
 </template>
 <script>
     import {certificateList, delCertificate} from '@/api/user'
