@@ -30,8 +30,9 @@
             <div class="top">
               <a class="list" @click="upData(list.courseId)">编辑</a>
               <a class="list">复制</a>
-              <a class="list" @click="release(list.courseId)">发布</a>
-              <a class="list">删除</a>
+              <a class="list" v-if="list.courseStatus === 30">停用</a>
+              <a class="list" v-else-if="list.courseStatus === 10" @click="release(list.courseId)">发布</a>
+              <a class="list" v-if="list.courseStatus === 30 || list.courseStatus === 10">删除</a>
             </div>
             <el-button type="primary" @click="goCourseModel(list.courseId)">课堂模式</el-button>
             <el-button type="primary" @click="goCourseChapter(list.courseId)">教学管理</el-button>

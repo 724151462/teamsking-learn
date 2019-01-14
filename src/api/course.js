@@ -246,6 +246,24 @@ export function itemDelete(data) {
 
 
 /**
+ * 添加内嵌题
+ */
+
+export function subjectAdd(data) {
+  let url = `${baseUrl}videoquiz`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 获取内嵌题
+ */
+export function subjectGet(data) {
+  let url = `${baseUrl}videoquiz/${data.itemId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
  * 添加成员方案名称
  */
 export function schemeAdd(data) {
