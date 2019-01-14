@@ -373,10 +373,10 @@
         tag:'', //标签搜索用
         accreditTeacher:'',// 授权教师用
         // accreditTeacherList:[], //被授权教师列表
-        isAccredit:false, //弹出教学课程授权
-        isSysTem:false, //弹出设置
-        coverPreviewShow: false, //弹出课程封面上传
+        isAccredit:false, //弹出教学课程授权弹出课程封面上传
         isTeacher:false,  //弹出添加老师
+        isSysTem:false, //弹出设置
+        coverPreviewShow: false, //
         isChooseTeacher:false, //选择讲师
         rules:[],
         //判断是否为编辑课程

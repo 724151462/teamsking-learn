@@ -45,6 +45,10 @@
             show-checkbox
             @check-change	="nodeCheck"
             accordion
+            draggable
+            :default-expanded-keys="expan"
+            @node-drag-enter="handleDragEnter"
+            @node-drop="handleDrop"
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
@@ -61,8 +65,9 @@
               <span>
                 <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
-                  <el-button size="mini" type="primary" v-show="data.catalogLevel" @click.stop="goUp">上传</el-button>
-                  <!--<input style="display: none" type="file" id="inputs" @change="upInput"/>-->
+                  <!--<el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="test()"> 创建子目录 </el-button>-->
+                  <el-button size="mini" type="primary" v-show="data.catalogLevel" @click.stop="goUp(data.catalogId)"><label for="male">上传</label></el-button>
+                  <up-oss style="display: none;" @ossUp="upRes"></up-oss>
                   <el-button size="mini" style="margin-left: 5px" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
                   <!--<el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>-->
                   <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
@@ -76,7 +81,6 @@
             </span>
         </el-tree>
       </div>
-      <input type="file" id="inputs" multiple @change="upInput"/>
     </div>
     <!--删除确认框-->
     <el-dialog
@@ -120,17 +124,17 @@
 </template>
 
 <script>
-  import oss from 'ali-oss'
   import { ossAliSts } from '@/api/oss'
-  import {getResList, newResFileFold, reResFileFold, delResFileFold, deleteRes } from "@/api/library";
-  // import oss from '@/components/up-oss'
+  import {getResList, newResFileFold, reResFileFold, delResFileFold, deleteRes ,localUpload, moveRes} from "@/api/library";
+  import UpOss from "@/components/up-oss";
+  import Cookie from 'js-cookie';
   export default {
     name: "resource",
     created() {
       this.getResource(0);
     },
     components:{
-      // oss
+      UpOss
     },
     data() {
       return {
@@ -188,6 +192,7 @@
         resourceArr:[],
         createCatalog : false,
         renameCatalog : false,
+        expan:[],
         allDelete:false,
         isError:3,
         fileArr:[],
@@ -196,11 +201,23 @@
       };
     },
     methods: {
+      //新建文件夹test
+      test(){
+        let data = [{catalogId: 38,
+        catalogLevel: 2,
+        catalogName: "王永新测试章6",
+        childCatalogList: [],
+        count: 23,
+        parentId: 25}]
+        this.resourceData[1].childCatalogList = data
+        // this.$set( this.$data,this.resourceData[1], data )
+      },
       //获取数据
       getResource(id,key) {
         let data = {
             resourceType: id,
-            searchKey: key
+            searchKey: key,
+            catalogId: 0,
         }
         let loading = this.$loading({
           lock: true,
@@ -222,10 +239,11 @@
                 }
                 let data = JSON.parse(JSON.stringify(res.data))
                 this.resourceData = this.filterData(data)
+              // this.$set( this.$data, 'resourceData', curdata )
                 console.log(this.resourceData)
             } else {
                 this.$message({
-                    message: "试题列表数据获取失败",
+                    message: "资源获取失败",
                     type: "error"
                 });
             }
@@ -233,6 +251,8 @@
     },
       //点击弹出重命名的弹窗
       goRenameCatalog(data,id) {
+        let parentId =  data.parentId || 0
+        this.expan = [parentId]
         this.newCatalog.catalogId = id
         this.renameCatalog = true
         //创建子目录时目录不折叠
@@ -243,13 +263,57 @@
         // }
         // data.catalogList.push(newChild);
       },
-      //  文件下载
-      fileDownload(url) {},
-      fileUpload() {
-        alert("上传");
-      },
       change(value){
         alert(value)
+      },
+      handleDragEnd(draggingNode, dropNode, dropType, ev) {
+        console.log(draggingNode.label)
+        console.log(dropNode.label)
+        let data = {
+          catalogId: dropNode.data.catalogId,
+          ids: [draggingNode.data.catalogId]
+        }
+        this.remove(data)
+      },
+      handleDragEnter(draggingNode, dropNode, ev) {
+        // console.log('移动进入文件夹')
+        // console.log(draggingNode)
+        // console.log(dropNode)
+        // console.log(ev)
+        // let data = {
+        //   catalogId: dropNode.data.catalogId,
+        //   ids: [draggingNode.data.catalogId]
+        // }
+        // console.log(data)
+      },
+      handleDrop(draggingNode, dropNode, dropType, ev) {
+        console.log(draggingNode.label)
+        console.log('要去往:', dropNode.label, dropType);
+        if(dropType == 'after'){
+          let data = {
+            id:draggingNode.data.catalogId,
+            type:1,
+            previous: {
+              id: dropNode.data.catalogId,
+              type:1
+            },
+          }
+          data = JSON.parse(JSON.stringify(data))
+          moveRes(data).then(res => {
+              console.log(res)
+              if (Number(res.code) === 200) {
+                this.$message.success('移动成功')
+              } else {
+                this.$message({
+                  message: "移动失败",
+                  type: "error"
+                });
+              }
+            }).catch((err)=>{
+            console.log(err)
+          })
+        }
+
       },
       //获取图片路径
       getImgSrc(type) {
@@ -306,8 +370,16 @@
       },
       //新建文件夹
       newFileFold(){
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
           let data = this.newCatalog
-          newResFileFold(data).then(res => {
+        this.expan = [this.newCatalog.catalogId]
+
+        newResFileFold(data).then(res => {
               console.log(res)
               if (Number(res.code) === 200) {
                   this.$message.success('文件夹新建成功');
@@ -315,6 +387,7 @@
                   this.newCatalog.catalogName = ''
                   //更新页面数据
                   this.getResource(0)
+                loading.close()
               } else {
                   this.$message.error('文件夹新建失败');
               }
@@ -334,61 +407,6 @@
             this.$message.error(res.data.message);
           }
         })
-      },
-      goEditTest(id) {
-          this.$router.push(`/course/resource/edittest/${id}`);
-      },
-      goAddTest(catalogId) {
-          this.$router.push({path: `/course/resource/addtest/${catalogId}` });
-      },
-      // 导入试题模板
-      upTestFile(item) {
-          this.beforTestUpload()
-          console.log(item)
-          let fileFormData = new FormData();
-          fileFormData.append('file', item.file);
-          console.log(fileFormData)
-          upQuiz(this.courseId, fileFormData).then(res => {
-              this.$notify({
-                  title: '试题导入成功',
-                  message: '新增' + res.data.totalCount + '个试题',
-                  type: 'success',
-                  duration: 0
-              });
-          }).catch(error => {
-              console.log(error)
-          })
-      },
-      //文件上传验证
-      beforTestUpload(file) {
-
-          if (!this.courseId) {
-              this.$notify.error({
-                  title: '错误',
-                  message: '请先搜索相关课程，再导入该课程的试题模板'
-              });
-              return false
-          }
-
-          console.log(file, '文件');
-          this.files = file;
-          const extension = file.name.split('.')[1] === 'xls'
-          const extension2 = file.name.split('.')[1] === 'xlsx'
-          const isLt2M = file.size / 1024 / 1024 < 5
-          if (!extension && !extension2) {
-              this.$message.warning('上传模板只能是 xls、xlsx格式!')
-              return
-          }
-          if (!isLt2M) {
-              this.$message.warning('上传模板大小不能超过 5MB!')
-              return
-          }
-          this.fileName = file.name;
-          return false // 返回false不会自动上传
-      },
-      //选择试题章节查询
-      getChapterQuiz() {
-          alert("按章节查询")
       },
       // 删除资源
       delRes(id) {
@@ -436,10 +454,6 @@
               }
           })
       },
-      //编辑试题
-      goEdit(quizId){
-          this.$router.push({ path: `/course/resource/edittest/${quizId}` })
-      },
       //清洗数据
       filterData(data){
           let getFilter = (data)=>{
@@ -465,83 +479,35 @@
           let curData = getFilter(data)
           return curData
       },
-      goUp () {
-        document.getElementById('inputs').click()
+      goUp (id) {
+        Cookie.set('catalogId',id)
       },
-      //资源上传到OSS
-      upInput(event){
-        this.fileArr = event
-        console.log(event.target.files)
-        console.log('验签状态',this.isError)
-        if (Number(this.isError) === 0) {
-          this.errors()
-          return false
-        }
-        if (this.ossData === null && Number(this.isError) !== 0) {
-          this.ossCheck()
-          return false
-        }
+      upRes (url,name) {
+        //判断资源类型
+        let a = '123.jpg'
+        let b= a.lastIndexOf('.')
+        a.substring(b+1,a.length)
+
         // let loading = this.$loading({
         //   lock: true,
-        //   text: '正在努力上传中',
+        //   text: '正在保存资源',
         //   spinner: 'el-icon-loading',
         //   background: 'rgba(0, 0, 0, 0.7)'
         // });
-        for(let i=0;i<event.target.files.length;i++){
-          console.log('执行')
-          let file = event.target.files[i]
-          let name = new Date().getTime() + event.target.files[i].name
-          let client = new oss(this.ossData)
-          this.forInputs(client,name,file)
-        }
-        console.log(this.uploadArr)
+        // let id = Number(Cookie.get('catalogId'))
+        // let data = {catalogId: id,resourceUrl:url,resourceTitle:name,resourceType :20,contentType :'20'}
+        // console.log(id)
+        // localUpload(data).then(res => {
+        //   loading.close()
+        //   console.log(res)
+        //   if (Number(res.code) === 200) {
+        //     this.$message.success('上传成功');
+        //     this.getResource(0)
+        //   } else {
+        //     this.$message.error('资源保存失败');
+        //   }
+        // })
       },
-      forInputs (client,name,file) {
-        let self = this
-        client.multipartUpload(name, file, {}).then((results) => {
-          let msg =  `${name}上传成功`;
-          self.$message({
-            message:msg,
-            type:'success'
-          })
-          Number(self.isError) !== 2 ? (self.isError = 2) : ''
-          let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
-          this.uploadArr.push(url)
-        }).catch(error=>{
-          //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
-          self.ossCheck('error')
-        })
-      },
-      inputNull () {
-        let dom = document.getElementById('inputs')
-        dom.value = ''
-        // dom.outerHTML = dom.outerHTML
-      },
-      ossCheck (e) {
-        // console.log('e的监控数据',e , this.isError)
-        if (Number(this.isError) === 0) {
-          this.errors()
-          return false
-        }
-        this.isError -= 1
-        ossAliSts().then(res => {
-          if (Number(res.code) === 200) {
-            this.ossData = JSON.parse(res.data)
-            console.log('给到', this.ossData)
-            this.upInput(this.fileArr)
-          } else {
-            console.log('执行')
-            this.ossCheck()
-          }
-        })
-      },
-      errors () {
-        this.$message({
-          message: '验签获取错误，请联系管理员',
-          type: 'error'
-        })
-        this.inputNull()
-      }
   },
 };
 </script>
