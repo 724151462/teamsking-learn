@@ -4,6 +4,7 @@
       <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 头脑风暴
     </span>
     <div>
+      <div class="margin-sides">题目</div>
       <el-input
         type="textarea"
         v-model="brainStorm.stormTitle"

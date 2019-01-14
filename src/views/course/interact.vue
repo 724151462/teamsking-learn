@@ -44,7 +44,7 @@
             <div
               class="collapse-layout"
               v-for="(interact,interactIndex) in item.interactions"
-              :key="interact.interactionId"
+              :key="interactIndex"
             >
               <div class="collapse-layout interact-left" @click="toDetail(interact)">
                 <img width="60px" :src="interactImg(interact.interactionType)" alt>
@@ -272,6 +272,7 @@ export default {
       }
     },
     handleSelect(value) {
+      console.log(value)
       this.interactParams.interactionStatus = value;
       console.log(this.interactParams);
       interactList(this.interactParams).then(response => {
