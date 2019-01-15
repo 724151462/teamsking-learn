@@ -44,7 +44,6 @@
             accordion
             draggable
             :default-expanded-keys="expan"
-            @node-drag-enter="handleDragEnter"
             @node-drop="handleDrop"
             @node-drag-start="handleDragStart"
             node-key="catalogId"
@@ -63,12 +62,9 @@
               <span>
                 <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
-                  <!--<el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="test()"> 创建子目录 </el-button>-->
                   <el-button size="mini" type="primary" v-show="data.catalogLevel" @click.stop="goUp(data.catalogId)"><label for="male">上传</label></el-button>
                   <up-oss style="display: none;" @ossUp="upRes"></up-oss>
                   <el-button size="mini" style="margin-left: 5px" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
-                  <!--<el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>-->
-                  <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
                 </span>
                 <span v-else >
                   <span class="hide-button">
@@ -132,7 +128,6 @@
   import {getResList, newResFileFold, reResFileFold, delResFileFold, deleteRes ,localUpload, moveRes} from "@/api/library";
   import UpOss from "@/components/up-oss";
   import Cookie from 'js-cookie';
-  import axios from 'axios'
   export default {
     name: "resource",
     created() {
@@ -537,57 +532,85 @@
         let type= node.data.resourceId ? 2 :1,
             id = type ==1 ? node.data.catalogId: node.data.resourceId;
         let data = {id,type}
+        // console.log('开始拖拽',node.label)
         this.$store.commit('SAVE_DRAG',data)
       },
-      handleDragEnd(draggingNode, dropNode, dropType, ev) {
-        console.log(draggingNode.label)
-        console.log(dropNode.label)
-        let data = {
-          catalogId: dropNode.data.catalogId,
-          ids: [draggingNode.data.catalogId]
-        }
-        this.remove(data)
-      },
-      handleDragEnter(draggingNode, dropNode, ev) {
-        // console.log('移动进入文件夹')
-        // console.log(draggingNode)
-        // console.log(dropNode)
-        // console.log(ev)
-        // let data = {
-        //   catalogId: dropNode.data.catalogId,
-        //   ids: [draggingNode.data.catalogId]
-        // }
-        // console.log(data)
-      },
       handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log('目标文件夹：','id',draggingNode.data.catalogId,'name',draggingNode.label)
-        console.log('要去往:', 'id',dropNode.data.catalogId, 'name',dropNode.label, dropType);
+        let beforeType= draggingNode.data.resourceId ? 2 :1,
+            beforeId = beforeType ==1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
+            afterType = dropNode.data.resourceId ? 2 :1,
+            afterId = afterType ==1 ? dropNode.data.catalogId: dropNode.data.resourceId;
+        // let data = {id,type}
+        let expanId = draggingNode.data.catalogId || draggingNode.data.parentId
+        this.expan=[expanId]
         if(dropType == 'after'){
           let data = {
-            id:draggingNode.data.catalogId,
-            type:1,
+            id:beforeId,
+            type:beforeType,
             previous: {
-              id: dropNode.data.catalogId,
-              type:1
+              id: afterId,
+              type:afterType
             }
           }
-          data = JSON.parse(JSON.stringify(data))
-          moveRes(data).then(res => {
-            console.log(res)
-            if (Number(res.code) === 200) {
-              this.$message.success('移动成功')
-            } else {
-              this.$message({
-                message: "移动失败",
-                type: "error"
-              });
+          console.log(data)
+          // data = JSON.parse(JSON.stringify(data))
+          console.log('下移操作')
+          this.move(data)
+        }else if(dropType == 'before'){
+          let data = {
+            id:beforeId,
+            type:beforeType,
+            next: {
+              id: afterId,
+              type:afterType
             }
-          }).catch((err)=>{
-            console.log(err)
-          })
+          }
+          console.log(data)
+          console.log('上移操作')
+          this.move(data)
+        }else if(dropType == 'inner'){
+          let data = {
+            id:beforeId,
+            type:beforeType,
+            inCatalogId:afterId
+          }
+          console.log(data)
+          console.log('移入操作')
+          this.move(data)
         }
-
       },
+      allowDrop(draggingNode, dropNode, dropType) {
+        //拖拽验证，情况复杂
+        // let type = draggingNode.data.resourceId ? 2 :1
+        //   type == 1 ? console.log('文件夹') :console.log('资源')
+        //
+        // if(type ==2 && dropNode.data.catalogLevel == 1 || dropType !== 'inner'){
+        //
+        //   return false
+        // }else{
+        //   return true
+        // }
+      },
+      //文件夹/文件 移动操作
+      move(data){
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        moveRes(data).then(res => {
+          loading.close()
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.$message.success('移动成功')
+            this.getResource(0)
+          } else {
+            this.$message.error('移动失败');
+            this.getResource(0)
+          }
+        })
+      }
   },
 };
 </script>
