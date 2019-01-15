@@ -34,6 +34,22 @@ export function publish(data) {
   return commonsAjax(url, '', 'put')
 }
 
+/**
+ * 复制课程
+ */
+export function copy(data) {
+  let url = `${baseUrl}` + data + '/copy'
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 关闭课程
+ */
+export function close(data) {
+  let url = `${baseUrl}` + data + '/close'
+  return commonsAjax(url, '', 'put')
+}
+
 
 /**
  * 课程简单信息
@@ -262,6 +278,13 @@ export function subjectGet(data) {
   return commonsAjax(url, data, 'get')
 }
 
+/**
+ * 删除内嵌题
+ */
+export function subjectDel(data) {
+  let url = `${baseUrl}videoquiz`
+  return commonsAjax(url, data, 'delete')
+}
 
 /**
  * 添加成员方案名称

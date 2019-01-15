@@ -186,9 +186,9 @@
                 type="text"
                 style="border: 1px solid black; width: 120px; margin-left:5px"
                 placeholder="输入00:00:00格式"
-                @blur="saveAddTime(index)"
+                @blur="saveAddTime(subject)"
               >
-              <span v-if="subject.timeFormatTip" style="color:red;margin-left:2px">输入00:00:00格式</span>
+              <span v-if="subject.timeFormatTip === true" style="color:red;margin-left:2px">输入00:00:00格式</span>
             </div>
             <div class="subject-operate">
               <span>预览</span>
@@ -200,7 +200,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveAllSubj">确 定</el-button>
+        <el-button type="primary" @click="saveAllSubj">保 存</el-button>
       </span>
     </el-dialog>
 
@@ -291,7 +291,8 @@ import {
   itemDelete,
   publish,
   subjectAdd,
-  subjectGet
+  subjectGet,
+  subjectDel
 } from "@/api/course";
 import { getResList, localUpload, getTestFileFold } from "@/api/library";
 
@@ -483,7 +484,7 @@ export default {
     },
     addChapter(chapterName) {
       chaptersAdd({
-        chapterStatus: 2,
+        chapterStatus: 1,
         courseId: this.courseId,
         chapterName: chapterName
       }).then(response => {
@@ -586,6 +587,8 @@ export default {
           this.delChapterEnsure();
         case "delItem":
           this.delItemEnsure();
+        case 'delSubject':
+          this.delSubjectEnsure();
         default:
           break;
       }
@@ -728,7 +731,6 @@ export default {
       this.subjectList = [];
       subjectGet({itemId: subject.itemId})
       .then(response=> {
-          this.subjectList = response.data
           response.data.forEach((element, i) => {  
             console.log(Math.floor(element.timePoint / 3600))
             let hour = Math.floor(element.timePoint / 3600);
@@ -737,9 +739,10 @@ export default {
             hour = String(hour).length === 1 ? '0' + String(hour) : String(hour)
             minute = String(minute).length === 1 ? '0' + String(minute) : String(minute)
             second = String(second).length === 1 ? '0' + String(second) : String(second)
-            this.subjectList[i].time = `${hour}:${minute}:${second}`
-            console.log(this.subjectList[i].time)
+            element.time = `${hour}:${minute}:${second}`
+            element.timeFormatTip = false
           });
+          this.subjectList = response.data
       })
       this.subjectVisible = true;
     },
@@ -797,24 +800,45 @@ export default {
       // }
     },
     // 保存时间点
-    saveAddTime(index) {
+    saveAddTime(subject) {
+      console.log(subject)
       if (
-        this.subjectList[index].time.split(":").length - 1 !== 2 ||
-        this.subjectList[index].time.length !== 8
+        subject.time.split(":").length - 1 !== 2 ||
+        subject.time.length !== 8
       ) {
-        this.subjectList[index].timeFormatTip = true;
+        subject.timeFormatTip = true;
       } else {
-        this.subjectList[index].timeFormatTip = false;
+        subject.timeFormatTip = false;
       }
-      let timeSplit = this.subjectList[index].time.split(":");
+      let timeSplit = subject.time.split(":");
       let second = 
-          Number(timeSplit[0]) * 3600 + Number(timeSplit[1]) * 60 + Number(timeSplit[1]);
-      this.subjectList[index].timePoint = second
+          Number(timeSplit[0]) * 3600 + Number(timeSplit[1]) * 60 + Number(timeSplit[2]);
+      console.log(timeSplit[0],timeSplit[1],timeSplit[2],second)
+      subject.timePoint = second
     },
     // 删除时间点
     delSubject(index) {
-      this.subjectList.splice(index, 1);
-      console.log(this.subjectList);
+      let delArr = [];
+      delArr.push(this.subjectList[index].id);
+      this.delDialogParm = {};
+      this.delDialogParm.info = "确认删除内嵌题？";
+      this.delDialogParm.type = "delSubject";
+      this.delDialogParm.subjectIndex = index;
+      this.delDialogParm.ids = delArr;
+      this.delDialog = true;
+    },
+    delSubjectEnsure() {
+      subjectDel(this.delDialogParm.ids)
+      .then(response=> {
+        if(response.code === 200) {
+          this.subjectList.splice(this.delDialogParm.subjectIndex, 1);
+          this.$message({
+            message: '删除内嵌题成功',
+            type: 'success'
+          })
+          this.delDialog = false
+        }
+      })
     },
     // 编辑题目弹窗
     editSubject(index) {
@@ -836,7 +860,14 @@ export default {
     saveAllSubj() {
       console.log(this.subjectList);
       this.subjectList.forEach(element => {
-        subjectAdd(element)
+        if(element.timeFormatTip === true){
+          this.$message({
+            message: '时间点格式有误',
+            type: 'warning'
+          })
+          return
+        }else{
+          subjectAdd(element)
         .then(response=> {
           if(response.code === 200) {
             this.$message({
@@ -844,8 +875,14 @@ export default {
               type: 'success'
             })
             this.subjectVisible = false;
+          }else{
+            this.$message({
+              message: '添加失败,请选择题目',
+              type: 'warning'
+            })
           }
         })
+        }
       });
       
       

@@ -27,7 +27,8 @@
 <script>
   import upOss from '@/components/up-oss'
   import {
-    platformInfo
+    platformInfo,
+    getPlatformInfo
   }from "@/api/system"
   export default {
 
@@ -38,6 +39,12 @@
           introduct: ''
         }
       };
+    },
+    mounted() {
+      getPlatformInfo()
+      .then(response=> {
+        this.platformData = response.data
+      })
     },
     methods: {
       handleSelect(key, keyPath) {
