@@ -94,8 +94,6 @@ export function newResFileFold(data) {
  */
 export function moveRes(data) {
   let url = `${baseUrl}catalog/resource`
-  console.log('地址:',url)
-  console.log('参数',data)
   return commonsAjax(url, data, 'patch')
 }
 /**

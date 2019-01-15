@@ -322,10 +322,12 @@
                     if(item.interactionList.length !==0){
                         item.interactionList.forEach((list)=>{
                             list.interactionTitle = list.interactionTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
-                            item.childList.push({catalogName: list.interactionTitle,
-                                interactionId: list.interactionId,
-                                createTime:list.createTime,
-                                interactionType:list.interactionType})
+                            item.childList.push({
+                              catalogName: list.interactionTitle,
+                              interactionId: list.interactionId,
+                              createTime:list.createTime,
+                              interactionType:list.interactionType
+                            })
                         })
                     }
                 })

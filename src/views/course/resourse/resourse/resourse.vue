@@ -5,11 +5,11 @@
     </div>
     <div class="radio-group">
       <div style="flex:1">
-        <el-radio v-model="radio" :label="0" @change="getResource(radio)">全部文件</el-radio>
-        <el-radio v-model="radio" :label="40" @change="getResource(radio)">图片</el-radio>
-        <el-radio v-model="radio" :label="10" @change="getResource(radio)">视频</el-radio>
-        <el-radio v-model="radio" :label="20" @change="getResource(radio)">文档</el-radio>
-        <el-radio v-model="radio" :label="30" @change="getResource(radio)">音频</el-radio>
+        <el-radio v-model="radio" :label="0" @change="radioChange(radio)">全部文件</el-radio>
+        <el-radio v-model="radio" :label="40" @change="radioChange(radio)">图片</el-radio>
+        <el-radio v-model="radio" :label="10" @change="radioChange(radio)">视频</el-radio>
+        <el-radio v-model="radio" :label="20" @change="radioChange(radio)">文档</el-radio>
+        <el-radio v-model="radio" :label="30" @change="radioChange(radio)">音频</el-radio>
       </div>
       <div style="display: flex">
         <el-input
@@ -17,7 +17,7 @@
           v-model="input">
         </el-input>
         <div>
-          <el-button icon="el-icon-search" class="search-btn" @click="getResource(0,input)"></el-button>
+          <el-button icon="el-icon-search" class="search-btn" @click="searchResource(input)"></el-button>
         </div>
       </div>
     </div>
@@ -25,10 +25,7 @@
       <div class="test-title">
         <div style="flex: 1"></div>
         <div>
-          <!--全选-->
-          <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
           <el-button type="primary" size="small" @click="goCreateCatalog('',0)">创建目录</el-button>
-          <el-button type="primary" size="small">移动到</el-button>
           <el-button type="info" size="small"
                      v-bind:class="{ active: deleteArr.length>0}"
                      @click="deleteCatalog" >删除</el-button>
@@ -49,6 +46,7 @@
             :default-expanded-keys="expan"
             @node-drag-enter="handleDragEnter"
             @node-drop="handleDrop"
+            @node-drag-start="handleDragStart"
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
@@ -72,9 +70,15 @@
                   <!--<el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>-->
                   <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
                 </span>
-                <span v-else class="hide-button">
-                  <el-button size="mini" type="primary" @click.stop="" v-if="data.resourceType.type ==10 && !data.srtUrl"> 添加字幕 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="delRes(data.resourceId)">删除</el-button>
+                <span v-else >
+                  <span class="hide-button">
+                    <el-button size="mini" type="primary" @click.stop="" v-if="data.resourceType.type ==10 && !data.srtUrl"> 添加字幕 </el-button>
+                    <el-button size="mini" type="primary" @click.stop="delRes(data.resourceId,data.parentId)">删除</el-button>
+                  </span>
+
+                  <span style="margin-right: 10px;">{{data.resourceSize}}</span>
+                  <span>{{data.createTime}}</span>
+                  <!--<span>预览</span>-->
                 </span>
               </span>
               <span style="margin-right: 10px" v-show="data.updateTime">{{data.updateTime}}</span>
@@ -128,6 +132,7 @@
   import {getResList, newResFileFold, reResFileFold, delResFileFold, deleteRes ,localUpload, moveRes} from "@/api/library";
   import UpOss from "@/components/up-oss";
   import Cookie from 'js-cookie';
+  import axios from 'axios'
   export default {
     name: "resource",
     created() {
@@ -217,7 +222,6 @@
         let data = {
             resourceType: id,
             searchKey: key,
-            catalogId: 0,
         }
         let loading = this.$loading({
           lock: true,
@@ -249,71 +253,46 @@
             }
         })
     },
+      //搜索资源
+      searchResource(key) {
+        let data = {
+          resourceType: this.radio,
+          searchKey: key,
+        }
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        getResList(data).then(res => {
+          loading.close()
+          // console.log(res)
+          if (Number(res.code) === 200) {
+            //如果试题库为空，则初始化新建一个默认的文件夹
+            let data = JSON.parse(JSON.stringify(res.data))
+            this.resourceData = this.filterData(data)
+            // this.$set( this.$data, 'resourceData', curdata )
+            console.log(this.resourceData)
+          } else {
+            this.$message({
+              message: "资源获取失败",
+              type: "error"
+            });
+          }
+        })
+      },
+      //资源种类改变时
+      radioChange(radio){
+        this.input = ''
+        this.getResource(radio)
+      },
       //点击弹出重命名的弹窗
       goRenameCatalog(data,id) {
         let parentId =  data.parentId || 0
         this.expan = [parentId]
         this.newCatalog.catalogId = id
         this.renameCatalog = true
-        //创建子目录时目录不折叠
-        // console.log(data)
-        // const newChild = { catalogId: 101 , catalogName: "计算机网络--第一章" };
-        // if (!data.catalogList) {
-        //   this.$set(data, 'children', []);
-        // }
-        // data.catalogList.push(newChild);
-      },
-      change(value){
-        alert(value)
-      },
-      handleDragEnd(draggingNode, dropNode, dropType, ev) {
-        console.log(draggingNode.label)
-        console.log(dropNode.label)
-        let data = {
-          catalogId: dropNode.data.catalogId,
-          ids: [draggingNode.data.catalogId]
-        }
-        this.remove(data)
-      },
-      handleDragEnter(draggingNode, dropNode, ev) {
-        // console.log('移动进入文件夹')
-        // console.log(draggingNode)
-        // console.log(dropNode)
-        // console.log(ev)
-        // let data = {
-        //   catalogId: dropNode.data.catalogId,
-        //   ids: [draggingNode.data.catalogId]
-        // }
-        // console.log(data)
-      },
-      handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log(draggingNode.label)
-        console.log('要去往:', dropNode.label, dropType);
-        if(dropType == 'after'){
-          let data = {
-            id:draggingNode.data.catalogId,
-            type:1,
-            previous: {
-              id: dropNode.data.catalogId,
-              type:1
-            },
-          }
-          data = JSON.parse(JSON.stringify(data))
-          moveRes(data).then(res => {
-              console.log(res)
-              if (Number(res.code) === 200) {
-                this.$message.success('移动成功')
-              } else {
-                this.$message({
-                  message: "移动失败",
-                  type: "error"
-                });
-              }
-            }).catch((err)=>{
-            console.log(err)
-          })
-        }
-
       },
       //获取图片路径
       getImgSrc(type) {
@@ -323,20 +302,12 @@
       goCreateCatalog(data,id) {
           this.newCatalog.catalogId = id
           this.createCatalog = true
-
-          //创建子目录时目录不折叠
-          // console.log(data)
-          // const newChild = { catalogId: 101 , catalogName: "计算机网络--第一章" };
-          // if (!data.catalogList) {
-          //   this.$set(data, 'children', []);
-          // }
-          // data.catalogList.push(newChild);
       },
       //全选操作
       checkAll(flag){
           //获取所有文件夹节点的id用于全选
           let idArr = []
-          this.catalogData.forEach((item)=>{
+          this.resourceData.forEach((item)=>{
               idArr.push(item.catalogId)
           })
           this.isCheckAll = flag
@@ -344,8 +315,6 @@
           this.deleteArr= idArr
 
           this.allDelete = flag
-          console.log(this.deleteArr)
-          // this.$refs.tree.setCheckedKeys(idArr)
       },
       //节点复选框被选
       nodeCheck(data, checked){
@@ -378,7 +347,6 @@
         });
           let data = this.newCatalog
         this.expan = [this.newCatalog.catalogId]
-
         newResFileFold(data).then(res => {
               console.log(res)
               if (Number(res.code) === 200) {
@@ -409,7 +377,7 @@
         })
       },
       // 删除资源
-      delRes(id) {
+      delRes(id,parentId) {
         let loading = this.$loading({
           lock: true,
           text: 'loading',
@@ -418,6 +386,7 @@
         });
         this.resourceArr.push(Number(id))
         let arr = [...this.resourceArr]
+        this.expan = [parentId]
         deleteRes(arr).then(res => {
           loading.close()
             console.log(res)
@@ -444,14 +413,13 @@
         });
         delResFileFold(this.deleteArr).then(res => {
           loading.close()
-          console.log(res)
-              if (Number(res.code) === 200) {
-                  this.$message.success('删除成功');
-                  this.allDelete = false
-                  this.getResource(0)
-              } else {
-                  this.$message.error('删除失败');
-              }
+            if (Number(res.code) === 200) {
+                this.$message.success('删除成功');
+                this.allDelete = false
+                this.getResource(0)
+            } else {
+                this.$message.error('删除失败');
+            }
           })
       },
       //清洗数据
@@ -462,15 +430,19 @@
                       getFilter(item.childCatalogList)
                   }
                   if(item.resourceList.length !==0){
+                    let parentId = item.catalogId
                     item.resourceList.forEach((list)=>{
-                      console.log()
                       list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
-                        item.childCatalogList.push(
-                          {catalogName: list.resourceTitle,
-                            resourceId: list.resourceId,
-                            createTime:list.createTime,
-                            srtUrl: list.srtUrl,
-                            resourceType:list.resourceType})
+                      list.resourceSize = this.sizeTrans(list.resourceSize)
+                        item.childCatalogList.push({
+                          catalogName: list.resourceTitle,
+                          resourceId: list.resourceId,
+                          createTime:list.createTime,
+                          parentId:parentId,
+                          srtUrl: list.srtUrl,
+                          resourceType:list.resourceType,
+                          resourceSize:list.resourceSize,
+                        })
                       })
                   }
               })
@@ -482,31 +454,139 @@
       goUp (id) {
         Cookie.set('catalogId',id)
       },
-      upRes (url,name) {
+      upRes (url,name,size) {
         //判断资源类型
-        let a = '123.jpg'
-        let b= a.lastIndexOf('.')
-        a.substring(b+1,a.length)
+        let type = this.resType(name)
+        if(!type){
+          return false
+        }
+        let loading = this.$loading({
+          lock: true,
+          text: '正在保存资源',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        let id = Number(Cookie.get('catalogId'))
+        let userId = Number(Cookie.get('userId'))
+        console.log(userId)
+        this.expan = [id]
+        let data = {
+          catalogId: id,
+          userId:userId,
+          resourceUrl:url,
+          resourceTitle:name,
+          resourceType :type,
+          contentType :type,
+          resourceSize:size
+        }
+        localUpload(data).then(res => {
+          loading.close()
+          if (Number(res.code) === 200) {
+            this.$message.success('上传成功');
+            this.getResource(0)
+          } else {
+            this.$message.error('资源保存失败');
+          }
+        })
+      },
+      resType(name){
+        let index= name.lastIndexOf('.'),
+            imgArr = ['jpeg','jpg','png'],
+            audioArr=['mp3','wav'],
+            videoArr=['mp4','avi','rmvb','wmv','mkv'],
+            docArr=['pdf','txt','doc','docx','xls','xlsx','ppt','pptx'],
+            typeNumber = '';
+        let curType = name.substring(index+1,name.length).toLowerCase()
 
-        // let loading = this.$loading({
-        //   lock: true,
-        //   text: '正在保存资源',
-        //   spinner: 'el-icon-loading',
-        //   background: 'rgba(0, 0, 0, 0.7)'
-        // });
-        // let id = Number(Cookie.get('catalogId'))
-        // let data = {catalogId: id,resourceUrl:url,resourceTitle:name,resourceType :20,contentType :'20'}
-        // console.log(id)
-        // localUpload(data).then(res => {
-        //   loading.close()
-        //   console.log(res)
-        //   if (Number(res.code) === 200) {
-        //     this.$message.success('上传成功');
-        //     this.getResource(0)
-        //   } else {
-        //     this.$message.error('资源保存失败');
-        //   }
-        // })
+        if(imgArr.find((item)=>{return curType == item})){
+            typeNumber = 40
+          }else if(videoArr.find((item)=>{return curType == item})){
+            typeNumber = 10
+          }else if(docArr.find((item)=>{return curType == item})){
+            typeNumber = 20
+          }else if(audioArr.find((item)=>{return curType == item})){
+            typeNumber=30
+          }else{
+          this.$message.error('请上传受支持的资源文件')
+        }
+        return typeNumber
+      },
+      //文件大小转换
+      sizeTrans(limit){
+        let size = "";
+        if( limit < 0.1 * 1024 ){ //如果小于0.1KB转化成B
+          size = limit.toFixed(2) + "B";
+        }else if(limit < 0.1 * 1024 * 1024 ){//如果小于0.1MB转化成KB
+          size = (limit / 1024).toFixed(2) + "KB";
+        }else if(limit < 0.1 * 1024 * 1024 * 1024){ //如果小于0.1GB转化成MB
+          size = (limit / (1024 * 1024)).toFixed(2) + "MB";
+        }else{ //其他转化成GB
+          size = (limit / (1024 * 1024 * 1024)).toFixed(2) + "GB";
+        }
+        let sizestr = size + "";
+        let len = sizestr.indexOf("\.");
+        let dec = sizestr.substr(len + 1, 2);
+        if(dec == "00"){//当小数点后为00时 去掉小数部分
+          return sizestr.substring(0,len) + sizestr.substr(len + 3,2);
+        }
+        return sizestr;
+      },
+      //拖拽相关
+      //开始拖拽
+      handleDragStart(node) {
+        let type= node.data.resourceId ? 2 :1,
+            id = type ==1 ? node.data.catalogId: node.data.resourceId;
+        let data = {id,type}
+        this.$store.commit('SAVE_DRAG',data)
+      },
+      handleDragEnd(draggingNode, dropNode, dropType, ev) {
+        console.log(draggingNode.label)
+        console.log(dropNode.label)
+        let data = {
+          catalogId: dropNode.data.catalogId,
+          ids: [draggingNode.data.catalogId]
+        }
+        this.remove(data)
+      },
+      handleDragEnter(draggingNode, dropNode, ev) {
+        // console.log('移动进入文件夹')
+        // console.log(draggingNode)
+        // console.log(dropNode)
+        // console.log(ev)
+        // let data = {
+        //   catalogId: dropNode.data.catalogId,
+        //   ids: [draggingNode.data.catalogId]
+        // }
+        // console.log(data)
+      },
+      handleDrop(draggingNode, dropNode, dropType, ev) {
+        console.log('目标文件夹：','id',draggingNode.data.catalogId,'name',draggingNode.label)
+        console.log('要去往:', 'id',dropNode.data.catalogId, 'name',dropNode.label, dropType);
+        if(dropType == 'after'){
+          let data = {
+            id:draggingNode.data.catalogId,
+            type:1,
+            previous: {
+              id: dropNode.data.catalogId,
+              type:1
+            }
+          }
+          data = JSON.parse(JSON.stringify(data))
+          moveRes(data).then(res => {
+            console.log(res)
+            if (Number(res.code) === 200) {
+              this.$message.success('移动成功')
+            } else {
+              this.$message({
+                message: "移动失败",
+                type: "error"
+              });
+            }
+          }).catch((err)=>{
+            console.log(err)
+          })
+        }
+
       },
   },
 };
@@ -576,7 +656,7 @@
             margin 0 10px
     .test-warp
       .tree-title
-        max-width: 500px;
+        max-width: 300px;
         display: inline-block;
         overflow: hidden;
         white-space: nowrap;

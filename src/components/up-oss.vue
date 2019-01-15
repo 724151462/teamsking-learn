@@ -30,7 +30,11 @@
         schedule:0, //上传进度
         ossData:null,
         fileData:null,
-        isError:3
+        isError:3,
+        //需要返回的文件信息
+        fileName:'',
+        fileSize:'',
+        // fileName:'',
       }
     },
     methods:{
@@ -45,6 +49,8 @@
         console.log('1',event)
         if(event){
           this.fileData = event
+          this.fileName =event.target.files[0].name
+          this.fileSize =event.target.files[0].size
         }
         //这里加一个获取验签信息的错误处理
         if (Number(this.isError) === 0) {
@@ -93,7 +99,7 @@
           })
           Number(self.isError) !== 2 ? (self.isError = 2) : ''
           let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
-          self.$emit('ossUp', url, this.fileData.target.files[0].name)
+          self.$emit('ossUp', url, this.fileName, this.fileSize)
         }).catch(error=>{
           console.log(error)
           //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
@@ -102,11 +108,8 @@
       },
       inputNull () {
         let dom = document.getElementById('inputs')
-        console.log('清空前:',dom.value)
         dom.value = ''
         dom.outerHTML = dom.outerHTML
-        console.log('清空后:',dom.value)
-
         this.fileData = null
       },
       ossCheck (e) {

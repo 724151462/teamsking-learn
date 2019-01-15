@@ -274,7 +274,7 @@
           mobile: null,
           nickName: null,
           realName: "",
-          userId: 1351,
+          userId: '',
         },
         newForm:{
           mobile: '',
