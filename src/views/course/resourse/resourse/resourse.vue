@@ -552,9 +552,9 @@
               type:afterType
             }
           }
+          console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的后面')
           console.log(data)
-          // data = JSON.parse(JSON.stringify(data))
-          console.log('下移操作')
+          // data = JSON.stringify(data)
           this.move(data)
         }else if(dropType == 'before'){
           let data = {
@@ -565,8 +565,8 @@
               type:afterType
             }
           }
+          console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的前面')
           console.log(data)
-          console.log('上移操作')
           this.move(data)
         }else if(dropType == 'inner'){
           let data = {
