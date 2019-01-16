@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p class="route-guide">教师用户><span>{{currentRoute}}</span></p>
+        <p class="route-guide"><router-link :to="{path:'/school/teacher'}">教师用户</router-link>><span>{{currentRoute}}</span></p>
         <el-form ref="form1" :model="form" label-width="80px" class="teacherForm">
             <!-- {{testList}} -->
             <el-form-item label="用户名">
@@ -79,16 +79,16 @@ export default {
             dialogVisible: false,
             // 表单信息
             form: {
-                userName: 'wjx',
-                teacherNo: '888888',
-                realName: '吴佳雄',
-                gender: '1',
-                mobile: 18459183928,
-                jobName: '前端菜鸟',
-                jobYear: '1',
+                userName: '',
+                teacherNo: '',
+                realName: '',
+                gender: '',
+                mobile: '',
+                jobName: '',
+                jobYear: '',
                 collegeId: '',
                 departmentId: '',
-                introduct: '我是菜鸟我怕谁'
+                introduct: ''
             },
             // form: {
             //     userName: '',

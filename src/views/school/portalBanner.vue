@@ -112,13 +112,13 @@ export default {
       this.dialogVisible = true;
     },
     deleteBanner(item) {
-      delBanner(item.carouselId).then(response => {
+      delBanner([item.carouselId]).then(response => {
         if (response.code === 200) {
-          bannerList();
           this.$message({
             message: "删除成功",
             type: "success"
           });
+          this.getBannerList();
         }
       });
     },
@@ -130,6 +130,7 @@ export default {
         addBanner(this.form)
           .then(response => {
             if (response.code === 200) {
+              this.getBannerList()
               this.$message({
                 message: "添加成功",
                 type: "success"
@@ -171,10 +172,9 @@ export default {
             });
           });
       }
-    }
-  },
-  created: function() {
-    bannerList()
+    },
+    getBannerList() {
+      bannerList()
       .then(res => {
         res.data.forEach(element => {
           element.imageUrl = [{ imgUrl: element.imageUrl }];
@@ -182,6 +182,10 @@ export default {
         this.tableData3 = res.data;
       })
       .catch();
+    }
+  },
+  created: function() {
+    this.getBannerList()
   }
 };
 </script>

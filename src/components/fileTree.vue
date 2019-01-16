@@ -1,5 +1,5 @@
 <template>
-    <el-tree :data="sourceData" ref="tree" @check="test" show-checkbox :props="props">
+    <el-tree :data="sourceData" :ref="treeName" @check="test" show-checkbox :props="props">
         <span class="custom-tree-node" slot-scope="{ node, data }">
             <img
             :width="15"
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-    props: ['sourceData', 'props'],
+    props: ['sourceData', 'props', 'treeName'],
     mounted() {
         console.log(this.sourceData,this.props)
     },

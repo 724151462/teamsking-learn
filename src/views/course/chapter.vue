@@ -36,10 +36,7 @@
             :key="jieIndex"
           >
             <template slot="title">
-              <div
-                class="title-container"
-                style="margin-left: 40px;"
-              >
+              <div class="title-container" style="margin-left: 40px;">
                 <span>{{jie.sectionName}}</span>
                 <div class="operate">
                   <span @click.stop="addContentBtn(jie)">+添加内容</span>
@@ -58,10 +55,7 @@
                   <div style="display: flex;align-items: center;margin-right: 10px">
                     <img :src="typeIcon(content)" width="40" alt style="margin-right: 10px">
                     <span>{{content.itemName}}</span>
-                    <div
-                      class="video-info"
-                      v-if="content.contentType === 10"
-                    >
+                    <div class="video-info" v-if="content.contentType === 10">
                       <span style="margin-left: 15px">时长：{{content.resourceLength | timeTransfer}}</span>
                       <el-tooltip
                         class="item"
@@ -131,7 +125,7 @@
                 :value="item.value"
               ></el-option>
             </el-select>
-          </div> -->
+          </div>-->
           <el-tree :data="fileList" ref="tree" show-checkbox node-key="id" :props="defaultProps">
             <span class="custom-tree-node" slot-scope="{ node, data }">
               <img
@@ -161,9 +155,12 @@
         </el-tab-pane>
       </el-tabs>
       <span slot="footer" class="dialog-footer">
-        <el-button v-if="contentType === '视频'" type="primary" @click="localVideoDialog = true">本地上传视频</el-button>
-        <upOss v-else style="margin: 0px 10px 10px 0px" :btnText="'本地上传文档'" @ossUp="getDocUrl">
-        </upOss>
+        <el-button
+          v-if="contentType === '视频'"
+          type="primary"
+          @click="localVideoDialog = true"
+        >本地上传视频</el-button>
+        <upOss v-else style="margin: 0px 10px 10px 0px" :btnText="'本地上传文档'" @ossUp="getDocUrl"></upOss>
         <el-button type="primary" @click="addItem">确 认</el-button>
         <el-button @click="dialogVisible = false">取 消</el-button>
       </span>
@@ -189,8 +186,9 @@
                 type="text"
                 style="border: 1px solid black; width: 120px; margin-left:5px"
                 placeholder="输入00:00:00格式"
-                @blur="saveAddTime(index)"
+                @blur="saveAddTime(subject)"
               >
+              <span v-if="subject.timeFormatTip === true" style="color:red;margin-left:2px">输入00:00:00格式</span>
             </div>
             <div class="subject-operate">
               <span>预览</span>
@@ -202,7 +200,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveAllSubj">确 定</el-button>
+        <el-button type="primary" @click="saveAllSubj">保 存</el-button>
       </span>
     </el-dialog>
 
@@ -222,9 +220,12 @@
           <el-button>查询</el-button>
         </div>
         <div class="subjRadio">
-          <Tree :sourceData="fileList" @checkedList="checkedFiles" :props="defaultProps">
-
-          </Tree>
+          <Tree
+            :sourceData="quizList"
+            @checkedList="checkedQuizFiles"
+            :treeName="'tree3'"
+            :props="quizProps"
+          ></Tree>
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -243,20 +244,24 @@
     <!-- 本地上传视频弹窗 -->
     <el-dialog title="添加视频" :visible.sync="localVideoDialog" top="30vh" :modal="false">
       <div style="display: flex;width: 100%">
-        <div style="display: flex;flex-direction: column;justify-content: space-around;height: 300px">
+        <div
+          style="display: flex;flex-direction: column;justify-content: space-around;height: 300px"
+        >
           <div style="display: flex;flex-direction: column;">
-            <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频'" @ossUp="getVideoUrl">
-            </upOss>
+            <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频'" @ossUp="getVideoUrl"></upOss>
             <span>请上传格式为mp4或flv格式，且小于2GB的视频</span>
           </div>
-            <div style="display: flex;flex-direction: column;">
-              <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频字幕'">
-              </upOss>
-              <span>请上传srt格式的字幕</span>
-            </div>
-            
+          <div style="display: flex;flex-direction: column;">
+            <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频字幕'"></upOss>
+            <span>请上传srt格式的字幕</span>
+          </div>
         </div>
-        <videoPlayer style="width:500px; margin-left:50px" v-if="videoUrl !== ''" :isMp4.sync="videoUrl" :poster="coverUrl"></videoPlayer>
+        <videoPlayer
+          style="width:500px; margin-left:50px"
+          v-if="videoUrl !== ''"
+          :isMp4.sync="videoUrl"
+          :poster="coverUrl"
+        ></videoPlayer>
         <div v-else style="width: 500px;background: rgb(192,199,204);text-align:center">
           <span style="display:inline-block; margin-top:140px;">请先上传视频</span>
         </div>
@@ -265,8 +270,6 @@
         <el-button @click="localVideoDialog = false">取 消</el-button>
         <el-button type="primary" @click="localVideoUpload">确 定</el-button>
       </span>
-      
-      
     </el-dialog>
   </div>
 </template>
@@ -274,8 +277,8 @@
 <script>
 import adialog from "@/components/dialog";
 import videoPlayer from "@/components/video-pay";
-import Tree from "@/components/fileTree"
-import upOss from "@/components/up-oss"
+import Tree from "@/components/fileTree";
+import upOss from "@/components/up-oss";
 import {
   chaptersList,
   chaptersAdd,
@@ -286,9 +289,12 @@ import {
   studyModeModify,
   courseBaseInfo,
   itemDelete,
-  publish
+  publish,
+  subjectAdd,
+  subjectGet,
+  subjectDel
 } from "@/api/course";
-import { getResList, localUpload } from "@/api/library";
+import { getResList, localUpload, getTestFileFold } from "@/api/library";
 
 export default {
   data() {
@@ -331,9 +337,7 @@ export default {
       checkAll: false,
       formData: [],
       tempChapter: "",
-      sourceData: [
-        
-      ],
+      sourceData: [],
 
       addTitle: "",
       // 添加视频
@@ -342,9 +346,7 @@ export default {
         contentId: "",
         contentType: 10,
         courseId: this.$route.query.id,
-        itemResource: {
-
-        }
+        itemResource: {}
       },
       radio: "1.2",
       // 添加内容类型tab
@@ -354,26 +356,20 @@ export default {
         itemName: "",
         contentType: 20,
         courseId: this.$route.query.id,
-        itemResource: {
-
-        }
+        itemResource: {}
       },
       // 添加本地视频弹窗
       localVideoDialog: false,
       // 添加题目对话框
+      quizList: [],
       subjectVisible: false,
       subjectList: [
-        {
-          time: "",
-          title: "",
-          ids: []
-        }
       ],
       // 题目弹窗的视频地址
       videoUrl: "",
       // 课程资源
       resource: {
-        courseId: this.$route.query.id,
+        courseId: this.$route.query.id
       },
       temCheckedList: [],
       // 题目弹窗的视频封面
@@ -391,6 +387,10 @@ export default {
       // 选项model
       subjPick: "",
       // =====资源=====
+      quizProps: {
+        children: "catalogList",
+        label: "catalogName"
+      },
       defaultProps: {
         children: "childCatalogList",
         label: "catalogName"
@@ -405,35 +405,43 @@ export default {
       tempSection: [],
       // 删除小项
       tempItems: [],
-      tempItemIndex: ''
+      tempItemIndex: ""
     };
   },
   created() {
-    chaptersList(this.courseId).then(response => {
-      this.sourceData = response.data;
-    });
+    this.getChapterList();
     courseBaseInfo(this.courseId).then(response => {
       this.patternId = String(response.data.studyMode);
     });
     getResList({ resourceType: 10 }).then(response => {
-        this.fileList = this.filterData(response.data);
+      this.fileList = this.filterData(response.data);
     });
     getResList({ resourceType: 20 }).then(response => {
       this.docList = this.filterData(response.data);
     });
+    getTestFileFold({
+      quizType: 0,
+      searchKey: ""
+    }).then(response=> {
+      this.quizList = this.filterQuizData(response.data);
+    })
   },
   methods: {
+    getChapterList() {
+      chaptersList(this.courseId).then(response => {
+        this.sourceData = response.data;
+      });
+    },
     // 发布课程
     coursePublish() {
-      publish(this.$route.query.id)
-      .then(response=> {
-        if(response.code === 200) {
+      publish(this.$route.query.id).then(response => {
+        if (response.code === 200) {
           this.$message({
-            message: '发布成功',
-            type: 'success'
-          })
+            message: "发布成功",
+            type: "success"
+          });
         }
-      })
+      });
     },
     // 修改教学模式
     changeTModel(value) {
@@ -476,7 +484,7 @@ export default {
     },
     addChapter(chapterName) {
       chaptersAdd({
-        chapterStatus: 2,
+        chapterStatus: 1,
         courseId: this.courseId,
         chapterName: chapterName
       }).then(response => {
@@ -545,8 +553,8 @@ export default {
     },
     // 删除小项
     delItem(content, item, contentIndex) {
-      this.tempItems = item
-      this.tempItemIndex = contentIndex
+      this.tempItems = item;
+      this.tempItemIndex = contentIndex;
       let delArr = [];
       delArr.push(content.itemId);
       this.delDialogParm = {};
@@ -556,10 +564,10 @@ export default {
       this.delDialog = true;
     },
     delItemEnsure() {
-      console.log(this.delDialogParm)
+      console.log(this.delDialogParm);
       itemDelete(this.delDialogParm.itemIds).then(response => {
         if (response.code === 200) {
-          this.tempItems.splice(this.tempItemIndex, 1)
+          this.tempItems.splice(this.tempItemIndex, 1);
           this.$message({
             message: "删除内容成功",
             type: "success"
@@ -579,6 +587,8 @@ export default {
           this.delChapterEnsure();
         case "delItem":
           this.delItemEnsure();
+        case 'delSubject':
+          this.delSubjectEnsure();
         default:
           break;
       }
@@ -598,7 +608,7 @@ export default {
     },
     // 添加内容弹窗
     addContentBtn(data) {
-      this.tempSection = data
+      this.tempSection = data;
       console.log(data);
       this.videoForm.chapterId = data.chapterId;
       this.videoForm.sectionId = data.sectionId;
@@ -609,34 +619,36 @@ export default {
     // 添加内容对话框确认按钮
     addItem() {
       console.log(this.contentType);
-      console.log('缓存节', this.tempSection.catalogItem);
+      console.log("缓存节", this.tempSection.catalogItem);
       let formType = {};
       let resource;
       if (this.contentType === "视频") {
         formType = this.videoForm;
-        resource = this.fileNumberCheck(this.$refs.tree)
+        resource = this.fileNumberCheck(this.$refs.tree);
       } else {
         formType = this.docForm;
-        resource = this.fileNumberCheck(this.$refs.tree1)
+        resource = this.fileNumberCheck(this.$refs.tree1);
       }
-      if(!resource) return
-      formType.itemName = resource[0].catalogName
-      formType.contentId = resource[0].resourceId
-      this.dialogVisible = false
+      if (!resource) return;
+      formType.itemName = resource[0].catalogName;
+      formType.contentId = resource[0].resourceId;
+      this.dialogVisible = false;
       console.log("ft", formType);
       itemAdd(formType).then(response => {
         console.log(response.data);
-        if(response.code === 200) {
-          this.tempSection.catalogItem.push(formType)
+        if (response.code === 200) {
+          this.tempSection.catalogItem.push(formType);
           this.$message({
             message: "添加内容成功",
             type: "success"
-          })
+          });
+          this.dialogVisible = false;
+          this.getChapterList();
         }
       });
     },
     fileNumberCheck(treeName) {
-      let checkedList =treeName.getCheckedNodes().filter(element => {
+      let checkedList = treeName.getCheckedNodes().filter(element => {
         return element.catalogId === undefined;
       });
       if (checkedList.length > 1) {
@@ -645,14 +657,14 @@ export default {
           type: "warning"
         });
         return false;
-      }else if(checkedList.length < 1) {
+      } else if (checkedList.length < 1) {
         this.$message({
           message: "尚未选择文件",
           type: "warning"
         });
         return false;
       }
-      return checkedList
+      return checkedList;
     },
     addJie(jieName) {
       console.log("jiename", jieName);
@@ -715,7 +727,23 @@ export default {
       console.log("题目所在的内容", subject);
       this.videoUrl = subject.resourceUrl;
       this.coverUrl = subject.coverUrl;
+      this.tempItems = subject
       this.subjectList = [];
+      subjectGet({itemId: subject.itemId})
+      .then(response=> {
+          response.data.forEach((element, i) => {  
+            console.log(Math.floor(element.timePoint / 3600))
+            let hour = Math.floor(element.timePoint / 3600);
+            let minute = element.timePoint > 60 ? Math.floor((element.timePoint - (hour * 3600)) / 60) : 0;
+            let second = element.timePoint % 60;
+            hour = String(hour).length === 1 ? '0' + String(hour) : String(hour)
+            minute = String(minute).length === 1 ? '0' + String(minute) : String(minute)
+            second = String(second).length === 1 ? '0' + String(second) : String(second)
+            element.time = `${hour}:${minute}:${second}`
+            element.timeFormatTip = false
+          });
+          this.subjectList = response.data
+      })
       this.subjectVisible = true;
     },
     filterData(data) {
@@ -740,100 +768,202 @@ export default {
       let curData = getFilter(data);
       return curData;
     },
+    filterQuizData(data) {
+      let getFilter = data => {
+        data.forEach(item => {
+          // 文件夹处理
+          if (!item.catalogList.length !== 0) {
+            getFilter(item.catalogList);
+          }
+          // 文件处理
+          if (item.quizList.length !== 0) {
+            item.quizList.forEach(list => {
+              item.catalogList.push({
+                catalogName: list.quizTitle,
+                resourceId: list.quizId
+              });
+            });
+          }
+        });
+        return data;
+      };
+      let curData = getFilter(data);
+      return curData;
+    },
     // 添加时间点
     addTime() {
-      if (this.subjectList.length >= 3) {
-        alert("亲，3题差不多了哦");
-        return;
-      } else {
-        this.subjectList.push({ time: "" });
-      }
+      // if (this.subjectList.length >= 3) {
+      //   alert("亲，3题差不多了哦");
+      //   return;
+      // } else {
+        this.subjectList.push({ timePoint: "", timeFormatTip: false });
+      // }
     },
     // 保存时间点
-    saveAddTime(index) {
-      // this.subjectList[index].time = this.addTimeInput
+    saveAddTime(subject) {
+      console.log(subject)
+      if (
+        subject.time.split(":").length - 1 !== 2 ||
+        subject.time.length !== 8
+      ) {
+        subject.timeFormatTip = true;
+      } else {
+        subject.timeFormatTip = false;
+      }
+      let timeSplit = subject.time.split(":");
+      let second = 
+          Number(timeSplit[0]) * 3600 + Number(timeSplit[1]) * 60 + Number(timeSplit[2]);
+      console.log(timeSplit[0],timeSplit[1],timeSplit[2],second)
+      subject.timePoint = second
     },
     // 删除时间点
     delSubject(index) {
-      this.subjectList.splice(index, 1);
-      console.log(this.subjectList);
+      let delArr = [];
+      delArr.push(this.subjectList[index].id);
+      this.delDialogParm = {};
+      this.delDialogParm.info = "确认删除内嵌题？";
+      this.delDialogParm.type = "delSubject";
+      this.delDialogParm.subjectIndex = index;
+      this.delDialogParm.ids = delArr;
+      this.delDialog = true;
+    },
+    delSubjectEnsure() {
+      subjectDel(this.delDialogParm.ids)
+      .then(response=> {
+        if(response.code === 200) {
+          this.subjectList.splice(this.delDialogParm.subjectIndex, 1);
+          this.$message({
+            message: '删除内嵌题成功',
+            type: 'success'
+          })
+          this.delDialog = false
+        }
+      })
     },
     // 编辑题目弹窗
     editSubject(index) {
       console.log("当前点击的添加时间点", index);
       this.sourceSubListIndex = index;
-      this.checkedFiles(this.temCheckedList)
       this.editSubjectVisible = true;
+      this.checkedQuizFiles(this.temCheckedList);
     },
     // 选完题确认按钮
     editEnsure() {
-      console.log(this.sourceSubListIndex);
+      this.subjectList[this.sourceSubListIndex].courseId = this.courseId
+      this.subjectList[this.sourceSubListIndex].itemId = this.tempItems.itemId
+      this.subjectList[this.sourceSubListIndex].videoId = this.tempItems.contentId
       this.subjectList[this.sourceSubListIndex].title = this.subjPick;
+      this.editSubjectVisible = false;
       console.log("题目列表对象", this.subjectList);
     },
     // 保存所有的题目信息
     saveAllSubj() {
       console.log(this.subjectList);
-      this.subjectVisible = false;
+      this.subjectList.forEach(element => {
+        if(element.timeFormatTip === true){
+          this.$message({
+            message: '时间点格式有误',
+            type: 'warning'
+          })
+          return
+        }else{
+          subjectAdd(element)
+        .then(response=> {
+          if(response.code === 200) {
+            this.$message({
+              message: '添加内嵌题成功',
+              type: 'success'
+            })
+            this.subjectVisible = false;
+          }else{
+            this.$message({
+              message: '添加失败,请选择题目',
+              type: 'warning'
+            })
+          }
+        })
+        }
+      });
+      
+      
     },
     // 选中的文件
     checkedFiles(checkedList) {
-      this.temCheckedList = checkedList
+      this.temCheckedList = checkedList;
       if (checkedList.length > 1) {
         this.$message({
           message: "请选择单个文件",
           type: "warning"
         });
         return false;
-      }else if(checkedList.length < 1) {
+      } else if (checkedList.length < 1) {
         this.$message({
           message: "尚未选择文件",
           type: "warning"
         });
         return false;
       }
-      let ids = this.subjectList[this.sourceSubListIndex].ids = []
-      ids.push(checkedList[0])
+      let ids = (this.subjectList[this.sourceSubListIndex].ids = []);
+      ids.push(checkedList[0]);
+    },
+    // 添加题目
+    checkedQuizFiles(checkedList) {
+      this.temCheckedList = checkedList;
+      if (checkedList.length > 1) {
+        this.$message({
+          message: "请选择单个文件",
+          type: "warning"
+        });
+        return false;
+      } else if (checkedList.length < 1) {
+        this.$message({
+          message: "尚未选择文件",
+          type: "warning"
+        });
+        return false;
+      }
+      this.subjectList[this.sourceSubListIndex].quizId = checkedList[0].resourceId
     },
     // 本地上传视频
     getVideoUrl(...params) {
-       
-      this.videoForm.itemResource.resourceTitle = params[1].substring(13);// 名称
+      this.videoForm.itemResource.resourceTitle = params[1].substring(13); // 名称
       this.videoForm.itemResource.resourceUrl = params[0]; // 路径
       this.videoForm.itemResource.resourceType = 10; // 资源类型
       let start = params[0].lastIndexOf(".");
-      let end = params[0].length
-      this.videoForm.contentType = 10
-      this.videoForm.chapterId = this.tempSection.chapterId
-      this.videoForm.sectionId = this.tempSection.sectionId
-      this.videoForm.catalogId = null
+      let end = params[0].length;
+      this.videoForm.contentType = 10;
+      this.videoForm.chapterId = this.tempSection.chapterId;
+      this.videoForm.sectionId = this.tempSection.sectionId;
+      this.videoForm.catalogId = null;
       this.videoForm.itemName = params[1].substring(13);
-      this.videoUrl = params[0]
+      this.videoUrl = params[0];
     },
     getDocUrl(...params) {
-      this.docForm.itemResource.resourceTitle = params[1].substring(13);// 名称
+      this.docForm.itemResource.resourceTitle = params[1].substring(13); // 名称
       this.docForm.itemResource.resourceUrl = params[0]; // 路径
       this.docForm.itemResource.resourceType = 20; // 资源类型
       let start = params[0].lastIndexOf(".");
-      let end = params[0].length
-      this.docForm.contentType = 20
-      this.docForm.catalogId = null
+      let end = params[0].length;
+      this.docForm.contentType = 20;
+      this.docForm.catalogId = null;
       this.docForm.itemName = params[1].substring(13);
-      this.contentAdd(this.docForm)
+      this.contentAdd(this.docForm);
     },
     localVideoUpload() {
-      console.log(this.videoForm)
-      this.contentAdd(this.videoForm)
-      this.localVideoDialog = false
+      console.log(this.videoForm);
+      this.contentAdd(this.videoForm);
+      this.getChapterList();
     },
     contentAdd(formName) {
       itemAdd(formName).then(response => {
         console.log(response.data);
-        if(response.code === 200) {
+        if (response.code === 200) {
+          this.localVideoDialog = false;
+          this.dialogVisible = false;
           this.$message({
             message: "添加内容成功",
             type: "success"
-          })
+          });
         }
       });
     }
@@ -876,7 +1006,7 @@ export default {
 .course-tab-container {
   div {
     .shuxian {
-      color: rgb(235,176,78);
+      color: rgb(235, 176, 78);
       font-weight: bold;
       font-size: 20px;
     }
@@ -921,9 +1051,11 @@ export default {
     padding: 0 10px;
     border-radius: 5px;
   }
+
   .title-container:hover {
-    background-color: rgb(243,247,255)
+    background-color: rgb(243, 247, 255);
   }
+
   .itemTitleContainer {
     display: flex;
     align-items: center;
@@ -941,8 +1073,9 @@ export default {
       }
     }
   }
+
   .itemTitleContainer:hover {
-    background-color: rgb(243,247,255)
+    background-color: rgb(243, 247, 255);
   }
 
   .chapter-content {
