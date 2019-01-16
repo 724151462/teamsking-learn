@@ -53,18 +53,18 @@
           <el-input v-model="form.tenantDomain"></el-input>
         </el-form-item>
         <el-form-item label="本地部署" required>
-          <el-radio v-model="form.localDeploy" label="1">
+          <el-radio v-model="form.localDeploy" :label="1">
             是
           </el-radio>
-          <el-radio v-model="form.localDeploy" label="2">
+          <el-radio v-model="form.localDeploy" :label="2">
             否
           </el-radio>
         </el-form-item>
         <el-form-item label="推送平台课程" required>
-          <el-radio v-model="form.pushCourse" label="1">
+          <el-radio v-model="form.pushCourse" :label="1">
             是
           </el-radio>
-          <el-radio v-model="form.pushCourse" label="2">
+          <el-radio v-model="form.pushCourse" :label="2">
             否
           </el-radio>
         </el-form-item>
@@ -77,26 +77,26 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="授权类型" required>
-          <el-radio v-model="form.authorizeType" label="10">
+          <el-radio v-model="form.authorizeType" :label="10">
             正式
           </el-radio>
-          <el-radio v-model="form.authorizeType" label="20">
+          <el-radio v-model="form.authorizeType" :label="20">
             试用
           </el-radio>
         </el-form-item>
         <el-form-item label="试用oss平台" required>
-          <el-radio v-model="form.ossPublic" label="1">
+          <el-radio v-model="form.ossPublic" :label="1">
             是
           </el-radio>
-          <el-radio v-model="form.ossPublic" label="2">
+          <el-radio v-model="form.ossPublic" :label="2">
             否
           </el-radio>
         </el-form-item>
         <el-form-item label="是否启用" required>
-          <el-radio v-model="form.status" label="1">
+          <el-radio v-model="form.status" :label="1">
             启用
           </el-radio>
-          <el-radio v-model="form.status" label="3">
+          <el-radio v-model="form.status" :label="3">
             禁用
           </el-radio>
         </el-form-item>
@@ -115,7 +115,7 @@ import tableTheAgain from "@/components/table-theAgain";
 
 import { sysRolePage } from "../../api/system";
 import { sysRoleAdd } from "../../api/system";
-import { sysRoleEdit } from "../../api/system";
+import { tenantMod } from "../../api/system";
 import { sysRoleDelete } from "../../api/system";
 import { sysUserMenuList } from "../../api/system";
 import { sysTenantManagerPage, tenantGet, tenantAdd } from "../../api/system";
@@ -178,11 +178,11 @@ export default {
       operateList: [
         {
           content: "修改",
-          type: "delete"
+          type: "edit"
         },
         {
           content: "添加管理员",
-          type: "edit"
+          type: "add"
         }
       ],
       tableData: ""
@@ -246,6 +246,9 @@ export default {
       this.addForm.data = { roleName: "" };
     },
     editRole: function(roleInfo) {
+      this.dialogVisible = true;
+      this.addForm.title = "修改信息";
+      this.form = roleInfo
     },
     editMenu: function(roleInfo) {
     },

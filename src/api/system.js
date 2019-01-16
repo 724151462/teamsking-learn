@@ -55,7 +55,12 @@ export function sysTenantManager (data) {
   return commonsAjax(`${baseUrl}tenant/manager`,data,'post')
 }
 
-
+/**
+ * 修改租户
+ **/
+export function tenantMod (data) {
+  return commonsAjax(`${baseUrl}tenant/${data.tenantId}`,data,'put')
+}
 
 /**
  * 分页查询系统消息
