@@ -273,6 +273,7 @@ export default {
     },
     handleSelect(value) {
       console.log(value)
+      Cookie.set('interactionStatus', value)
       this.interactParams.interactionStatus = value;
       console.log(this.interactParams);
       interactList(this.interactParams).then(response => {

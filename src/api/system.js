@@ -13,6 +13,13 @@ export function sysRolePage (data) {
 }
 
 /**
+ * 角色列表 
+ * */
+export function sysRoleList (data) {
+  return commonsAjax(`${baseUrl}role/list`,data,'get')
+}
+
+/**
  * 添加角色 
  * */
 export function sysRoleAdd (data) {
@@ -41,11 +48,11 @@ export function sysUserMenuList () {
   return commonsAjax(`${baseUrl}user/menu/list`,{},'get')
 }
 
-/**
- * 分页查询租户管理员 
- * */
-export function sysTenantManagerPage (data) {
-  return commonsAjax(`${baseUrl}tenant/manager/page`,data,'get')
+/*
+*  查询用户权限菜单 
+* */
+export function sysUserMenuTree () {
+  return commonsAjax(`${baseUrl}menu/tree`,{},'get')
 }
 
 /**
@@ -56,10 +63,19 @@ export function sysTenantManager (data) {
 }
 
 /**
+ * 分页查询租户管理员 
+ * */
+export function sysTenantManagerPage (data) {
+  return commonsAjax(`${baseUrl}tenant/manager/page`,data,'get')
+}
+
+
+
+/**
  * 修改租户
  **/
 export function tenantMod (data) {
-  return commonsAjax(`${baseUrl}tenant/${data.tenantId}`,data,'put')
+  return commonsAjax(`http://120.36.137.90:9008/api/v1/tenant/${data.tenantId}`,data,'put')
 }
 
 /**
@@ -83,6 +99,14 @@ export function sysMessageDel (data) {
 export function courseMsgAdd(data) {
   let url = `${baseUrl}message/course`
   return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 课程消息新增
+ */
+export function courseCatalogList(data) {
+  let url = `/api/v1/common/categories`
+  return commonsAjax(url, data, 'get')
 }
 
 /**

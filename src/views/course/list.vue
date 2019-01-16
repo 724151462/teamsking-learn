@@ -32,7 +32,7 @@
               <a class="list" @click="copyCourse(list.courseId)" >复制</a>
               <a class="list" @click="closeCourse(list.courseId)" v-if="list.courseStatus === 30">关闭</a>
               <a class="list" v-else-if="list.courseStatus === 10" @click="release(list.courseId)">发布</a>
-              <a class="list" v-if="list.courseStatus === 40 || list.courseStatus === 10">删除</a>
+              <a class="list" @click="deleteCourse(list.courseId)" v-if="list.courseStatus === 40 || list.courseStatus === 10">删除</a>
             </div>
             <el-button type="primary" @click="goCourseModel(list.courseId)" v-if="list.courseStatus === 30">课堂模式</el-button>
             <el-button type="primary" @click="goCourseChapter(list.courseId)">教学管理</el-button>
@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { coursePage, publish, copy, close } from '../../api/course'
+import { coursePage, publish, copy, close, courseDel } from '../../api/course'
 export default {
   data () {
     return {
@@ -143,6 +143,18 @@ export default {
         query: {
           type: 'upData',
           courseId: e
+        }
+      })
+    },
+    deleteCourse(courseId) {
+      courseDel([courseId])
+      .then(response=> {
+        if(response.code === 200) {
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+          this.getList()
         }
       })
     },

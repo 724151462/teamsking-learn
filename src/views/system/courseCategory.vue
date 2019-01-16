@@ -46,98 +46,47 @@
           </el-input>
         </div>
 
-        <el-button type="primary">取消</el-button>
         <el-button type="primary">保存</el-button>
 
 
       </div>
 
       <div class="tabContent" v-show="!showTab1">
-
-        <el-table
-            :data="tableData5"
-            style="width: 100%"
-            @expand-change="expandChange()">
-          <el-table-column type="expand">
-            <template slot-scope="props">
-
-              <el-table
-                  :data="tableData"
-                  style="width: 100%"
-                  :show-header="showHeader" >
-                <el-table-column
-                    prop="date"
-                    label="编号">
-                </el-table-column>
-                <el-table-column
-                    prop="name"
-                    label="分类名称">
-                </el-table-column>
-                <el-table-column
-                    prop="address"
-                    label="级别">
-                </el-table-column>
-                <el-table-column
-                    prop="address"
-                    label="是否显示">
-                </el-table-column>
-                <el-table-column
-                    prop="address"
-                    label="课程数量">
-                </el-table-column>
-                <el-table-column
-                    prop="address"
-                    label="排序">
-                </el-table-column>
-                <el-table-column
-                    prop="address"
-                    label="操作">
-                </el-table-column>
-              </el-table>
-
-            </template>
-          </el-table-column>
-          <el-table-column
-              label="编号"
-              prop="id">
-          </el-table-column>
-          <el-table-column
-              label="分类名称"
-              prop="id">
-          </el-table-column>
-          <el-table-column
-              label="级别"
-              prop="name">
-          </el-table-column>
-          <el-table-column
-              label="课程数量"
-              prop="desc">
-          </el-table-column>
-          <el-table-column
-              label="是否显示"
-              prop="id">
-          </el-table-column>
-          <el-table-column
-              label="排序"
-              prop="id">
-          </el-table-column>
-          <el-table-column
-              fixed="right"
-              label="操作"
-              width="100">
-            <template slot-scope="scope">
-              <el-button @click="handleClick(scope.row)" type="text" size="small">编辑</el-button>
-              <el-button type="text" size="small">删除</el-button>
-              <el-button type="text" size="small">新增下级</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-
-
-
-
+        <tableNoHeader
+        :tableData="tableData" 
+        :tables="tables" 
+        :buttonStylus="sysButton" 
+        @showComponentInfo="showComponentInfo"
+      ></tableNoHeader>
+      <!-- 展示二级分类弹窗 -->
+      <el-dialog :visible.sync="dialogVisible">
+        <tableNoHeader
+        :tableData="level2" 
+        :tables="tables" 
+        :buttonStylus="sysButton1" 
+        @showComponentInfo="showComponentInfo"
+      ></tableNoHeader>
+      </el-dialog>
       </div>
-
+      <!-- 保存分类弹窗 -->
+      <el-dialog
+        :title="addForm.title"
+        :visible.sync="saveDialog"
+        width="60%"
+        style="min-width: 800px">
+        <el-form ref="form" :model="form" label-width="120px">
+          <el-form-item label="分类名称" required>
+            <el-input v-model="form.categoryName"></el-input>
+          </el-form-item>
+          <el-form-item label="分类描述" required>
+            <el-input v-model="form.description"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="saveDialog = false">取 消</el-button>
+          <el-button type="primary" @click="save()">确 定</el-button>
+        </span>
+      </el-dialog>
     </div>
 
 
@@ -147,64 +96,93 @@
 </template>
 
 <script>
+  import {courseCatalogList} from '@/api/system'
+  import tableNoHeader from '@/components/table-no-header'
   export default {
     name: "courseCategory",
     data(){
       return{
         showTab1:false,
+        dialogVisible: false,
+        saveDialog: false,
         input:'',
         radio: '1',
         textarea3:'',
         showHeader:false,
-
-
-
-        tableData5: [{
-          id: '12987122',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }, {
-          id: '12987123',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }, {
-          id: '12987125',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }, {
-          id: '12987126',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }],
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }]
-
-
-
+        tableTitle:'角色管理列表',
+        addForm: {
+          title: ''
+        },
+        form:{},
+        tables:[
+          {
+            name:'分类名称',
+            prop:'categoryName',
+          },
+          {
+            name:'级别',
+            prop:'level',
+          },
+          {
+            name:'描述',
+            prop:'description',
+          },
+          
+        ],
+        tableData:[
+          {
+            zyname:'资源名',
+            notesTitle:'笔记标题1',
+            notesContent:'<p>笔记内容</p>',
+            fbr:'发布人',
+            fbsj:'2018-1-1',
+            popover: 'dsawf'
+          },
+          {
+            zyname:'资源名',
+            notesTitle:'笔记标题',
+            notesContent:'笔记内容',
+            fbr:'发布人',
+            fbsj:'2018-1-1',
+            popover: 'twqfwq'
+          },
+        ],
+        sysButton:[
+          {
+            name:'查看二级分类',
+            type:'detail',
+          },
+          {
+            name:'添加二级分类',
+            type:'addCatalog',
+          },
+          {
+            name:'删除',
+            type:'delete',
+          },
+        ],
+        sysButton1:[
+          {
+            name:'编辑',
+            type:'edit',
+          },
+          {
+            name:'删除',
+            type:'delete',
+          },
+        ],
+        tableData: [],
+        level2: []
       }
+    },
+    created() {
+      courseCatalogList()
+      .then(response=> {
+        response.data.forEach(element => {
+          element.level = '一级'
+        });
+        this.tableData = response.data
+      })
     },
     methods:{
       switchTab:function(rank){
@@ -219,32 +197,30 @@
         //this.showTab1 = !this.showTab1;
         console.log(this.showTab1)
       },
-      expandChange:function(row,expandedRows){
-        let el = event.currentTarget;
-        console.log('执行expand-change');
-        console.log("el:",el);
-        //console.log("props:",props);
-        // document.getElementsByTagName('style')[0] += `
-        //     .el-table__expanded-cell[class*=cell]{
-        //       padding:0 !important;
-        //     }
-        // `;
+      showComponentInfo:function(type,info){
+        console.log('type',type,'info',info);
+         switch(type){
+           case 'addCatalog':
+             this.form = {}
+             this.addForm.title = "添加分类"
+             this.saveDialog = true
+             break;
+           case 'detail':
+             this.level2 = info.children
+             this.dialogVisible = true
+             break;
+           case 'edit':
+             console.log(info)
+             this.form = info
+             this.addForm.title = "编辑分类"
+             this.saveDialog = true
+             break;
+        }
+      }
 
-        let trNoClass = document.getElementsByTagName('tr').filter;
-
-
-
-        //console.log('样式:', document.getElementsByTagName('style')[0] );
-
-
-        console.log('节点:',document.getElementsByTagName('tr') );
-        console.log('trNoClass:',trNoClass );
-
-           //'.el-table__expanded-cell[class*=cell]{\n' +
-        //   '    padding:0 !important;\n' +
-        //   '  }';
-  }
-
+    },
+    components: {
+      tableNoHeader
     }
   }
 </script>
@@ -309,6 +285,9 @@
 
   .el-table__expanded-cell[class*=cell]{
     padding:0 !important;
+  }
+  #courseCategory{
+    height: 600px;
   }
   .courseCategory .el-table__expanded-cell{
     padding:0 !important;

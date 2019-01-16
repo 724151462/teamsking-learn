@@ -20,6 +20,14 @@ import {
 export function coursePage(data) {
   return commonsAjax(`${baseUrl}page`, data, 'get')
 }
+
+/**
+ * 获取课程列表
+ */
+export function courseDel(data) {
+  return commonsAjax(`${baseUrl}`, data, 'delete')
+}
+
 /**
  * 获取默认的课程封面
  */

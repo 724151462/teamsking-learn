@@ -39,7 +39,6 @@
         :title="addForm.title"
         :visible.sync="dialogVisible"
         width="60%"
-        :before-close="handleClose"
         style="min-width: 800px">
 
       <el-form ref="form" :model="form" label-width="120px">
@@ -190,6 +189,7 @@
            case 'created':
              console.log('here is created');
              console.log(this.form)
+             this.form = {}
              this.appendTenant();
              break;
            case 'edit':
@@ -313,10 +313,7 @@
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;
         // this.queryRoleList();
-      },
-      handleClose(done) {
-        done();
-      },
+      }
     }
   }
 </script>

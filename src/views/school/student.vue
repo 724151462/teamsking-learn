@@ -115,46 +115,44 @@
                 <el-form-item label="手机号码">
                     <el-input v-model="form.mobile" :disabled="mobileEnable"></el-input>
                 </el-form-item>
-                <el-form-item label="院名称">
-                    <el-select v-model="collegeId" placeholder="院名称">
-                        <el-option value="-2" label="无院"></el-option>
-                        <el-option 
-                            v-for="(item, index) in collegeList" 
-                            :key="index" 
-                            :label="item.collegeName"
-                            :value="item.collegeId"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="系名称">
-                    <el-select v-model="departmentId" placeholder="系名称">
-                        <el-option value="-2" label="无系"></el-option>
-                        <el-option 
-                            v-for="(item, index) in departmentList" 
-                            :key="index" 
-                            :label="item.departmentName"
-                            :value="item.departmentId"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="专业">
-                    <el-select v-model="specialityId" placeholder="专业">
-                        <el-option value="-2" label="无专业"></el-option>
-                        <el-option 
-                            v-for="(item, index) in specialityList" 
-                            :key="index" 
-                            :label="item.specialityName"
-                            :value="item.specialityId"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="班级">
-                    <el-select v-model="classId" placeholder="班级">
-                        <el-option value="-1" label="请添加班级"></el-option>
-                        <el-option ref="class"
-                            v-for="(item, index) in classList" 
-                            :key="index" 
-                            :label="item.className"
-                            :value="item.classId"></el-option>
-                    </el-select>
-                </el-form-item>
+                <el-form-item>
+                <el-select v-model="searchForm.college" :readonly="true" placeholder="院" @change="collegeChange">
+                    <el-option 
+                    v-for="(item, index) in searchCollegeList" 
+                    :key="index" 
+                    :label="item.collegeName"
+                    :value="item.collegeId">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="searchForm.department" :readonly="true" placeholder="系" @change="departmentChange">
+                    <el-option 
+                    v-for="(item, index) in searchDepartmentList" 
+                    :key="index" 
+                    :label="item.departmentName"
+                    :value="item.departmentId">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="searchForm.speciality" placeholder="专业" @change="specialityChange">
+                    <el-option 
+                    v-for="(item, index) in searchSpecialityList" 
+                    :key="index" 
+                    :label="item.specialityName"
+                    :value="item.specialityId"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="searchForm.studentClass" placeholder="班级">
+                    <el-option 
+                    v-for="(item, index) in classSearchList" 
+                    :key="index" 
+                    :label="item.className"
+                    :value="item.classId"></el-option>
+                </el-select>
+            </el-form-item>
                 <el-form-item label="是否启用">
                     <el-switch active-value=1
                         inactive-value=2
@@ -607,10 +605,10 @@ import { setTimeout } from 'timers';
                 console.log(123,this.form.classId)
                 let sex = this.form.sex == "男" ? 1:2
                 let formData = {
-                    "classId": this.classId,
-                    "collegeId": this.collegeId,
+                    "classId": this.searchForm.studentClass,
+                    "collegeId": this.searchForm.collegeId,
                     "realName": this.form.realName,
-                    "specialityId": this.specialityId,
+                    "specialityId": this.searchForm.specialityId,
                     "gender": sex,
                     "mobile": this.form.mobile,
                     "studentNo": this.form.studentNo,

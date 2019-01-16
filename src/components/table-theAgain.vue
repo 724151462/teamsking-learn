@@ -109,6 +109,7 @@
                 </el-table-column>
 
                 <el-table-column
+                        v-if="operateList"
                         fixed="right"
                         label="操作"
                         :width="operateList.length * 100"
