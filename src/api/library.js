@@ -93,7 +93,8 @@ export function newResFileFold(data) {
  * 移动资源
  */
 export function moveRes(data) {
-  let url = `http://120.36.137.90:9008/api/v1/library/catalog/resource`
+  // let url = `http://120.36.137.90:9008/api/v1/library/catalog/resource`
+  let url = `${baseUrl}/catalog/resource`
   return commonsAjax(url, data, 'patch')
 }
 /**
