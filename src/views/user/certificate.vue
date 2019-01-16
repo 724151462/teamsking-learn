@@ -44,7 +44,22 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-dialog
+          title="提示"
+          width="500px"
+          :visible.sync="imgDialog">
+            <el-carousel :interval="0" arrow="always" height="350px">
+                <el-carousel-item v-for="creImg in imgSrc" :key="creImg.id">
+                    <img :src="creImg.img" alt="证书图片" style="width: inherit;height: inherit;">
+                </el-carousel-item>
+            </el-carousel>
+            <span slot="footer" class="dialog-footer">
+            <el-button @click="imgDialog = false">取 消</el-button>
+            <el-button type="primary" @click="imgDialog = false">确 定</el-button>
+          </span>
+        </el-dialog>
     </div>
+
 </template>
 <script>
     import {certificateList, delCertificate} from '@/api/user'
@@ -55,7 +70,13 @@
         },
         data() {
             return {
-                data: []
+                data: [],
+                imgDialog:false,
+              imgSrc: [
+                {img: 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/154726200084466669.jpeg'},
+                {img: 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/154726200084466669.jpeg'},
+                {img: 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/154726200084466669.jpeg'}
+              ]
             }
         },
         methods: {

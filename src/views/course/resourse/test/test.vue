@@ -71,7 +71,7 @@
                 </span>
                 <span v-else class="hide-button">
                   <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="delQuiz()">删除</el-button>
+                  <el-button size="mini" type="primary" @click.stop="delQuiz(data.quizId)">删除</el-button>
                 </span>
               </span>
 
@@ -230,8 +230,15 @@
       },
       // 获取所有试题列表
       getTestList(id){
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         let data = {quizType: id}
         getTestFileFold(data).then(res => {
+          loading.close()
           console.log(res)
           if (Number(res.code) === 200) {
             //如果试题库为空，则初始化新建一个默认的文件夹
@@ -258,8 +265,15 @@
       },
       //新建文件夹
       newFileFold(){
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         let data = this.newCatalog
         newTestFileFold(data).then(res => {
+          loading.close()
           console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('文件夹新建成功');
@@ -323,13 +337,18 @@
         this.fileName = file.name;
         return false // 返回false不会自动上传
       },
-      //选择试题章节查询
-      getChapterQuiz() {
-        alert("按章节查询")
-      },
       // 删除试题
-      delQuiz() {
-        deleteQuiz(this.quizArr).then(res => {
+      delQuiz(id) {
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        this.quizArr.push(Number(id))
+        let arr = [...this.quizArr]
+        deleteQuiz(arr).then(res => {
+          loading.close()
           console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('试题删除成功');
@@ -341,9 +360,16 @@
       },
       //删除文件夹
       deleteCatalog(){
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         let catalogIds = [...this.deleteArr]
         console.log(catalogIds)
         deleteTestFileFold(this.deleteArr).then(res => {
+          loading.close()
           console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('删除成功');

@@ -90,6 +90,13 @@ export function newResFileFold(data) {
   return commonsAjax(url, data, 'post')
 }
 /**
+ * 移动资源
+ */
+export function moveRes(data) {
+  let url = `${baseUrl}catalog/resource`
+  return commonsAjax(url, data, 'patch')
+}
+/**
  * 修改资源文件夹名字
  */
 export function reResFileFold(data) {

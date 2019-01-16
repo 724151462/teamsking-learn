@@ -12,7 +12,11 @@ const state = {
   filterMenu: [],
   topNavState: 'course',
   leftNavState: 'course' ,
-  modelActive: Cookie.get('modelActive') || "1"
+  modelActive: Cookie.get('modelActive') || "1",
+  beginDrag:{
+    type: '',
+    id:''
+  }, //当前被拖拽对象的信息
 }
 
 const mutations = {
@@ -24,6 +28,10 @@ const mutations = {
     list.forEach(element => {
       state.allMenu.push(element)
     });
+  },
+  SAVE_DRAG:(state, data)=>{
+    state.beginDrag.type = data.type
+    state.beginDrag.id = data.id
   }
 }
 
