@@ -227,8 +227,8 @@ export default {
 
     .img
       position: relative
-      width:260px
-      height:200px
+      width:280px
+      height:160px
       border:1px solid #CCCCCC
       display:inline-block
       vertical-align:top
@@ -237,6 +237,7 @@ export default {
       .tib
         background: #3EABA8
         padding:2px 5px
+        z-index 1000
         color:#ffffff;
         font-size: 16px
         -webkit-border-radius: 2px

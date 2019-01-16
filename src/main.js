@@ -21,7 +21,12 @@ import VueSocketIO from 'vue-socket.io';
 // }));
 Vue.use(ElementUI)
 
-
+Vue.prototype.loadingCss = {
+  lock: true,
+  text: 'loading',
+  spinner: 'el-icon-loading',
+  background: 'rgba(0, 0, 0, 0.7)'
+};
 Vue.config.productionTip = false
 
 var routeList = []

@@ -138,6 +138,19 @@ export function certificateList (data) {
     return commonsAjax(`${baseUrl}user/certificate`, data, 'get')
 }
 
+/**
+ * 获取审核中的证书信息
+ * */
+export function statusCre (data) {
+  return commonsAjax(`${baseUrl}certificate/${data}/audit`, data, 'get')
+}
+
+/**
+ * 获取证书信息
+ * */
+export function cerInfo (data) {
+  return commonsAjax(`${baseUrl}certificate/${data}`, data, 'get')
+}
 //============================教师相关===========================
 /**
  * 获取我的教师信息

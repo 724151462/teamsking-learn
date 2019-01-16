@@ -39,7 +39,9 @@
           <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
           <el-button type="primary" size="small" @click="goCreateCatalog('',0)">创建目录</el-button>
           <el-button type="primary" size="small">移动到</el-button>
-          <el-button type="info" size="small" @click="deleteCatalog">删除</el-button>
+          <el-button type="info" size="small"
+                     v-bind:class="{ active: deleteArr.length>0}"
+                     @click="deleteCatalog">删除</el-button>
           <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
         </div>
       </div>
@@ -60,6 +62,7 @@
                 <img :src="imgSrc.folder" alt="" class="folder-img" v-show="!data.quizId">
                 <span class="quiz-tag" v-show="data.quizType == 10">单选题</span>
                 <span class="quiz-tag" v-show="data.quizType == 20">多选题</span>
+                <span class="quiz-tag" v-show="data.quizType == 30">主观题</span>
                 <span>{{ node.label }}</span>
               </span>
               <span class="hide-button">
@@ -411,6 +414,10 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+  .active
+    color: #fff;
+    background-color: #409EFF;
+    border-color: #409EFF;
   //单选，多选，徽章
   .quiz-tag
     display inline-block

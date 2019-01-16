@@ -854,7 +854,7 @@
   .course-tag-warp
     width 300px
     border-radius 5px
-    border 1px solid #e9e9e9
+    /*border 1px solid #e9e9e9*/
     padding-left 5px
     padding-bottom 10px
     & span
@@ -862,7 +862,7 @@
   .instructor-tag-warp
     width 300px
     border-radius 5px
-    border 1px solid #e9e9e9
+    /*border 1px solid #e9e9e9*/
     border-bottom 0
     /*padding 5px*/
     padding-left 5px

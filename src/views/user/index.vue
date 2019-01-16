@@ -121,7 +121,6 @@
           </div>
           <div style="text-align: right"><el-button type="primary" @click="changePassword()">保存</el-button></div>
         </div>
-
       </el-tab-pane>
       <el-tab-pane label="消息管理" name="second"></el-tab-pane>
       <el-tab-pane label="我的证书" name="third"></el-tab-pane>
@@ -234,7 +233,6 @@
         <span v-for="img in cerForm.imgUrls" :key="img.id">
           <img :src="img.imgUrl" alt="" class="cre-img">
         </span>
-
         <!--<span><i class="el-icon-picture cre-uploader-icon"></i></span>-->
         <up-oss @ossUp="upCre" :inputs="'creImg'"></up-oss>
       </el-form>
@@ -460,6 +458,7 @@
       //更换头像
       changeAvatar(url , name){
           this.infoForm.avatar = url
+          this.changeInfo()
       },
       //修改本人信息
       changeInfo(){
@@ -522,29 +521,25 @@
       },
       // 修改密码
       changePassword(){
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         let data  = {
           checking: String(this.passForm.checking),
           newPasswd: String(this.passForm.newPasswd),
           oldPasswd: String(this.passForm.oldPasswd)
         }
         userApi.changeUserPassword(data).then(res=>{
+          loading.close()
           console.log(res)
           if(Number(res.code) === 200) {
             this.$message.success('密码修改成功')
-            this.$notify.success({
-              title: '成功',
-              message:'密码修改成功'
-            });
-
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
-            this.$notify.error({
-              title: '错误',
-              message:msgs[0].message
-            });
+          }else{
+            this.$message.error(res.msg)
           }
-        }).catch(error=>{
-          console.log(error)
         })
       },
       //手机换绑时验证密码

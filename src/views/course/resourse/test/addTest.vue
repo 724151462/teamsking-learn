@@ -1,7 +1,7 @@
 <template>
   <div class="addTest">
     <div class="title">
-      <div><span style="cursor: pointer" @click="toTest">试题管理</span> > 添加试题</div>
+      <div>添加试题</div>
     </div>
     <div style="padding-right: 35%">
       <el-form :model="testData" ref="testData" >
@@ -15,12 +15,12 @@
             <el-radio :label="20">多选</el-radio>
             <!-- 目前没有判断和主观题型-->
             <!--<el-radio :label="30">判断题</el-radio>-->
-            <!--<el-radio :label="40">主观</el-radio>-->
+            <el-radio :label="30">主观</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="选项" required>
           <br>
-          <div v-if="testData.quizType===40">
+          <div v-if="testData.quizType===30">
             <p style="padding-left: 40px">主观题无固定答案</p>
           </div>
           <div class="option-list"
@@ -103,7 +103,7 @@
             },
           ],
           quizTitle: "",
-          quizType: 10, // 0 为单选，1为多选，2为判断，3为主观
+          quizType: 10, // 10 为单选，20为多选，30为主观
         },
         optionItem:["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"]
       }
@@ -133,7 +133,7 @@
     methods:{
       // 题目类型改变
       quizTypeChange(e){
-        let data1 = [{"correctFlag": 0, "optionTitle": "主观题没有正确答案"}],
+        let data1 = [{"correctFlag": 1, "optionTitle": "主观题没有正确答案"}],
           data2 = [
             // 单选和多选
             {"correctFlag": 0, "optionTitle": ""},
@@ -147,10 +147,10 @@
             {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
           ];
         //将数据组装为数组，若用push方法，会发生不可描述的错误
-        if(e === 40){
+        if(e === 30){
           this.testData.quizOption = []
           this.testData.quizOption = data1
-        } else if (e === 30){
+        } else if (e === 40){
           this.testData.quizOption = []
           this.testData.quizOption = data3
         }else{
@@ -203,46 +203,47 @@
           });
           return false
         }
-        this.testData.quizOption.forEach((item)=>{
-          flagArr.push(item.correctFlag)
-          if(item.optionTitle == ''){
-            isEmpty = true
-          }
-        })
-        if(isEmpty){
-          this.$notify({
-            message: '请将为空的试题选项删除',
-            type: 'warning',
-          });
-          return false
-        }
-
-        if(this.testData.quizType !== 3){
-          if(flagArr.indexOf(1) === -1){
+        if(this.testData.quizType!==30){
+          this.testData.quizOption.forEach((item)=>{
+            flagArr.push(item.correctFlag)
+            if(item.optionTitle == ''){
+              isEmpty = true
+            }
+          })
+          if(isEmpty){
             this.$notify({
-              message: '请至少设置一个正确选项',
+              message: '请将为空的试题选项删除',
               type: 'warning',
             });
             return false
           }
+
+          if(this.testData.quizType !== 3){
+            if(flagArr.indexOf(1) === -1){
+              this.$notify({
+                message: '请至少设置一个正确选项',
+                type: 'warning',
+              });
+              return false
+            }
+          }
         }
+
       },
       // 保存试题
       saveQuiz () {
-        this.filterQuiz() //保存试题前验证数据
+        this.filterQuiz() //保存试题前的数据验证
 
         let data = this.testData
-
+        let loading = this.$loading(this.loadingCss)
         saveQuiz(data).then(res=>{
+          loading.close()
           console.log(res)
           if(Number(res.code) === 200) {
             this.$message.success('试题添加成功')
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
-            this.$message({
-              message:msgs[0].message,
-              type:'error'
-            })
+            this.$router.push('/course/resource/test');
+          }else{
+            this.$message.error(res.msg)
           }
         })
       }

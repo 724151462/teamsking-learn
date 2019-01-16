@@ -560,7 +560,7 @@
           let data = {
             id:beforeId,
             type:beforeType,
-            next: {
+            previous: {
               id: afterId,
               type:afterType
             }
@@ -580,6 +580,8 @@
         }
       },
       allowDrop(draggingNode, dropNode, dropType) {
+        //拖拽验证，情况复杂
+        //拖拽验证，情况复杂
         //拖拽验证，情况复杂
         // let type = draggingNode.data.resourceId ? 2 :1
         //   type == 1 ? console.log('文件夹') :console.log('资源')
