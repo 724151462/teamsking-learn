@@ -427,7 +427,7 @@
                   if(item.resourceList.length !==0){
                     let parentId = item.catalogId
                     item.resourceList.forEach((list)=>{
-                      list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
+                      // list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
                       list.resourceSize = this.sizeTrans(list.resourceSize)
                         item.childCatalogList.push({
                           catalogName: list.resourceTitle,

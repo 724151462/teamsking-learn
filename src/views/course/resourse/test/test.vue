@@ -8,12 +8,12 @@
       <div style="display: flex">
         <div style="width: 300px">
           <el-input
-            placeholder="输入课程名称查询资源"
+            placeholder="搜索试题"
             v-model="input">
           </el-input>
         </div>
         <div>
-          <el-button icon="el-icon-search" class="search-btn"></el-button>
+          <el-button icon="el-icon-search" class="search-btn" @click="getTestList(0,input)"></el-button>
         </div>
       </div>
       <div style="" class="btn-warp" >
@@ -38,7 +38,6 @@
           <!--全选-->
           <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
           <el-button type="primary" size="small" @click="goCreateCatalog('',0)">创建目录</el-button>
-          <el-button type="primary" size="small">移动到</el-button>
           <el-button type="info" size="small"
                      v-bind:class="{ active: deleteArr.length>0}"
                      @click="deleteCatalog">删除</el-button>
@@ -53,6 +52,7 @@
             children: 'catalogList'
           }"
           show-checkbox
+          :default-expanded-keys="expan"
           @check-change	="nodeCheck"
           accordion
           node-key="catalogId"
@@ -68,13 +68,13 @@
               <span class="hide-button">
                 <span v-if="data.catalogLevel">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="() => append(data)"> 重命名 </el-button>
+                  <el-button size="mini" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
                   <el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>
                   <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
                 </span>
                 <span v-else class="hide-button">
                   <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="delQuiz(data.quizId)">删除</el-button>
+                  <el-button size="mini" type="primary" @click.stop="delQuiz(data.quizId,data.parentId)">删除</el-button>
                 </span>
               </span>
 
@@ -129,17 +129,36 @@
           <el-button type="primary" @click="newFileFold">确 定</el-button>
         </span>
     </el-dialog>
+    <!--重命名弹窗-->
+    <el-dialog
+      title="重命名"
+      :visible.sync="renameCatalog"
+      width="40%">
+      <el-input v-model="newCatalog.catalogName" placeholder="请输入文件夹的名字"></el-input>
+
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="renameCatalog = false">取 消</el-button>
+          <el-button type="primary" @click="reFileFold">确 定</el-button>
+        </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  // import uposs from '@/components/up-oss.vue'
-  import {getTestFileFold, newTestFileFold , deleteTestFileFold, deleteQuiz} from "../../../../api/library";
+  import UpOss from "@/components/up-oss";
+  import {
+    getTestFileFold, newTestFileFold ,
+    deleteTestFileFold, deleteQuiz,
+    upQuiz, testFileFoldRename
+  } from "../../../../api/library";
 
   export default {
     // components:{uposs},
     created (){
       this.getTestList(0)
+    },
+    components:{
+      UpOss
     },
     data() {
       return {
@@ -170,17 +189,20 @@
           catalogId: 0,
           catalogName: ""
         },
+        input:'',//搜索框的值
         deleteArr:[],//需要删除的文件夹的数组
         quizArr:[],//需要删除的试题数组
         uploadDialog: false, //文件上传弹窗
         createCatalog: false, //新建目录弹窗
+        renameCatalog : false,//重命名弹窗
         testView: false , //试题查看弹窗
         allDelete: false, //删除试题
         //courseId: '0608367675f54267aa6960fd0557cc1b',//如果指定课程的话，课程ID
         courseId: '',//如果指定课程的话，课程ID
         catalogPros:{
           label:'catalogName'
-        }
+        },
+        expan:[],
       }
     },
     methods: {
@@ -188,14 +210,27 @@
       goCreateCatalog(data,id) {
         this.newCatalog.catalogId = id
         this.createCatalog = true
-
-        //创建子目录时目录不折叠
-        // console.log(data)
-        // const newChild = { catalogId: 101 , catalogName: "计算机网络--第一章" };
-        // if (!data.catalogList) {
-        //   this.$set(data, 'children', []);
-        // }
-        // data.catalogList.push(newChild);
+      },
+      //点击弹出重命名的弹窗
+      goRenameCatalog(data,id) {
+        let parentId =  data.parentId || 0
+        this.expan = [parentId]
+        this.newCatalog.catalogId = id
+        this.renameCatalog = true
+      },
+      reFileFold(){
+        let data = this.newCatalog
+        testFileFoldRename(data).then(res => {
+          if (Number(res.code) === 200) {
+            this.$message.success('重命名成功');
+            this.renameCatalog = false
+            this.newCatalog.catalogName = ''
+            //更新页面数据
+            this.getTestList(0)
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
       },
       //全选操作
       checkAll(flag){
@@ -232,14 +267,17 @@
         })
       },
       // 获取所有试题列表
-      getTestList(id){
+      getTestList(id,key){
         let loading = this.$loading({
           lock: true,
           text: 'loading',
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         });
-        let data = {quizType: id}
+        let data = {
+          quizType: id,
+          searchKey:key
+        }
         getTestFileFold(data).then(res => {
           loading.close()
           console.log(res)
@@ -275,6 +313,7 @@
           background: 'rgba(0, 0, 0, 0.7)'
         });
         let data = this.newCatalog
+        this.expan = [this.newCatalog.catalogId]
         newTestFileFold(data).then(res => {
           loading.close()
           console.log(res)
@@ -297,18 +336,15 @@
       },
       // 导入试题模板
       upTestFile(item) {
-        this.beforTestUpload()
-        console.log(item)
+        this.beforTestUpload(item)
+        let upFile = item.file
         let fileFormData = new FormData();
-        fileFormData.append('file', item.file);
-        console.log(fileFormData)
-        upQuiz(this.courseId, fileFormData).then(res => {
-          this.$notify({
-            title: '试题导入成功',
-            message: '新增' + res.data.totalCount + '个试题',
-            type: 'success',
-            duration: 0
-          });
+        fileFormData.append('file', upFile);
+        let loading = this.$loading(this.loadingCss)
+        upQuiz(fileFormData).then(res => {
+          loading.close()
+          console.log(res)
+          this.$message.success('新增' + res.data.totalCount + '个试题')
         }).catch(error => {
           console.log(error)
         })
@@ -316,19 +352,19 @@
       //文件上传验证
       beforTestUpload(file) {
 
-        if (!this.courseId) {
-          this.$notify.error({
-            title: '错误',
-            message: '请先搜索相关课程，再导入该课程的试题模板'
-          });
-          return false
-        }
+        // if (!this.courseId) {
+        //   this.$notify.error({
+        //     title: '错误',
+        //     message: '请先搜索相关课程，再导入该课程的试题模板'
+        //   });
+        //   return false
+        // }
 
-        console.log(file, '文件');
+        console.log(file.file.name, '文件');
         this.files = file;
-        const extension = file.name.split('.')[1] === 'xls'
-        const extension2 = file.name.split('.')[1] === 'xlsx'
-        const isLt2M = file.size / 1024 / 1024 < 5
+        const extension = file.file.name.split('.')[1] === 'xls'
+        const extension2 = file.file.name.split('.')[1] === 'xlsx'
+        const isLt2M = file.file.size / 1024 / 1024 < 5
         if (!extension && !extension2) {
           this.$message.warning('上传模板只能是 xls、xlsx格式!')
           return
@@ -337,11 +373,11 @@
           this.$message.warning('上传模板大小不能超过 5MB!')
           return
         }
-        this.fileName = file.name;
+        this.fileName = file.file.name;
         return false // 返回false不会自动上传
       },
       // 删除试题
-      delQuiz(id) {
+      delQuiz(id,parentId) {
         let loading = this.$loading({
           lock: true,
           text: 'loading',
@@ -350,6 +386,7 @@
         });
         this.quizArr.push(Number(id))
         let arr = [...this.quizArr]
+        this.expan = [parentId]
         deleteQuiz(arr).then(res => {
           loading.close()
           console.log(res)
@@ -395,12 +432,16 @@
               getFilter(item.catalogList)
             }
             if(item.quizList.length !==0){
+              let parentId = item.catalogId
               item.quizList.forEach((list)=>{
                 list.quizTitle = list.quizTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
-                item.catalogList.push({catalogName: list.quizTitle,
-                    quizId: list.quizId,
-                    updateTime:list.updateTime,
-                    quizType:list.quizType})
+                item.catalogList.push({
+                  catalogName: list.quizTitle,
+                  quizId: list.quizId,
+                  updateTime:list.updateTime,
+                  quizType:list.quizType,
+                  parentId
+                })
               })
             }
           })

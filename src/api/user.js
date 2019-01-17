@@ -28,7 +28,14 @@ export function getMeInfo (id) {
   // return commonsAjax(url, '', 'get')
   return commonsAjax(url, '', 'get')
 }
-
+/**
+ * 获取用户消息
+ * */
+export function getMsg (data) {
+  let url = `${baseUrl}/user/message/page`
+  // return commonsAjax(url, '', 'get')
+  return commonsAjax(url, data, 'get')
+}
 
 /**
  * 修改本人的用户信息，密码、身份证和电话号码除外
