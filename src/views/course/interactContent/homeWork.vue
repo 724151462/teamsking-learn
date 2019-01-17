@@ -84,11 +84,13 @@
       </div>
     </div>
     <el-button @click="hwSave">保存</el-button>
+    <el-button @click="cancel">取消</el-button>
   </div>
 </template>
 
 <script>
 import upOss from "@/components/up-oss";
+import Cookie from 'js-cookie'
 import {
   assetCreate,
   homeWorkDetail,
@@ -118,7 +120,8 @@ export default {
           //   markScore: 0
           // }
         ],
-        schemeId: ""
+        schemeId: "",
+        routerType: 'cancel'
       },
       groupList: [
         {
@@ -199,6 +202,23 @@ export default {
         console.log("asset", this.homeWork);
       });
     },
+    handleSuccess() {
+      this.routerType = 'success'
+      let chapterArr = JSON.parse(localStorage.getItem('localInteractId'))
+      Cookie.set('interactionStatus', "10")
+      let index = ''
+      let findFlag = chapterArr.some((element, i)=> {
+        if(element === this.homeWork.chapterId) {
+          index = i
+        }
+      })
+      if(index !== '') {
+        Cookie.set('interactActiveIndex', index)
+      }else{
+        Cookie.set('interactActiveIndex', chapterArr.length)
+      }
+      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
+    },
     hwSave() {
       if (this.$route.query.operation === "edit") {
         homeworkPut(this.homeWork).then(response => {
@@ -207,6 +227,7 @@ export default {
               message: "修改作业成功",
               type: "success"
             });
+            this.handleSuccess()
           }
         });
       } else {
@@ -216,9 +237,15 @@ export default {
               message: "添加作业成功",
               type: "success"
             });
+            this.handleSuccess()
           }
         });
       }
+    },
+    // 取消
+    cancel() {
+      this.routerType = "cancel"
+      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
     }
   },
   computed: {
@@ -241,7 +268,13 @@ export default {
     }
   },
   beforeRouteLeave (to, from, next) {
-    this.$confirm('跳转将丢失未保存数据，是否跳转', '提示', {
+    let msg = '跳转将丢失未保存数据，是否跳转'
+    if(this.routerType === 'cancel') {
+      msg = '跳转将丢失未保存数据，是否跳转'
+    }else {
+      msg = '添加成功，是否跳活动转列表页'
+    }
+    this.$confirm(msg, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'

@@ -1,7 +1,9 @@
 <template>
   <div class="warp">
     <div class="header">
-      <span class="back"><i class="el-icon-arrow-left"></i>返回</span>
+      <span style="display:inline-block;margin: 5px 10px">
+        <router-link :to="{path: '/course/list/discuss', query:{id: this.$route.query.id}}">讨论</router-link>> 讨论详情
+      </span>
     </div>
     <div class="content">
       <div>请问我来迟了，作业无法提交怎么办</div>
@@ -24,20 +26,26 @@
 </template>
 
 <script>
+  import {
+    discussIssue,
+    discussReply
+  } from '@/api/course'
   export default {
-    name: "discussDialog"
+    name: "discussDialog",
+    mounted() {
+      discussIssue({discussId: this.$route.query.disId})
+      discussReply({discussId: this.$route.query.disId})
+    }
   }
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
   .warp
-    width: 60%;
+    width: 100%;
     margin: 0 auto
-    margin-top 50px
     .header
       height 50px;
       background rgb(215, 215, 215)
-      text-align right
       line-height 50px;
       .back
         cursor: pointer

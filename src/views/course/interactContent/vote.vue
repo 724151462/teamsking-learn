@@ -64,6 +64,7 @@
       </div>
     </div>
     <el-button @click="saveVoteArr">保存</el-button>
+    <el-button @click="cancel">取消</el-button>
   </div>
 </template>
 
@@ -74,6 +75,9 @@ import {
   chaptersListSimple,
   interactVote,
 } from "@/api/course";
+
+import Cookie from 'js-cookie'
+
 export default {
   data() {
     return {
@@ -111,7 +115,8 @@ export default {
       tabIndex: 1,
       showTitle: "",
       temTitle: "",
-      chapterList: []
+      chapterList: [],
+      routerType: 'cancel'
     };
   },
   mounted() {
@@ -180,6 +185,23 @@ export default {
         tab.title = `第${index + 1}题`;
       });
     },
+    handleSuccess() {
+      this.routerType = 'success'
+      let chapterArr = JSON.parse(localStorage.getItem('localInteractId'))
+      Cookie.set('interactionStatus', "10")
+      let index = ''
+      let findFlag = chapterArr.some((element, i)=> {
+        if(element === this.voteObj.chapterId) {
+          index = i
+        }
+      })
+      if(index !== '') {
+        Cookie.set('interactActiveIndex', index)
+      }else{
+        Cookie.set('interactActiveIndex', chapterArr.length)
+      }
+      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
+    },
     saveVoteArr() {
       console.log(this.$route.query.operation);
       if(this.$route.query.operation === 'edit'){
@@ -189,6 +211,7 @@ export default {
               message: "修改投票成功",
               type: "success"
             });
+            this.handleSuccess()
           }
         });
       }else{
@@ -198,6 +221,7 @@ export default {
               message: "发起投票成功",
               type: "success"
             });
+            this.handleSuccess()
           }
         });
       }
@@ -214,6 +238,11 @@ export default {
     delAnswer(item, index) {
       console.log(item, index);
       item.voteQuizOptions.splice(index, 1);
+    },
+    // 取消
+    cancel() {
+      this.routerType = "cancel"
+      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
     }
   },
   filters: {
@@ -239,7 +268,13 @@ export default {
     }
   },
   beforeRouteLeave (to, from, next) {
-    this.$confirm('跳转将丢失未保存数据，是否跳转', '提示', {
+    let msg = '跳转将丢失未保存数据，是否跳转'
+    if(this.routerType === 'cancel') {
+      msg = '跳转将丢失未保存数据，是否跳转'
+    }else {
+      msg = '添加成功，是否跳活动转列表页'
+    }
+    this.$confirm(msg, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'

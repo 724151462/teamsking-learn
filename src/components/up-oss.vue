@@ -23,6 +23,9 @@
       },
       inputs: {
         default: "inputs"
+      },
+      fileType: {
+        default: ''
       }
     },
     data(){
@@ -39,11 +42,7 @@
     },
     methods:{
       goUp () {
-        if(this.inputs === undefined) {
-          document.getElementById('inputs').click()
-        }else{
-          document.getElementById(this.inputs).click()
-        }
+        document.getElementById(this.inputs).click()
       },
       upInput (event) {
         console.log('1',event)
@@ -63,6 +62,20 @@
         }
         let file = this.fileData.target.files[0]
         let name = new Date().getTime() + file.name
+        console.log(file)
+        if(this.fileType !== '') {
+          let chekcType = this.fileType.split(',').some(element=> {
+            return file.type === element
+          })
+          if(!chekcType) {
+              this.$message({
+                message: '文件格式错误',
+                type: 'error'
+              })
+              this.inputNull()
+              return false
+            }
+        }
         if (file.size > this.size) {
           this.$message({
             message: '上传文件超出可上传范围，请重新选择文件上传',
@@ -100,6 +113,7 @@
           Number(self.isError) !== 2 ? (self.isError = 2) : ''
           let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
           self.$emit('ossUp', url, this.fileName, this.fileSize)
+          this.inputNull()
         }).catch(error=>{
           console.log(error)
           //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
@@ -107,7 +121,7 @@
         })
       },
       inputNull () {
-        let dom = document.getElementById('inputs')
+        let dom = document.getElementById(this.inputs)
         dom.value = ''
         dom.outerHTML = dom.outerHTML
         this.fileData = null

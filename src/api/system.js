@@ -102,11 +102,36 @@ export function courseMsgAdd(data) {
 }
 
 /**
- * 课程消息新增
+ * 获取课程分类
  */
 export function courseCatalogList(data) {
   let url = `/api/v1/common/categories`
   return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 获取课程分类
+ */
+export function courseCatalogAdd(data) {
+  let url = `${baseUrl}category`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 获取课程分类
+ */
+export function courseCatalogEdit(data) {
+  let url = `${baseUrl}category`
+  return commonsAjax(url, data, 'put')
+}
+
+/**
+ * 获取课程分类
+ */
+export function courseCatalogDel(data) {
+  let url = `${baseUrl}category`
+  return commonsAjax(url, data, 'delete')
 }
 
 /**

@@ -119,6 +119,7 @@ import {
 } from "@/api/course";
 import { getTestFileFold, getAnswer } from "@/api/library";
 import { log } from "util";
+import Cookie from "js-cookie"
 export default {
   data() {
     return {
@@ -146,7 +147,8 @@ export default {
       },
       tabIndex: 0,
       testLibrary: {},
-      checkedQuiz: []
+      checkedQuiz: [],
+      routerType: 'cancel'
     };
   },
   mounted() {
@@ -226,6 +228,23 @@ export default {
       });
       this.$refs.tree.setCheckedKeys(leftQuizIds);
     },
+    handleSuccess() {
+      this.routerType = 'success'
+      let chapterArr = JSON.parse(localStorage.getItem('localInteractId'))
+      Cookie.set('interactionStatus', "10")
+      let index = ''
+      let findFlag = chapterArr.some((element, i)=> {
+        if(element === this.testObj.chapterId) {
+          index = i
+        }
+      })
+      if(index !== '') {
+        Cookie.set('interactActiveIndex', index)
+      }else{
+        Cookie.set('interactActiveIndex', chapterArr.length)
+      }
+      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
+    },
     savetestArr() {
       console.log(this.$route.query.operation);
       if (this.$route.query.operation === "edit") {
@@ -244,6 +263,7 @@ export default {
               message: "修改测试成功",
               type: "success"
             });
+            this.handleSuccess()
           } else if (response.code === 1000) {
             this.$message({
               message: response.msg,
@@ -268,6 +288,7 @@ export default {
               message: "添加测试成功",
               type: "success"
             });
+            this.handleSuccess()
           } else if (response.code === 1000) {
             this.$message({
               message: response.msg,
@@ -292,7 +313,11 @@ export default {
       //   })
       // });
     },
-
+    // 取消
+    cancel() {
+      this.routerType = "cancel"
+      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
+    },
     filterData(data) {
       let getFilter = data => {
         data.forEach(item => {
@@ -343,7 +368,13 @@ export default {
     }
   },
   beforeRouteLeave (to, from, next) {
-    this.$confirm('跳转将丢失未保存数据，是否跳转', '提示', {
+    let msg = '跳转将丢失未保存数据，是否跳转'
+    if(this.routerType === 'cancel') {
+      msg = '跳转将丢失未保存数据，是否跳转'
+    }else {
+      msg = '添加成功，是否跳活动转列表页'
+    }
+    this.$confirm(msg, {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'

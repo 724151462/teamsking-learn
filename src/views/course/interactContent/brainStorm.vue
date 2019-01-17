@@ -15,7 +15,7 @@
       <div class="margin-sides">
         <i class="el-icon-picture"></i>
         <span>添加图片</span>
-        <upOss @ossUp="getUrl"></upOss>
+        <upOss @ossUp="getUrl" :fileType="'image/jpeg,image/png'"></upOss>
         <div>
           <img v-for="(item, index) in addImgList" :src="item" :width="50" :key="index" alt>
         </div>
@@ -38,11 +38,13 @@
       <span style="color: red">提示：学生参与默认活动90分基础分</span>
     </div>
     <el-button @click="brainStormSave">保存</el-button>
+    <el-button @click="cancel">取消</el-button>
   </div>
 </template>
 
 <script>
 import upOss from "@/components/up-oss";
+import Cookie from 'js-cookie'
 import { 
   interactStorm,
   assetCreate, 
@@ -76,7 +78,8 @@ export default {
         coverUrl: "",
         resourceLength: 0,
         updateId: 0
-      }
+      },
+      routerType: 'cancel'
     };
   },
   mounted() {
@@ -100,6 +103,23 @@ export default {
         this.brainStorm.assetIds.push(response.data.assetId);
       });
     },
+    handleSuccess() {
+      this.routerType = 'success'
+      let chapterArr = JSON.parse(localStorage.getItem('localInteractId'))
+      Cookie.set('interactionStatus', "10")
+      let index = ''
+      let findFlag = chapterArr.some((element, i)=> {
+        if(element === this.brainStorm.chapterId) {
+          index = i
+        }
+      })
+      if(index !== '') {
+        Cookie.set('interactActiveIndex', index)
+      }else{
+        Cookie.set('interactActiveIndex', chapterArr.length)
+      }
+      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
+    },
     brainStormSave() {
       if(this.$route.query.operation === 'edit'){
         stormPut(this.brainStorm).then(response => {
@@ -108,6 +128,7 @@ export default {
               message: "修改投票成功",
               type: "success"
             });
+            this.handleSuccess()
           }
         });
       }else{
@@ -117,14 +138,25 @@ export default {
             message: "成功",
             type: "success"
           });
+          this.handleSuccess()
         }
       });
       }
-      
+    },
+    // 取消
+    cancel() {
+      this.routerType = "cancel"
+      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
     }
   },
   beforeRouteLeave (to, from, next) {
-    this.$confirm('跳转将丢失未保存数据，是否跳转', '提示', {
+    let msg = '跳转将丢失未保存数据，是否跳转'
+    if(this.routerType === 'cancel') {
+      msg = '跳转将丢失未保存数据，是否跳转'
+    }else {
+      msg = '添加成功，是否跳活动转列表页'
+    }
+    this.$confirm(msg, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'

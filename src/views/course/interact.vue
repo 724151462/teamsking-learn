@@ -147,7 +147,7 @@ export default {
     return {
       interactParams: {
         courseId: this.$route.query.id,
-        interactionStatus: "20"
+        interactionStatus: Cookie.get('interactionStatus') || "20"
       },
       activeNames:
         Number(Cookie.get("interactActiveIndex")) === ""
@@ -163,10 +163,7 @@ export default {
   },
   mounted() {
     console.log(Number(Cookie.get("interactActiveIndex")));
-    interactList(this.interactParams).then(response => {
-      this.interactList = response.data;
-      // this.interactList = response.data
-    });
+    this.getInteracts()
   },
   methods: {
     // 折叠面板改变时触发
@@ -343,18 +340,23 @@ export default {
           break;
       }
     },
-    deleteHandle(id) {
-      this.interactList.forEach(element => {
-        element.interactions.forEach((interact, i) => {
-          if (interact.interactionId === id) {
-            element.interactions.splice(i, 1);
-          }
-        });
+    getInteracts() {
+      interactList(this.interactParams).then(response => {
+        let localInteractId = []
+        response.data.forEach(element=> {
+          localInteractId.push(element.chapterId)
+        })
+        localStorage.setItem('localInteractId', JSON.stringify(localInteractId))
+        this.interactList = response.data;
+        // this.interactList = response.data
       });
+    },
+    deleteHandle(id) {
       this.$message({
         message: "删除成功",
         type: "success"
       });
+      this.getInteracts()
       this.deleteDialog = false;
     }
   },
