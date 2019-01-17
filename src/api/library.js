@@ -19,6 +19,11 @@ export function getAnswer(data) {
   let url = `${baseUrl}quiz/${data.quizId}/options`
   return commonsAjax(url, '', 'get')
 }
+//上传试题模板
+export function upQuiz(data) {
+  let url = `${baseUrl}quiz/import`
+  return commonsAjax(url, data, 'post')
+}
 
 //保存新试题
 export function saveQuiz(data) {

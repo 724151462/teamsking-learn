@@ -28,7 +28,14 @@ export function getMeInfo (id) {
   // return commonsAjax(url, '', 'get')
   return commonsAjax(url, '', 'get')
 }
-
+/**
+ * 获取用户消息
+ * */
+export function getMsg (data) {
+  let url = `${baseUrl}/user/message/page`
+  // return commonsAjax(url, '', 'get')
+  return commonsAjax(url, data, 'get')
+}
 
 /**
  * 修改本人的用户信息，密码、身份证和电话号码除外
@@ -138,6 +145,19 @@ export function certificateList (data) {
     return commonsAjax(`${baseUrl}user/certificate`, data, 'get')
 }
 
+/**
+ * 获取审核中的证书信息
+ * */
+export function statusCre (data) {
+  return commonsAjax(`${baseUrl}certificate/${data}/audit`, data, 'get')
+}
+
+/**
+ * 获取证书信息
+ * */
+export function cerInfo (data) {
+  return commonsAjax(`${baseUrl}certificate/${data}`, data, 'get')
+}
 //============================教师相关===========================
 /**
  * 获取我的教师信息

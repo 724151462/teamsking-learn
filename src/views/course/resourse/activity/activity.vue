@@ -7,12 +7,12 @@
       <div style="display: flex">
         <div style="width: 300px">
           <el-input
-              placeholder="输入课程名称查询资源"
+              placeholder="查找活动"
               v-model="input">
           </el-input>
         </div>
         <div>
-          <el-button icon="el-icon-search" class="search-btn"></el-button>
+          <el-button icon="el-icon-search" class="search-btn" @click="getList(0,input)"></el-button>
         </div>
       </div>
     </div>
@@ -23,8 +23,10 @@
           <!--全选-->
           <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
           <el-button type="primary" size="small" @click="goCreateCatalog('',0)">创建目录</el-button>
-          <el-button type="primary" size="small">移动到</el-button>
-          <el-button type="info" size="small" @click="deleteCatalog">删除</el-button>
+          <el-button type="info"
+                     size="small"
+                     v-bind:class="{ active: deleteArr.length>0}"
+                     @click="deleteCatalog">删除</el-button>
           <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
         </div>
       </div>
@@ -39,11 +41,7 @@
             @check-change = "nodeCheck"
             accordion
             draggable
-            @node-drag-enter="handleDragEnter"
-            @node-drag-leave="handleDragLeave"
-            @node-drag-over="handleDragOver"
-            @node-drag-end="handleDragEnd"
-            @node-drop="handleDrop"
+            :default-expanded-keys="expan"
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
@@ -55,18 +53,17 @@
                 <span class="quiz-tag" v-else-if="data.interactionType == 60">投票问卷</span>
                 <span class="quiz-tag" v-else-if="data.interactionType == 70">讨论</span>
                 <span>{{ node.label }}</span>
-                <span v-if="data.interactionId" style="margin-left: 20px"> >查看</span>
+                <span v-if="data.interactionId" class="golook" style="margin-left: 20px">查看</span>
               </span>
               <span>
                 <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
                   <el-button size="mini" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="goAddTest(data.catalogId)"> 添加试题 </el-button>
                   <!--<el-button size="mini" type="primary" @click="() => remove(node, data)">删除</el-button>-->
                 </span>
                 <span v-else class="hide-button">
-                  <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
-                  <el-button size="mini" type="primary" @click.stop="delQuiz()">删除</el-button>
+                  <!--<el-button size="mini" type="primary" @click.stop="goEditTest(data.interactionId)"> 编辑 </el-button>-->
+                  <!--<el-button size="mini" type="primary" @click.stop="delAc(data.interactionId)">删除</el-button>-->
                 </span>
               </span>
 
@@ -83,7 +80,7 @@
         :close-on-press-escape="false"
         :close-on-click-modal="false"
         width="40%">
-      <span style="font-size: 16px">此操作会清空试题库，请慎重！</span>
+      <span style="font-size: 16px">此操作会清空活动库，请慎重！</span>
       <span slot="footer" class="dialog-footer">
     <el-button @click="checkAll(false)">取 消</el-button>
     <el-button type="danger" @click="deleteCatalog">确 定</el-button>
@@ -113,11 +110,25 @@
           <el-button type="primary" @click="reFileFold">确 定</el-button>
         </span>
     </el-dialog>
+    <!-- 查看活动弹窗-->
+    <el-dialog
+      title="提示"
+      :visible.sync="showCatalog"
+      width="30%">
+      <span>这是一段信息</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showCatalog = false">取 消</el-button>
+        <el-button type="primary" @click="showCatalog = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import {deleteAc, removeAc, createAc, renameAc, getAcList} from '@/api/library'
+  import {
+    deleteAc, removeAc, createAc,
+    renameAc, getAcList
+  } from '@/api/library'
   export default {
     created () {
         this.getList(0)
@@ -160,8 +171,11 @@
         deleteArr:[],
         interactionIdArr:[],
         dragArr:[],
+        expan:[],
+        input:'', //搜索时用的搜索框
         createCatalog : false,
         renameCatalog : false,
+        showCatalog : false,
         allDelete:false
       };
     },
@@ -170,28 +184,13 @@
         goCreateCatalog(data,id) {
             this.newCatalog.catalogId = id
             this.createCatalog = true
-
-            //创建子目录时目录不折叠
-            // console.log(data)
-            // const newChild = { catalogId: 101 , catalogName: "计算机网络--第一章" };
-            // if (!data.catalogList) {
-            //   this.$set(data, 'children', []);
-            // }
-            // data.catalogList.push(newChild);
         },
         //点击弹出重命名的弹窗
         goRenameCatalog(data,id) {
-            this.newCatalog.catalogId = id
+          let parentId =  data.parentId || 0
+          this.expan = [parentId]
+          this.newCatalog.catalogId = id
             this.renameCatalog = true
-            console.log(data)
-            console.log(id)
-            //创建子目录时目录不折叠
-            // console.log(data)
-            // const newChild = { catalogId: 101 , catalogName: "计算机网络--第一章" };
-            // if (!data.catalogList) {
-            //   this.$set(data, 'children', []);
-            // }
-            // data.catalogList.push(newChild);
         },
         //全选操作
         checkAll(flag){
@@ -214,7 +213,6 @@
             }else{
                 let index = this.deleteArr.indexOf(data.catalogId)
                 this.deleteArr.splice(index,1)
-
                 let reindex = this.interactionIdArr.indexOf(data.interactionId)
                 this.interactionIdArr.splice(index,1)
             }
@@ -226,10 +224,15 @@
             })
         },
         // 获取所有活动列表
-        getList(id){
-            let data = {interactionType : id}
+        getList(id,key){
+          let loading = this.$loading(this.loadingCss)
+            let data = {
+              interactionType : id,
+              searchKey:key
+            }
             getAcList(data).then(res => {
-                console.log(res)
+              loading.close()
+                // console.log(res)
                 if (Number(res.code) === 200) {
                     //如果试题库为空，则初始化新建一个默认的文件夹
                     if(res.data.length === 0){
@@ -256,8 +259,8 @@
         //新建文件夹
         newFileFold(){
             let data = this.newCatalog
-            console.log(data)
-            createAc(data).then(res => {
+          this.expan = [this.newCatalog.catalogId]
+          createAc(data).then(res => {
                 if (Number(res.code) === 200) {
                     this.$message.success('文件夹新建成功');
                     this.createCatalog = false
@@ -288,9 +291,9 @@
         goAddTest(catalogId) {
             this.$router.push({path: `/course/resource/addtest/${catalogId}` });
         },
-        // 删除试题
-        delQuiz() {
-            deleteQuiz(this.quizArr).then(res => {
+        // 删除活动
+        delAc() {
+          deleteAc(this.quizArr).then(res => {
                 console.log(res)
                 if (Number(res.code) === 200) {
                     this.$message.success('试题删除成功');
@@ -306,7 +309,7 @@
                 if (Number(res.code) === 200) {
                     this.$message.success('删除成功');
                     this.allDelete = false
-                    this.getTestList(0)
+                    this.getList(0)
                 } else {
                     this.$message.error(res.data.message);
                 }
@@ -320,13 +323,16 @@
                         getFilter(item.childList)
                     }
                     if(item.interactionList.length !==0){
-                        item.interactionList.forEach((list)=>{
+                      let parentId = item.catalogId
+
+                      item.interactionList.forEach((list)=>{
                             list.interactionTitle = list.interactionTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
                             item.childList.push({
                               catalogName: list.interactionTitle,
                               interactionId: list.interactionId,
                               createTime:list.createTime,
-                              interactionType:list.interactionType
+                              interactionType:list.interactionType,
+                              parentId,
                             })
                         })
                     }
@@ -336,38 +342,10 @@
             let curData = getFilter(data)
             return curData
         },
-        // handleDragStart(node, ev) {
-        //   console.log('拖拽开始', node);
-        // },
-        handleDragEnter(draggingNode, dropNode, ev) {
-          let data = {
-            catalogId: dropNode.data.catalogId,
-            ids: [draggingNode.data.catalogId]
-          }
-          // console.log(data)
+        //查看资源
+        showAc(id,type){
+
         },
-        // handleDragLeave(draggingNode, dropNode, ev) {
-        //   console.log(dropNode.data.catalogId)
-        //   console.log(dropNode.data)
-        //   this.dragArr.push(dropNode.data.catalogId)
-        //   console.log('tree drag leave: ', dropNode.label);
-        // },
-        // handleDragOver(draggingNode, dropNode, ev) {
-        //   console.log('tree drag over: ', dropNode.label);
-        // },
-        handleDragEnd(draggingNode, dropNode, dropType, ev) {
-          console.log(draggingNode.label)
-          console.log(dropNode.label)
-          let data = {
-            catalogId: dropNode.data.catalogId,
-            ids: [draggingNode.data.catalogId]
-          }
-          this.remove(data)
-        },
-        // handleDrop(draggingNode, dropNode, dropType, ev) {
-        //   console.log('tree drop: ', dropNode.label, dropType);
-        // },
-        //移动资源
         //移动文件夹、
         remove(data){
           removeAc(data).then(res => {
@@ -385,6 +363,14 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+  .golook
+    color #ccc
+    &:hover
+      color :#409EFF
+  .active
+    color: #fff;
+    background-color: #409EFF;
+    border-color: #409EFF;
   .activity
     padding:0 5% 20px 50px
     .title

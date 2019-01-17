@@ -10,17 +10,37 @@
         <div>
           <div v-for="(message, messageIndex) in messageData" :key="message.id" class="message-item">
             <div style="padding-right: 20px">
-              <el-checkbox v-model="message.selected" @change="checkChange(messageIndex, $event)"></el-checkbox>
+              <el-checkbox @change="checkChange(messageIndex, $event)"></el-checkbox>
             </div>
             <div style="padding-right: 20px">
-              <el-tag type="success" size="small">{{message.type}}</el-tag>
+              <el-tag type="success" size="small" v-if="message.messageType  == 10">系统通知</el-tag>
+              <el-tag type="success" size="small" v-else-if="message.messageType  == 20 ">学校通知</el-tag>
+              <el-tag type="success" size="small" v-else-if="message.messageType  == 30">课程通知</el-tag>
             </div>
             <div style="cursor:pointer" @click="read(messageIndex)">
-              <p :class="{markread: message.isReady}"><span class="red-c" v-show="!message.isReady"></span>{{message.title}}
+              <p :class="{markread: message.status == 20 }">
+                <span class="red-c" v-show="message.status != 20"></span>{{message.title}}
               </p>
-              <p class="message-time">{{message.time}}</p>
+              <p class="message-time">{{message.publishTime}}</p>
             </div>
           </div>
+          <el-pagination
+            style="margin-top: 20px"
+            background
+            layout="prev, pager, next"
+            :current-page="currentPage"
+            @current-change="handleCurrentChange"
+            :total="totalPage">
+          </el-pagination>
+
+          <!--<el-pagination-->
+            <!--background-->
+            <!--layout="prev, pager, next"-->
+            <!--:page-size="tableData.pageSize"-->
+            <!--:page-count="tableData.totalPage"-->
+            <!--:current-page="tableData.pageIndex"-->
+            <!--@current-change="handleCurrentChange">-->
+          <!--</el-pagination>-->
         </div>
 
         <!--查看消息对话框-->
@@ -29,23 +49,30 @@
           :visible.sync="dialogVisible"
           width="50%">
           <div>
-            <span style="margin-right: 20px"><el-tag type="success" size="small">{{messageData[currentMessage].type}}</el-tag></span>
+            <span style="margin-right: 20px">
+              <!--<el-tag type="success" size="small">{{messageData[currentMessage].type}}</el-tag>-->
+              <el-tag type="success" size="small" v-if="messageData[currentMessage].messageType  == 10">系统通知</el-tag>
+              <el-tag type="success" size="small" v-else-if="messageData[currentMessage].messageType  == 20 ">学校通知</el-tag>
+              <el-tag type="success" size="small" v-else-if="messageData[currentMessage].messageType  == 30">课程通知</el-tag>
+            </span>
             {{messageData[currentMessage].title}}
           </div>
           <div style="margin-top: 20px">
-            《计算机科学1》成绩已公布,请同学们查看，如有疑问，联系老师。
+            {{messageData[currentMessage].content}}
           </div>
           <span slot="footer" class="dialog-footer">
-            <span class="markread">{{messageData[currentMessage].time}}</span>
+            <span class="markread">{{messageData[currentMessage].publishTime}}</span>
           </span>
         </el-dialog>
       </el-tab-pane>
+      <el-tab-pane label="我的证书" name="third"></el-tab-pane>
     </el-tabs>
   </div>
 </template>
 
 <script>
-  export default {
+  import {getMsg} from '@/api/user'
+export default {
     name: "message",
     data() {
       return {
@@ -53,36 +80,17 @@
         dialogVisible: false, //消息框的显隐
         currentMessage: 0, //当前被点击的消息的Index,用于弹窗的取值
         checkAll: false,
-        messageData: [
-          {
-            type: '课程公告',
-            title: '《计算机科学1》成绩已公布',
-            isReady: false,
-            time: '2016.12.15 10.05.56',
-            selected: false,
-            messageId: 1
-          },
-          {
-            type: '课程公告',
-            title: '《计算机科学2》成绩已公布',
-            isReady: false,
-            time: '2016.12.15 10.05.56',
-            selected: false,
-            messageId: 2
-          },
-          {
-            type: '课程公告',
-            title: '《城市交通轨道规划》开课啦',
-            isReady: true,
-            time: '2016.12.15 10.05.56',
-            selected: false,
-            messageId: 3
-          }
-        ],
+        messageData: [],
+        //10 系统通知 20:学校通知 30:课程通知
         message: 3, //所有消息数量
         checkedMessage: [], //被选中的
-        isIndeterminate: false
+        isIndeterminate: false,
+        totalPage:10,
+        currentPage:1,
       };
+    },
+    created() {
+      this.initList(1);
     },
     methods: {
       //全选
@@ -92,6 +100,24 @@
         this.messageData.forEach((item) => {
           item.selected = e
           e ? this.checkedMessage.push(item.messageId) : this.checkedMessage = []
+        })
+      },
+      //获取消息列表
+      initList(pageIndex){
+        let data = {
+          pageIndex
+        }
+        let loading = this.$loading(this.loadingCss)
+        getMsg(data).then(res => {
+          loading.close()
+          console.log(res)
+          if (Number(res.code) === 200) {
+
+            this.messageData = res.data.pageData
+            this.totalPage = res.data.totalPage*10
+          } else {
+            this.$message.error('消息获取失败');
+          }
         })
       },
       // 单个消息被选中
@@ -114,6 +140,10 @@
         this.dialogVisible = true
         this.currentMessage = messageIndex
         this.messageData[messageIndex].isReady = true
+      },
+      //分页页码改变
+      handleCurrentChange(number){
+        this.initList(number)
       }
     }
   }
@@ -126,7 +156,7 @@
       height 50px
       display flex
       align-items center
-      padding-bottom 20px;
+      padding-bottom 10px;
       padding-top 10px;
       border-bottom 2px solid $c-gray
     .red-c

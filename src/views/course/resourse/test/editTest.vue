@@ -1,7 +1,10 @@
 <template>
   <div class="editTest">
     <div class="title">
-      <div><span style="cursor: pointer" @click="toTest">试题管理</span> > 编辑试题</div>
+      <div>
+        <!--<span style="cursor: pointer" @click="toTest">试题管理</span> > -->
+        编辑试题
+      </div>
     </div>
     <div style="padding-right: 35%">
       <el-form :model="quizData" ref="testForm">
@@ -14,12 +17,12 @@
             <el-radio :label="10">单选</el-radio>
             <el-radio :label="20">多选</el-radio>
             <!--<el-radio :label="30">判断题</el-radio>-->
-            <!--<el-radio :label="40">主观</el-radio>-->
+            <el-radio :label="30">主观</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="选项" required>
           <br>
-          <div v-if="quizData.quizType===40">
+          <div v-if="quizData.quizType===30">
             <p style="padding-left: 40px">主观题无固定答案</p>
           </div>
           <div class="option-list"
@@ -102,7 +105,7 @@
             },
           ],
           quizTitle: "",
-          quizType: 10, // 0 为单选，1为多选，2为判断，3为主观
+          quizType: 10,
         },
         optionItem:["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"]
       }
@@ -151,8 +154,8 @@
       },
       // 题目类型改变
       quizTypeChange(e){
-        let data1 = [{"correctFlag": 0, "optionTitle": "主观题没有正确答案"}],
-          data2 = [
+        let data1 = [{"correctFlag": 1, "optionTitle": "主观题没有正确答案"}],
+            data2 = [
             // 单选和多选
             {"correctFlag": 0, "optionTitle": ""},
             {"correctFlag": 0, "optionTitle": ""},
@@ -165,10 +168,10 @@
             {"correctFlag": 0, "optionId": 0, "optionTitle": "", "quizId": 0},
           ];
         //将数据组装为数组，若用push方法，会发生不可描述的错误
-        if(e === 40){
+        if(e === 30){
           this.quizData.quizOption = []
           this.quizData.quizOption = data1
-        } else if (e === 30){
+        } else if (e === 40){
           this.quizData.quizOption = []
           this.quizData.quizOption = data3
         }else{
@@ -212,30 +215,38 @@
       //保存试题前的验证
       filterQuiz(){
         let isEmpty = false, //是否存在标题为空的试题选项
-            flagArr = []  // 存放答案的数组
+          flagArr = []  // 存放答案的数组
 
         if(this.quizData.quizTitle.length === 0){
-          this.$message.warning('请输入题干')
+          this.$notify({
+            message: '请输入题干',
+            type: 'warning',
+          });
           return false
         }
-        this.quizData.quizOption.forEach((item)=>{
-          flagArr.push(item.correctFlag)
-          if(item.optionTitle == ''){
-            isEmpty = true
-          }
-        })
-        if(isEmpty){
-          this.$message.warning('请将为空的是试题删除')
-          return false
-        }
-
-        if(this.quizData.quizType !== 3){
-          if(flagArr.indexOf(1) === -1){
+        if(this.quizData.quizType!==30){
+          this.quizData.quizOption.forEach((item)=>{
+            flagArr.push(item.correctFlag)
+            if(item.optionTitle == ''){
+              isEmpty = true
+            }
+          })
+          if(isEmpty){
             this.$notify({
-              message: '请至少设置一个正确选项',
+              message: '请将为空的试题选项删除',
               type: 'warning',
             });
             return false
+          }
+
+          if(this.quizData.quizType !== 3){
+            if(flagArr.indexOf(1) === -1){
+              this.$notify({
+                message: '请至少设置一个正确选项',
+                type: 'warning',
+              });
+              return false
+            }
           }
         }
       },
@@ -246,7 +257,9 @@
 
         delete data.updateTime
         console.log(data)
+        let loading = this.$loading(this.loadingCss)
         putQuiz(data).then(res=>{
+          loading.close()
           if(Number(res.code) === 200){
             console.log(res)
             this.$message.success('修改成功');
@@ -257,8 +270,6 @@
               type:'error'
             })
           }
-        }).catch(error=>{
-          console.log(error)
         })
       }
     }
