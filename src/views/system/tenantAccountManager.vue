@@ -4,16 +4,11 @@
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.search"  style="width: 200px;margin-left: 10px;" placeholder="用户名/姓名"></el-input>
+        <el-input v-model="searchForm.search"  style="width: 200px;margin-left: 10px;" placeholder="用户名/姓名"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="value" placeholder="请选择学校">
-          <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-          </el-option>
+        <el-select v-model="searchForm.tenantId" placeholder="请选择学校">
+          <el-option v-for="tenant in tenantlist" :key="tenant.tenantId" :label="tenant.tenantName" :value="tenant.tenantId"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -47,26 +42,45 @@
         :before-close="handleClose"
         style="min-width: 800px">
 
-      <div class="pop-academy">
-        <div class="item-title">
-          <span class="color-red">*</span><span>账号：</span>
-        </div>
-        <div class="item-input">
-          <el-input class="input-pop"  v-model="addForm.data.mobile"  placeholder="请输入手机号或者邮箱" clearable></el-input>
-        </div>
-      </div>
-      <div class="pop-academy">
-        <div class="item-title">
-          <span class="color-red">*</span><span>姓名：</span>
-        </div>
-        <div class="item-input">
-          <el-input class="input-pop"  v-model="addForm.data.realName"  placeholder="请输入姓名" clearable></el-input>
-        </div>
-      </div>
+      <el-form ref="form" :model="form" label-width="120px">
+        <el-form-item label="用户名" required>
+          <el-input v-model="form.userName"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" required>
+          <el-input v-model="form.passwd"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号码" required>
+          <el-input v-model="form.mobile"></el-input>
+        </el-form-item>
+        <el-form-item label="真实姓名" required>
+          <el-input v-model="form.realName"></el-input>
+        </el-form-item>
+        <el-form-item label="性别" required>
+          <el-radio v-model="form.gender" label="1">
+            男
+          </el-radio>
+          <el-radio v-model="form.gender" label="2">
+            女
+          </el-radio>
+        </el-form-item>
+        <el-form-item label="学校" required>
+          <el-select v-model="form.tenantId">
+            <el-option v-for="tenant in tenantlist" :key="tenant.tenantId" :label="tenant.tenantName" :value="tenant.tenantId"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否启用" required>
+          <el-radio v-model="form.status" label="1">
+            是
+          </el-radio>
+          <el-radio v-model="form.status" label="2">
+            否
+          </el-radio>
+        </el-form-item>
+      </el-form>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="save">确 定</el-button>
+        <el-button type="primary" @click="save()">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -86,7 +100,7 @@
   import { sysRoleDelete } from '../../api/system'
   import { sysUserMenuList } from '../../api/system'
   import { sysTenantManagerPage } from '../../api/system'
-  import { sysTenantManager } from '../../api/system'
+  import { sysTenantManager,tenantGet } from '../../api/system'
 
   export default {
     name: "role",
@@ -96,23 +110,9 @@
     },
     data(){
       return {
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
-        value: '',
+        tenantlist: [],
+        searchForm: {
+        },
         addForm:{
           title:'添加租户',
           data:{
@@ -123,8 +123,6 @@
         menuDialogVisible:false,
         dialogVisible:false,
         form:{
-          search:'',
-          tenantId:1,
         },
         tableTitle:'角色管理列表',
         tableOperate:[
@@ -173,35 +171,17 @@
       }
     },
     created:function(){
+      tenantGet({
+        pageParam: {
+          pageIndex: 1,
+          pageSize: 1000
+        },
+        searchKey: ""
+      }).then(response => {
+        console.log(response.data.pageData);
+        this.tenantlist = response.data.pageData;
+      });
       this.queryTenantList();
-      // this.queryRoleList();
-    },
-    mounted:function(){
-      /* sysUserMenuList().then(
-         res => {
-           console.log("权限菜单:",res);
-
-           let menuTree = res.data.filter(
-             element => {
-               return element.parentId === 0
-             }
-           );
-
-           for( let i = 0; i < menuTree.length; i++  ){
-             menuTree[i].children = [];
-             menuTree[i].children.push( res.data.filter(
-               element => {
-                 return element.parentId === menuTree[i].menuId
-               }
-             ) )
-           }
-
-
-           console.log( 'menuTree' , menuTree );
-
-         }
-       ).catch()*/
-
     },
     methods:{
       showComponentInfo:function(type,info){
@@ -209,12 +189,14 @@
          switch(type){
            case 'created':
              console.log('here is created');
+             console.log(this.form)
              this.appendTenant();
              break;
-           /*case 'edit':
+           case 'edit':
              console.log('here is edit');
              this.editRole(info);
              break;
+           /*
            case 'delete':
              this.delete('one',info);
              break;
@@ -227,8 +209,8 @@
          }
       },
       queryTenantList:function () {
-        console.log('请求的参数信息:',this.form);
-        sysTenantManagerPage(this.form).then(
+        console.log('请求的参数信息:',this.searchForm);
+        sysTenantManagerPage(this.searchForm).then(
           res => {
             if(res.code === 200){
               this.tableData = res.data;
@@ -259,10 +241,9 @@
         this.addForm.data={ roleName:'',mobile:'',tenantId:1 }
       },
       editRole:function(roleInfo){
-        /*this.dialogVisible = true;
+        this.dialogVisible = true;
         this.addForm.title = '编辑角色';
-        this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data' , this.addForm.data );*/
+        this.form  = roleInfo;
       },
       editMenu:function(roleInfo){
         /*this.menuDialogVisible = true;
@@ -272,8 +253,9 @@
       },
       save:function(){
         if( this.addForm.title === '添加租户管理员账号'){
-          console.log( '添加角色的信息:', this.addForm.data);
-          sysTenantManager( this.addForm.data).then(
+          console.log( '添加角色的信息:', this.form);
+          // this.form.tenantName = '123'
+          sysTenantManager( this.form).then(
             res => {
               if(res.code === 200){
 
@@ -283,9 +265,9 @@
           ).catch(
             error => console.log('添加角色出错',error)
           )
-        }/*else if( this.addForm.title === '编辑角色' ){
-          console.log('编辑提交的信息:',this.addForm.data);
-          sysRoleEdit( this.addForm.data ).then(
+        }else if( this.addForm.title === '编辑角色' ){
+          console.log('编辑提交的信息:',this.form);
+          sysRoleEdit( this.form ).then(
             res =>{
               console.log( '编辑的信息返回：',res);
             }
@@ -296,7 +278,7 @@
           );
         }
         this.dialogVisible = false;
-        setTimeout( ()=>{ this.queryRoleList() },300);*/
+        setTimeout( ()=>{ this.queryRoleList() },300);
         this.dialogVisible = false;
       },
       delete:function(type,list){

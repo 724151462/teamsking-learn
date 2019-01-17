@@ -55,7 +55,12 @@ export function sysTenantManager (data) {
   return commonsAjax(`${baseUrl}tenant/manager`,data,'post')
 }
 
-
+/**
+ * 修改租户
+ **/
+export function tenantMod (data) {
+  return commonsAjax(`${baseUrl}tenant/${data.tenantId}`,data,'put')
+}
 
 /**
  * 分页查询系统消息
@@ -108,7 +113,16 @@ export function platformInfo(data) {
 
 
 /**
- * 设置平台信息
+ * 获取平台信息
+ */
+export function getPlatformInfo(data) {
+  let url = `${baseUrl}tenant/info`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 设置轮播
  */
 export function bannerList(data) {
   let url = `${baseUrl}tenant/carousel/list`
@@ -196,4 +210,20 @@ export function recAdd(data) {
 export function recMod(data) {
   let url = `${baseUrl}recommend`
   return commonsAjax(url, data, 'put')
+}
+
+/**
+ * 获取租户
+ */
+export function tenantGet(data) {
+  let url = `http://120.36.137.90:9008/api/v1/tenant/page`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 新增租户
+ */
+export function tenantAdd(data) {
+  let url = `http://120.36.137.90:9008/api/v1/tenant`
+  return commonsAjax(url, data, 'post')
 }

@@ -146,10 +146,10 @@ export function sysStudentPage(data){
   let department = data.department || -1
   let speciality = data.speciality || -1
   let studentClass = data.studentClass || -1
-  let studentInfo = data.studentInfo || ''
+  let studentInfo = data.search || ''
 
   //return commonsAjax('${baseUrl}student/page',{ studentId:1,pageIndex:1,pageSize:10  },'get')
-  let url = `${baseUrl}student/page?collegeId=${college}&departmentId=${department}&classId=${studentClass}&specialityId=${speciality}&pageSize=10&pageIndex=${data.pageIndex || 1}`
+  let url = `${baseUrl}student/page?collegeId=${college}&departmentId=${department}&classId=${studentClass}&specialityId=${speciality}&pageSize=10&pageIndex=${data.pageIndex || 1}&search=${studentInfo}`
   return commonsAjax(url,'','get')
 }
 
