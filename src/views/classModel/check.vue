@@ -89,7 +89,7 @@
         sign()
       },
       closeSign(){
-
+        signClose()
       },
       enter(){
         console.log('执行')

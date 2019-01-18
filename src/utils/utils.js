@@ -42,19 +42,21 @@ export function formatDate (time) {
 
 export function connect(resolve,reject){
     let socket = new SockJS('http://120.36.137.90:9008/websocket'),
-        token = store.state.socket.token,
-        userId = store.state.socket.userId,
-        courseId = store.state.socket.courseId;
+        token = sessionStorage.getItem('token'),
+        userId = sessionStorage.getItem('userId'),
+        courseId = sessionStorage.getItem('courseId');
     let stompClient = Stomp.over(socket);
     stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
-        store.commit('NEW_SOCKET',stompClient)
         stompClient.subscribe('/teamsking/helloWorld', function (result) {
           console.log(result);
         },{'token': token});
         stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
           console.log(result);
         });
-        resolve('连接失败');
+        store.commit('NEW_SOCKET',stompClient)
+        let tagClient = JSON.stringify(stompClient)
+        sessionStorage.setItem('client',tagClient)
+        resolve('连接成功');
       },
       function errorCallBack (error) {
         // 连接失败时（服务器响应 ERROR 帧）的回调方法
@@ -65,12 +67,12 @@ export function connect(resolve,reject){
 
 export function sign(resolve,reject) {
     let tagClient = store.state.socket.stompClient,
-        token = store.state.socket.token,
-        userId = store.state.socket.userId,
-      classroomId = store.state.socket.classroomId,
-        courseId = store.state.socket.courseId;
-        console.log(store.state.socket.stompClient)
-      tagClient.send('/teamsking/course/sign/start',{'token': token},
+        token = sessionStorage.getItem('token'),
+        userId = sessionStorage.getItem('userId'),
+        courseId = sessionStorage.getItem('courseId'),
+        classroomId = sessionStorage.getItem('classroom');
+
+  tagClient.send('/teamsking/course/sign/start',{'token': token},
         JSON.stringify({
           "classroomId":1,
           "courseId":classroomId,
@@ -81,16 +83,14 @@ export function sign(resolve,reject) {
 
 export function signClose(resolve,reject) {
   let tagClient = store.state.socket.stompClient,
-    token = store.state.socket.token,
-    userId = store.state.socket.userId,
-    classroomId = store.state.socket.classroomId,
-    courseId = store.state.socket.courseId;
-
+      token = sessionStorage.getItem('token'),
+      userId = sessionStorage.getItem('userId'),
+      courseId = sessionStorage.getItem('courseId'),
+      classroomId = sessionStorage.getItem('classroom');
   tagClient.send('/teamsking/course/sign/close',{'token': token},
     JSON.stringify({
-      "bean":50,
-      "classroomId":1,
-      "courseId":classroomId,
+      "classroomId":classroomId,
+      "courseId":courseId,
       "userId":userId
     })
   );

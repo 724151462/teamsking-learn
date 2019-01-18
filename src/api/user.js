@@ -29,12 +29,26 @@ export function getMeInfo (id) {
   return commonsAjax(url, '', 'get')
 }
 /**
- * 获取用户消息
+ * 获取用户消息列表
  * */
 export function getMsg (data) {
   let url = `${baseUrl}/user/message/page`
   // return commonsAjax(url, '', 'get')
   return commonsAjax(url, data, 'get')
+}
+/**
+ * 删除用户消息
+ * */
+export function delMsg (data) {
+  let url = `${baseUrl}/user/message`
+  return commonsAjax(url, data, 'delete')
+}
+/**
+ * 设为已读
+ * */
+export function readMsg (data) {
+  let url = `${baseUrl}/user/message`
+  return commonsAjax(url, data, 'post')
 }
 
 /**

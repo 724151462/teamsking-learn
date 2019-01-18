@@ -3,23 +3,25 @@
     <el-tabs v-model="activeName" @tab-click="toIndex">
       <el-tab-pane label="个人设置" name="first"></el-tab-pane>
       <el-tab-pane label="消息管理" name="second">
-        <el-checkbox v-model="checkAll" @change="checkAllChange"></el-checkbox>
-        <el-button type="primary" size="small" style="margin-left: 20px;">标记已读</el-button>
-        <el-button size="small">删除</el-button>
+        <el-checkbox v-model="checkAll"
+                     :indeterminate="isIndeterminate"
+                     @change="checkAllChange"></el-checkbox>
+        <el-button type="primary" size="small"  style="margin-left: 20px;" @click="readAll">标记已读</el-button>
+        <el-button size="small" @click ="del">删除</el-button>
         <div style="margin: 15px 0;"></div>
         <div>
-          <div v-for="(message, messageIndex) in messageData" :key="message.id" class="message-item">
+          <div v-for="(message) in messageData" :key="message.id" class="message-item">
             <div style="padding-right: 20px">
-              <el-checkbox @change="checkChange(messageIndex, $event)"></el-checkbox>
+              <el-checkbox v-model="message.selected" @change="checkChange(message.userMessageId, $event)"></el-checkbox>
             </div>
             <div style="padding-right: 20px">
               <el-tag type="success" size="small" v-if="message.messageType  == 10">系统通知</el-tag>
               <el-tag type="success" size="small" v-else-if="message.messageType  == 20 ">学校通知</el-tag>
               <el-tag type="success" size="small" v-else-if="message.messageType  == 30">课程通知</el-tag>
             </div>
-            <div style="cursor:pointer" @click="read(messageIndex)">
-              <p :class="{markread: message.status == 20 }">
-                <span class="red-c" v-show="message.status != 20"></span>{{message.title}}
+            <div style="cursor:pointer" @click="read(message.userMessageId,message)">
+              <p :class="{markread: message.status == 10 }">
+                <span class="red-c" v-show="message.status != 10"></span>{{message.title}}
               </p>
               <p class="message-time">{{message.publishTime}}</p>
             </div>
@@ -51,17 +53,17 @@
           <div>
             <span style="margin-right: 20px">
               <!--<el-tag type="success" size="small">{{messageData[currentMessage].type}}</el-tag>-->
-              <el-tag type="success" size="small" v-if="messageData[currentMessage].messageType  == 10">系统通知</el-tag>
-              <el-tag type="success" size="small" v-else-if="messageData[currentMessage].messageType  == 20 ">学校通知</el-tag>
-              <el-tag type="success" size="small" v-else-if="messageData[currentMessage].messageType  == 30">课程通知</el-tag>
+              <el-tag type="success" size="small" v-if="dialogInfo.messageType  == 10">系统通知</el-tag>
+              <el-tag type="success" size="small" v-else-if="dialogInfo.messageType  == 20 ">学校通知</el-tag>
+              <el-tag type="success" size="small" v-else-if="dialogInfo.messageType  == 30">课程通知</el-tag>
             </span>
-            {{messageData[currentMessage].title}}
+            {{dialogInfo.title}}
           </div>
           <div style="margin-top: 20px">
-            {{messageData[currentMessage].content}}
+            {{dialogInfo.content}}
           </div>
           <span slot="footer" class="dialog-footer">
-            <span class="markread">{{messageData[currentMessage].publishTime}}</span>
+            <span class="markread">{{dialogInfo.publishTime}}</span>
           </span>
         </el-dialog>
       </el-tab-pane>
@@ -71,7 +73,7 @@
 </template>
 
 <script>
-  import {getMsg} from '@/api/user'
+  import {getMsg, readMsg, delMsg} from '@/api/user'
 export default {
     name: "message",
     data() {
@@ -80,12 +82,27 @@ export default {
         dialogVisible: false, //消息框的显隐
         currentMessage: 0, //当前被点击的消息的Index,用于弹窗的取值
         checkAll: false,
-        messageData: [],
+        messageData: [
+          {
+            content: "特委屈让我去让我去热武器若",
+            messageId: 70,
+            messageType: 30,
+            orderValue: null,
+            publishTime: "2019-01-17 18:56:11",
+            readCount: 0,
+            selected: false,
+            status: 20,
+            title: "日网签任务特委屈认为其他",
+            totalCount: 39,
+            userMessageId: 15276,
+         }
+        ],
         //10 系统通知 20:学校通知 30:课程通知
         message: 3, //所有消息数量
         checkedMessage: [], //被选中的
         isIndeterminate: false,
         totalPage:10,
+        dialogInfo:{},//消息弹窗的信息
         currentPage:1,
       };
     },
@@ -99,20 +116,20 @@ export default {
         this.checkedMessage = []
         this.messageData.forEach((item) => {
           item.selected = e
-          e ? this.checkedMessage.push(item.messageId) : this.checkedMessage = []
+          e ? this.checkedMessage.push(item.userMessageId) : this.checkedMessage = []
         })
       },
       //获取消息列表
       initList(pageIndex){
-        let data = {
-          pageIndex
-        }
+        let data = {pageIndex}
         let loading = this.$loading(this.loadingCss)
         getMsg(data).then(res => {
           loading.close()
           console.log(res)
           if (Number(res.code) === 200) {
-
+            let data = res.data.pageData.forEach(item=>{
+              item.selected = false
+            })
             this.messageData = res.data.pageData
             this.totalPage = res.data.totalPage*10
           } else {
@@ -121,13 +138,13 @@ export default {
         })
       },
       // 单个消息被选中
-      checkChange(messageIndex, $event) {
-        this.messageData[messageIndex].selected = $event
-        //检查当前项是否在被选数组
-        let cuerrentId = this.messageData[messageIndex].messageId
-        let isCheck = this.checkedMessage.find((n) => n === cuerrentId)
-        let cuerrentIndex = this.checkedMessage.indexOf(cuerrentId);  //需要被删除的项的index
-        isCheck ? this.checkedMessage.splice(cuerrentIndex, 1) : this.checkedMessage.push(cuerrentId)
+      checkChange(messageId, $event) {
+        // this.messageData[messageIndex].selected = $event
+        //  检查当前项是否在被选数组
+        // let cuerrentId = this.messageData[messageIndex].messageId
+        let isCheck = this.checkedMessage.find((n) => n === messageId)
+        let cuerrentIndex = this.checkedMessage.indexOf(messageId);  //需要被删除的项的index
+        isCheck ? this.checkedMessage.splice(cuerrentIndex, 1) : this.checkedMessage.push(messageId)
         //  全选检查
         this.checkAll = this.checkedMessage.length === this.messageData.length
       },
@@ -135,15 +152,58 @@ export default {
       toIndex() {
         this.activeName === 'first' ? this.$router.push('index') : false
       },
+      //全部标记为已读
+      readAll() {
+        readMsg(this.checkedMessage).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.initList()
+          } else {
+            this.$message.error('读取消息失败');
+          }
+        })
+      },
       //消息设为已读
-      read(messageIndex) {
-        this.dialogVisible = true
-        this.currentMessage = messageIndex
-        this.messageData[messageIndex].isReady = true
+      read(messageId,message) {
+        let data = [messageId]
+        console.log(data)
+        this.dialogInfo = message
+        readMsg(data).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+
+            getMsg().then(res => {
+              if (Number(res.code) === 200) {
+                let data = res.data.pageData.forEach(item=>{
+                  item.selected = false
+                })
+                this.messageData = res.data.pageData
+                this.totalPage = res.data.totalPage*10
+
+                this.dialogVisible = true //打开消息弹窗
+              } else {
+              }
+            })
+
+          } else {
+            this.$message.error('读取消息失败');
+          }
+        })
       },
       //分页页码改变
       handleCurrentChange(number){
         this.initList(number)
+      },
+      del(){
+        delMsg(this.checkedMessage).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.$message.success('删除成功');
+            this.initList()
+          } else {
+            this.$message.error('删除失败');
+          }
+        })
       }
     }
   }
