@@ -894,7 +894,7 @@ export function classTestRes(data) {
  */
 export function discussGet(data) {
   let url = `${studyUrl}${data.courseId}/discussion/page`
-  return commonsAjax(url, '', 'get')
+  return commonsAjax(url, data, 'get')
 }
 
 
@@ -913,4 +913,12 @@ export function discussIssue(data) {
 export function discussReply(data) {
   let url = `${studyUrl}discussion/reply/list/${data.discussId}`
   return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 发送讨论
+ */
+export function discussPost(data) {
+  let url = `${studyUrl}discussion/save/reply`
+  return commonsAjax(url, data, 'post')
 }

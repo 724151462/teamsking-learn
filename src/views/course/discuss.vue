@@ -56,16 +56,24 @@
         activeIndex: '1',
         input1: '',
         discussObj: {},
-        pageParams: {}
+        pageParams: {
+          pageIndex: 1,
+          pageSize: 10,
+          courseId: this.$route.query.id
+        }
       };
     },
     mounted() {
-      discussGet({courseId: this.$route.query.id})
-      .then(response=> {
-        this.discussObj = response.data
-      })
+      this.getList()
+      
     },
     methods: {
+      getList() {
+        discussGet(this.pageParams)
+        .then(response=> {
+          this.discussObj = response.data
+        })
+      },
       handleSelect(key, keyPath) {
         console.log(key, keyPath);
       },
@@ -73,7 +81,9 @@
         console.log('点击了')
       },
       handlePage(value) {
-        
+        console.log(value)
+        this.pageParams.pageIndex = value
+        this.getList()
       }
     }
   }
