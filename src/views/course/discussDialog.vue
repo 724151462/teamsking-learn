@@ -18,6 +18,7 @@
             <div>
               <img :src="item.avatar" width="30" alt>
               <span style="margin-left: 10px">{{item.userName}}评论内容：{{item.replyContent}}</span>
+              <span class="reply-btn">回复</span>
             </div>
             <div class="answer-right">
               <span>{{item.replyTime}}</span>
@@ -37,15 +38,13 @@
               <span
                 style="margin-left: 10px"
                 v-else
-              >{{reply.userName}}回复{{replyer(item.children, reply.parentReplyId)}}：{{reply.replyContent}}</span>
+              >{{reply.userName}}回复{{replyer(item.children, reply.parentReplyId)}}：{{reply.replyContent}}</span><span class="reply-btn">回复</span>
             </div>
             <div class="answer-right">
               <span>2019-1-18 00:00:00</span>
               <i
                 class="el-icon-delete"
                 style="color: green;font-size: 20px;margin-left: 10px; cursor: pointer"
-                v-show="show"
-                 @mouseenter="show = false" @mouseleave="show = true"
               ></i>
             </div>
           </div>
@@ -73,7 +72,6 @@ export default {
     return {
       issueObj: {},
       replyList: {},
-      show: true,
       replyForm: {
         "discussionId": this.$route.query.disId,
         "isleaf": 0,
@@ -174,6 +172,14 @@ export default {
       justify-content: space-between;
       align-items: center;
       margin-top: 10px;
+      cursor pointer
+    }
+    .answer:hover {
+      background-color #f3f7ff
+    }
+    .answer:hover  .reply-btn {
+      display inline-block
+      
     }
 
     .answer> div {
@@ -187,6 +193,12 @@ export default {
 
     .reply {
       margin-left: 20px;
+    }
+    .reply-btn {
+      display none
+      margin-left 20px 
+      color cadetblue
+      cursor pointer
     }
   }
 }
