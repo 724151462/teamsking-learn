@@ -82,7 +82,7 @@
                 </el-form-item>
                 <span>证书图片</span>
                 <span v-for="img in cerForm.imgUrls" :key="img.id">
-                    <img :src="img.imgUrl" alt="" class="cre-img">
+                    <img :src="img.imgUrl" alt="" class="cre-img has-close" style="position: relative">
                 </span>
                 <!--<span><i class="el-icon-picture cre-uploader-icon"></i></span>-->
                 <up-oss @ossUp="upCre" :inputs="'creImg'"></up-oss>
@@ -246,6 +246,15 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+    .has-close
+        &::after
+            content :''
+            width 50px
+            height 50px
+            background red
+            position absolute
+            top 0
+            right 0
     .cre-img
         width: 120px;
         height: 100px;

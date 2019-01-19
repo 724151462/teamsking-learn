@@ -69,13 +69,39 @@ export default {
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         });
+        // let sock = new SockJS('http://120.36.137.90:9008/websocket');
+        // let stompClient = Stomp.over(sock);
+        // let token = sessionStorage.getItem('token'),
+        //   userId = sessionStorage.getItem('userId'),
+        //   courseId = sessionStorage.getItem('courseId');
+        // stompClient.connect(
+        //   {'token': token,'courseId':courseId},
+        //   function connectCallback (frame) {
+        //     loading.close()
+        //     // 连接成功时（服务器响应 CONNECTED 帧）的回调方法
+        //     console.log('已连接【' + frame + '】');
+        //     stompClient.subscribe('/teamsking/helloWorld', function (result) {
+        //       console.log(result);
+        //     },{'token': token});
+        //     stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+        //       console.log(result);
+        //     });
+        //   },
+        //   function errorCallBack (error) {
+        //     // 连接失败时（服务器响应 ERROR 帧）的回调方法
+        //     console.log('连接失败【' + error + '】');
+        //   }
+        // );
+
+
         new Promise(connect)
           .then((result)=>{
             loading.close()
             classSave({ courseId: this.$route.query.id }).then(response => {
               if (response.code === 200) {
                 console.log(response)
-                this.$store.commit('SAVE_CLASSROME',response.data.classroomId)
+                sessionStorage.setItem('classroom',response.data.classroomId)
+                // this.$store.commit('SAVE_CLASSROME',response.data.classroomId)
                 this.$router.push({
                   path: "/course/classchapter",
                   query: {
@@ -103,14 +129,19 @@ export default {
           console.log(res)
           loading.close()
           if(res.data){
-            this.$store.commit('SAVE_CLASSROME',res.data.classroomId)
+            sessionStorage.setItem('classroom',res.data.classroomId)
+            // this.$store.commit('SAVE_CLASSROME',res.data.classroomId)
             this.dialogVisible = true
           }else{
-            this.$store.commit('SAVE_INFO',{
-              courseId : this.$route.query.id,
-              userId: Cookie.get('userId'),
-              token: Cookie.get('token'),
-            })
+            sessionStorage.setItem('userId',Cookie.get('userId'))
+            sessionStorage.setItem('token',Cookie.get('token'))
+            sessionStorage.setItem('courseId',this.$route.query.id)
+
+            // sessionStorage.setItem('courseInfo',{
+            //   courseId : this.$route.query.id,
+            //   userId: Cookie.get('userId'),
+            //   token: Cookie.get('token'),
+            // })
           }
         });
       },
@@ -121,7 +152,7 @@ export default {
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         });
-        classOver({ classroomId: this.$store.state.socket.classroomId }).then((res)=>{
+        classOver({ classroomId: sessionStorage.getItem('classroom') }).then((res)=>{
           loading.close()
           console.log(res)
             this.$message.success('课堂已结束')
@@ -129,7 +160,7 @@ export default {
               path: "/course/classend",
               query: {
                 id: this.$route.query.id,
-                classroomId: this.$store.state.socket.classroomId
+                classroomId: sessionStorage.getItem('classroom')
               }
             });
         })
@@ -140,7 +171,7 @@ export default {
           path: "/course/classchapter",
           query: {
             id: this.$route.query.id,
-            classroomId: this.$store.state.socket.classroomId
+            classroomId: sessionStorage.getItem('classroom')
           }
         });
       }
