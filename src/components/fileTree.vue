@@ -1,5 +1,5 @@
 <template>
-    <el-tree :data="sourceData" :ref="treeName" @check="test" show-checkbox :props="props">
+    <el-tree :data="sourceData" :accordion="isAccordion" :ref="treeName" @check="test" show-checkbox :props="props">
         <span class="custom-tree-node" slot-scope="{ node, data }">
             <img
             :width="15"
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-    props: ['sourceData', 'props', 'treeName'],
+    props: ['sourceData', 'props', 'treeName','isAccordion'],
     mounted() {
         console.log(this.sourceData,this.props)
     },

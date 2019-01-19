@@ -4,10 +4,10 @@
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.search" style="width: 200px;margin-left: 10px" placeholder="学校名称"></el-input>
+        <el-input v-model="form.searchKey" style="width: 200px;margin-left: 10px" placeholder="学校名称"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="queryTenantList">查询</el-button>
+        <el-button type="primary" @click="tenantList">查询</el-button>
       </el-form-item>
     </el-form>
 
@@ -118,7 +118,7 @@ import { sysRoleAdd } from "../../api/system";
 import { tenantMod } from "../../api/system";
 import { sysRoleDelete } from "../../api/system";
 import { sysUserMenuList } from "../../api/system";
-import { sysTenantManagerPage, tenantGet, tenantAdd } from "../../api/system";
+import { tenantGet, tenantAdd } from "../../api/system";
 import upOss from '@/components/up-oss'
 
 export default {
@@ -131,14 +131,20 @@ export default {
   data() {
     return {
       addForm: {
-        title: "添加角色",
+        title: "",
         data: {
           roleName: ""
         }
       },
       menuDialogVisible: false,
       dialogVisible: false,
-      form: {},
+      form: {
+        pageParam: {
+          pageIndex: 1,
+          pageSize: 10
+        },
+        searchKey: ""
+      },
       tableTitle: "角色管理列表",
       tableOperate: [
         {
@@ -185,28 +191,26 @@ export default {
           type: "add"
         }
       ],
-      tableData: ""
+      tableData: []
     };
   },
   created: function() {
-    tenantGet({
-      pageParam: {
-        pageIndex: 1,
-        pageSize: 10
-      },
-      searchKey: ""
-    }).then(response => {
-      console.log(response.data.pageData);
-      this.tableData = response.data.pageData;
-    });
+    this.tenantList()
     // this.queryRoleList();
   },
   methods: {
+    tenantList() {
+      tenantGet(this.form).then(response => {
+        console.log(response.data.pageData);
+        this.tableData = response.data.pageData;
+      });
+    },
     showComponentInfo: function(type, info) {
       console.log("type", type, "info", info);
       switch (type) {
         case "created":
           console.log("here is created");
+          this.form = {}
           this.appendRole();
           break;
         case "edit":
@@ -232,17 +236,9 @@ export default {
       console.log(params)
       this.form.tenantPic = params[0]
     },
-    queryTenantList: function() {
-      sysTenantManagerPage(this.form)
-        .then(res => {
-          this.tableData = res.data;
-          console.log("租户管理员列表:", this.tableData);
-        })
-        .catch();
-    },
     appendRole: function() {
       this.dialogVisible = true;
-      this.addForm.title = "添加角色";
+      this.addForm.title = "创建租户";
       this.addForm.data = { roleName: "" };
     },
     editRole: function(roleInfo) {
@@ -253,18 +249,32 @@ export default {
     editMenu: function(roleInfo) {
     },
     save: function() {
-      console.log(this.form)
-      tenantAdd(this.form)
-      .then(response=> {
-        if(response.code === 200) {
-          this.$message({
-            message: '添加成功',
-            type: 'success'
-          })
-          this.tableData.push(response.data)
-          this.dialogVisible = false;
-        }
-      })
+      console.log(this.addForm)
+      if(this.addForm.title === "创建租户") {
+        tenantAdd(this.form)
+        .then(response=> {
+          if(response.code === 200) {
+            this.$message({
+              message: '添加成功',
+              type: 'success'
+            })
+            this.tableData.push(response.data)
+            this.dialogVisible = false;
+          }
+        })
+      }else {
+        tenantMod(this.form)
+        .then(response=> {
+          if(response.code === 200) {
+            this.$message({
+              message: '修改成功',
+              type: 'success'
+            })
+            this.tenantList()
+            this.dialogVisible = false;
+          }
+        })
+      }
     },
     delete: function(type, list) {
     },

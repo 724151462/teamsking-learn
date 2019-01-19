@@ -1,9 +1,17 @@
 <template>
     <div>
-        <modelAside 
-        @dialogShow="dialogShow" 
-        :sourceList="testList" 
-        :textObj="textObj"></modelAside>
+        <el-container>
+            <modelAside 
+            @dialogShow="dialogShow" 
+            :sourceList="stormList" 
+            :textObj="stormObj"
+            :dataKey="dataKey"
+            @activeEvent="activeStrome"
+            @beginEvent="beginStrome"></modelAside>
+            <el-main>
+                <span>头脑风暴</span>
+            </el-main>
+        </el-container>
     </div>
 </template>
 
@@ -13,16 +21,29 @@ import modelAside from "@/components/modelAside"
 export default {
     data() {
         return{
-            testList: [],
-            textObj: {
+            stormList: [{
+                stormId: 1,
+                stromTitle: '测试头脑风暴'
+            }],
+            stormObj: {
                 addBtn: "添加头脑风暴",
                 interactItemBtn: "开始活动"
-            }
+            },
+            dataKey: {
+                itemId: 'stromeId',
+                itemTitle: 'stromTitle' 
+            },
         }
     },
     methods: {
         dialogShow(value) {
             alert(value)
+        },
+        activeStrome(value) {
+            
+        },
+        beginStrome() {
+
         }
     },
     created() {
@@ -34,6 +55,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="stylus" scoped>
+    .el-main 
+        padding-left: 300px;
 
 </style>
+

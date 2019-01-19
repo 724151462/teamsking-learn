@@ -81,6 +81,11 @@
                           height="18px"
                         >
                       </el-tooltip>
+                      <img
+                          :src="require('../../assets/images/txt.png')"
+                          style="margin-left: 5px"
+                          height="18px"
+                        >
                     </div>
                   </div>
                   <div class="operate">

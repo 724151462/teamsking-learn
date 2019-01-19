@@ -10,6 +10,10 @@ const courseDev = '/api/v1/course' // 开发环境
 const courseProd = 'http://120.36.137.90:9008/api/v1/course' // 生产环境
 const courseUrl = process.env.NODE_ENV === 'production' ? courseProd : courseDev
 
+const studyDev = '/api/v1/study/' // 开发环境
+const studyProd = 'http://120.36.137.90:9008/api/v1/study/' // 生产环境
+const studyUrl = process.env.NODE_ENV === 'production' ? studyProd : studyDev
+
 import {
   commonsAjax
 } from '../utils/requery'
@@ -20,6 +24,14 @@ import {
 export function coursePage(data) {
   return commonsAjax(`${baseUrl}page`, data, 'get')
 }
+
+/**
+ * 获取课程列表
+ */
+export function courseDel(data) {
+  return commonsAjax(`${baseUrl}`, data, 'delete')
+}
+
 /**
  * 获取默认的课程封面
  */
@@ -876,4 +888,37 @@ export function classTestRes(data) {
   return commonsAjax(url, data, 'post')
 }
 
+// =======讨论======
+/**
+ * 讨论列表
+ */
+export function discussGet(data) {
+  let url = `${studyUrl}${data.courseId}/discussion/page`
+  return commonsAjax(url, data, 'get')
+}
 
+
+/**
+ * 讨论详情页主题
+ */
+export function discussIssue(data) {
+  let url = `${studyUrl}${data.discussId}/discussion`
+  return commonsAjax(url, '', 'get')
+}
+
+
+/**
+ * 讨论详情页主题
+ */
+export function discussReply(data) {
+  let url = `${studyUrl}discussion/reply/list/${data.discussId}`
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 发送讨论
+ */
+export function discussPost(data) {
+  let url = `${studyUrl}discussion/save/reply`
+  return commonsAjax(url, data, 'post')
+}

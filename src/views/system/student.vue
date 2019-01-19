@@ -56,7 +56,7 @@
             @select="handleSelect"
             ></el-autocomplete> -->
             <el-form-item>
-                <el-input v-model="searchForm.studentInfo" placeholder="选择输入姓名/学号">
+                <el-input v-model="searchForm.search" placeholder="选择输入姓名/学号">
                 </el-input>
             </el-form-item>
             <!-- <el-form-item label="系名称">
@@ -90,7 +90,7 @@
                 :tableOperate="tableOperate"
                 :columnNameList="columnNameList"
                 :tableData="tableData3"
-                :operateList="operateList"
+   
                 @showComponentInfo="showComponentInfo"
                 switchColumn='open'>
         </table-the-again>
@@ -203,7 +203,7 @@ import { setTimeout } from 'timers';
                     college: '',
                     department: '',
                     speciality: '',
-                    studentInfo: '',
+                    search: '',
                     studentClass: ''
                 },
                 searchCollegeList: [],
@@ -254,18 +254,18 @@ import { setTimeout } from 'timers';
                   }
                 ],
                 operateList:[
-                    {
-                        content:'编辑',
-                        type:'edit'
-                    },
-                    {
-                        content:'重置密码',
-                        type:'resetPassword'
-                    },
-                    {
-                        content:'删除',
-                        type:'delete'
-                    }
+                    // {
+                    //     content:'编辑',
+                    //     type:'edit'
+                    // },
+                    // {
+                    //     content:'重置密码',
+                    //     type:'resetPassword'
+                    // },
+                    // {
+                    //     content:'删除',
+                    //     type:'delete'
+                    // }
                 ],
                 tableData3: [
                 ],
@@ -328,6 +328,8 @@ import { setTimeout } from 'timers';
                     this.collegeList = response.data
                     this.searchCollegeList = response.data
                     let all = {"collegeId": -1, "collegeName": "全部"}
+                    let nullOption = {"collegeId": -2, "collegeName": "无院"}
+                    this.collegeList.unshift(nullOption)
                     this.collegeList.unshift(all)
                     // this.searchCollegeList.unshift(all)
                     console.log(this.collegeList)
@@ -340,12 +342,13 @@ import { setTimeout } from 'timers';
                     this.departmentRows = response.data
                     this.searchDepartmentList = response.data
                     let all = {"departmentId": -1, "departmentName": "全部"}
-                    // this.searchDepartmentList.unshift(all)
+                    let nullOption = {"departmentId": -2, "departmentName": "无系"}
+                    this.departmentRows.unshift(nullOption)
                     this.departmentRows.unshift(all)
                 }
             })
             // 专业列表
-            sysSpecialityList()
+            sysSpecialityList({collegeId: -1, departmentId: -1})
             .then((response)=>{
                 if (response.code === 200){
                     this.specialityRows = response.data
@@ -356,7 +359,7 @@ import { setTimeout } from 'timers';
                 }
             })
             // 班级列表
-            sysClassList()
+            sysClassList({specialityId: -1})
             .then((response)=>{
                 console.log(response.data)
                 if (response.code === 200){
@@ -369,100 +372,116 @@ import { setTimeout } from 'timers';
             })
         },
         watch:{
-            collegeId: function(val){
-                console.log(val)
-                if(val == -1 || val == -2 || val == '无院'){
-                    this.departmentList = this.departmentRows
-                }else{
-                    this.departmentList = this.departmentRows.filter(function (x) { return x.collegeId == val });
-                }
-                if (this.departmentList.length>0) {
-                    console.log(this.departmentId)
-                    if (this.departmentId) {
-                        this.departmentId = this.departmentId
-                        return
-                    }
-                    this.departmentId = this.departmentList[0].departmentId
-                }else{
-                    this.departmentId = ""
-                }
-            },
-            departmentId: function(val){
-                console.log('depid', val)
-                if(val == -1 || val == -2 || val == '无系'){
-                    this.specialityList = this.specialityRows
-                }else{
-                    this.specialityList = this.specialityRows.filter(function (x) { return x.departmentId == val });
-                }
-                if (this.specialityList.length>0) {
-                    if (this.specialityId) {
-                        this.specialityId = this.specialityId
-                        return
-                    }
-                    this.specialityId = this.specialityList[0].specialityId
-                }else{
-                    this.specialityId = ""
-                }
-            },
-            specialityId: function(val){
-                if(val == -1 || val == -2 || val == '无专业'){
-                    this.classList = this.classRows
-                }else{
-                    this.classList = this.classRows.filter(function (x) { return x.specialityId == val });
-                }
-                if (this.classList.length>0) {
-                    if (this.classId) {
-                        this.classId = this.classId
-                        return
-                    }
-                    this.classId = this.classList[0].classId
-                }else{
-                    this.classId = ""
-                }
-            }
+            // collegeId: function(val){
+            //     console.log(val)
+            //     if(val == -1 || val == -2 || val == '无院'){
+            //         this.departmentList = this.departmentRows
+            //     }else{
+            //         this.departmentList = this.departmentRows.filter(function (x) { return x.collegeId == val });
+            //     }
+            //     if (this.departmentList.length>0) {
+            //         console.log(this.departmentId)
+            //         if (this.departmentId) {
+            //             this.departmentId = this.departmentId
+            //             return
+            //         }
+            //         this.departmentId = this.departmentList[0].departmentId
+            //     }else{
+            //         this.departmentId = ""
+            //     }
+            // },
+            // departmentId: function(val){
+            //     console.log('depid', val)
+            //     if(val == -1 || val == -2 || val == '无系'){
+            //         this.specialityList = this.specialityRows
+            //     }else{
+            //         this.specialityList = this.specialityRows.filter(function (x) { return x.departmentId == val });
+            //     }
+            //     if (this.specialityList.length>0) {
+            //         if (this.specialityId) {
+            //             this.specialityId = this.specialityId
+            //             return
+            //         }
+            //         this.specialityId = this.specialityList[0].specialityId
+            //     }else{
+            //         this.specialityId = ""
+            //     }
+            // },
+            // specialityId: function(val){
+            //     if(val == -1 || val == -2 || val == '无专业'){
+            //         this.classList = this.classRows
+            //     }else{
+            //         this.classList = this.classRows.filter(function (x) { return x.specialityId == val });
+            //     }
+            //     if (this.classList.length>0) {
+            //         if (this.classId) {
+            //             this.classId = this.classId
+            //             return
+            //         }
+            //         this.classId = this.classList[0].classId
+            //     }else{
+            //         this.classId = ""
+            //     }
+            // }
         },
         methods:{
             // 院搜索值变化
             collegeChange(value) {
                 // console.log(value)
                 // console.log('a',this.departmentRows)
+                // console.log(this.departmentRows)
+                this.searchForm.department = -1
                 if(value === -1){
                     console.log('coid', this.departmentRows)
                     this.searchDepartmentList = this.departmentRows
-                    this.searchForm.department = -1
-                }else{
+                    // this.searchForm.department = -1
+                }else if (value === -2){
+                    this.searchDepartmentList = this.departmentRows.filter((item)=>{
+                        console.log('coid', item)
+                        return (item.collegeId == null || item.departmentId == -1 || item.departmentId == -2)
+                    })
+                }
+                else{
                     console.log('list', this.departmentRows)
                     this.searchDepartmentList = this.departmentRows.filter((item)=>{
-                        console.log('coid', item.collegeId)
-                        return (item.collegeId == value || item.collegeId == -1)
+                        console.log('coid', item)
+                        return (item.collegeId == value || item.departmentId == -1 || item.departmentId == -2)
                     })
                     console.log('121', this.searchDepartmentList)
-                    this.searchForm.department = -1   
+                    // this.searchForm.department = -1   
                 }
                          
             },
             // 系搜索值变化
             departmentChange(value) {
-                console.log('dep', value)
+                console.log('dep', value)   
+                this.searchForm.speciality = -1             
                 if(value === -1){
-                    return this.specialityRows
+                    this.searchSpecialityList = this.specialityRows
+                }else if (value === -2){
+                    this.searchSpecialityList = this.specialityRows.filter((item)=>{
+                        return (item.departmentId == null || item.specialityId == -1 || item.specialityId == -2)
+                    })
+                }else {
+                    this.searchSpecialityList = this.specialityRows.filter((item)=>{
+                        return (item.departmentId == value || item.specialityId == -1 || item.specialityId == -2)
+                    })
                 }
-                this.searchForm.speciality = -1
-                this.searchSpecialityList = this.specialityRows.filter((item)=>{
-                    return item.departmentId == value || item.departmentId == -1
-                })
+                
             },
             // 专业搜索值变化
             specialityChange(value) {
                 console.log('spec', value)
-                if(value === -1){
-                    return this.classRows
-                }
                 this.searchForm.studentClass = -1
-                this.classSearchList = this.classRows.filter((item)=>{
-                    console.log(item)
-                    return item.specialityId == value || item.specialityId == -1
-                })
+                if(value === -1){
+                    this.classSearchList = this.classRows
+                }else{
+                    this.classSearchList = this.classRows.filter((item)=>{
+                        console.log(item)
+                        return item.specialityId == value || item.classId == -1
+                    })
+                }
+                
                 // console.log(this.classSearchList)
             },
             // 查找按钮事件
