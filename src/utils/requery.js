@@ -3,10 +3,9 @@ import qs from 'qs'
 import Globe_VM from '../main'
 import { getToken, removeToken } from './auth'
 
-if (getToken()) {
-  axios.defaults.headers.token = getToken()
-}
-axios.defaults.headers.token = 'a0e8dfc91dde92f85c9b9ee31fe17252'
+
+// axios.defaults.headers.token = '1f905951b9b371530396ea07f6cbe94a'
+
 axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 axios.defaults.responseType = 'json'
@@ -31,7 +30,8 @@ axios.interceptors.request.use(
  */
 axios.interceptors.response.use(
   res => {
-   // console.log('tokens',getToken())
+    // console.log('tokens',getToken())
+
       if (Number(res.data.code) === 401) {
         removeToken()
         Globe_VM.$router.push({ path: '/login' })
@@ -65,6 +65,9 @@ export function commonsAjax (url, data, method, headers) {
       date.data = data
     }
     if( data !== '' && method === 'put'){
+      date.data = data
+    }
+    if( data !== '' && method === 'patch'){
       date.data = data
     }
     axios(date).then(res => {

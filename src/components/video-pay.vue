@@ -7,6 +7,7 @@
                      :options="playerOptions"
                      @play="onPlayerPlay($event)"
                      @pause="onPlayerPause($event)"
+                     @ended="onPlayerEnded($event)"
       >
       </video-player>
     </div>
@@ -50,11 +51,16 @@
     },
     methods: {
       onPlayerPlay(player) {
-        alert("play");
+        this.playerOptions.sources[0].src = this.isMp4
+        console.log('play', this.isMp4)
+        // alert("play");
       },
       onPlayerPause(player){
-        alert("pause");
+        // alert("pause");
       },
+      onPlayerEnded(player) {
+        // alert()
+      }
     },
     computed: {
       player() {

@@ -2,106 +2,141 @@
   <div>
     <div class="addCourse">
       <span>课程信息</span>
-      <el-button plain style="float:right">返回</el-button>
+      <el-button plain style="float:right" @click="$router.push('/course/list')">返回</el-button>
     </div>
     <div class="addCourse-center">
-      <el-form :model="Course" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+      <el-form :model="Course" ref="postForm" label-width="100px">
         <el-form-item label="课程名称" required>
           <el-input v-model="Course.courseName" style="width: 220px;"></el-input>
         </el-form-item>
 
-        <el-form-item label="课程分类" required>
-          <el-cascader
-              placeholder="请选择课程分类"
-              :options="categoriesList"
-              :props='categoriesConfig'
-              @change="yesCategories"
-              filterable
-          ></el-cascader>
+        <el-form-item label="课程分类"  required>
+          <el-select v-model="Course.courseCategoryParent" placeholder="课程一级分类" @change="yesCategories">
+            <el-option
+              v-for="(item , index) in categoriesList"
+              :key="index"
+              :label="item.categoryName"
+              :value="item.categoryId">
+            </el-option>
+          </el-select>
+          <el-select v-model="Course.courseCategory" placeholder="课程二级分类" style="margin-left: 30px" v-show="isCourseChild">
+            <el-option
+              v-for="item in categoriesChildList"
+              :key="item.categoryId"
+              :label="item.categoryName"
+              :value="item.categoryId">
+            </el-option>
+          </el-select>
         </el-form-item>
 
         <el-form-item label="起止时间" required>
-          <el-date-picker
-              v-model="courseTime"
-              type="datetimerange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期">
-          </el-date-picker>
+          <div class="block">
+            <el-date-picker
+                    v-model="Course.beginTime"
+                    type="datetime"
+                    prefix-icon="el-icon-date"
+                    placeholder="选择日期时间"
+                    value-format="yyyy-MM-dd HH:mm:ss"
+                    default-time="12:00:00">
+            </el-date-picker>
+            <span style="margin: 0 20px">至</span>
+            <el-date-picker
+                    v-model="Course.endTime"
+                    type="datetime"
+                    prefix-icon="el-icon-date"
+                    placeholder="选择日期时间"
+                    value-format="yyyy-MM-dd HH:mm:ss"
+                    default-time="12:00:00">
+            </el-date-picker>
+          </div>
         </el-form-item>
 
         <el-form-item label="课程封面" required>
-          <el-upload
-              class="avatar-uploader"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload">
-            <img v-if="Course.courseCover" :src="Course.courseCover" class="avatar">
+          <div class="avatar-uploader" @click="coverPreviewShow = true">
+            <img v-if="Course.courseCover" :src="Course.courseCover" class="avatar" >
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
+          </div>
         </el-form-item>
 
-        <el-form-item label="课程价格" required>
-          <el-radio v-model="Course.payMode" label="10">免费</el-radio>
-          <el-radio v-model="Course.payMode" label="20">收费</el-radio>
-          <el-input v-model="Course.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;" v-show="Number(Course.payMode) === 20"></el-input>
-          <span v-show="Number(Course.payMode) === 20">元</span>
+        <cover-preview :show="coverPreviewShow"
+                       @closeCoverPreview="closeCoverPreview"
+                       @chooseCover="chooseCover"></cover-preview>
+
+        <!--<el-form-item label="课程价格" required>-->
+          <!--<el-radio v-model="Course.payMode" :label="10">免费</el-radio>-->
+          <!--<el-radio v-model="Course.payMode" label="20">收费</el-radio>-->
+          <!--<el-input v-model="Course.coursePrice" style="width: 80px;margin-left:50px;margin-right:20px;" v-show="Number(Course.payMode) === 20"></el-input>-->
+          <!--<span v-show="Number(Course.payMode) === 20">元</span>-->
+        <!--</el-form-item>-->
+
+        <el-form-item label="课程标签">
+          <div class="course-tag-warp" v-show="Course.courseTagIds.length !== 0">
+            <el-tag
+              size="small"
+              v-for="tag in Course.courseTagIds"
+              :key="tag.id"
+              @close="tagRemove(tag)"
+              closable>
+              {{tag.tagName}}
+            </el-tag>
+          </div>
+
+          <el-row>
+            <el-autocomplete
+              style="width: 305px;"
+              v-model="tag"
+              suffix-icon="el-icon-search"
+              :fetch-suggestions="tagSearch"
+              placeholder="选择课程标签"
+              @select="yesTages"
+            ></el-autocomplete>
+          </el-row>
         </el-form-item>
 
-        <el-form-item label="课程标签" required>
-          <el-cascader
-              placeholder="请选择课程标签"
-              :options="tagsList"
-              :props='tagsConfig'
-              @change="yesTages"
-              filterable
-          ></el-cascader>
+        <el-form-item label="讲师">
+          <div class="instructor-tag-warp" v-show="CourseForm.instructor.length !== 0">
+            <el-tag
+              size="small"
+              v-for="instructor in CourseForm.instructor"
+              :key="instructor.id"
+              @close="instructorRemove(instructor)"
+              closable>
+              {{instructor.instructorName}}
+            </el-tag>
+          </div>
+
+          <el-row>
+              <el-autocomplete
+                style="width: 300px;"
+                v-model="instructor"
+                suffix-icon="el-icon-search"
+                :fetch-suggestions="instructorSearch"
+                placeholder="请输入老师名字搜索"
+                @select="yesInstructor"
+              ></el-autocomplete>
+            <el-button type="primary"
+                       size="medium"
+                       style="margin-left: 20px;display: inline-block"
+                       @click="isTeacher = true">增加讲师</el-button>
+          </el-row>
         </el-form-item>
 
-        <el-form-item label="讲师" required>
-          <el-select
-              v-model="CourseForm.instructor"
-              multiple
-              filterable
-              allow-create
-              default-first-option
-              @change="yesInstructor"
-              placeholder="请选择讲师">
-            <el-option
-                v-for="item in instructorLists"
-                :key="item.instructorId"
-                :label="item.instructorName"
-                :value="item.instructorId">
-            </el-option>
-          </el-select>
-          <el-button type="primary" round style="margin-left: 20px;" @click="isTeacher = true">创建讲师</el-button>
-        </el-form-item>
-
-        <el-form-item label="教学老师" required>
-          <el-select
-              v-model="CourseForm.teacher"
-              multiple
-              filterable
-              allow-create
-              default-first-option
-              @change="yesTeacher"
-              placeholder="请选择讲师">
-            <el-option
-                v-for="item in teachersLists"
-                :key="item.userId"
-                :label="item.teacherName"
-                :value="item.userId">
-            </el-option>
-          </el-select>
+        <el-form-item label="教学课程授权" label-width="120px" required>
+            <el-button type="text" @click="isAccredit = true">设置</el-button>
         </el-form-item>
 
         <el-form-item label="选课名单" required>
           <el-row>
             <span>开放范围：</span>
-            <el-radio v-model="Course.courseMode" label="10">选课名单学员</el-radio>
-            <el-radio v-model="Course.courseMode" label="20">本校学员</el-radio>
-            <el-radio v-model="Course.courseMode" label="30">全部学员</el-radio>
+            <el-tooltip class="item" effect="dark" content="只对选课名单内的学生开放，需要导入选课学生名单" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="10">选课名单学员</el-radio>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="只对本校认证的学员开放，其他学员无法学习！" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="20">本校学员</el-radio>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="对所有学员开放！" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="30">全部学员</el-radio>
+            </el-tooltip>
           </el-row>
           <el-row>
             <span>退课权限：</span>
@@ -110,43 +145,95 @@
         </el-form-item>
 
         <el-form-item label="成绩考核" required>
-          <span class="courseExplanation">视频50% | 测验30% | 讨论20%</span>
+          <div style="display: inline-block">
+            <span class="courseExplanation" v-show="CourseSetEntity.videoPercent !=0" style="margin-right: 10px">视频{{CourseSetEntity.videoPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.docPercent !=0" style="margin-right: 10px">文档{{CourseSetEntity.docPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.quizPercent !=0" style="margin-right: 10px">测试{{CourseSetEntity.quizPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.homeworkPercent !=0" style="margin-right: 10px">作业{{CourseSetEntity.homeworkPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.offlinePercent !=0" style="margin-right: 10px">线下{{CourseSetEntity.offlinePercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.votePercent !=0" style="margin-right: 10px">投票{{CourseSetEntity.votePercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.stormPercent !=0" style="margin-right: 10px">头脑风暴{{CourseSetEntity.stormPercent}}%</span>
+          </div>
           <a class="sysTem" @click="isSys">设置</a>
         </el-form-item>
 
         <el-form-item label="课程代码">
           <el-input v-model="Course.courseCode" style="width: 120px;"></el-input>
         </el-form-item>
-
+        <!--引用课程包，二期需求-->
+<!--        <div style="margin-left: 30px;margin-bottom: 22px">
+          <el-checkbox v-model="Course.isCoursePackge">引用已有课程包</el-checkbox>
+          <el-select v-model="Course.coursePackge" filterable placeholder="请选择" style="margin-left: 12px">
+            <el-option
+                    v-for="item in Course.coursePackgeList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+            </el-option>
+          </el-select>
+          <span style="margin-left: 12px" class="remind-text-color">下拉选择已有课程包</span>
+        </div>-->
         <el-form-item label="课程介绍" required>
-          <div id="editor1"></div>
+          <el-row>
+            <el-button type="text" v-show="!iseditor1" @click="iseditor1 = true">设置</el-button>
+          </el-row>
+          <div id="editor1" v-show="iseditor1"></div>
         </el-form-item>
 
         <el-form-item label="教学目标" required>
-          <div id="editor2"></div>
+          <el-row>
+            <el-button type="text" v-show="!iseditor2" @click="iseditor2 = true">设置</el-button>
+          </el-row>
+          <div id="editor2" v-show="iseditor2"></div>
         </el-form-item>
 
         <el-form-item label="教学安排" required>
-          <div id="editor3"></div>
+          <el-row>
+            <el-button type="text" v-show="!iseditor3" @click="iseditor3 = true">设置</el-button>
+          </el-row>
+          <div id="editor3" v-show="iseditor3"></div>
         </el-form-item>
       </el-form>
-      <el-row style="text-align: right">
-        <el-button type="success" @click="goUpCourseResource">下一步，上传课程资源</el-button>
+      <el-row style="text-align: center" v-if="!isUpdata">
+        <el-button type="primary" @click="goUpCourseResource">完成</el-button>
+      </el-row>
+      <el-row style="text-align: center" v-else>
+        <el-button type="primary" @click="goPutCourse">修改</el-button>
       </el-row>
     </div>
-
+    <!--教学课程授权设置-->
+    <el-dialog title="教学课程授权" :visible.sync="isAccredit"
+               width="50%"
+               class="addCourse-dialog teacher-dialog">
+    <el-autocomplete
+                  class="accredit-input"
+                  v-model="accreditTeacher"
+                  suffix-icon="el-icon-search"
+                  :fetch-suggestions="teacherSearch"
+                  placeholder="输入名字进行搜索"
+                  @select="yesTeacher"
+          ></el-autocomplete>
+        <div>
+          <el-checkbox-group v-model="CourseForm.teacher">
+            <el-checkbox v-for="teacher in teachersLists" :label="teacher.teacherName" :value="teacher.teacherId" :name="teacher.teacherNumber" :key="teacher.id"></el-checkbox>
+          </el-checkbox-group>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="isAccredit = false">确 定</el-button>
+            <el-button @click="isAccredit = false">取 消</el-button>
+        </div>
+      </el-dialog >
     <!--弹出的设置说明-->
     <el-dialog
         title="成绩权重设定"
         :visible.sync="isSysTem"
         style="z-index: 10002"
         class="isSystem"
-        width="70%">
+        width="750px">
       <el-row>
         <div class="top">
-          <span>满分：100</span>
-          <span>最终得分 = A + B + C + D + E + F +G</span>
-          <span>*单项考核权重为0则不计入成绩！</span>
+          <span>满分：100分</span>
+          <span style="text-align: right;float: right">*单项考核权重为0则不计入成绩！</span>
         </div>
         <div class="center">
           <div class="left">
@@ -154,17 +241,20 @@
               <tr class="tr-h no-tr">
                 <td>评分项</td>
                 <td>视频</td>
+                <td>文档</td>
                 <td>测验</td>
                 <td>作业</td>
-                <td>讨论</td>
-                <td>线下</td>
-                <td>投票问卷</td>
                 <td>头脑风暴</td>
+                <td>投票问卷</td>
+                <td>线下</td>
               </tr>
               <tr class="tr-h">
                 <td>权重共100%</td>
                 <td>
-                  <el-input v-model="CourseSetEntity.videoPercent" style="width:50px;" @change="canvasTab"></el-input>%
+                  <el-input v-model="CourseSetEntity.videoPercent" style="width:50px;"></el-input>%
+                </td>
+                <td>
+                  <el-input v-model="CourseSetEntity.docPercent" style="width:50px;"></el-input>%
                 </td>
                 <td>
                   <el-input v-model="CourseSetEntity.quizPercent" style="width:50px"></el-input>%
@@ -173,46 +263,16 @@
                   <el-input v-model="CourseSetEntity.homeworkPercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.topicPercent" style="width:50px"></el-input>%
-                </td>
-                <td>
-                  <el-input v-model="CourseSetEntity.offlinePercent" style="width:50px"></el-input>%
+                  <el-input v-model="CourseSetEntity.stormPercent" style="width:50px"></el-input>%
                 </td>
                 <td>
                   <el-input v-model="CourseSetEntity.votePercent" style="width:50px"></el-input>%
                 </td>
                 <td>
-                  <el-input v-model="CourseSetEntity.stormPercent" style="width:50px"></el-input>%
-                </td>
-              </tr>
-              <tr class="tr-h">
-                <td>单项分数</td>
-                <td>
-                  <span class="icons" style="background:#FE6370">A</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#63BAEE">B</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#B8E664">C</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#E38EF7">D</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#FFB8CA">E</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#ED9B63">F</span>
-                </td>
-                <td>
-                  <span class="icons" style="background:#FFC0CB">G</span>
+                  <el-input v-model="CourseSetEntity.offlinePercent" style="width:50px"></el-input>%
                 </td>
               </tr>
             </table>
-          </div>
-          <div class="right">
-            <div id="echart"></div>
           </div>
         </div>
         <div class="norm">
@@ -220,43 +280,43 @@
           <span class="norm-right">（默认分数全部为100分，投票问卷默认90分）</span>
         </div>
         <div class="score">
-          <div class="list">视频得分 = 完整观看视频 / 总视频数 * 100 分 * {{CourseSetEntity.videoPercent}}%</div>
-          <div class="list">测试得分 = 测试得分总和 / 测验次数 * {{CourseSetEntity.quizPercent}}%</div>
-          <div class="list">作业得分 = 作业得分总和 / 作业次数 * {{CourseSetEntity.homeworkPercent}}%</div>
-          <div class="list">讨论得分 = 获得分数的讨论数 / 讨论次数 * 100分 * {{CourseSetEntity.topicPercent}}%</div>
-          <div class="list">线下得分 = 线下得分 * {{CourseSetEntity.offlinePercent}}%</div>
-          <div class="list">投票问卷得分 = 投票问卷得分 * {{CourseSetEntity.votePercent}}%</div>
-          <div class="list">头脑风暴得分 = 头脑风暴得分 * {{CourseSetEntity.stormPercent}}%</div>
+          <div class="list">视频得分 = 完整观看视频 / 总视频数 * 100 分 * <span class="blue-text">{{CourseSetEntity.videoPercent}}</span>%</div>
+          <div class="list">文档得分 = 完整观看文档 / 总文档数 * 100 分 * <span class="blue-text">{{CourseSetEntity.docPercent}}</span>%</div>
+          <div class="list">测试得分 = 测试得分总和 / 测验次数 * <span class="blue-text">{{CourseSetEntity.quizPercent}}</span>%</div>
+          <div class="list">作业得分 = 作业得分总和 / 作业次数 * <span class="blue-text">{{CourseSetEntity.homeworkPercent}}</span>%<span style="color: red;margin-left: 10px">(取最高分)</span></div>
+          <div class="list">线下得分 = 线下得分 * <span class="blue-text">{{CourseSetEntity.offlinePercent}}</span>%</div>
+          <div class="list">投票问卷得分 = 投票问卷得分 / 投票数 * 100 *<span class="blue-text">{{CourseSetEntity.votePercent}}</span>%</div>
+          <div class="list">头脑风暴得分 = 头脑风暴得分总和 / 头脑风暴数 * <span class="blue-text">{{CourseSetEntity.stormPercent}}</span>%</div>
         </div>
       </el-row>
-<!--
       <el-row style="text-align: right;">
-        <el-button @click="isSysTem = false">取 消</el-button>
         <el-button type="primary" @click="isSysTem = false">确 定</el-button>
+        <el-button @click="isSysTem = false">取 消</el-button>
       </el-row>
--->
     </el-dialog>
-
     <!--创建讲师-->
-        <el-dialog
-            title="添加授课老师"
+    <el-dialog
+            title="新增讲师"
             :visible.sync="isTeacher"
             width="50%">
 
           <addTeachers v-on:goAddTeachersData="teachersData"></addTeachers>
-        </el-dialog>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import wangEditor from 'wangeditor'
-  import echarts from 'echarts'
+  import vueCropper from 'vue-cropper'
   import addTeachers from './upCourse/addTeacher.vue'
-  import { categories, tags, instructorList, teachersList, saveCourse, courseInfo } from '../../api/course'
+  import coverPreview from './coverPreview.vue'
+  import { categories, tags, instructorList, teachersList, saveCourse, courseInfo , putCourse} from '../../api/course'
   import { formatDate } from '../../utils/utils'
   export default {
     components:{
-      addTeachers
+      addTeachers,
+      coverPreview,
+      vueCropper
     },
     data(){
       return{
@@ -264,17 +324,16 @@
           courseName:'',  //课程名称
           courseCategoryParent:'',  //课程分类
           courseCategory:'',  //课程子分类
-          courseTagParent:'', //课程标签
-          courseTag:'', //课程子标签
+          courseTagIds:[], // 课程标签
           beginTime:'', //开课时间
           endTime:'', //结课时间
           courseCover:'', //课程封面
-          payMode:'10',  //课程价格 10授课 20售卖
+          payMode: 10,  //课程价格 10授课 20售卖
           coursePrice:0, //课程价格
-          courseMode:'10',  //10：教师导入 20 本校学生 30 全部学员 ,
-          dropCourse:false, //1 允许退课 2 不允许
+          courseMode: 10,  //10：教师导入 20 本校学生 30 全部学员 ,
+          dropCourse:true, //1 允许退课 2 不允许
           courseCode:'',  //课程代码/课程编码
-          teacher:'', //教师id
+          // teacher:'', //教师id
           //一下的默认值
           studyMode:10, //课程学习模式
           difficultyStatus:10,  //课程难度
@@ -285,26 +344,47 @@
           instructor:[],  //要保存的讲师Id
           teacher:[], //要保存的教师Id
         },
-        //课程完成度
-        CourseSetEntity:{
-          homeworkPercent:0, // 作业成绩占比
-          offlinePercent:0,  // 线下成绩占比
-          quizPercent:30, //测验成绩占比
-          stormPercent:0,  //头脑风暴占比
-          topicPercent:20,  //讨论成绩占比
-          videoPercent:50,  //视频成绩占比
-          votePercent:0, //投票问卷占比
+        //课程完成度设置
+        CourseSetEntity: {
+          // 视频成绩占比
+          videoPercent: 0,
+          //文档占比
+          docPercent:0,
+          //作业占比
+          homeworkPercent: 0,
+          // 测试成绩占比
+          quizPercent :0,
+          // 线下成绩占比
+          offlinePercent : 0,
+          // 头脑风暴成绩占比
+          stormPercent : 0,
+          // 讨论成绩占比
+          topicPercent : 0,
+          // 投票成绩占比
+          votePercent : 0,
         },
         //课程相关
         CourseInfoEntity:{
-          courseDescription:null, //课程信息
-          teachingArrangement:null, //教学安排
-          teachingTarget:null, //教学目标
+          courseDescription:"", //课程信息
+          teachingArrangement:"", //教学安排
+          teachingTarget:"", //教学目标
         },
-        courseTime:[],  //课程开始 and 结束时间
-        isSysTem:false, //弹出设置
+        instructor:'', //讲师搜索时用
+        tag:'', //标签搜索用
+        accreditTeacher:'',// 授权教师用
+        // accreditTeacherList:[], //被授权教师列表
+        isAccredit:false, //弹出教学课程授权弹出课程封面上传
         isTeacher:false,  //弹出添加老师
+        isSysTem:false, //弹出设置
+        coverPreviewShow: false, //
+        isChooseTeacher:false, //选择讲师
         rules:[],
+        //判断是否为编辑课程
+        isUpdata:false,
+        //三个富文本的显隐
+        iseditor1:false,
+        iseditor2:false,
+        iseditor3:false,
         //以下三个是富文本属性
         editor1:null,
         editor2:null,
@@ -314,25 +394,19 @@
         addEditor2:null,
         addEditor3:null,
         //课程分类
-        categoriesList:[],
-        //配置二级
-        categoriesConfig:{
-          label:'categoryName',
-          value:'categoryId',
-          children:'children'
-        },
+        categoriesList:[],  //一级课程
+        categoriesChildList:[],   //二级课程
+        isCourseChild: false,    //二级课程选择框的隐显
         //课程标签列表
-        tagsList:[],
-        //配置二级
-        tagsConfig:{
-          label:'tagName',
-          value:'tagId',
-          children:'children'
-        },
+        tagLists:[],
         //讲师列表
         instructorLists:[],
         //教师列表
-        teachersLists:[]
+        teachersLists:[],
+        //表单提交验证
+        courseRules:{
+          CourseName: [{ required: true, message: '请输入活动名称', trigger: 'blur' }]
+        }
       }
     },
     watch:{
@@ -345,16 +419,34 @@
     created(){
       this.$emit('floorStatus','course')
       this.selectList()
-      // if(this.$route.query.courseId)
+      //课程编辑
       if(this.$route.query.courseId && this.$route.query.courseId !== ''){
         this.getUpData(this.$route.query.courseId)
+        this.isUpdata = true
       }
     },
     methods:{
-      //进入查询编辑数据
+      //课程编辑时获取该课程的数据
       getUpData(e){
         courseInfo(e).then(res=>{
           console.log(res)
+          //后台请求到的数据不完全适合展示，需要清洗
+          let data = this.upDataFilter(res.data)
+          console.log(data)
+          this.Course = data.course
+          //教师相关信息
+          this.CourseForm.instructor = data.instructor
+          this.CourseForm.teacher = data.teacher
+          this.CourseSetEntity = data.set
+          this.CourseInfoEntity = data.info
+
+          // 课程介绍
+          this.editor1.txt.html(data.info.courseDescription)
+          //教学目标
+          this.editor2.txt.html(data.info.teachingTarget)
+          //教学安排
+          this.editor3.txt.html(data.info.teachingArrangement)
+          console.log(this.CourseInfoEntity)
         }).catch(error=>{
           console.log(error)
         })
@@ -368,41 +460,110 @@
       },
       //教师
       yesTeacher (e) {
-        this.CourseForm.teacher = e
+        this.CourseForm.teacher.push(e.teacherName)
+        console.log(this.CourseForm.teacher)
       },
       //讲师
       yesInstructor (e) {
-        this.CourseForm.instructor = e
+        delete e.value
+        this.CourseForm.instructor.push(e)
+        console.log(this.CourseForm.instructor)
       },
       //标签数据赋值
       yesTages(e){
-        this.Course.courseTagParent = e[0]
-        this.Course.courseTag = e[1]
+        delete e.value
+        this.Course.courseTagIds.push(e)
+        console.log(this.CourseForm.instructor)
       },
-      //分类数据赋值
+      //赋值二级课程
       yesCategories(e){
-        this.Course.courseCategoryParent = e[0]
-        this.Course.courseCategory = e[1]
+        let course = e
+        this.categoriesList.forEach( (item, index) =>{
+          if(item.categoryId === course){
+            this.categoriesChildList = item.children
+            this.isCourseChild = true
+          }
+        })
       },
+      //创建课程
       goUpCourseResource(){
-        let data = {
-          course:this.Course,
-          info:this.CourseInfoEntity,
-          set:this.CourseSetEntity
-        }
-        data.course.dropCourse = !data.course.dropCourse ? 1 : 2
-        let fun = null
+        let data = this.goDataFilter()
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        console.log(data)
 
         saveCourse(data).then(res=>{
-          console.log(res)
+            loading.close()
           if(Number(res.code) === 200) {
+            this.$message.success('课程创建成功')
             this.$router.push({
-              path:'/course/upCourses/resource'
+              path:'/course/list'
             })
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
+          }else{
+            this.$message.success('课程创建失败')
+          }
+        })
+      },
+      //弹出设置
+      isSys(){
+        this.isSysTem = true
+        // this.canvasTab()
+      },
+      //图片上传方法
+      handleAvatarSuccess(res, file) {
+        this.imageUrl = URL.createObjectURL(file.raw);
+      },
+      //标签移除
+      tagRemove(e){
+        this.tag = ''
+        let data = this.Course.courseTagIds,
+          newData = [];
+        data.forEach((item)=>{
+          if (item.tagId !== e.tagId){
+              newData.push(item)
+          }
+        })
+        console.log(newData)
+        this.Course.courseTagIds = newData
+      },
+      //讲师移除
+      instructorRemove(e){
+        this.instructor = ''
+        let data = this.CourseForm.instructor,
+            newData = [];
+        data.forEach((item)=>{
+          if (item.instructorId !== e.instructorId){
+            newData.push(item)
+          }
+        })
+        this.CourseForm.instructor = newData
+      },
+      //标签搜索筛选
+      tagSearch(queryString, cb){
+        //后台返回所有标签列表，前端进行模糊查询匹配
+        tags().then(res=>{
+          if(Number(res.code) === 200){
+            console.log(res)
+            let data = [],
+                rsdata = [];
+            //临时填充value用于组件值的展示
+            res.data.forEach((item)=>{
+              item.value = item.tagName
+              rsdata.push(item)
+            })
+            data = rsdata.filter((item)=>{
+              return item.tagName.indexOf(queryString) != -1
+            });
+            // this.tagLists = data
+            // 调用 callback 返回建议列表的数据
+            cb(data)
+          }else{
             this.$message({
-              message:msgs[0].message,
+              message:'讲师列表获取失败',
               type:'error'
             })
           }
@@ -410,76 +571,68 @@
           console.log(error)
         })
       },
-      //弹出设置
-      isSys(){
-        this.isSysTem = true
-        this.canvasTab()
-      },
-      //表格渲染
-      canvasTab(){
-        let self = this
-        setTimeout(function () {
-          let myChart = echarts.init(document.getElementById('echart'));
-          // 绘制图表
-          myChart.setOption({
-            color:['#FE6370','#63BAEE','#B8E664','#E38EF7','#FFB8CA','#ED9B63','#FFC0CB'],
-            series: [
-              {
-                type:'pie',
-                radius: ['50%', '70%'],
-                avoidLabelOverlap: false,
-                label: {
-                  normal: {
-                    show: false,
-                    position: 'center'
-                  },
-                },
-                labelLine: {
-                  normal: {
-                    show: false
-                  }
-                },
-                data:[
-                  {value:self.CourseSetEntity.videoPercent, name:'视频'},
-                  {value:self.CourseSetEntity.quizPercent, name:'测验'},
-                  {value:self.CourseSetEntity.homeworkPercent, name:'作业'},
-                  {value:self.CourseSetEntity.topicPercent, name:'讨论'},
-                  {value:self.CourseSetEntity.offlinePercent, name:'线下'},
-                  {value:self.CourseSetEntity.votePercent, name:'投票问卷'},
-                  {value:self.CourseSetEntity.stormPercent, name:'头脑风暴'}
-                ]
-              }
-            ]
-          })
-        },0)
-      },
-      //图片上传方法
-      handleAvatarSuccess(res, file) {
-        this.imageUrl = URL.createObjectURL(file.raw);
-      },
-      beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-
-        if (!isJPG) {
-          this.$message.error('上传头像图片只能是 JPG 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-        return isJPG && isLt2M;
-      },
-      //获取基础选择列表分类信息
-      selectList () {
-        //课程列表
-        categories().then(res=>{
+      //获取讲师搜索的列表
+      instructorSearch(queryString, cb) {
+        instructorList({instructorName:queryString}).then(res=>{
           if(Number(res.code) === 200){
-            //数据处理
-            let data = this.electChilder(res.data)
-            this.categoriesList = data
+            //给查询到的值加入value字段，用于搜索组件值的显示，数据提交时需将value字段删除
+            let data = []
+            res.data.forEach((item)=>{
+              item.value = item.instructorName
+              data.push(item)
+            })
+            // 调用 callback 返回建议列表的数据
+            cb(data)
+
           }else{
             this.$message({
-              message:'课程分类数据获取失败',
+              message:'讲师列表获取失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
+      //从后台获取基础信息
+      //授权教师搜索
+      teacherSearch(queryString,cb){
+        teachersList().then(res=>{
+          if(Number(res.code) === 200){
+            //给查询到的值加入value字段，用于搜索组件值的显示，数据提交时需将value字段删除
+            let data = [],
+              rsdata = [];
+            res.data.forEach((item)=>{
+              item.value = item.teacherName
+
+              if(item.teacherName.indexOf(queryString) != -1){
+                data.push(item)
+              }
+            })
+            console.log(data)
+            // 调用 callback 返回建议列表的数据
+            cb(data)
+          }else{
+            this.$message({
+              message:'教师列表获取失败',
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
+      selectList () {
+        //课程分类列表
+        categories().then(res=>{
+          if(Number(res.code) === 200){
+            let data = this.electChilder(res.data) //删除为空的子节点
+            this.categoriesList = res.data
+            // console.log('课程分类')
+            // console.log(this.categoriesList)
+          }else{
+            this.$message({
+              message:'课程分类获取失败',
               type:'error'
             })
           }
@@ -491,17 +644,21 @@
           if(Number(res.code) === 200){
             let data = this.electChilder(res.data)
             this.tagsList = data
+            //Course课程信息下的列表仅存了标签的ID
+            // console.log('标签列表:')
+            // console.log(this.tagsList)
           }else{
             this.$message({
-              message:'课程列表获取失败',
+              message:'课程课程标签获取失败',
               type:'error'
             })
           }
         }).catch(error=>{
           console.log(error)
         })
-        //讲师列表
+        //获取讲师列表的数据
         instructorList().then(res=>{
+          // console.log('讲师列表:')
           // console.log(res)
           if(Number(res.code) === 200){
             this.instructorLists = res.data
@@ -514,8 +671,9 @@
         }).catch(error=>{
           console.log(error)
         })
-        //教师列表
+        //获取教师列表的数据
         teachersList().then(res=>{
+          // console.log('教师列表:')
           // console.log(res)
           if(Number(res.code) === 200){
             this.teachersLists = res.data
@@ -532,7 +690,10 @@
       //删除空的childer
       electChilder (data) {
         data.forEach(item => {
-          if (item.children && !item.children.length) {
+          // 如果没有children
+          if ( typeof(item.children) == "undefined") {
+
+          }else if (item.children && !item.children.length) {
             delete item.children;
           } else {
             item.children = this.electChilder(item.children)
@@ -540,8 +701,112 @@
         });
         return data;
       },
+      //教师授权搜索框
+      accreditSelect(item) {
+        console.log(item);
+      },
+      //教师授权搜索提示框
+      querySearch(queryString, cb) {
+        var restaurants = JSON.stringify(this.teachersLists);
+        var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+        // 调用 callback 返回建议列表的数据
+        cb(results);
+      },
+      // 上传封面图片弹窗的关闭
+      closeCoverPreview () {
+        this.coverPreviewShow = false
+      },
+      // 封面图替换
+      chooseCover(url){
+        this.coverPreviewShow = false
+        this.Course.courseCover = url
+      },
+      //课程编辑时对取到的数据进行处理
+      upDataFilter(data){
+        //获取到的数据有些字段的值只有id，渲染时要将值补上
+        let redata = data,
+            currentTags = [],
+            curTeacher=[];
+        //标签数据
+        redata.course.courseTagIds.forEach((item)=>{
+          this.tagsList.forEach((list)=>{
+            // console.log(list)
+            if(list.tagId === item){
+              currentTags.push(list)
+            }
+          })
+        })
+        // 教师列表
+        redata.teacher.forEach((item)=>{
+          curTeacher.push(item.teacherName)
+        })
+        //是否可退课，1为允许，2为不允许
+        data.course.dropCourse = redata.course.dropCourse === 1 ? true : false
+        data.course.courseTagIds = currentTags;
+        data.teacher = curTeacher;
+        return data
+      },
+      //上传，修改课程时数据清洗
+      goDataFilter(){
+        let data = {
+          course:this.Course,
+          info:this.CourseInfoEntity,
+          set:this.CourseSetEntity,
+          teacher:this.CourseForm.teacher,
+          instructor:this.CourseForm.instructor
+        }
+        let currentTag = [],
+            currnetteacher = [],
+            currentinstructor = [];
+        this.Course.courseTagIds.forEach((item)=>{
+          currentTag.push(item.tagId)
+        })
+        this.CourseForm.teacher.forEach((item)=>{
+          this.teachersLists.forEach((list)=>{
+            if(item === list.teacherName){
+              currnetteacher.push(list.userId)
+            }
+          })
+        })
+        this.CourseForm.instructor.forEach((item)=>{
+          currentinstructor.push(item.instructorId)
+        })
+
+        let curData =JSON.parse( JSON.stringify(data));
+
+        curData.course.courseTagIds = currentTag
+        curData.teacher = currnetteacher
+        curData.instructor = currentinstructor
+        curData.course.dropCourse = this.Course.dropCourse ? 1 : 2
+        return curData
+      },
+      //修改课程
+      goPutCourse () {
+        let data = this.goDataFilter()
+        console.log('请求发送前的数据')
+        console.log(data)
+        putCourse(data).then(res=>{
+          console.log(res)
+          if(Number(res.code) === 200) {
+            this.$message.success('课程信息修改成功')
+            this.$router.push('/course/list')
+          }else if(Number(res.code) === 440){
+            let msgs = JSON.parse(res.msg)
+            this.$message({
+              message:msgs[0].message,
+              type:'error'
+            })
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      }
     },
     mounted(){
+      //编辑课程
+      if(this.$route.query.type === 'upData') {
+        // console.log("课程编辑")
+      }
       //课程介绍
       let self = this
       this.editor1 = new wangEditor('#editor1')
@@ -578,15 +843,38 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+
+  .blue-text
+    color #40caff
+  .remind-text-color
+    ccolor:#606266
   .addCourse
     overflow: hidden
     height:50px
-
+  .course-tag-warp
+    width 300px
+    border-radius 5px
+    /*border 1px solid #e9e9e9*/
+    padding-left 5px
+    padding-bottom 10px
+    & span
+      margin-right 5px
+  .instructor-tag-warp
+    width 300px
+    border-radius 5px
+    /*border 1px solid #e9e9e9*/
+    border-bottom 0
+    /*padding 5px*/
+    padding-left 5px
+    padding-bottom 10px
+    /*margin-bottom 10px;*/
+    & span
+      margin-right 5px
   .isSystem
     .top
       padding-bottom:10px
       overflow:hidden
-
+      width 672px
     .center
       .left
         display:inline-block
@@ -647,7 +935,7 @@
       padding-top:10px
       padding-bottom:10px
       text-indent:10px
-
+      width 672px
       .norm-right
         font-size:12px
         color:#59C2BB
@@ -659,6 +947,7 @@
       border-bottom:1px solid #E4E4E6
       text-indent:10px
       margin-bottom:10px
+      width 672px
 
       .list
         padding-top:10px
@@ -672,22 +961,26 @@
       color:#3EABA8
       margin-left:20px
 
-  .avatar-uploader .el-upload
+  .avatar-uploader
     border: 1px dashed #d9d9d9
     border-radius: 6px
+    width 280px
+    height 160px
     cursor: pointer
     position: relative
     overflow: hidden
-
-  .avatar-uploader .el-upload:hover
+  .avatar-uploader img
+    height 160px
+    width 280px
+  .avatar-uploader:hover
     border-color: #409EFF
 
   .avatar-uploader-icon
     font-size: 28px
     color: #8c939d
-    width: 178px
-    height: 178px
-    line-height: 178px
+    width: 280px
+    height: 160px
+    line-height: 160px
     text-align: center
     border:1px solid #ded5d5
 
@@ -696,4 +989,9 @@
     height: 178px
     display: block
 
+  .accredit-input{
+    margin-right 30px
+    margin-left: calc(100% - 220px);
+    border-radius 30px
+  }
 </style>

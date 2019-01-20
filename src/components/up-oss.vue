@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <el-button type="primary" @click="goUp">上传</el-button>
-    <div>{{schedule}}</div>
-    <input type="file" id="inputs" @change="upInput"/>
+  <div style="display: inline-block;margin: 0 10px">
+    <el-button type="primary" @click="goUp" id="male">{{btnText}}</el-button>
+    <!-- <div>{{schedule}}</div> -->
+    <input type="file" :id="inputs" @change="upInput"/>
   </div>
 </template>
 
@@ -17,6 +17,15 @@
       //可上传大小
       size:{
         default:2 * 1024 * 1024 * 1024
+      },
+      btnText: {
+        default: "上传"
+      },
+      inputs: {
+        default: "inputs"
+      },
+      fileType: {
+        default: ''
       }
     },
     data(){
@@ -24,17 +33,23 @@
         schedule:0, //上传进度
         ossData:null,
         fileData:null,
-        isError:3
+        isError:3,
+        //需要返回的文件信息
+        fileName:'',
+        fileSize:'',
+        // fileName:'',
       }
     },
     methods:{
       goUp () {
-        document.getElementById('inputs').click()
+        document.getElementById(this.inputs).click()
       },
       upInput (event) {
         console.log('1',event)
         if(event){
           this.fileData = event
+          this.fileName =event.target.files[0].name
+          this.fileSize =event.target.files[0].size
         }
         //这里加一个获取验签信息的错误处理
         if (Number(this.isError) === 0) {
@@ -47,6 +62,20 @@
         }
         let file = this.fileData.target.files[0]
         let name = new Date().getTime() + file.name
+        console.log(file)
+        if(this.fileType !== '') {
+          let chekcType = this.fileType.split(',').some(element=> {
+            return file.type === element
+          })
+          if(!chekcType) {
+              this.$message({
+                message: '文件格式错误',
+                type: 'error'
+              })
+              this.inputNull()
+              return false
+            }
+        }
         if (file.size > this.size) {
           this.$message({
             message: '上传文件超出可上传范围，请重新选择文件上传',
@@ -60,6 +89,12 @@
         this.forInputs(client,name,file)
       },
       forInputs (client,name,file) {
+        let loading = this.$loading({
+          lock: true,
+          text: '正在努力上传中',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         let self = this
         client.multipartUpload(name, file, {
           progress(p, checkpoint){
@@ -68,6 +103,7 @@
             self.schedule = (p.toFixed(2) * 100) + '%'
           }
         }).then((results) => {
+          loading.close()
           // console.log('then返回',results)
           //http://tskedu-course.oss-cn-beijing.aliyuncs.com/ + name = 完整的url
           self.$message({
@@ -76,7 +112,8 @@
           })
           Number(self.isError) !== 2 ? (self.isError = 2) : ''
           let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
-          self.$emit('ossUp', url)
+          self.$emit('ossUp', url, this.fileName, this.fileSize)
+          this.inputNull()
         }).catch(error=>{
           console.log(error)
           //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
@@ -84,7 +121,7 @@
         })
       },
       inputNull () {
-        let dom = document.getElementById('inputs')
+        let dom = document.getElementById(this.inputs)
         dom.value = ''
         dom.outerHTML = dom.outerHTML
         this.fileData = null
@@ -121,6 +158,12 @@
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
+  #logo
+    display:none
+  #pic
+    display:none
   #inputs
+    display:none
+  #creImg
     display:none
 </style>

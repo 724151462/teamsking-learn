@@ -4,16 +4,11 @@
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="用户名/姓名"></el-input>
+        <el-input v-model="searchForm.search"  style="width: 200px;margin-left: 10px;" placeholder="用户名/姓名"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="value" placeholder="请选择">
-          <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-          </el-option>
+        <el-select v-model="searchForm.tenantId" placeholder="请选择学校">
+          <el-option v-for="tenant in tenantlist" :key="tenant.tenantId" :label="tenant.tenantName" :value="tenant.tenantId"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -27,6 +22,7 @@
         :columnNameList="columnNameList"
         :tableData="tableData.pageData"
         :operateList="operateList"
+        switchColumn = 'open'
         @showComponentInfo="showComponentInfo">
     </table-the-again>
 
@@ -43,21 +39,47 @@
         :title="addForm.title"
         :visible.sync="dialogVisible"
         width="60%"
-        :before-close="handleClose"
         style="min-width: 800px">
 
-      <div class="pop-academy">
-        <div class="item-title">
-          <span class="color-red">*</span><span>请输入角色名：</span>
-        </div>
-        <div class="item-input">
-          <el-input class="input-pop"  v-model="addForm.data.roleName"  placeholder="角色名称" clearable></el-input>
-        </div>
-      </div>
+      <el-form ref="form" :model="form" label-width="120px">
+        <el-form-item label="用户名" required>
+          <el-input v-model="form.userName"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" required>
+          <el-input v-model="form.passwd"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号码" required>
+          <el-input v-model="form.mobile"></el-input>
+        </el-form-item>
+        <el-form-item label="真实姓名" required>
+          <el-input v-model="form.realName"></el-input>
+        </el-form-item>
+        <el-form-item label="性别" required>
+          <el-radio v-model="form.gender" label="1">
+            男
+          </el-radio>
+          <el-radio v-model="form.gender" label="2">
+            女
+          </el-radio>
+        </el-form-item>
+        <el-form-item label="学校" required>
+          <el-select v-model="form.tenantId">
+            <el-option v-for="tenant in tenantlist" :key="tenant.tenantId" :label="tenant.tenantName" :value="tenant.tenantId"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否启用" required>
+          <el-radio v-model="form.status" label="1">
+            是
+          </el-radio>
+          <el-radio v-model="form.status" label="2">
+            否
+          </el-radio>
+        </el-form-item>
+      </el-form>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="save">确 定</el-button>
+        <el-button type="primary" @click="save()">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -77,6 +99,7 @@
   import { sysRoleDelete } from '../../api/system'
   import { sysUserMenuList } from '../../api/system'
   import { sysTenantManagerPage } from '../../api/system'
+  import { sysTenantManager,tenantGet } from '../../api/system'
 
   export default {
     name: "role",
@@ -86,43 +109,29 @@
     },
     data(){
       return {
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
-        value: '',
+        tenantlist: [],
+        searchForm: {
+        },
         addForm:{
-          title:'添加角色',
+          title:'添加租户',
           data:{
-            roleName:'',
+            realName:'',
+            mobile:''
           }
         },
         menuDialogVisible:false,
         dialogVisible:false,
         form:{
-          title:'添加角色',
         },
         tableTitle:'角色管理列表',
         tableOperate:[
           {
             content:'删除',
-            type:'created'
+            type:'批量删除'
           },
           {
             content:'创建租户',
-            type:'deleteList'
+            type:'created'
           }
         ],
         columnNameList:[
@@ -130,35 +139,27 @@
             type:'selection'
           },
           {
-            name:'学校名称',
+            name:'用户名',
+            prop:'userName'
+          },
+          {
+            name:'姓名',
+            prop:'realName'
+          },
+          {
+            name:'所属学校',
             prop:'tenantName'
           },
           {
-            name:'学生数',
+            name:'创建时间',
             prop:'createTime'
-          },
-          {
-            name:'教师数',
-            prop:'createName'
-          },
-          {
-            name:'课程数',
-            prop:'createName'
-          },
-          {
-            name:'课程包数',
-            prop:'createName'
-          },
+          }
         ],
         operateList:[
           {
-            content:'修改',
-            type:'delete'
-          },
-          {
-            content:'添加管理员',
+            content:'编辑',
             type:'edit'
-          },
+          }
 
         ],
         tableData:'',
@@ -169,48 +170,33 @@
       }
     },
     created:function(){
+      tenantGet({
+        pageParam: {
+          pageIndex: 1,
+          pageSize: 1000
+        },
+        searchKey: ""
+      }).then(response => {
+        console.log(response.data.pageData);
+        this.tenantlist = response.data.pageData;
+      });
       this.queryTenantList();
-      // this.queryRoleList();
-    },
-    mounted:function(){
-      /* sysUserMenuList().then(
-         res => {
-           console.log("权限菜单:",res);
-
-           let menuTree = res.data.filter(
-             element => {
-               return element.parentId === 0
-             }
-           );
-
-           for( let i = 0; i < menuTree.length; i++  ){
-             menuTree[i].children = [];
-             menuTree[i].children.push( res.data.filter(
-               element => {
-                 return element.parentId === menuTree[i].menuId
-               }
-             ) )
-           }
-
-
-           console.log( 'menuTree' , menuTree );
-
-         }
-       ).catch()*/
-
     },
     methods:{
       showComponentInfo:function(type,info){
-        /*console.log('type',type,'info',info);
+        console.log('type',type,'info',info);
          switch(type){
            case 'created':
              console.log('here is created');
-             this.appendRole();
+             console.log(this.form)
+             this.form = {}
+             this.appendTenant();
              break;
            case 'edit':
              console.log('here is edit');
              this.editRole(info);
              break;
+           /*
            case 'delete':
              this.delete('one',info);
              break;
@@ -219,16 +205,26 @@
              break;
            case 'set':
              this.editMenu(info);
-             break;
-         }*/
+             break;*/
+         }
       },
       queryTenantList:function () {
-        sysTenantManagerPage().then(
+        console.log('请求的参数信息:',this.searchForm);
+        sysTenantManagerPage(this.searchForm).then(
           res => {
-            this.tableData = res.data;
+            if(res.code === 200){
+              this.tableData = res.data;
+            }else{
+              this.open4('查询出错' + res.msg);
+            }
+            // this.tableData = res.data;
             console.log('租户管理员列表:', this.tableData );
           }
-        ).catch()
+        ).catch(
+          error => {
+            this.open4('查询出错' + error)
+          }
+        )
         /*console.log('this.form',this.form);
         sysRolePage(this.form).then(
           res => {
@@ -239,16 +235,15 @@
           error => console.log('error',error)
         )*/
       },
-      appendRole:function(){
-        /*this.dialogVisible = true;
-        this.addForm.title = '添加角色';
-        this.addForm.data={ roleName:'' }*/
+      appendTenant:function(){
+        this.dialogVisible = true;
+        this.addForm.title = '添加租户管理员账号';
+        this.addForm.data={ roleName:'',mobile:'',tenantId:1 }
       },
       editRole:function(roleInfo){
-        /*this.dialogVisible = true;
+        this.dialogVisible = true;
         this.addForm.title = '编辑角色';
-        this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data' , this.addForm.data );*/
+        this.form  = roleInfo;
       },
       editMenu:function(roleInfo){
         /*this.menuDialogVisible = true;
@@ -257,18 +252,22 @@
         console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );*/
       },
       save:function(){
-        /*if( this.addForm.title === '添加角色'){
-          console.log( '添加角色的信息:', this.addForm.data);
-          sysRoleAdd( this.addForm.data).then(
+        if( this.addForm.title === '添加租户管理员账号'){
+          console.log( '添加角色的信息:', this.form);
+          // this.form.tenantName = '123'
+          sysTenantManager( this.form).then(
             res => {
-              console.log('添加角色:',res);
+              if(res.code === 200){
+
+              }
+              console.log('添加租户管理员账号:',res);
             }
           ).catch(
             error => console.log('添加角色出错',error)
           )
         }else if( this.addForm.title === '编辑角色' ){
-          console.log('编辑提交的信息:',this.addForm.data);
-          sysRoleEdit( this.addForm.data ).then(
+          console.log('编辑提交的信息:',this.form);
+          sysRoleEdit( this.form ).then(
             res =>{
               console.log( '编辑的信息返回：',res);
             }
@@ -279,7 +278,7 @@
           );
         }
         this.dialogVisible = false;
-        setTimeout( ()=>{ this.queryRoleList() },300);*/
+        setTimeout( ()=>{ this.queryRoleList() },300);
         this.dialogVisible = false;
       },
       delete:function(type,list){
@@ -308,13 +307,13 @@
          )
          setTimeout( () => { this.queryRoleList() },300 );*/
       },
+      open4(errorInfo) {
+        this.$message.error(errorInfo);
+      },
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;
         // this.queryRoleList();
-      },
-      handleClose(done) {
-        done();
-      },
+      }
     }
   }
 </script>

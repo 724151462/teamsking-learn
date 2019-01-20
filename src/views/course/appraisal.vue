@@ -10,22 +10,10 @@
 
     <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.appraisal" ></el-input>
-      </el-form-item>
-      <el-form-item label="课程分类：">
-        <el-select v-model="form.catagory" placeholder="请选择课程分类">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="教学老师：">
-        <el-select v-model="form.teacher" placeholder="请选择教师">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-        </el-select>
+        <el-input v-model="form.appraisal"  placeholder="课程名称"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+        <el-button type="primary" @click="onSubmit" size="small">查询</el-button>
       </el-form-item>
     </el-form>
 
@@ -39,43 +27,43 @@
       <el-table-column label="课程评价列表">
         <el-table-column
           v-for="list in data"
-          :key="list"
+          :key="list.id"
           :prop="list.prop"
-          :label="list.name"
-          :width="list.width">
+          :label="list.name">
         </el-table-column>
         <el-table-column
           label="操作"
           width="120">
           <template slot-scope="scope">
-            <a @click="dialogVisible = true">查看</a>
+            <el-button type="text" @click="dialogVisible = true">查看</el-button>
           </template>
         </el-table-column>
       </el-table-column>
     </el-table>
 
     <el-dialog
-      title="课程评价详情"
+      title=""
       :visible.sync="dialogVisible"
-      width="60%"
+      width="70%"
       :before-close="handleClose">
 
-      <div class="pop-user-info">
-        <div></div>
-        <span>windir</span>
-      </div>
-      <div class="pop-content-item" v-for="item in popContentItem">
-        <span class="title"> {{ item.title }} </span>
-        <span class="content"> {{ item.content }} </span>
-      </div>
-      <div class="pop-content-item">
-        <span class="title"> 评价内容 </span>
-        <el-input
-          type="textarea"
-          :rows="4"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
+      <div class="appraisal-warp">
+        <div class="appraisal-left">
+          <div class="appraisal-img">
+            <img src="" alt="" class="">
+          </div>
+        </div>
+        <div class="appraisal-body">
+          <div>
+            <div>张三</div>
+            <div><el-rate v-model="rateValue" disabled></el-rate></div>
+            <div>-2018-12-25 10:46:30</div>
+          </div>
+          <p>很有帮助的课程，谢谢老师</p>
+        </div>
+        <div class="appraisal-right">
+          <el-button type="text" style="color: #999999;">删除</el-button>
+        </div>
       </div>
 
       <span slot="footer" class="dialog-footer">
@@ -94,34 +82,20 @@
       return {
         data:[
           {
-            name:'用户昵称',
-            width:120,
-            prop:'username'
-          },
-          {
             name:'课程名称',
-            width:120,
             prop:'courseName'
           },
           {
-            name:'评价',
-            width:120,
-            prop:'evaluate'
+            name:'所属分类',
+            prop:'classify'
           },
           {
-            name:'所属以及分类',
-            width:120,
-            prop:'evaluate'
+            name:'分数',
+            prop:'score'
           },
           {
-            name:'教学老师',
-            width:120,
+            name:'评价条数',
             prop:'evaluate'
-          },
-          {
-            name:'评价时间',
-            width:120,
-            prop:'time'
           },
         ],
         dialogVisible: false,
@@ -159,19 +133,20 @@
         },
         tableData3: [
           {
-            username:'windir',
-            courseName:'高等数学',
-            evaluate:"5",
-            time:'2018'
+            courseName:'色彩构成',    //课程名称
+            classify:"计算机-设计",   //所属分类
+            evaluate:"35",           // 评价条数
+            score:'5'                //分数
           },
           {
-            username:'windir',
-            courseName:'高等数学',
-            evaluate:"5",
-            time:'2018'
+            courseName:'搜索引擎技术',
+            classify:"计算机-程序",
+            evaluate:"50",
+            score:'3.5'
           }
         ],
-        multipleSelection: []
+        multipleSelection: [],
+        rateValue: 5 //评分
       }
     },
     created(){
@@ -232,7 +207,29 @@
 <style scoped lang="stylus" type="text/stylus">
   .appraisal
       -webkit-font-smoothing:antialiased
-
+  .appraisal-warp
+    height 60px
+    display flex
+    align-items center
+    .appraisal-left
+      height 100%
+      width 50px
+      border 1px soild blue
+      padding-right 10px
+      .appraisal-img
+        background-color yellow
+        height 100%
+        width 100%
+    .appraisal-body
+      height 100%
+      background-color #FAFAFA
+      flex 1
+      & div
+        display flex
+    .appraisal-right
+      height 100%
+      line-height 60px
+      background-color: #FAFAFA
     .grid-content
       box-sizing: border-box
       padding: 10px 0 10px 10px

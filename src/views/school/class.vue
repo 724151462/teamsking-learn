@@ -460,7 +460,6 @@
     }
   }
 </script>
-
 <style scoped lang="stylus" type="text/stylus">
   .academy
     .el-pagination

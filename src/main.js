@@ -6,10 +6,27 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'vue-video-player/src/custom-theme.css'
 import 'video.js/dist/video-js.css'
+import Cookie from 'js-cookie'
+import VueSocketIO from 'vue-socket.io';
+// import socketio from 'socket.io-client';
 
-
+// Vue.use(VueSocketIO , new VueSocketIO({
+//   debug: true,
+//   connection: 'http://120.36.137.90:9008/websocket',
+//   // vuex: {
+//   //     store,
+//   //     actionPrefix: 'SOCKET_',
+//   //     mutationPrefix: 'SOCKET_'
+//   // }
+// }));
 Vue.use(ElementUI)
 
+Vue.prototype.loadingCss = {
+  lock: true,
+  text: 'loading',
+  spinner: 'el-icon-loading',
+  background: 'rgba(0, 0, 0, 0.7)'
+};
 Vue.config.productionTip = false
 
 var routeList = []
@@ -23,6 +40,12 @@ router.beforeEach((to, from, next) => {
     routeList.push(to.name)
   }
   to.meta.routeList = routeList
+  store.commit('setNav', to.path)
+  var n=(to.path.split('/')).length-1;
+  console.log('timess', n)
+  if(n <= 3) {
+    Cookie.set('path', to.path)
+  }
   next()
 })
 

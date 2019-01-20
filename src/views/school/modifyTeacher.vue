@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p class="route-guide">教师用户><span>{{currentRoute}}</span></p>
+        <p class="route-guide"><router-link :to="{path:'/school/teacher'}">教师用户</router-link>><span>{{currentRoute}}</span></p>
         <el-form ref="form1" :model="form" label-width="80px" class="teacherForm">
             <!-- {{testList}} -->
             <el-form-item label="用户名">
@@ -48,7 +48,6 @@
             </el-form-item>
             <el-form-item class="commit">
                 <el-button type="primary" @click="ensureBtn()">修改</el-button>
-                <el-button @click="dialogVisible = false">取消</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -110,7 +109,7 @@ export default {
     mounted() {
         this.currentRoute = this.$route.name
         console.log(this.$route.params.id)
-        sysTeacherId({"id": this.$route.params.id})
+        sysTeacherId({"id": this.$route.query.teacherId})
         .then((response)=>{
             let teacherInfo = response.data
             this.form.collegeId = teacherInfo.collegeId
@@ -187,7 +186,7 @@ export default {
                 "realName": this.form.realName,
                 "schoolAge": this.form.jobYear,
                 "synopsis": this.form.introduct,
-                "teacherId": this.$route.params.id,
+                "teacherId": this.$route.query.teacherId,
                 "teacherNumber": this.form.teacherNo
             }
             sysTeacherModify(teacherForm)

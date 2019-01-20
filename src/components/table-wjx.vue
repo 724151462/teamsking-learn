@@ -40,7 +40,7 @@
                 ],
     -->
     <div class="table-theAgain">
-        <div class="tableOperate">
+        <div class="tableOperate" v-if="tableOperate">
             <el-button v-for="item in tableOperate" type="primary" class="" @click="onSubmit(item.type,multipleSelection)" >{{ item.content }}</el-button>
         </div>
 
@@ -67,7 +67,7 @@
                 <template v-else-if="list.imgList">
                   <el-table-column :label="list.name"
                                    align="center"
-                                    :key="index">
+                                   :key="index">
                     <template scope="scope">
                       <div>
                         <img v-for="(item, index) in scope.row[list.prop]" :src="item.imgUrl" :key="index"/>
@@ -75,8 +75,19 @@
                     </template>
                   </el-table-column>
                 </template>
+                <template v-else-if="list.progress">
+                  <el-table-column :label="list.name"
+                                   align="center"
+                                   :key="index">
+                    <template scope="scope">
+                      <div>
+                        <el-progress :text-inside="true" :stroke-width="18" :percentage="scope.row[list.prop]" status="success"></el-progress>
+                      </div>
+                    </template>
+                  </el-table-column>
+                </template>
                 <template v-else>
-                    
+
                   <el-table-column
                                    :prop="list.prop"
                                    :label="list.name"
@@ -104,12 +115,13 @@
                 </template>
               </template>
                 <el-table-column
+                        v-if="operateList"
                         fixed="right"
                         label="操作"
                         :width="operateList.length * 100"
                         align="center">
                     <template slot-scope="scope">
-                        
+
                          <el-button  v-for="item in operateList"  @click="onSubmit(item.type,scope.row)"
                                    v-if="item.type === 'edit'"
                                    size="small">{{ item.content }}</el-button>
@@ -121,12 +133,12 @@
                                    v-if="item.type !== 'delete' && item.type !== 'edit'"
                                    type="primary"
                                    size="small">{{ item.content }}</el-button>
-                        
-                        
+
+
                         <!-- <el-button v-for="item in operateList" @click="onSubmit(item.type,scope.row)" type="text" size="small">{{ item.content }}</el-button> -->
                     </template>
                 </el-table-column>
-                
+
                 <el-table-column
                     fixed="right"
                     label="是否启用"
@@ -169,7 +181,7 @@
         },
       created:function(){
           //console.log('是否开启',this.switchColumn,'类型',typeof(this.switchColumn ) )
-          console.log('fff', this.tableData)
+          // console.log('fff', this.tableData)
       }
 
     }
@@ -192,5 +204,10 @@
         a
             display:inline-block
             margin-right:5px
+
+    img
+      width :35px
+      height :35px
+      background-size:100% 100%
 
 </style>

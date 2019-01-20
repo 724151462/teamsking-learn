@@ -1,3 +1,5 @@
+import store from '@/store/index';
+
 export function formatDate (time) {
   let date
   if (time) {
@@ -37,3 +39,60 @@ export function formatDate (time) {
   }
   return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + seconds
 }
+
+export function connect(resolve,reject){
+    let socket = new SockJS('http://120.36.137.90:9008/websocket'),
+        token = sessionStorage.getItem('token'),
+        userId = sessionStorage.getItem('userId'),
+        courseId = sessionStorage.getItem('courseId');
+    let stompClient = Stomp.over(socket);
+    stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
+        stompClient.subscribe('/teamsking/helloWorld', function (result) {
+          console.log(result);
+        },{'token': token});
+        stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+          console.log(result);
+        });
+        store.commit('NEW_SOCKET',stompClient)
+        let tagClient = JSON.stringify(stompClient)
+        sessionStorage.setItem('client',tagClient)
+        resolve('连接成功');
+      },
+      function errorCallBack (error) {
+        // 连接失败时（服务器响应 ERROR 帧）的回调方法
+        reject('连接失败');
+      }
+    )
+}
+
+export function sign(resolve,reject) {
+    let tagClient = store.state.socket.stompClient,
+        token = sessionStorage.getItem('token'),
+        userId = sessionStorage.getItem('userId'),
+        courseId = sessionStorage.getItem('courseId'),
+        classroomId = sessionStorage.getItem('classroom');
+
+  tagClient.send('/teamsking/course/sign/start',{'token': token},
+        JSON.stringify({
+          "classroomId":1,
+          "courseId":classroomId,
+          "userId":userId
+        })
+  );
+}
+
+export function signClose(resolve,reject) {
+  let tagClient = store.state.socket.stompClient,
+      token = sessionStorage.getItem('token'),
+      userId = sessionStorage.getItem('userId'),
+      courseId = sessionStorage.getItem('courseId'),
+      classroomId = sessionStorage.getItem('classroom');
+  tagClient.send('/teamsking/course/sign/close',{'token': token},
+    JSON.stringify({
+      "classroomId":classroomId,
+      "courseId":courseId,
+      "userId":userId
+    })
+  );
+}
+
