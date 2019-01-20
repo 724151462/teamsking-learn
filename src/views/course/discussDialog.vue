@@ -6,19 +6,25 @@
       </span>
     </div>
     <div class="content">
-      <div class="issue-title">标题： {{issueObj.discussionTitle}}</div>
+      <div class="issue-title">
+        标题： {{issueObj.discussionTitle}}
+        <span
+          @click="inputShow"
+          style="font-size:12px;font-weight: normal;margin-left: 20px; cursor:pointer"
+        >{{this.disscussInput === true ? '收起' : '评论'}}</span>
+      </div>
       <div class="issue-info">
         <span>发布人：{{issueObj.userName}}</span>
         <span>阅读：{{issueObj.readerCount}}人</span>
         <span>发布日期：{{issueObj.createTime}}</span>
       </div>
-      <div style="height: 350px;">
+      <div style="height: 350px;overflow-x: hidden">
         <div class="discuss-warp" v-for="(item,index) in replyList.pageData" :key="index">
           <div class="answer">
             <div>
               <img :src="item.avatar" width="30" alt>
               <span style="margin-left: 10px">{{item.userName}}评论内容：{{item.replyContent}}</span>
-              <span class="reply-btn">回复</span>
+              <span class="reply-btn" @click="replyToggle(replyList.pageData,item)">回复</span>
             </div>
             <div class="answer-right">
               <span>{{item.replyTime}}</span>
@@ -28,17 +34,27 @@
               ></i>
             </div>
           </div>
-          <div class="answer reply" v-for="(reply, i) in item.children" :key="reply.replyId">
-            <div>
+          <div v-if="item.repInput === true">
+            <el-form ref="form" :model="replyForm" label-width="120px" style="margin-top: 20px">
+              <el-form-item label="回复内容：">
+                <el-input style="width: 1000px" type="textarea" v-model="replyForm.replyContent"></el-input>
+              </el-form-item>
+            </el-form>
+            <el-button type="primary" style="margin-left: 950px" @click="sendComment('lv2')">发送</el-button>
+          </div>
+          <div class="reply" v-for="(reply, i) in item.children" :key="reply.replyId">
+            <div class="answer">
+              <div>
               <img :src="reply.avatar" width="30" alt>
               <span
                 style="margin-left: 10px"
                 v-if="reply.parentReplyId === item.replyId"
-              >{{reply.userName}}：{{reply.replyContent}}</span>
+              >{{reply.userName}}评论：{{reply.replyContent}}</span>
               <span
                 style="margin-left: 10px"
                 v-else
-              >{{reply.userName}}回复{{replyer(item.children, reply.parentReplyId)}}：{{reply.replyContent}}</span><span class="reply-btn">回复</span>
+              >{{reply.userName}}回复{{replyer(item.children, reply.parentReplyId)}}：{{reply.replyContent}}</span>
+              <span class="reply-btn" @click="replyToggle(item.children, reply)">回复</span>
             </div>
             <div class="answer-right">
               <span>2019-1-18 00:00:00</span>
@@ -47,18 +63,26 @@
                 style="color: green;font-size: 20px;margin-left: 10px; cursor: pointer"
               ></i>
             </div>
+            </div>
+            <div v-if="reply.repInput === true">
+            <el-form ref="form" :model="replyForm" label-width="120px" style="margin-top: 20px">
+              <el-form-item label="回复内容：">
+                <el-input style="width: 1000px" type="textarea" v-model="replyForm.replyContent"></el-input>
+              </el-form-item>
+            </el-form>
+            <el-button type="primary" style="margin-left: 950px" @click="sendComment('lv3')">发送</el-button>
           </div>
+          </div>
+          
         </div>
       </div>
-      <div>
+      <div v-if="disscussInput === true">
         <el-form ref="form" :model="replyForm" label-width="120px" style="margin-top: 20px">
           <el-form-item label="回复内容：">
             <el-input style="width: 1000px" type="textarea" v-model="replyForm.replyContent"></el-input>
           </el-form-item>
         </el-form>
-        <el-button type="primary" style="margin-left: 950px" @click="sendComment">
-          发送
-        </el-button>
+        <el-button type="primary" style="margin-left: 950px" @click="sendComment('lv1')">发送</el-button>
       </div>
     </div>
   </div>
@@ -72,17 +96,20 @@ export default {
     return {
       issueObj: {},
       replyList: {},
+      temParentLvId: '',
+      temParentId: '',
       replyForm: {
-        "discussionId": this.$route.query.disId,
-        "isleaf": 0,
-        "levelonereplyId": 0,
-        "parentReplyId": this.$route.query.disId,
-        "replyContent": "",
-        "replyId": "",
-        "replyTime": "",
-        "userId": "",
-        "userName": "wjx"
-      }
+        discussionId: this.$route.query.disId,
+        isleaf: 0,
+        levelonereplyId: 0,
+        parentReplyId: this.$route.query.disId,
+        replyContent: "",
+        replyId: "",
+        replyTime: "",
+        userId: "",
+        userName: "b"
+      },
+      disscussInput: false
     };
   },
   mounted() {
@@ -97,6 +124,14 @@ export default {
     },
     getReply() {
       discussReply({ discussId: this.$route.query.disId }).then(response => {
+        response.data.pageData.forEach(element => {
+          element.repInput = false
+          if (element.children) {
+            element.children.forEach(ele => {
+              ele.repInput = false;
+            });
+          }
+        });
         this.replyList = response.data;
         console.log(this.replyList);
       });
@@ -110,18 +145,60 @@ export default {
       });
       return userName[0].userName;
     },
-    // 发送评论
-    sendComment() {
-      discussPost(this.replyForm)
-      .then(response=> {
-        if(response.code === 200) {
-          this.$message({
-            message: '评论成功',
-            type: 'success'
-          })
-          this.getReply()
+    // 点击回复获取对象
+    replyToggle(list, params) {
+      // console.log(params)
+      // let func = data =>{
+      //   data.forEach(item=> {
+      //     console.log(item.repInput)
+      //     if(item.repInput === false) {
+      //       if(item.replyId === params.replyId) {
+              
+      //         item.repInput = !item.repInput
+      //       }
+      //     }else{
+      //       item.repInput = false
+      //       if(item.children) {
+      //         func(item.children)
+      //       }
+      //     }
+      //   })
+      // }
+      // func(this.replyList.pageData);
+      console.log(params)
+      this.temParentId = params.replyId
+      this.temParentLvId = params.levelonereplyId
+      list.forEach(element=> {
+        if(element.replyId === params.replyId) {
+          element.repInput = !element.repInput
+        }else{
+          element.repInput = false
         }
       })
+    },
+    // 发送评论
+    sendComment(level) {
+      if(level === 'lv2'){
+        this.replyForm.parentReplyId = this.temParentId
+        this.replyForm.levelonereplyId = this.temParentLvId
+        console.log(this.replyForm)
+      }else{
+        this.replyForm.parentReplyId = this.temParentId
+        this.replyForm.levelonereplyId = this.temParentLvId
+      }
+      discussPost(this.replyForm).then(response => {
+        if (response.code === 200) {
+          this.$message({
+            message: "评论成功",
+            type: "success"
+          });
+          this.getReply();
+        }
+      });
+    },
+    inputShow() {
+      this.disscussInput = !this.disscussInput;
+      console.log(this.disscussInput);
     }
   }
 };
@@ -130,7 +207,7 @@ export default {
 <style scoped lang="stylus" type="text/stylus">
 .warp {
   width: 100%;
-  height 700px
+  height: 700px;
   margin: 0 auto;
   border: 1px solid;
   border-radius: 5px;
@@ -172,14 +249,15 @@ export default {
       justify-content: space-between;
       align-items: center;
       margin-top: 10px;
-      cursor pointer
+      cursor: pointer;
     }
+
     .answer:hover {
-      background-color #f3f7ff
+      background-color: #f3f7ff;
     }
-    .answer:hover  .reply-btn {
-      display inline-block
-      
+
+    .answer:hover .reply-btn {
+      display: inline-block;
     }
 
     .answer> div {
@@ -194,11 +272,12 @@ export default {
     .reply {
       margin-left: 20px;
     }
+
     .reply-btn {
-      display none
-      margin-left 20px 
-      color cadetblue
-      cursor pointer
+      display: none;
+      margin-left: 20px;
+      color: cadetblue;
+      cursor: pointer;
     }
   }
 }
