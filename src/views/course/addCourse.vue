@@ -5,9 +5,9 @@
       <el-button plain style="float:right" @click="$router.push('/course/list')">返回</el-button>
     </div>
     <div class="addCourse-center">
-      <el-form :model="Course" ref="postForm" label-width="100px">
-        <el-form-item label="课程名称" required>
-          <el-input v-model="Course.courseName" style="width: 220px;"></el-input>
+      <el-form :model="Course" :rules="courseRules" ref="Course" label-width="100px">
+        <el-form-item label="课程名称" required prop="courseName">
+          <el-input v-model="Course.courseName"  style="width: 220px;"></el-input>
         </el-form-item>
 
         <el-form-item label="课程分类"  required>
@@ -29,7 +29,8 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="起止时间" required>
+
+        <el-form-item label="起止时间" required prop="beginTime">
           <div class="block">
             <el-date-picker
                     v-model="Course.beginTime"
@@ -40,14 +41,16 @@
                     default-time="12:00:00">
             </el-date-picker>
             <span style="margin: 0 20px">至</span>
-            <el-date-picker
-                    v-model="Course.endTime"
-                    type="datetime"
-                    prefix-icon="el-icon-date"
-                    placeholder="选择日期时间"
-                    value-format="yyyy-MM-dd HH:mm:ss"
-                    default-time="12:00:00">
-            </el-date-picker>
+            <el-form-item  required prop="endTime" style="display: inline-block">
+              <el-date-picker
+                  v-model="Course.endTime"
+                      type="datetime"
+                      prefix-icon="el-icon-date"
+                      placeholder="选择日期时间"
+                      value-format="yyyy-MM-dd HH:mm:ss"
+                      default-time="12:00:00">
+              </el-date-picker>
+            </el-form-item>
           </div>
         </el-form-item>
 
@@ -405,7 +408,9 @@
         teachersLists:[],
         //表单提交验证
         courseRules:{
-          CourseName: [{ required: true, message: '请输入活动名称', trigger: 'blur' }]
+          courseName: [{ required: true, message: '请输入课程名称', trigger: 'blur' }],
+          beginTime: [{ required: true, message: '请选择开始时间', trigger: 'blur' }],
+          endTime: [{ required: true, message: '请选择结束时间', trigger: 'blur' }],
         }
       }
     },
@@ -465,15 +470,25 @@
       },
       //讲师
       yesInstructor (e) {
+          console.log(e)
         delete e.value
-        this.CourseForm.instructor.push(e)
-        console.log(this.CourseForm.instructor)
+
+        let flag = this.CourseForm.instructor.find((item)=>{
+            return item.instructorId == e.instructorId
+        })
+
+        flag ? this.$message.warning('已选择此讲师'):this.CourseForm.instructor.push(e)
       },
       //标签数据赋值
       yesTages(e){
         delete e.value
-        this.Course.courseTagIds.push(e)
-        console.log(this.CourseForm.instructor)
+
+          let flag = this.Course.courseTagIds.find((item)=>{
+              return item.tagId == e.tagId
+          })
+
+          flag ? this.$message.warning('已选择此标签'):this.Course.courseTagIds.push(e)
+
       },
       //赋值二级课程
       yesCategories(e){
@@ -625,8 +640,9 @@
       selectList () {
         //课程分类列表
         categories().then(res=>{
+            console.log('课程分类',res)
           if(Number(res.code) === 200){
-            let data = this.electChilder(res.data) //删除为空的子节点
+            // let data = this.electChilder(res.data) //删除为空的子节点
             this.categoriesList = res.data
             // console.log('课程分类')
             // console.log(this.categoriesList)
@@ -638,6 +654,7 @@
           }
         }).catch(error=>{
           console.log(error)
+            this.$message.error('课程分类获取失败')
         })
         //课程标签列表
         tags().then(res=>{
