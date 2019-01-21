@@ -628,6 +628,15 @@ export function interactVote(data) {
   return commonsAjax(url, data, 'get')
 }
 
+/**
+ * 投票列表
+ */
+export function voteList(data) {
+  let url = `${baseUrl}${data.courseId}/interaction/vote/${data.classroomId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
 
 /**
  * 保存投票
@@ -877,6 +886,24 @@ export function classTest(data) {
  */
 export function classTestSave(data) {
   let url = `http://120.36.137.90:9008/api/v1/classroom/course/exam`
+  return commonsAjax(url, data, 'post')
+}
+
+
+/**
+ * 课堂头脑风暴列表
+ */
+export function classStromeGet(data) {
+  let url = `http://120.36.137.90:9008/api/v1/course/${data.courseId}/interaction/storm/${data.classroomId}`
+  return commonsAjax(url, data, 'get')
+}
+
+
+/**
+ * 课堂保存头脑风暴
+ */
+export function classStromeSave(data) {
+  let url = `http://120.36.137.90:9008/api/v1/course/interaction/storm/classroom`
   return commonsAjax(url, data, 'post')
 }
 

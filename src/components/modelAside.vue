@@ -64,7 +64,8 @@ export default {
             this.$emit('dialogShow', true)
         },
         activeEvent(item) {
-            this.activeIndex = item.examId
+            console.log(item[this.dataKey.itemId])
+            this.activeIndex = item[this.dataKey.itemId]
             this.$emit('activeEvent', item)
         },
         beginInteract(item) {

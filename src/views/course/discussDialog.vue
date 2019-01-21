@@ -18,13 +18,13 @@
         <span>阅读：{{issueObj.readerCount}}人</span>
         <span>发布日期：{{issueObj.createTime}}</span>
       </div>
-      <div style="height: 350px;overflow-x: hidden">
+      <div style="height: 400px;overflow-x: hidden">
         <div class="discuss-warp" v-for="(item,index) in replyList.pageData" :key="index">
           <div class="answer">
             <div>
               <img :src="item.avatar" width="30" alt>
               <span style="margin-left: 10px">{{item.userName}}评论内容：{{item.replyContent}}</span>
-              <span class="reply-btn" @click="replyToggle(replyList.pageData,item)">回复</span>
+              <span class="reply-btn" @click="replyToggle(replyList.pageData,item)">{{item.repInput === true ? '收起' : '回复'}}</span>
             </div>
             <div class="answer-right">
               <span>{{item.replyTime}}</span>
@@ -54,7 +54,7 @@
                 style="margin-left: 10px"
                 v-else
               >{{reply.userName}}回复{{replyer(item.children, reply.parentReplyId)}}：{{reply.replyContent}}</span>
-              <span class="reply-btn" @click="replyToggle(item.children, reply)">回复</span>
+              <span class="reply-btn" @click="replyToggle(item.children, reply)">{{reply.repInput === true ? '收起' : '回复'}}</span>
             </div>
             <div class="answer-right">
               <span>2019-1-18 00:00:00</span>
@@ -168,12 +168,30 @@ export default {
       console.log(params)
       this.temParentId = params.replyId
       this.temParentLvId = params.levelonereplyId
-      list.forEach(element=> {
+      // list.forEach(element=> {
+      //   if(element.replyId === params.replyId) {
+      //     element.repInput = !element.repInput
+      //   }else{
+      //     element.repInput = false
+      //   }
+      // })
+      this.replyList.pageData.forEach(element=> {
         if(element.replyId === params.replyId) {
           element.repInput = !element.repInput
         }else{
           element.repInput = false
         }
+        if(element.children) {
+          element.children.forEach(ele => {
+            if(ele.replyId === params.replyId) {
+              ele.repInput = !ele.repInput
+            }else{
+              ele.repInput = false
+            }
+          });
+        }
+         
+        
       })
     },
     // 发送评论
@@ -283,6 +301,7 @@ export default {
 }
 
 .discuss-warp {
-  margin-bottom: 30px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgb(216,216,216)
 }
 </style>
