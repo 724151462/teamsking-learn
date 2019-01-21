@@ -69,39 +69,37 @@ export default {
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         });
-        // let sock = new SockJS('http://120.36.137.90:9008/websocket');
-        // let stompClient = Stomp.over(sock);
-        // let token = sessionStorage.getItem('token'),
-        //   userId = sessionStorage.getItem('userId'),
-        //   courseId = sessionStorage.getItem('courseId');
-        // stompClient.connect(
-        //   {'token': token,'courseId':courseId},
-        //   function connectCallback (frame) {
-        //     loading.close()
-        //     // 连接成功时（服务器响应 CONNECTED 帧）的回调方法
-        //     console.log('已连接【' + frame + '】');
-        //     stompClient.subscribe('/teamsking/helloWorld', function (result) {
-        //       console.log(result);
-        //     },{'token': token});
-        //     stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
-        //       console.log(result);
-        //     });
-        //   },
-        //   function errorCallBack (error) {
-        //     // 连接失败时（服务器响应 ERROR 帧）的回调方法
-        //     console.log('连接失败【' + error + '】');
-        //   }
-        // );
-
-
-        new Promise(connect)
-          .then((result)=>{
+        let connect = new Promise((resolve, reject)=>{
+          let socket = new SockJS('http://120.36.137.90:9008/websocket'),
+            token = sessionStorage.getItem('token'),
+            userId = sessionStorage.getItem('userId'),
+            courseId = sessionStorage.getItem('courseId');
+          let stompClient = Stomp.over(socket);
+          console.log(this)
+          let _this_ = window
+          console.log(this.STOMP_CLIENT)
+          stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
+              stompClient.subscribe('/teamsking/helloWorld', function (result) {
+                console.log(result);
+              },{'token': token});
+              stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+                console.log(result);
+              });
+              // this.$store.commit('SAVE_CLASSROME',res.data.classroomId)
+              window.STOMP_CLIENT = stompClient
+              resolve('连接成功');
+            },
+            function errorCallBack (error) {
+              // 连接失败时（服务器响应 ERROR 帧）的回调方法
+              reject('连接失败');
+            }
+          )
+        }).then((result)=>{
             loading.close()
             classSave({ courseId: this.$route.query.id }).then(response => {
               if (response.code === 200) {
                 console.log(response)
                 sessionStorage.setItem('classroom',response.data.classroomId)
-                // this.$store.commit('SAVE_CLASSROME',response.data.classroomId)
                 this.$router.push({
                   path: "/course/classchapter",
                   query: {
@@ -111,11 +109,10 @@ export default {
                 });
               }
             })
-          })
-          .catch((error)=>{
+          }).catch((error)=>{
             loading.close()
             console.log(error,'连接失败,尝试重新连接中')
-            this.enterClass()
+            // this.enterClass()
           });
       },
       getClass(){
@@ -134,14 +131,8 @@ export default {
             this.dialogVisible = true
           }else{
             sessionStorage.setItem('userId',Cookie.get('userId'))
-            sessionStorage.setItem('token',Cookie.get('token'))
+            sessionStorage.setItem('token',Cookie.get('BackstageToken'))
             sessionStorage.setItem('courseId',this.$route.query.id)
-
-            // sessionStorage.setItem('courseInfo',{
-            //   courseId : this.$route.query.id,
-            //   userId: Cookie.get('userId'),
-            //   token: Cookie.get('token'),
-            // })
           }
         });
       },

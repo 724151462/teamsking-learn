@@ -79,9 +79,9 @@
     created(){
       // menuList().then((response)=>{
       //   console.log(this.storeNav, '``````', response.data)
-		this.$store.commit('setAllMenu',this.menuList)
-    this.fetchNavData();
-		this.getUserInfo();
+      this.$store.commit('setAllMenu',this.menuList)
+      this.fetchNavData();
+      this.getUserInfo();
     },
     methods:{
 		navChange() {
@@ -139,6 +139,7 @@
     getUserInfo(){
       let data = getUserId()
       getMeInfo().then(res=>{
+        console.log(res)
         if(Number(res.code) === 200) {
           this.realName = res.data.realName
         }else if(Number(res.code) === 440){

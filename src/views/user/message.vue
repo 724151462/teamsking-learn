@@ -150,7 +150,7 @@ export default {
       },
       // 跳往首页
       toIndex() {
-        this.activeName === 'first' ? this.$router.push('index') : false
+        this.activeName === 'first' ? this.$router.push('index') : this.$router.push('certificate')
       },
       //全部标记为已读
       readAll() {
@@ -184,7 +184,6 @@ export default {
               } else {
               }
             })
-
           } else {
             this.$message.error('读取消息失败');
           }

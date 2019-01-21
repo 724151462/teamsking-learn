@@ -46,6 +46,7 @@
             :default-expanded-keys="expan"
             @node-drop="handleDrop"
             @node-drag-start="handleDragStart"
+            :allow-drop="allowDrop"
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
@@ -313,8 +314,8 @@
       },
       //节点复选框被选
       nodeCheck(data, checked){
-        console.log(data)
-        console.log(checked)
+        // console.log(data)
+        // console.log(checked)
           if(checked){
               this.deleteArr.push(data.catalogId)
               this.resourceArr.push(data.resourceId)
@@ -419,32 +420,32 @@
       },
       //清洗数据
       filterData(data){
-          let getFilter = (data)=>{
-              data.forEach((item)=>{
-                  if(!item.childCatalogList.length!==0){
-                      getFilter(item.childCatalogList)
-                  }
-                  if(item.resourceList.length !==0){
-                    let parentId = item.catalogId
-                    item.resourceList.forEach((list)=>{
-                      // list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
-                      list.resourceSize = this.sizeTrans(list.resourceSize)
-                        item.childCatalogList.push({
-                          catalogName: list.resourceTitle,
-                          resourceId: list.resourceId,
-                          createTime:list.createTime,
-                          parentId:parentId,
-                          srtUrl: list.srtUrl,
-                          resourceType:list.resourceType,
-                          resourceSize:list.resourceSize,
-                        })
+        let getFilter = (data)=>{
+            data.forEach((item)=>{
+                if(!item.childCatalogList.length!==0){
+                    getFilter(item.childCatalogList)
+                }
+                if(item.resourceList.length !==0){
+                  let parentId = item.catalogId
+                  item.resourceList.forEach((list)=>{
+                    // list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
+                    list.resourceSize = this.sizeTrans(list.resourceSize)
+                      item.childCatalogList.push({
+                        catalogName: list.resourceTitle,
+                        resourceId: list.resourceId,
+                        createTime:list.createTime,
+                        parentId:parentId,
+                        srtUrl: list.srtUrl,
+                        resourceType:list.resourceType,
+                        resourceSize:list.resourceSize,
                       })
-                  }
-              })
-              return data
-          }
-          let curData = getFilter(data)
-          return curData
+                    })
+                }
+            })
+            return data
+        }
+        let curData = getFilter(data)
+        return curData
       },
       goUp (id) {
         Cookie.set('catalogId',id)
@@ -536,6 +537,10 @@
         this.$store.commit('SAVE_DRAG',data)
       },
       handleDrop(draggingNode, dropNode, dropType, ev) {
+
+        console.log(draggingNode)
+        console.log(dropNode)
+
         let beforeType= draggingNode.data.resourceId ? 2 :1,
             beforeId = beforeType ==1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
             afterType = dropNode.data.resourceId ? 2 :1,
@@ -581,17 +586,15 @@
       },
       allowDrop(draggingNode, dropNode, dropType) {
         //拖拽验证，情况复杂
-        //拖拽验证，情况复杂
-        //拖拽验证，情况复杂
-        // let type = draggingNode.data.resourceId ? 2 :1
-        //   type == 1 ? console.log('文件夹') :console.log('资源')
-        //
-        // if(type ==2 && dropNode.data.catalogLevel == 1 || dropType !== 'inner'){
-        //
-        //   return false
-        // }else{
-        //   return true
-        // }
+        // console.log(draggingNode,dropNode,dropType)
+        let type = draggingNode.data.resourceId ? 2 :1
+        if(type ==2 && dropNode.data.catalogLevel == 1){
+          return false
+        }else if (dropType == 'prev'){
+          return false
+        }else{
+          return true
+        }
       },
       //文件夹/文件 移动操作
       move(data){

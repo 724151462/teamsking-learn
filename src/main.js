@@ -28,6 +28,7 @@ Vue.prototype.loadingCss = {
   background: 'rgba(0, 0, 0, 0.7)'
 };
 Vue.config.productionTip = false
+window.STOMP_CLIENT = ''
 
 var routeList = []
 

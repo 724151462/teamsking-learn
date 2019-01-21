@@ -2,6 +2,10 @@ const devUrl = '/api/v1/library/' // 开发环境
 const prodUrl = 'http://120.36.137.90:9008/api/v1/library/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
+const courseDevUrl = '/api/v1/course/' // 开发环境
+const courseprodUrl = 'http://120.36.137.90:9008/api/v1/course/' // 生产环境
+const courseUrl = process.env.NODE_ENV === 'production' ? courseprodUrl : courseDevUrl
+
 import {
     commonsAjax
   } from '../utils/requery'
@@ -170,4 +174,33 @@ export function renameAc(data) {
 export function getAcList(data) {
     let url = `${baseUrl}interaction/interactions`
     return commonsAjax(url, data, 'post')
+}
+/**
+ * 获取头脑风暴的信息
+ */
+export function getStormInfo(data) {
+  let url = `${courseUrl}storm/record/${data}`
+  return commonsAjax(url, '', 'get')
+}
+/**
+ * 获取作业的信息
+ */
+export function getHomeWorkInfo(data) {
+  let url = `${courseUrl}homework/${data}`
+  return commonsAjax(url, '', 'get')
+}
+
+/**
+ * 获取测试的信息
+ */
+export function getExamInfo(data) {
+  let url = `${courseUrl}exam/${data}`
+  return commonsAjax(url, '', 'get')
+}
+/**
+ * 获取投票问卷的信息
+ */
+export function getVoteInfo(data) {
+  let url = `${courseUrl}vote/${data}`
+  return commonsAjax(url, '', 'get')
 }

@@ -46,27 +46,29 @@ export function connect(resolve,reject){
         userId = sessionStorage.getItem('userId'),
         courseId = sessionStorage.getItem('courseId');
     let stompClient = Stomp.over(socket);
-    stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
+    console.log(this)
+
+  stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
         stompClient.subscribe('/teamsking/helloWorld', function (result) {
           console.log(result);
         },{'token': token});
         stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
           console.log(result);
         });
-        store.commit('NEW_SOCKET',stompClient)
-        let tagClient = JSON.stringify(stompClient)
-        sessionStorage.setItem('client',tagClient)
-        resolve('连接成功');
+      // this.$store.commit('SAVE_CLASSROME',res.data.classroomId)
+      resolve('连接成功');
       },
       function errorCallBack (error) {
         // 连接失败时（服务器响应 ERROR 帧）的回调方法
         reject('连接失败');
       }
     )
+  console.log(this)
+
 }
 
 export function sign(resolve,reject) {
-    let tagClient = store.state.socket.stompClient,
+    let tagClient = this.STOMP_CLIENT,
         token = sessionStorage.getItem('token'),
         userId = sessionStorage.getItem('userId'),
         courseId = sessionStorage.getItem('courseId'),
@@ -82,7 +84,7 @@ export function sign(resolve,reject) {
 }
 
 export function signClose(resolve,reject) {
-  let tagClient = store.state.socket.stompClient,
+  let tagClient = this.STOMP_CLIENT,
       token = sessionStorage.getItem('token'),
       userId = sessionStorage.getItem('userId'),
       courseId = sessionStorage.getItem('courseId'),

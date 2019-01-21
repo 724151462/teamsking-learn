@@ -7,12 +7,13 @@
       </div>
     </div>
     <div class="check-btn" style="">
-      <el-button type="primary" @click="closeSign">结束签到并进入课堂</el-button>
+      <el-button type="primary" @click="closeSign">结束签到进入课堂</el-button>
       <el-button type="primary" @click="startSign">开始签到</el-button>
     </div>
     <div class="check-num"> <span style="color: #409EFF;">12</span>人已加入</div>
     <div class="check-avatar-warp">
-      <div class="check-avatar-box first-check" v-for="(student,index) in studenlist" :key="student.id">
+      <div class="check-avatar-box " v-bind:class="{ 'first-check': index<3 }"
+            v-for="(student,index) in studenlist" :key="student.id">
         <img  :src="imgSrc.full" alt="" class="check-avatar">
         <p style="text-align: center">{{student.name}}</p>
       </div>
@@ -86,10 +87,33 @@
         }
       },
       startSign(){
-        sign()
+        let tagClient = STOMP_CLIENT,
+          token = sessionStorage.getItem('token'),
+          userId = sessionStorage.getItem('userId'),
+          courseId = sessionStorage.getItem('courseId'),
+          classroomId = sessionStorage.getItem('classroom');
+
+        tagClient.send('/teamsking/course/sign/start',{'token': token},
+          JSON.stringify({
+            "classroomId":1,
+            "courseId":classroomId,
+            "userId":userId
+          })
+        );
       },
       closeSign(){
-        signClose()
+        let tagClient = STOMP_CLIENT,
+          token = sessionStorage.getItem('token'),
+          userId = sessionStorage.getItem('userId'),
+          courseId = sessionStorage.getItem('courseId'),
+          classroomId = sessionStorage.getItem('classroom');
+        tagClient.send('/teamsking/course/sign/close',{'token': token},
+          JSON.stringify({
+            "classroomId":classroomId,
+            "courseId":courseId,
+            "userId":userId
+          })
+        );
       },
       enter(){
         console.log('执行')
@@ -210,6 +234,7 @@
       text-align left
       .check-avatar-box
         margin 20px
+        display inline-block
         .check-avatar
           width 60px
           height 60px

@@ -13,7 +13,7 @@
           </el-input>
         </div>
         <div>
-          <el-button icon="el-icon-search" class="search-btn" @click="getTestList(0,input)"></el-button>
+          <el-button icon="el-icon-search" class="search-btn" @click="searchTestList(0,input)"></el-button>
         </div>
       </div>
       <div style="" class="btn-warp" >
@@ -303,6 +303,30 @@
         .catch(error => {
           console.log(error);
         });
+      },
+      searchTestList(id,key){
+        let loading = this.$loading({
+          lock: true,
+          text: 'loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        let data = {
+          quizType: id,
+          searchKey:key
+        }
+        getTestFileFold(data).then(res => {
+          loading.close()
+          if (Number(res.code) === 200) {
+            let data = JSON.parse(JSON.stringify(res.data))
+            this.catalogData = this.filterData(data)
+          } else {
+            this.$message({
+              message: "试题列表数据获取失败",
+              type: "error"
+            });
+          }
+        })
       },
       //新建文件夹
       newFileFold(){
