@@ -105,7 +105,7 @@ export function courseMsgAdd(data) {
  * 获取课程分类
  */
 export function courseCatalogList(data) {
-  let url = `/api/v1/common/categories`
+  let url = `http://120.36.137.90:9008/api/v1/common/categories`
   return commonsAjax(url, data, 'get')
 }
 

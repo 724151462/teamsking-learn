@@ -11,7 +11,7 @@
       ></modelAside>
       <el-main>
         <div v-if="testObj === ''">
-          <span>请选择测试</span>
+          <span>请选择或添加测试</span>
         </div>
         <div v-else-if="testObj.interactionStatus === 10 || testObj.interactionStatus === 20">
           <!-- <div v-else-if="testObj.interactionStatus === 60 || testObj.interactionStatus === 70"> -->
@@ -116,7 +116,7 @@
             </div>
           </div>
           <span slot="footer" class="dialog-footer">
-            <el-button @click="editSubjectVisible = false">取 消</el-button>
+            <el-button @click="dialogVisible = false">取 消</el-button>
             <el-button type="primary" @click="addEnsure">确 定</el-button>
           </span>
         </el-dialog>
@@ -139,7 +139,7 @@ export default {
   data() {
     return {
       textObj: {
-        addBtn: "添加头脑风暴",
+        addBtn: "添加测试",
         interactItemBtn: "开始活动"
       },
       dataKey: {
