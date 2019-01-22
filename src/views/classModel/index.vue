@@ -70,11 +70,12 @@ export default {
           background: 'rgba(0, 0, 0, 0.7)'
         });
         let connect = new Promise((resolve, reject)=>{
-          let socket = new SockJS('http://120.36.137.90:9008/websocket'),
+          let url = 'ws://120.36.137.90:9008/websocket',
             token = sessionStorage.getItem('token'),
             userId = sessionStorage.getItem('userId'),
             courseId = sessionStorage.getItem('courseId');
-          let stompClient = Stomp.over(socket);
+          let stompClient = Stomp.client(url);
+          // let stompClient = Stomp.over(socket);
           let _this_ = window
           let _Vue_ = this
           //禁用控制台调试信息
@@ -117,7 +118,7 @@ export default {
           }).catch((error)=>{
             loading.close()
             console.log(error,'连接失败,尝试重新连接中')
-            // this.enterClass()
+            this.enterClass()
           });
       },
       //订阅classroom
