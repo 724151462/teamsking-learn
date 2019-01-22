@@ -56,6 +56,8 @@
   }
   .modelStrome .el-textarea__inner
     min-height 200px !important
+  .modelVote .el-textarea__inner
+    min-height 200px !important
 </style>
   #app .courseCategory .el-table__expanded-cell
     padding:0 0 0 48px

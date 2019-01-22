@@ -647,6 +647,18 @@ export function voteSave(data) {
 }
 
 /**
+ * 保存课堂投票
+ */
+export function classVoteSave(data) {
+  data.quizOptions.forEach((element, i) => {
+    data.quizOptions[i] = element.text
+  });
+  console.log(data)
+  let url = `${baseUrl}vote/classroom`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
  * 投票删除
  */
 export function voteDelete(data) {

@@ -159,17 +159,6 @@ export default {
         "G",
         "H",
         "I",
-        "J",
-        "K",
-        "L",
-        "M",
-        "N",
-        "O",
-        "P",
-        "Q",
-        "R",
-        "S",
-        "T"
       ],
       examParams: {
         courseId: this.$route.query.id,
