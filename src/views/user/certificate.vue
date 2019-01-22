@@ -31,8 +31,8 @@
                 </template>
             </el-table-column>
             <el-table-column
-            label="审核状态"
-            width="100">
+                label="审核状态"
+                width="100">
                 <template slot-scope="scope">
                     <el-tag v-if="scope.row.status==1" type="success">已通过</el-tag>
                     <el-tag v-else-if="scope.row.status==3">审核中</el-tag>
@@ -81,7 +81,8 @@
                     <el-input type="text" class="input-width" v-model="cerForm.issuingAuthority" placeholder="请输入"></el-input>
                 </el-form-item>
                 <span>证书图片</span>
-                <span v-for="img in cerForm.imgUrls" :key="img.id">
+                <span v-for="(img,index) in cerForm.imgUrls" :key="img.id" class="" style="display: inline-block;position: relative">
+                    <span class="close" @click="delImg(index)"><i class="el-icon-error"></i></span>
                     <img :src="img.imgUrl" alt="" class="cre-img has-close" style="position: relative">
                 </span>
                 <!--<span><i class="el-icon-picture cre-uploader-icon"></i></span>-->
@@ -93,7 +94,7 @@
             </div>
             <span slot="footer" class="dialog-footer">
         <el-button @click="()=>{uploadDialog = false}">取 消</el-button>
-        <el-button type="primary" @click="saveCre">提交</el-button>
+        <el-button type="primary" @click="changeCre">提交</el-button>
       </span>
         </el-dialog>
         <!--查看证书-->
@@ -174,11 +175,11 @@
           //修改证书
             changeCre(id){
               let loading = this.$loading(this.loadingCss)
-              statusCre(id).then(res=>{
+
+              changeCer(this.cerForm).then(res=>{
                 loading.close()
                 if(Number(res.code) === 200) {
                   console.log(res.data)
-                  this.cerComment = res.data[0].comment
                 }else {
                   this.$message.error(res.data.msg)
                 }
@@ -189,7 +190,6 @@
                 if(Number(res.code) === 200) {
                   this.cerForm = res.data
                   this.uploadDialog = true
-
                 }else {
                   this.$message.error(res.data.msg)
                 }
@@ -198,32 +198,8 @@
           //证书图片上传
           upCre (url) {
             console.log('证书上传')
-            let data = {imgUrl : url,order: this.order}
-            this.order+=1
+            let data = {imgUrl : url,order: 1}
             this.cerForm.imgUrls.push(data)
-          },
-          //证书保存
-          saveCre(){
-            let loading = this.$loading(this.loadingCss);
-            let data = this.cerForm
-            console.log('要上传的数据',data)
-            change(data).then(res=>{
-              loading.close()
-              if(Number(res.code) === 200) {
-                this.$message.success('证书保存成功');
-                this.cerForm = {
-                  certificateName: "",
-                  certificateNo: "",
-                  imgUrls: [],
-                  issuingAuthority: "",
-                  issuingDate: ""
-                }
-                this.order = 1
-                this.uploadDialog = false
-              }else {
-                this.$message.error('证书保存失败');
-              }
-            })
           },
           //撤销证书
           delCre(id){
@@ -234,28 +210,30 @@
                 console.log(res)
                 loading.close()
                 if(Number(res.code) === 200) {
-                  this.$message.error('撤销成功');
+                  this.$message.success('撤销成功');
+                  this.initInfo()
                 }else {
                   this.$message.error('撤销失败');
                 }
               })
               // delCertificate()
             },
+          delImg(index){
+            console.log(index)
+            this.cerForm.imgUrls.splice(index, 1)
+          },
         }
     }
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
-    .has-close
-        &::after
-            content :''
-            width 50px
-            height 50px
-            background red
-            position absolute
-            top 0
-            right 0
+    .close
+        z-index 20
+        cursor pointer
+        position absolute
+        top 0
+        right 0
     .cre-img
-        width: 120px;
-        height: 100px;
+      width: 120px;
+      height: 100px;
 </style>

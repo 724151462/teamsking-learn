@@ -53,7 +53,7 @@
                 <span class="quiz-tag" v-else-if="data.interactionType == 60">投票问卷</span>
                 <span class="quiz-tag" v-else-if="data.interactionType == 70">讨论</span>
                 <span>{{ node.label }}</span>
-                <span v-if="data.interactionId" class="golook" style="margin-left: 20px">查看</span>
+                <span v-if="data.interactionId" class="golook" style="margin-left: 20px" @click="showAc(data.interactionId,data.interactionType)">查看</span>
               </span>
               <span>
                 <span v-if="data.catalogLevel" class="hide-button">
@@ -127,7 +127,8 @@
 <script>
   import {
     deleteAc, removeAc, createAc,
-    renameAc, getAcList
+    renameAc, getAcList, getStormInfo,
+    getHomeWorkInfo, getExamInfo, getVoteInfo
   } from '@/api/library'
   export default {
     created () {
@@ -176,7 +177,8 @@
         createCatalog : false,
         renameCatalog : false,
         showCatalog : false,
-        allDelete:false
+        allDelete:false,
+
       };
     },
     methods:{
@@ -232,7 +234,7 @@
             }
             getAcList(data).then(res => {
               loading.close()
-                // console.log(res)
+                console.log(res)
                 if (Number(res.code) === 200) {
                     //如果试题库为空，则初始化新建一个默认的文件夹
                     if(res.data.length === 0){
@@ -244,7 +246,7 @@
                     }
                     let data = JSON.parse(JSON.stringify(res.data))
                     this.activityData = this.filterData(data)
-                    console.log(this.activityData)
+                    // console.log(this.activityData)
                 } else {
                     this.$message({
                         message: "数据获取失败",
@@ -344,7 +346,17 @@
         },
         //查看资源
         showAc(id,type){
-
+          //30:测试，40:作业/任务，50:头脑风暴， 60:投票问卷
+          console.log(id,type)
+          if(type == 30){
+            this.initExamInfo(id)
+          }else if(type == 40){
+            this.initHomeWorkInfo(id)
+          }else if(type == 50){
+            this.initStormInfo(id)
+          }else if(type == 60){
+            this.initVoteInfo(id)
+          }
         },
         //移动文件夹、
         remove(data){
@@ -357,7 +369,55 @@
               this.$message.error(res.data.message);
             }
           })
-        }
+        },
+        //获取作业的信息
+        initExamInfo(id){
+          let loading = this.$loading(this.loadingCss)
+          getExamInfo(id).then(res => {
+            if (Number(res.code) === 200) {
+              loading.close()
+              console.log(res)
+            } else {
+              this.$message.error(res.data.message);
+            }
+          })
+        },
+      //获取头脑风暴的信息
+      initStormInfo(id){
+        let loading = this.$loading(this.loadingCss)
+        getStormInfo(id).then(res => {
+          if (Number(res.code) === 200) {
+            loading.close()
+            console.log(res)
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+      },
+      //获取投票的信息
+      initVoteInfo(id){
+        let loading = this.$loading(this.loadingCss)
+        getVoteInfo(id).then(res => {
+          if (Number(res.code) === 200) {
+            loading.close()
+            console.log(res)
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+      },
+      //获取作业的信息
+      initHomeWorkInfo(id){
+        let loading = this.$loading(this.loadingCss)
+        getHomeWorkInfo(id).then(res => {
+          if (Number(res.code) === 200) {
+            loading.close()
+            console.log(res)
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+      }
     }
   }
 </script>

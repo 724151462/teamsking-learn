@@ -1,6 +1,6 @@
 import Cookie from 'js-cookie'
 
-const TokenKey = 'token'
+const TokenKey = 'BackstageToken'
 
 export function getToken () {
   return Cookie.get(TokenKey)

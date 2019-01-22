@@ -3,7 +3,20 @@
     <div class="login-center">
       <el-form :model="data" :rules="rules" ref="data" label-width="100px">
         <el-form-item label="所属学校：" prop="tenantId">
-          <el-select v-model="data.tenantId" placeholder="请选择">
+          <!--<el-select v-model="data.tenantId" filterable  placeholder="请选择">-->
+            <!--<el-option-->
+              <!--v-for="item in schoolList"-->
+              <!--:key="item.tenantId"-->
+              <!--:label="item.tenantName"-->
+              <!--filter-method=""-->
+              <!--:value="item.tenantId">-->
+            <!--</el-option>-->
+          <!--</el-select>-->
+          <el-select
+            filterable
+            v-model="data.tenantId"
+            :filter-method="searchTenant"
+            placeholder="请选择">
             <el-option
               v-for="item in schoolList"
               :key="item.tenantId"
@@ -34,6 +47,7 @@
     data () {
       return {
         schoolList: [],   //租户列表
+        searchKey:'', //搜索
         data: {
           userName: '',
           password: '',
@@ -103,6 +117,19 @@
               message: '用户名密码错误，请重新输入',
               type: 'error'
             })
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      },
+      searchTenant(query){
+        let data = {searchKey: query}
+        getTenant(data).then(res => {
+          console.log(res)
+          if (res.code === 200) {
+            this.schoolList = res.data
+          }else{
+            this.$message.error('获取学校信息失败，请重试')
           }
         }).catch(error => {
           console.log(error)
