@@ -75,18 +75,23 @@ export default {
             userId = sessionStorage.getItem('userId'),
             courseId = sessionStorage.getItem('courseId');
           let stompClient = Stomp.over(socket);
-          console.log(this)
           let _this_ = window
-          console.log(this.STOMP_CLIENT)
+          let _Vue_ = this
+          //禁用控制台调试信息
+          // stompClient.debug = null
           stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
-              stompClient.subscribe('/teamsking/helloWorld', function (result) {
-                console.log(result);
-              },{'token': token});
-              stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
-                console.log(result);
-              });
-              // this.$store.commit('SAVE_CLASSROME',res.data.classroomId)
+              // stompClient.subscribe('/teamsking/helloWorld', function (result) {
+              //   console.log(result);
+              // },{'token': token});
+              // stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+              //   console.log(result);
+              // });
               window.STOMP_CLIENT = stompClient
+              // _Vue_.subClassroom()
+              // this.$store.commit('SAVE_CLASSROME',res.data.classroomId)
+            // window.STOMP_CLIENT = stompClient
+            let client = JSON.stringify(stompClient)
+            sessionStorage.STOMP_CLIENT = client
               resolve('连接成功');
             },
             function errorCallBack (error) {
@@ -114,6 +119,21 @@ export default {
             console.log(error,'连接失败,尝试重新连接中')
             // this.enterClass()
           });
+      },
+      //订阅classroom
+      subClassroom(){
+        let userId = sessionStorage.getItem('userId');
+        window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+          let data = result.body
+          JSON.parse(data)
+          console.log(JSON.parse(data))
+          if(data.socketType == 803){
+            this.$message.info('有学生签到')
+          }
+          if(data.socketType == 804){
+            this.$message.error('签到错误')
+          }
+        });
       },
       getClass(){
         let loading = this.$loading({

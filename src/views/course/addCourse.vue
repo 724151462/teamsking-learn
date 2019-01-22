@@ -10,7 +10,7 @@
           <el-input v-model="Course.courseName"  style="width: 220px;"></el-input>
         </el-form-item>
 
-        <el-form-item label="课程分类"  required>
+        <el-form-item label="课程分类" required>
           <el-select v-model="Course.courseCategoryParent" placeholder="课程一级分类" @change="yesCategories">
             <el-option
               v-for="(item , index) in categoriesList"
@@ -502,7 +502,16 @@
       },
       //创建课程
       goUpCourseResource(){
+        if(!this.Course.courseCategoryParent){
+          this.$message.warning('请选择课程分类')
+          return false;
+        }
+
         let data = this.goDataFilter()
+        console.log(data)
+        //课程父分类为必选
+
+
         let loading = this.$loading({
           lock: true,
           text: 'loading',
@@ -519,7 +528,8 @@
               path:'/course/list'
             })
           }else{
-            this.$message.success('课程创建失败')
+            let msg = data.msg[0] || data.msg
+            this.$message.error('课程创建失败')
           }
         })
       },

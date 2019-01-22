@@ -877,4 +877,26 @@ export function classTestRes(data) {
   return commonsAjax(url, data, 'post')
 }
 
+//======长连接签到相关
+/**
+ * 保存签到
+ */
+export function saveSign(data) {
+  let url = `${baseUrl}sign`
+  return commonsAjax(url, data, 'post')
+}
+/**
+ * 获取签到用户信息列表
+ */
+export function signList(data) {
+  let url = `${baseUrl}sign/${data}/page`
+  return commonsAjax(url, data, 'post')
+}
+/**
+ * 老师修改签到
+ */
+export function changeSign(data) {
+  let url = `${baseUrl}sign`
+  return commonsAjax(url, data, 'put')
+}
 

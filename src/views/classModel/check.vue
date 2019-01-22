@@ -25,7 +25,10 @@
 </template>
 
 <script>
-  import { classingInfo, classOver, classSave } from "@/api/course";
+  import {
+    classingInfo, classOver, classSave ,
+    saveSign, signList, changeSign
+  } from "@/api/course";
 
   import {sign,signClose, connect} from "../../utils/utils";
   import Cookie from "js-cookie";
@@ -86,29 +89,73 @@
           this.isFullScreen = true
         }
       },
+      //长连接开始签到
       startSign(){
-        let tagClient = STOMP_CLIENT,
+        //开始签到前保存签到
+        this.saveSign()
+        let tagClient = window.STOMP_CLIENT,
           token = sessionStorage.getItem('token'),
           userId = sessionStorage.getItem('userId'),
           courseId = sessionStorage.getItem('courseId'),
+          beanId = sessionStorage.getItem('signId'),
           classroomId = sessionStorage.getItem('classroom');
 
+        // let testTag = sessionStorage.STOMP_CLIENT;
+        //   let newTag = JSON.parse(testTag)
+          this.subClassroom()
         tagClient.send('/teamsking/course/sign/start',{'token': token},
           JSON.stringify({
-            "classroomId":1,
-            "courseId":classroomId,
+            "bean":beanId,
+            "classroomId":classroomId,
+            "courseId":courseId,
             "userId":userId
           })
         );
       },
+      subClassroom(){
+        let userId = sessionStorage.getItem('userId');
+        window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+          let data = result.body
+          JSON.parse(data)
+          console.log(JSON.parse(data))
+          if(data.socketType == 803){
+            console.log('学生签到')
+            this.$message.info('有学生签到')
+          }
+          if(data.socketType == 804){
+            this.$message.error('签到错误')
+          }
+        });
+      },
+      //保存签到
+      saveSign(){
+        let courseId = sessionStorage.getItem('courseId'),
+            classroomId = sessionStorage.getItem('classroom');
+        let data = {classroomId , courseId ,signType:10,usedType:10}
+        let loading = this.$loading(this.loadingCss)
+        saveSign(data).then(res=>{
+          if(Number(res.code) === 200){
+            sessionStorage.setItem('signId',res.data.signId)
+            loading.close()
+          }else{
+            // this.$message.error('保存签到失败')
+            let msg = data.msg
+            this.$message.error(msg)
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
       closeSign(){
-        let tagClient = STOMP_CLIENT,
+        let tagClient = window.STOMP_CLIENT,
           token = sessionStorage.getItem('token'),
           userId = sessionStorage.getItem('userId'),
           courseId = sessionStorage.getItem('courseId'),
+          signId = sessionStorage.getItem('signId'),
           classroomId = sessionStorage.getItem('classroom');
         tagClient.send('/teamsking/course/sign/close',{'token': token},
           JSON.stringify({
+            "bean":signId,
             "classroomId":classroomId,
             "courseId":courseId,
             "userId":userId

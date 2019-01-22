@@ -83,6 +83,9 @@
           background: 'rgba(0, 0, 0, 0.7)'
         });
         let self = this
+
+        // 'base-dir/' +'object-name' ， 如果要指定上传目录，第一个参数就这样传
+
         client.multipartUpload(name, file, {
           progress(p, checkpoint){
             //反回的 p 是当前进度，大概1s会返回一个进度的样子，下面处理了下百分比，checkpoint 是具体的数据流上传，不做暂停效果可以不考虑用它
