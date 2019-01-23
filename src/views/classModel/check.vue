@@ -160,7 +160,7 @@
         
            let newTag = JSON.parse(testTag)
           console.log(typeof newTag);
-        newTag.send('/teamsking/course/sign/close',{'token': token},
+        tagClient.send('/teamsking/course/sign/close',{'token': token},
           JSON.stringify({
             "bean":signId,
             "classroomId":classroomId,

@@ -130,7 +130,7 @@ import Cookie from "js-cookie";
 import echarts from "echarts";
 
 import { testList, interactExam, interactExamRes } from "@/api/course";
-import { classTest, classTestSave, classTestRes, classTestStart } from "../../../api/course";
+import { classTest, classTestSave, classTestRes } from "../../../api/course";
 import { getTestFileFold } from "@/api/library";
 import Tree from "@/components/fileTree";
 
@@ -230,14 +230,23 @@ export default {
       this.getQuiz(item);
     },
     // 获取并开始
-    beginTest(item) {
-      this.getQuiz(item);
+    beginTest(value) {
+      this.getQuiz(value);
       this.examParams.classroomId = this.$route.query.classroomId;
-      this.examParams.bean = item.examId
+      this.examParams.bean = value.examId
       this.examParams.userId = Cookie.get('userId')
       console.log(this.examParams)
-      classTestStart(this.examParams)
-      exam()
+      this.subClassroom()
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/test",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: value.testId,
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
     },
     // 获取测试
     getQuiz(item) {
@@ -372,7 +381,22 @@ export default {
         //     ansArr.push(item.optionTitle)
         // }
         // return ansArr
-    }
+    },
+    subClassroom(){
+      let userId = sessionStorage.getItem('userId');
+      window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+        let data = result.body
+        JSON.parse(data)
+        console.log(JSON.parse(data))
+        if(data.socketType == 803){
+          console.log('学生签到')
+          this.$message.info('有学生签到')
+        }
+        if(data.socketType == 804){
+          this.$message.error('签到错误')
+        }
+      });
+    },
   },
   components: {
     Tree,

@@ -10,7 +10,7 @@
         @beginEvent="beginStorm"
       ></modelAside>
       <el-main style="padding-left: 300px;">
-        <div v-if="stormObj === ''">
+        <div v-if="stormObj.stormTitle === undefined && stormObj !== 'add'">
           <span>请选择或添加头脑风暴</span>
         </div>
         <div v-else-if="stormObj === 'add'">
@@ -23,7 +23,7 @@
             ></el-input>
           </div>
           <el-button @click="dialogVisible = true">试题库导入</el-button>
-          <el-button @click="manualAdd" type="primary">开始头脑风暴</el-button>
+          <el-button @click="manualAdd" type="primary">添加头脑风暴</el-button>
         </div>
         <div v-else>
           <el-container>
@@ -32,19 +32,19 @@
               <!-- <div class="answer-container"><span>张三</span><span>eewgtewgtew</span></div> -->
               <el-card
                 class="item"
-                v-for="(o, index) in 7"
-                :key="o"
+                v-for="(item, index) in stormObj.answerList"
+                :key="index"
                 :body-style="{ padding: '10px' }"
               >
                 <div style="display: flex; align-items: center">
                   <img :src="require('@/assets/images/vote.png')" class="stu-image">
-                  <span style="margin-left: 20px">学生姓名</span>
+                  <span style="margin-left: 20px">{{item.userId}}</span>
                 </div>
                 <div>
                   <div
                     style="padding: 20px 0;min-height: 30px; border-bottom: 1px solid rgb(222,222,222)"
                   >
-                    <span>好吃的汉堡</span>
+                    <span>{{item.stormContent}}</span>
                   </div>
 
                   <div class="bottom clearfix">
@@ -56,6 +56,7 @@
                     <el-button
                       type="text"
                       style="float: right;margin-right:10px;margin-top: 10px"
+                      @click="addScore(item)"
                     >加分</el-button>
                   </div>
                 </div>
@@ -66,7 +67,8 @@
               <div class="footer-right">
                 <div>
                   <span style="margin-right: 20px">4/42人</span>
-                  <el-button type="primary" @click="begin">开始头脑风暴</el-button>
+                  <el-button type="primary" @click="beginStorm(stormObj)" v-if="stormObj.interactionStatus===10">开始头脑风暴</el-button>
+                  <el-button type="primary" @click="endStorm" v-else>结束头脑风暴</el-button>
                 </div>
                 <span style="font-size: 12px">结束后学生不能再回答</span>
               </div>
@@ -105,7 +107,7 @@
 import Cookie from "js-cookie";
 import modelAside from "@/components/modelAside";
 import { getTestFileFold } from "@/api/library";
-import { classStromeGet, classStromeSave, storm } from "@/api/course";
+import { classStromeGet, classStromeSave, storm, stormAddScore } from "@/api/course";
 import Tree from "@/components/fileTree";
 export default {
   data() {
@@ -121,7 +123,10 @@ export default {
         courseId: this.$route.query.id
       },
 
-      stormObj: "",
+      stormObj: {
+        // socket实时消息列表
+        answerList: []
+      },
       stormList: [
         {
           stormId: 1,
@@ -129,13 +134,14 @@ export default {
         }
       ],
       textObj: {
-        addBtn: "添加测试",
+        addBtn: "添加头脑风暴",
         interactItemBtn: "开始活动"
       },
       dataKey: {
         itemId: "stormId",
         itemTitle: "stormTitle"
-      }
+      },
+      
     };
   },
   methods: {
@@ -151,8 +157,10 @@ export default {
     },
     beginStorm(value) {
       console.log(value)
-      // let socket = JSON.parse(sessionStorage.getItem('STOMP_CLIENT'))
+      let socket = JSON.parse(sessionStorage.getItem('STOMP_CLIENT'))
       // console.log(socket)
+      this.stormObj = value;
+      this.stormObj.interactionStatus = 20
       this.subClassroom()
       window.STOMP_CLIENT.send(
         "/teamsking/course/storm",
@@ -165,18 +173,41 @@ export default {
         })
       );
     },
+    endStorm() {
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/storm/close",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: {stormId: this.stormObj.stormId},
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
     subClassroom(){
+      var that = this
       let userId = sessionStorage.getItem('userId');
       window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
-        let data = result.body
-        JSON.parse(data)
-        console.log(JSON.parse(data))
-        if(data.socketType == 803){
-          console.log('学生签到')
-          this.$message.info('有学生签到')
+        console.log(JSON.parse(result.body))
+        if(JSON.parse(result.body).data.socketType === 506) {
+          that.stormObj.answerList.push(JSON.parse(result.body).data.socketData)
+        }else if(JSON.parse(result.body).data.socketType === 502) {
+          that.$message({
+            message: "已结束头脑风暴",
+            type: "success"
+          })
         }
-        if(data.socketType == 804){
-          this.$message.error('签到错误')
+      });
+    },
+    addScore(answer) {
+      console.log(answer.id);
+      stormAddScore({ recordId: answer.id }).then(response => {
+        if (response.code === 200) {
+          this.$message({
+            message: "加分成功",
+            type: "success"
+          });
         }
       });
     },
@@ -253,19 +284,6 @@ export default {
           });
         }
       });
-    },
-    // 开始
-    begin() {
-      // window.STOMP_CLIENT.send(
-      //   "/teamsking/course/sign/start",
-      //   { token: token },
-      //   JSON.stringify({
-      //     bean: 50,
-      //     classroomId: 1,
-      //     courseId: "0608367675f54267aa6960fd0557cc1b",
-      //     userId: 1
-      //   })
-      // );
     },
     // 递归渲染试题
     filterData(data) {

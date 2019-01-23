@@ -44,6 +44,9 @@
             active: this.$store.state.modelActive
         }
     },
+    created() {
+        this.handleSelect(this.$store.state.modelActive)
+    },
     methods: {
       handleSelect(key, keyPath) {
         console.log(key, keyPath);
