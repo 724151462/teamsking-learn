@@ -482,7 +482,7 @@
       //标签数据赋值
       yesTages(e){
         delete e.value
-
+        
           let flag = this.Course.courseTagIds.find((item)=>{
               return item.tagId == e.tagId
           })
