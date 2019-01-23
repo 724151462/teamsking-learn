@@ -79,7 +79,7 @@ export default {
           let _this_ = window
           let _Vue_ = this
           //禁用控制台调试信息
-          // stompClient.debug = null
+          stompClient.debug = null
           stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
               // stompClient.subscribe('/teamsking/helloWorld', function (result) {
               //   console.log(result);
