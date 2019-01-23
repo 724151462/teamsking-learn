@@ -70,29 +70,21 @@ export default {
           background: 'rgba(0, 0, 0, 0.7)'
         });
         let connect = new Promise((resolve, reject)=>{
+          // let url = 'ws://192.168.10.48:9008/websocket',
           let url = 'ws://120.36.137.90:9008/websocket',
             token = sessionStorage.getItem('token'),
             userId = sessionStorage.getItem('userId'),
             courseId = sessionStorage.getItem('courseId');
           let stompClient = Stomp.client(url);
 
-          let _this_ = window
           let _Vue_ = this
           //禁用控制台调试信息
-          stompClient.debug = null
+          // stompClient.debug = null
           stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
-              // stompClient.subscribe('/teamsking/helloWorld', function (result) {
-              //   console.log(result);
-              // },{'token': token});
               // stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
               //   console.log(result);
               // });
               window.STOMP_CLIENT = stompClient
-              // _Vue_.subClassroom()
-              // this.$store.commit('SAVE_CLASSROME',res.data.classroomId)
-            // window.STOMP_CLIENT = stompClient
-            let client = JSON.stringify(stompClient)
-            sessionStorage.STOMP_CLIENT = client
               resolve('连接成功');
             },
             function errorCallBack (error) {
@@ -104,7 +96,7 @@ export default {
             loading.close()
             classSave({ courseId: this.$route.query.id }).then(response => {
               if (response.code === 200) {
-                console.log(response)
+                console.log('保存课堂',response)
                 sessionStorage.setItem('classroom',response.data.classroomId)
                 this.$router.push({
                   path: "/course/classchapter",
@@ -189,7 +181,7 @@ export default {
       }
     },
     created(){
-      // this.getClass()
+      // this.enterClass()
     },
     mounted() {
       this.getClass()

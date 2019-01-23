@@ -42,11 +42,11 @@
         min-height 300px;
     .model-resource
       .el-breadcrumb__inner
-        font-size: 18px;
-        cursor pointer
+        font-size: 1.2em;
+        cursor pointer!important
         user-select none
         &:hover
-          color: #409EFF
+          color: #409EFF!important
   .el-table .warning-row {
     background: oldlace !important;
   }

@@ -14,7 +14,7 @@
 
       <el-row>
         <el-row style="background:#F3F3F3;padding:10px 0 10px 10px;margin-top: 20px;">课程列表</el-row>
-        <el-row class="course-table" v-for="list in data" :key="list">
+        <el-row class="course-table" v-for="list in data" :key="list.id">
           <div class="img">
             <span class="tib">{{courseStatus(list.courseStatus)}}</span>
             <img :src="list.courseCover">

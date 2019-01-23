@@ -3,9 +3,9 @@ const prodUrl = 'http://120.36.137.90:9008/api/v1/sys/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
 
-const infoDev = 'http://192.168.10.48:9008/sys/user/info/' // 开发环境
-// const infoDev = '/sys/user/info/' // 开发环境
-const infoProd = 'http://120.36.137.90:9008/sys/user/info/' // 生产环境
+const infoDev = 'http://192.168.10.48:9008/api/v1/sys/user/info/' // 开发环境
+// const infoDev = '/api/v1/sys/user/info/' // 开发环境
+const infoProd = 'http://120.36.137.90:9008/api/v1/sys/user/info/' // 生产环境
 const infoUrl = process.env.NODE_ENV === 'production' ? infoProd : infoDev
 
 import { commonsAjax } from '@/utils/requery'

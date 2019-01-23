@@ -9,8 +9,8 @@
       <div class="nav-list">
         <!--<div class="path">资源库<i class="el-breadcrumb__separator el-icon-arrow-right"></i></div>-->
         <el-breadcrumb separator-class="el-icon-arrow-right">
-          <el-breadcrumb-item class="path">资源库</el-breadcrumb-item>
-          <el-breadcrumb-item class="path" v-for="router in routerList" :key="router.id" @click.native="routerClick(router.id)">{{router.name}}</el-breadcrumb-item>
+          <el-breadcrumb-item class="path" @click.native="goRoot">资源库</el-breadcrumb-item>
+          <el-breadcrumb-item class="path" v-for="(router,index) in routerList" :key="router.id" @click.native="routerClick(router.id,index)">{{router.name}}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <div class="nav-search">
@@ -25,32 +25,33 @@
         </div>
       </div>
     </div>
+    <div class="empty-data" v-show="data.length == 0">
+      <div >暂无数据</div>
+    </div>
     <div class="warp">
       <div class="box"
            v-for="catalog in data"
            :key="catalog.id" @click="goCatalog(catalog.catalogId,catalog.catalogName)">
-
-          <img :src="imgSrc.folder" alt="" class="box-img">
-          <p class="box-title">{{catalog.catalogName}}</p>
+        <div style="display: flex;justify-content: center"><img :src="imgSrc.folder" alt="" class="box-img"></div>
+        <p class="box-title">{{catalog.catalogName}}</p>
       </div>
       <div v-if="data.resourceList">
         <div class="box" v-for="resource in data.resourceList" :key="resource.id">
-          <img :src="imgSrc.word" alt="" class="box-img">
+          <img :src="imgSrc.word" alt="" class="box-img"></div>
           <p class="box-title">{{resource.resourceTitle}}</p>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
 <script>
 import Cookie from 'js-cookie'
-import {getResList} from "@/api/library";
+import {classRes} from "@/api/library";
 
 export default {
   created() {
     Cookie.set('modelActive', '6')
-    this.getResource(0)
+    this.getResource(0,0)
   },
   data() {
     return{
@@ -67,9 +68,10 @@ export default {
     }
   },
   methods:{
-    getResource(id,key) {
+    getResource(parentId,resourceType,key) {
       let data = {
-        resourceType: id,
+        parentId,
+        resourceType,
         searchKey: key
       }
       let loading = this.$loading({
@@ -78,13 +80,11 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       });
-      getResList(data).then(res => {
+      classRes(data).then(res => {
         loading.close()
         console.log(res)
         if (Number(res.code) === 200) {
-          let data = JSON.parse(JSON.stringify(res.data))
-          // this.resourceData = this.filterData(data)
-          this.data = res.data
+          this.data = res.data.catalogList
           // console.log(this.resourceData)
         } else {
           this.$message({
@@ -94,28 +94,22 @@ export default {
         }
       })
     },
-    goCatalog(id,name){
-      console.log('文件夹点击',id,name)
-      this.routerList.push({id,name})
-      this.data = [
-        {
-          catalogId: 2,
-          catalogLevel: 1,
-          catalogName: "文件夹1",
-          childCatalogList: [{}],
-          resourceList: [{
-            contentType: "mp4",
-            resourceId: 7,
-            resourceTitle: "大数据hadoop",
-          }]
-        }
-        ]
+    //资源库被点击
+    goRoot(){
+      this.getResource(0)
+      this.routerList = []
     },
-    routerClick(id){
-      let arrIndex = this.routerList.findIndex((value, index)=>{
-          return value.id == id
-      })
-      this.routerList.splice(arrIndex)
+    goCatalog(id,name){
+      this.routerList.push({id,name})
+      this.getResource(id)
+    },
+    routerClick(id,index){
+      if(index+1 == this.routerList.length){
+        return false
+      }else{
+        this.routerList.splice(index+1,this.routerList.length)
+        this.getResource(id,0)
+      }
     }
   }
 }
@@ -123,6 +117,16 @@ export default {
 
 <style scoped lang="stylus" type="text/stylus">
   .model-resource
+    .el-breadcrumb
+      .el-breadcrumb__item
+        &:hover
+          color: #409EFF;
+          cursor: pointer;
+    .empty-data
+      background #ccc
+      text-align center
+      height 40px
+      line-height 40px
     .nav
       /*height 20px*/
       padding 10px 0
@@ -153,14 +157,12 @@ export default {
       padding 40px
       display flex
       .box
-        width 80px
-        height 80px
-        display inline-block
+        width 6rem
         cursor pointer
         padding 10px
         .box-img
-          width 50px;
-          height 50px;
+          width 3.8em;
+          height 2.8em;
         .box-title
           overflow: hidden;
           text-overflow:ellipsis;

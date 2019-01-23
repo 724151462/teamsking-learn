@@ -26,6 +26,9 @@
       },
       fileType: {
         default: ''
+      },
+      fileKind: {
+        default: ''
       }
     },
     data(){
@@ -96,9 +99,10 @@
           background: 'rgba(0, 0, 0, 0.7)'
         });
         let self = this
-
+        // 判断上传文件的分类
+        this.resType()
+        // return false
         // 'base-dir/' +'object-name' ， 如果要指定上传目录，第一个参数就这样传
-
         client.multipartUpload(name, file, {
           progress(p, checkpoint){
             //反回的 p 是当前进度，大概1s会返回一个进度的样子，下面处理了下百分比，checkpoint 是具体的数据流上传，不做暂停效果可以不考虑用它
@@ -148,6 +152,23 @@
           //验签数据错误 / 过期，执行重试，3次后直接返回错误
           this.ossCheck()
         })
+      },
+      //判断文件类型
+      resType(){
+        console.log(this.fileKind)
+
+        // if(imgArr.find((item)=>{return curType == item})){
+        //   dir = 40
+        // }else if(videoArr.find((item)=>{return curType == item})){
+        //   dir = '/tskedu/video'
+        // }else if(docArr.find((item)=>{return curType == item})){
+        //   dir = 20
+        // }else if(audioArr.find((item)=>{return curType == item})){
+        //   dir=30
+        // }else{
+        //   this.$message.error('请上传受支持的资源文件')
+        // }
+        // return typeNumber
       },
       errors () {
         this.$message({

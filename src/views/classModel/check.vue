@@ -10,12 +10,12 @@
       <el-button type="primary" @click="closeSign">结束签到进入课堂</el-button>
       <el-button type="primary" @click="startSign">开始签到</el-button>
     </div>
-    <div class="check-num"> <span style="color: #409EFF;">12</span>人已加入</div>
+    <div class="check-num"> <span style="color: #409EFF;">{{studenlist.length}}</span>人已加入</div>
     <div class="check-avatar-warp">
       <div class="check-avatar-box " v-bind:class="{ 'first-check': index<3 }"
             v-for="(student,index) in studenlist" :key="student.id">
-        <img  :src="imgSrc.full" alt="" class="check-avatar">
-        <p style="text-align: center">{{student.name}}</p>
+        <img  :src="student.imgSrc" alt="" class="check-avatar">
+        <p style="text-align: center">{{student.usreName}}</p>
       </div>
     </div>
     <div class="fullScreen" @click="fullScreen">
@@ -29,7 +29,7 @@
     classingInfo, classOver, classSave ,
     saveSign, signList, changeSign
   } from "@/api/course";
-
+  import {getUserInfo} from '@/api/user'
   import {sign,signClose, connect} from "../../utils/utils";
   import Cookie from "js-cookie";
 
@@ -43,16 +43,7 @@
           full: require("@/assets/images/full.png"),
           unfull: require("@/assets/images/unfull.png"),
         },
-        studenlist:[
-          {name:'王某'},
-          {name:'王某某某'},
-          {name:'王某'},
-          {name:'王是某'},
-          {name:'王某某'},
-          {name:'王某'},
-          {name:'王某'},
-          {name:'王某'},
-        ]
+        studenlist:[]
       }
     },
     methods: {
@@ -97,22 +88,20 @@
           courseId = sessionStorage.getItem('courseId'),
           beanId = sessionStorage.getItem('signId'),
           classroomId = sessionStorage.getItem('classroom');
+        let signData = {classroomId , courseId ,signType:10,usedType:10};
 
         //开始签到前保存签到
-        this.saveSign()
+        saveSign(signData)
           .then(res=>{
-          console.log('保存签到成功',res.data)
+          console.log('保存签到成功')
           if(Number(res.code) === 200){
             sessionStorage.setItem('signId',res.data.signId)
-            // let testTag = sessionStorage.STOMP_CLIENT;
-            //   let newTag = JSON.parse(testTag)
+            beanId = sessionStorage.getItem('signId');
+
             this.subClassroom()
-            console.log('要发送的数据', JSON.stringify({
-              "bean":beanId,
-              "classroomId":classroomId,
-              "courseId":courseId,
-              "userId":userId
-            }))
+            // let testTag = sessionStorage.STOMP_CLIENT;
+            // let newTag = JSON.parse(testTag)
+            //  console.log(typeof newTag);
             tagClient.send('/teamsking/course/sign/start',{'token': token},
               JSON.stringify({
                 "bean":beanId,
@@ -127,54 +116,53 @@
             // let msg = data.msg
             // this.$message.error(msg)
           }
-        }).catch(error=>{
-          console.log(error)
         })
       },
       subClassroom(){
         let userId = sessionStorage.getItem('userId');
+        console.log('订阅成功')
+        let _this_ = this;
+
         window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
           let data = result.body
           data = JSON.parse(data)
-          console.log(data)
+
           if(data.data.socketType == 801){
             console.log('--开始签到--')
-            this.$message.success('开始签到')
+            console.log(data.data)
+            _this_.$message.success('开始签到')
           }
           if(data.data.socketType == 803){
             console.log('学生签到')
-            this.$message.info('有学生签到')
+            console.log(data.data)
+            _this_.studentSign(data.data.socketData.userId)
           }
-          if(data.socketType == 804){
-            this.$message.error('签到错误')
+          if(data.data.socketType == 804){
+            console.log('错误签到')
+            console.log(data.data)
+            _this_.$message.error('签到错误')
+          }
+          if(data.data.socketType == 802){
+            console.log('结束签到')
+            console.log(data.data)
+            _this_.$message.error('签到结束')
           }
         });
       },
-      //保存签到
-      saveSign(){
-        let courseId = sessionStorage.getItem('courseId'),
-            classroomId = sessionStorage.getItem('classroom');
-        let data = {classroomId , courseId ,signType:10,usedType:10}
-        // let loading = this.$loading(this.loadingCss)
-        console.log('创建签到时要发送的数据',data)
-        return saveSign(data)
-        //   .then(res=>{
-        //   console.log('创建签到成功',res.data)
-        //   if(Number(res.code) === 200){
-        //     sessionStorage.setItem('signId',res.data.signId)
-        //     loading.close()
-        //   }else{
-        //     // this.$message.error('保存签到失败')
-        //     let msg = data.msg
-        //     this.$message.error(msg)
-        //   }
-        // }).catch(error=>{
-        //   console.log(error)
-        // })
-      },
-      //开始签到
-      signStar(){
-
+      //有学生签到签到
+      studentSign(data){
+        console.log('开始查找用户信息')
+        getUserInfo(data).then((res)=>{
+          if (res.code === 200) {
+            console.log(res)
+            let data = {usreName:res.data.userName,imgSrc:res.data.avatar}
+            this.studenlist.push(data)
+          }else{
+            this.$message.error('学生签到信息获取失败')
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
       },
       closeSign(){
         let tagClient = window.STOMP_CLIENT,
@@ -184,11 +172,10 @@
           signId = sessionStorage.getItem('signId'),
           classroomId = sessionStorage.getItem('classroom');
 
-                   let testTag = sessionStorage.STOMP_CLIENT;
-        
-           let newTag = JSON.parse(testTag)
-          console.log(typeof newTag);
-        newTag.send('/teamsking/course/sign/close',{'token': token},
+         // let testTag = sessionStorage.STOMP_CLIENT;
+         // let newTag = JSON.parse(testTag)
+         //  console.log(typeof newTag);
+        tagClient.send('/teamsking/course/sign/close',{'token': token},
           JSON.stringify({
             "bean":signId,
             "classroomId":classroomId,
@@ -196,50 +183,6 @@
             "userId":userId
           })
         );
-      },
-      enter(){
-        console.log('执行')
-        var socket = new SockJS('http://120.36.137.90:9008/websocket');
-        stompClient = Stomp.over(socket);
-        console.log(stompClient)
-        stompClient.connect({'token': '9647dd84abb76fe6d78480b55f69d323','courseId':'1'}, function (frame) {
-            stompTopic();
-            stompQueue();
-            resolve('200 OK')
-          },
-          function errorCallBack (error) {
-            // 连接失败时（服务器响应 ERROR 帧）的回调方法
-            reject('error');
-          }
-        )
-      },
-      enterClass() {
-        let that = this;
-        let loading = this.$loading({
-          lock: true,
-          text: '正在进入课堂',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
-        new Promise(connect)
-          .then(function(result) {
-            loading.close()
-            console.log("成功：" + result);
-            classSave({ courseId: that.$route.query.id }).then(response => {
-              if (response.code === 200) {
-                that.$router.push({
-                  path: "/course/classchapter",
-                  query: {
-                    id: that.$route.query.id,
-                    classroomId: response.data.classroomId
-                  }
-                });
-              }
-            });
-          })
-          .catch(function(reason) {
-            that.enterClass();
-          });
       }
     },
     mounted(){
