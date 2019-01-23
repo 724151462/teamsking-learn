@@ -100,8 +100,10 @@
           beanId = sessionStorage.getItem('signId'),
           classroomId = sessionStorage.getItem('classroom');
 
-        // let testTag = sessionStorage.STOMP_CLIENT;
-        //   let newTag = JSON.parse(testTag)
+         let testTag = sessionStorage.STOMP_CLIENT;
+        
+           let newTag = JSON.parse(testTag)
+          console.log(typeof newTag);
           this.subClassroom()
         tagClient.send('/teamsking/course/sign/start',{'token': token},
           JSON.stringify({
@@ -153,7 +155,12 @@
           courseId = sessionStorage.getItem('courseId'),
           signId = sessionStorage.getItem('signId'),
           classroomId = sessionStorage.getItem('classroom');
-        tagClient.send('/teamsking/course/sign/close',{'token': token},
+
+                   let testTag = sessionStorage.STOMP_CLIENT;
+        
+           let newTag = JSON.parse(testTag)
+          console.log(typeof newTag);
+        newTag.send('/teamsking/course/sign/close',{'token': token},
           JSON.stringify({
             "bean":signId,
             "classroomId":classroomId,

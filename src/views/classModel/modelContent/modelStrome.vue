@@ -7,7 +7,7 @@
         :textObj="textObj"
         :dataKey="dataKey"
         @activeEvent="activeStrome"
-        @beginEvent="beginStrome"
+        @beginEvent="beginStorm"
       ></modelAside>
       <el-main style="padding-left: 300px;">
         <div v-if="stormObj === ''">
@@ -30,32 +30,43 @@
             <el-header>{{stormObj.stormTitle}}</el-header>
             <el-main class="answer-list" style="height:auto">
               <!-- <div class="answer-container"><span>张三</span><span>eewgtewgtew</span></div> -->
-             
-                  <el-card class="item"  v-for="(o, index) in 7" :key="o" :body-style="{ padding: '10px' }">
-                    <div style="display: flex; align-items: center">
-                      <img :src="require('@/assets/images/vote.png')" class="stu-image">
-                      <span style="margin-left: 20px">学生姓名</span>
-                    </div>
-                    <div>
-                      <div
-                        style="padding: 20px 0;min-height: 30px; border-bottom: 1px solid rgb(222,222,222)"
-                      >
-                        <span>好吃的汉堡</span>
-                      </div>
+              <el-card
+                class="item"
+                v-for="(o, index) in 7"
+                :key="o"
+                :body-style="{ padding: '10px' }"
+              >
+                <div style="display: flex; align-items: center">
+                  <img :src="require('@/assets/images/vote.png')" class="stu-image">
+                  <span style="margin-left: 20px">学生姓名</span>
+                </div>
+                <div>
+                  <div
+                    style="padding: 20px 0;min-height: 30px; border-bottom: 1px solid rgb(222,222,222)"
+                  >
+                    <span>好吃的汉堡</span>
+                  </div>
 
-                      <div class="bottom clearfix">
-                        <img :src="require('@/assets/images/dz.png')" width="30" style="float: right;cursor: pointer;margin-top: 10px"/>
-                        <el-button type="text" style="float: right;margin-right:10px;margin-top: 10px">加分</el-button>
-                      </div>
-                    </div>
-                  </el-card>
+                  <div class="bottom clearfix">
+                    <img
+                      :src="require('@/assets/images/dz.png')"
+                      width="30"
+                      style="float: right;cursor: pointer;margin-top: 10px"
+                    >
+                    <el-button
+                      type="text"
+                      style="float: right;margin-right:10px;margin-top: 10px"
+                    >加分</el-button>
+                  </div>
+                </div>
+              </el-card>
             </el-main>
             <el-footer>
               <span style="color: rgb(254,192,105)">学生参与即获得90分</span>
               <div class="footer-right">
                 <div>
                   <span style="margin-right: 20px">4/42人</span>
-                  <el-button type="primary">开始头脑风暴</el-button>
+                  <el-button type="primary" @click="begin">开始头脑风暴</el-button>
                 </div>
                 <span style="font-size: 12px">结束后学生不能再回答</span>
               </div>
@@ -138,7 +149,37 @@ export default {
         this.stormObj = response.data;
       });
     },
-    beginStrome() {},
+    beginStorm(value) {
+      console.log(value)
+      // let socket = JSON.parse(sessionStorage.getItem('STOMP_CLIENT'))
+      // console.log(socket)
+      this.subClassroom()
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/storm",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: value.stormId,
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
+    subClassroom(){
+      let userId = sessionStorage.getItem('userId');
+      window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+        let data = result.body
+        JSON.parse(data)
+        console.log(JSON.parse(data))
+        if(data.socketType == 803){
+          console.log('学生签到')
+          this.$message.info('有学生签到')
+        }
+        if(data.socketType == 804){
+          this.$message.error('签到错误')
+        }
+      });
+    },
     // 去富文本HTML标签
     matchReg(str) {
       let reg = /<\/?.+?\/?>/g;
@@ -213,6 +254,19 @@ export default {
         }
       });
     },
+    // 开始
+    begin() {
+      // window.STOMP_CLIENT.send(
+      //   "/teamsking/course/sign/start",
+      //   { token: token },
+      //   JSON.stringify({
+      //     bean: 50,
+      //     classroomId: 1,
+      //     courseId: "0608367675f54267aa6960fd0557cc1b",
+      //     userId: 1
+      //   })
+      // );
+    },
     // 递归渲染试题
     filterData(data) {
       let getFilter = data => {
@@ -257,18 +311,21 @@ export default {
   line-height: 60px;
 }
 
-.answer-list
-    width: 100%;
-    height: 150px;
-    display: flex;
-    flex-flow: row wrap;
-    align-content: flex-start;
-    .item
-        box-sizing: border-box;
-        background-color: white;
-        flex: 0 0 30%;
-        min-height : 180px;
-        margin: 10px 20px
+.answer-list {
+  width: 100%;
+  height: 150px;
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start;
+
+  .item {
+    box-sizing: border-box;
+    background-color: white;
+    flex: 0 0 30%;
+    min-height: 180px;
+    margin: 10px 20px;
+  }
+}
 
 .answer-container {
   display: flex;
