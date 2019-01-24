@@ -40,7 +40,7 @@
   export default {
     data(){
         return{
-            courseName: "国际服务贸易",
+            courseName: sessionStorage.getItem('courseName'),
             active: this.$store.state.modelActive
         }
     },
