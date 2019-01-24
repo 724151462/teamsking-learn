@@ -26,6 +26,9 @@
       },
       fileType: {
         default: ''
+      },
+      fileKind: {
+        default: 'default'
       }
     },
     data(){
@@ -62,7 +65,6 @@
         }
         let file = this.fileData.target.files[0]
         let name = new Date().getTime() + file.name
-        console.log(file)
         if(this.fileType !== '') {
           let chekcType = this.fileType.split(',').some(element=> {
             return file.type === element
@@ -96,10 +98,10 @@
           background: 'rgba(0, 0, 0, 0.7)'
         });
         let self = this
-
+        // 判断上传文件的分类
+        let dir = this.resType(name)
         // 'base-dir/' +'object-name' ， 如果要指定上传目录，第一个参数就这样传
-
-        client.multipartUpload(name, file, {
+        client.multipartUpload(dir, file, {
           progress(p, checkpoint){
             //反回的 p 是当前进度，大概1s会返回一个进度的样子，下面处理了下百分比，checkpoint 是具体的数据流上传，不做暂停效果可以不考虑用它
             console.log('进度返回', p, checkpoint)
@@ -114,7 +116,7 @@
             type:'success'
           })
           Number(self.isError) !== 2 ? (self.isError = 2) : ''
-          let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
+          let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + dir
           self.$emit('ossUp', url, this.fileName, this.fileSize)
           this.inputNull()
         }).catch(error=>{
@@ -148,6 +150,39 @@
           //验签数据错误 / 过期，执行重试，3次后直接返回错误
           this.ossCheck()
         })
+      },
+      //判断文件类型
+      resType(name){
+        let dir = ''
+        if(this.fileKind==='avatar'){
+          dir = 'teskedu/avatar/'+name
+        }else if(this.fileKind==='resource'){
+          let index= name.lastIndexOf('.'),
+            imgArr = ['jpeg','jpg','png'],
+            audioArr=['mp3','wav'],
+            videoArr=['mp4','avi','rmvb','wmv','mkv'],
+            docArr=['pdf','txt','doc','docx','xls','xlsx','ppt','pptx'];
+          let curType = name.substring(index+1,name.length).toLowerCase()
+
+          if(imgArr.find((item)=>{return curType == item})){
+            dir = 'teskedu/resource/img/'+name
+          }else if(videoArr.find((item)=>{return curType == item})){
+            dir = 'teskedu/resource/video/'+name
+          }else if(docArr.find((item)=>{return curType == item})){
+            dir = 'teskedu/resource/doc/'+name
+          }else if(audioArr.find((item)=>{return curType == item})){
+            dir = 'teskedu/resource/audio/'+name
+          }else{
+            this.$message.error('请上传受支持的资源文件')
+            return false
+          }
+        } else if (this.fileKind==='img'){
+          dir = 'teskedu/img/'+name
+        } else{
+          dir = name
+        }
+
+        return dir
       },
       errors () {
         this.$message({

@@ -8,7 +8,7 @@
             <img :src="infoForm.avatar" alt="" class="user-avatar">
             <div style="text-align: center;font-size: 14px;">
               <el-button type="text" @ossUp="changeAvatar"><label for="male" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
-              <up-oss style="display: none" @ossUp="changeAvatar"></up-oss>
+              <up-oss style="display: none" :file-kind="fileKind" @ossUp="changeAvatar"></up-oss>
             </div>
           </div>
         </div>
@@ -263,6 +263,7 @@
     },
     data() {
       return {
+        fileKind: 'avatar',
         activeName: 'first',
         infoForm:{
           avatar: null,

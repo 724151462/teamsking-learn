@@ -269,9 +269,7 @@ export const constantRouterMap = [{
         ]
       }
     ],
-
   },
-
   {
     path: '/school',
     component: Home,
@@ -796,6 +794,11 @@ export const constantRouterMap = [{
     name: 'modelMain',
     redirect: '/course/modelChapter',
     children: [
+      {
+        path: '/course/modelChecked',
+        component: _import('classModel/modelContent/modelChecked'),
+        name: 'modelChecked',
+      },
       {
         path: '/course/modelChapter',
         component: _import('classModel/modelContent/modelChapter'),

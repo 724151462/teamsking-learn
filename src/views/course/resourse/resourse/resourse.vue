@@ -65,7 +65,7 @@
                 <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
                   <el-button size="mini" type="primary" v-show="data.catalogLevel" @click.stop="goUp(data.catalogId)"><label for="male">上传</label></el-button>
-                  <up-oss style="display: none;" @ossUp="upRes"></up-oss>
+                  <up-oss style="display: none;" :file-kind="fileKind" @ossUp="upRes"></up-oss>
                   <el-button size="mini" style="margin-left: 5px" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
                 </span>
                 <span v-else >
@@ -140,6 +140,7 @@
     },
     data() {
       return {
+        fileKind:'resource',
         imgSrc: {
           folder: require("../../../../assets/images/folder.png"),
           pdf: require("../../../../assets/images/pdf.png"),
@@ -430,7 +431,9 @@
                   let parentId = item.catalogId
                   item.resourceList.forEach((list)=>{
                     // list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
-                    list.resourceSize = this.sizeTrans(list.resourceSize)
+                    if(list.resourceSize){
+                      list.resourceSize = this.sizeTrans(list.resourceSize)
+                    }
                       item.childCatalogList.push({
                         catalogName: list.resourceTitle,
                         resourceId: list.resourceId,

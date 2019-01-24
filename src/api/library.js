@@ -90,7 +90,13 @@ export function getResList(data) {
   let url = `${baseUrl}resource/resources`
   return commonsAjax(url, data, 'post')
 }
-
+/**
+ * 课堂模式下获取资源列表
+ */
+export function classRes(data) {
+  let url = `${baseUrl}resource/resources/async`
+  return commonsAjax(url, data, 'post')
+}
 /**
  * 新建资源文件夹
  */

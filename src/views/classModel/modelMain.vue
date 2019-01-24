@@ -6,7 +6,7 @@
                 <div class="icon-div">
                   <div class="icon-inner" style="cursor: pointer;" @click="goCheck">
                     <img :src="require('@/assets/images/user1.png')" height="35px" alt="">
-                    <span>开始签到</span>
+                    <span>签到</span>
                   </div>
                     <div class="icon-inner" style="cursor: pointer;">
                         <img :src="require('@/assets/images/user1.png')" height="35px" alt="">

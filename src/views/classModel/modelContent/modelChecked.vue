@@ -1,10 +1,11 @@
 <template>
-  <div>签退</div>
+  <div>签到结束，查看结果</div>
 </template>
 
 <script>
   export default {
-    name: "checked"
+    name: "modelChecked",
+
   }
 </script>
 
