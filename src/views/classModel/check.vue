@@ -146,6 +146,13 @@
             console.log('结束签到')
             console.log(data.data)
             _this_.$message.error('签到结束')
+            _this_.$router.push({
+              path: "/course/modelChecked",
+              query: {
+                id: _this_.$route.query.id,
+                classroomId: sessionStorage.getItem('classroom')
+              }
+            });
           }
         });
       },

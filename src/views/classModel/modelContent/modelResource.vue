@@ -4,7 +4,7 @@
       <div class="nav-go">
         <span><i class="el-icon-arrow-left"></i></span>
         <span><i class="el-icon-arrow-right"></i></span>
-        <span>|</span>
+        <span style="user-select: none">|</span>
       </div>
       <div class="nav-list">
         <!--<div class="path">资源库<i class="el-breadcrumb__separator el-icon-arrow-right"></i></div>-->
@@ -20,26 +20,28 @@
             v-model="search">
           </el-input>
           <div>
-            <el-button icon="el-icon-search" class="search-btn"></el-button>
+            <el-button icon="el-icon-search" class="search-btn" @click="getResource(0,0,search)"></el-button>
           </div>
         </div>
       </div>
     </div>
-    <div class="empty-data" v-show="data.length == 0">
+    <div class="empty-data" v-show="data.catalogList.length == 0 && data.resourceList.length == 0">
       <div >暂无数据</div>
     </div>
     <div class="warp">
       <div class="box"
-           v-for="catalog in data"
+           v-for="catalog in data.catalogList"
            :key="catalog.id" @click="goCatalog(catalog.catalogId,catalog.catalogName)">
-        <div style="display: flex;justify-content: center"><img :src="imgSrc.folder" alt="" class="box-img"></div>
+        <img :src="imgSrc.folder" alt="" class="box-img">
         <p class="box-title">{{catalog.catalogName}}</p>
       </div>
-      <div v-if="data.resourceList">
-        <div class="box" v-for="resource in data.resourceList" :key="resource.id">
-          <img :src="imgSrc.word" alt="" class="box-img"></div>
-          <p class="box-title">{{resource.resourceTitle}}</p>
-        </div>
+      <div class="box" v-for="resource in data.resourceList" :key="resource.id">
+        <img :src="imgSrc.mp4" alt="" class="res-img" v-show="resource.resourceType == 10">
+        <img :src="imgSrc.word" alt="" class="res-img" v-show="resource.resourceType == 20">
+        <img :src="imgSrc.mp4" alt="" class="res-img" v-show="resource.resourceType == 30">
+        <img :src="imgSrc.img" alt="" class="res-img" v-show="resource.resourceType == 40">
+        <p class="box-title">{{resource.resourceTitle}}</p>
+      </div>
       </div>
   </div>
 </template>
@@ -60,11 +62,14 @@ export default {
         pdf: require("@/assets/images/pdf.png"),
         mp4: require("@/assets/images/mp4.png"),
         word: require("@/assets/images/word.png"),
-        txt: require("@/assets/images/txt.png")
+        img: require("@/assets/images/img.png")
       },
       routerList:[],
       search:'',
-      data : []
+      data : {
+        catalogList:[],
+        resourceList:[],
+      }
     }
   },
   methods:{
@@ -74,17 +79,18 @@ export default {
         resourceType,
         searchKey: key
       }
-      let loading = this.$loading({
-        lock: true,
-        text: '努力加载中',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      });
+      console.log('搜索',data)
+      // let loading = this.$loading({
+      //   lock: true,
+      //   text: '努力加载中',
+      //   spinner: 'el-icon-loading',
+      //   background: 'rgba(0, 0, 0, 0.7)'
+      // });
       classRes(data).then(res => {
-        loading.close()
+        // loading.close()
         console.log(res)
         if (Number(res.code) === 200) {
-          this.data = res.data.catalogList
+          this.data = res.data
           // console.log(this.resourceData)
         } else {
           this.$message({
@@ -96,12 +102,12 @@ export default {
     },
     //资源库被点击
     goRoot(){
-      this.getResource(0)
+      this.getResource(0,0)
       this.routerList = []
     },
     goCatalog(id,name){
       this.routerList.push({id,name})
-      this.getResource(id)
+      this.getResource(id,0)
     },
     routerClick(id,index){
       if(index+1 == this.routerList.length){
@@ -155,14 +161,18 @@ export default {
         border-radius 4px
     .warp
       padding 40px
-      display flex
       .box
         width 6rem
         cursor pointer
         padding 10px
+        display inline-block
+        text-align center
         .box-img
           width 3.8em;
-          height 2.8em;
+          height 3em;
+        .res-img
+          width 3.8em;
+          height 3.8em;
         .box-title
           overflow: hidden;
           text-overflow:ellipsis;
