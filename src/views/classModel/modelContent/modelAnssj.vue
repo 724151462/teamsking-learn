@@ -22,12 +22,13 @@
           >{{subject.status === 'ready' || subject.status === 'finished' ? '返回' : '结束并返回'}}</router-link>
         </div>
         <div class="avatar-btn">
-          <img :src="answerAvatar" width="300px" alt>
+          <img :src="answer.answerAvatar" width="300px" alt>
+          <span>{{answer.answerName}}</span>
           <el-button
             type="primary"
             style="margin-top: 30px"
             @click="begin($event)"
-          >{{subject.status === 'ready' ? '开始随机选人' : (subject.status === 'chooseing' ? '选人中' : '停止') }}</el-button>
+          >{{subject.status === 'ready' ? '开始随机选人' : (subject.status === 'chooseing' ? '选人中' : '完成') }}</el-button>
         </div>
       </div>
     </div>
@@ -42,16 +43,26 @@ export default {
         title: this.$route.query.subject || "",
         status: "ready"
       },
-      answerAvatar: require("@/assets/images/answer.png"),
-      imgList: [
+      answer: {
+        answerAvatar: require("@/assets/images/answer.png"),
+        answerName: "",
+        userId: ""
+      },
+      olUserList: [
         {
-          src: require("@/assets/images/qd.png")
+          src: require("@/assets/images/qd.png"),
+          userName: "抢答哥",
+          userId: 1
         },
         {
-          src: require("@/assets/images/sj.png")
+          src: require("@/assets/images/sj.png"),
+          userName: "随机妹",
+          userId: 2
         },
         {
-          src: require("@/assets/images/sd.png")
+          src: require("@/assets/images/sd.png"),
+          userName: "手动姐",
+          userId: 3
         }
       ],
       timer: ""
@@ -61,18 +72,78 @@ export default {
     console.log(this.$route);
   },
   methods: {
+    // 获取长连接下参与的学生
+    getOnlineUser() {
+      var that = this;
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/classroom/onlineuser",
+        {
+          token: sessionStorage.getItem("token")
+        },
+        JSON.stringify({
+          bean: "",
+          classroomId: that.$route.query.classroomId,
+          courseId: that.$route.query.id,
+          userId: sessionStorage.getItem("userId")
+        })
+      );
+    },
     begin(e) {
       console.log(e.currentTarget.innerHTML);
-      this.timer = setInterval(this.getAnswer, 100);
-      setTimeout(() => {
-        clearInterval(this.timer);
-        this.subject.status = "finished";
-      }, 3000);
+      var that = this;
+      if (
+        e.currentTarget.innerHTML === "<!----><!----><span>开始随机选人</span>"
+      ) {
+        this.timer = setInterval(this.getAnswer, 100);
+        this.subClassroom();
+        this.getOnlineUser();
+        setTimeout(() => {
+          clearInterval(this.timer);
+          console.log(this.answer);
+          window.STOMP_CLIENT.send(
+            "/teamsking/course/rushanswer/randomselection",
+            {
+              token: sessionStorage.getItem("token")
+            },
+            JSON.stringify({
+              bean: {
+                topicTitle: that.subject.title,
+                selectUserId: that.answer.userId
+              },
+              classroomId: that.$route.query.classroomId,
+              courseId: that.$route.query.id,
+              userId: sessionStorage.getItem("userId")
+            })
+          );
+          this.subject.status = "finished";
+        }, 3000);
+      }
     },
     getAnswer() {
-      console.log(Math.random() * 3);
       this.subject.status = "chooseing";
-      this.answerAvatar = this.imgList[Math.floor(Math.random() * 3)].src;
+      let randomNum = Math.floor(Math.random() * 3);
+      this.answer.answerAvatar = this.olUserList[randomNum].src;
+      this.answer.answerName = this.olUserList[randomNum].userName;
+      this.answer.userId = this.olUserList[randomNum].userId;
+      // console.log(this.olUserList);
+    },
+    subClassroom() {
+      let userId = sessionStorage.getItem("userId");
+      var that = this;
+      window.STOMP_CLIENT.subscribe(
+        "/user/" + userId + "/teamsking/classroom",
+        function(result) {
+          let socketData = JSON.parse(result.body).data.socketData;
+          let socketType = JSON.parse(result.body).data.socketType;
+          console.log(socketType, socketData);
+          if (socketType === 903) {
+            that.$message({
+              message: `那么今天的受害者是：${that.answer.answerName}！！！`,
+              type: "success"
+            });
+          }
+        }
+      );
     }
   }
 };
