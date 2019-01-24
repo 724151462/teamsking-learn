@@ -117,8 +117,8 @@
           })
           Number(self.isError) !== 2 ? (self.isError = 2) : ''
           let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + dir
-          self.$emit('ossUp', url, this.fileName, this.fileSize)
           this.inputNull()
+          self.$emit('ossUp', url, this.fileName, this.fileSize)
         }).catch(error=>{
           console.log(error)
           //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
@@ -127,8 +127,8 @@
       },
       inputNull () {
         let dom = document.getElementById(this.inputs)
-        dom.value = ''
-        dom.outerHTML = dom.outerHTML
+        dom.value = '';
+        // dom.outerHTML = dom.outerHTML;
         this.fileData = null
       },
       ossCheck (e) {
