@@ -18,13 +18,14 @@
       <span>未签到(1人)</span>
       <span style="float: right;">点击可变更状态</span>
     </div>
-    <el-row type="flex" justify="center" align="middle">
-      <el-col :span="8">
+    <div class="user-box">
+      <div class="user-item" style="display: flex;justify-items: center;align-items: center">
         <div><img :src="require('@/assets/images/pdf.png')" alt="" class="user-avatar"></div>
-      </el-col>
-      <el-col :span="8" justify="center"><div>411212121</div></el-col>
-      <el-col :span="8" justify="center"><div>sssss</div></el-col>
-    </el-row>
+        <div><span style="margin-left: 20px">李某人</span></div>
+      </div>
+      <div class="user-item">898989898</div>
+      <div class="user-item">565656666</div>
+    </div>
 
     <div class="gary-mask">
       <div>已签到(37人)</div>
@@ -42,7 +43,7 @@
   .model-checked
     .gary-mask
       background #ccc
-      padding 5px
+      padding 10px 20px
     .header
       padding 10px 0
       padding-left 20px;
@@ -55,8 +56,17 @@
           border-left 0
           background-color #fff
           border-radius 4px
-    .user-avatar
-      width: 40px;
-      height 40px
-      border-radius 50%
+    .user-box
+      margin 10px 0;
+      /*border-bottom 1px solid #ccc*/
+      display flex
+      justify-items center
+      align-items center
+      .user-item
+        flex 1
+        padding-left 10%
+        .user-avatar
+          width: 40px;
+          height 40px
+          border-radius 50%
 </style>
