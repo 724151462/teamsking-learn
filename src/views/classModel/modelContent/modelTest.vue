@@ -36,7 +36,7 @@
               </p>
             </div>
           </div>
-          <el-button style="margin-left: 45%" type="primary">结束测试</el-button>
+          <el-button style="margin-left: 45%" type="primary" @click="endTest">结束测试</el-button>
 
           <el-collapse v-if="testObj.interactionStatus === 20">
             <el-collapse-item title="40/44位同学答题情况排名" name="1">
@@ -238,10 +238,23 @@ export default {
       console.log(this.examParams)
       this.subClassroom()
       window.STOMP_CLIENT.send(
-        "/teamsking/course/test",
+        "/teamsking/course/exam/start",
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
-          bean: value.testId,
+          bean: value.examId,
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
+    // 结束测试
+    endTest() {
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/exam/finish",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: this.testObj.examId,
           classroomId: this.$route.query.classroomId,
           courseId: this.$route.query.id,
           userId: sessionStorage.getItem('userId')
@@ -385,15 +398,15 @@ export default {
     subClassroom(){
       let userId = sessionStorage.getItem('userId');
       window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+        console.log(result)
         let data = result.body
         JSON.parse(data)
         console.log(JSON.parse(data))
-        if(data.socketType == 803){
-          console.log('学生签到')
-          this.$message.info('有学生签到')
+        if(data.socketType == 301){
+          this.$message.info('开始测试')
         }
-        if(data.socketType == 804){
-          this.$message.error('签到错误')
+        else if(data.socketType == 302){
+          this.$message.info('结束测试')
         }
       });
     },

@@ -67,7 +67,7 @@
           <div class="footer-right" style="float: right">
             <div>
               <span style="margin-right: 20px">4/42人</span>
-              <el-button type="primary" @click="begin">开始头脑风暴</el-button>
+              <el-button type="primary" @click="endVote">结束投票</el-button>
             </div>
             <span style="font-size: 12px">结束后学生不能再回答</span>
           </div>
@@ -107,6 +107,7 @@ import { voteList, interactVote, classVoteSave } from "@/api/course";
 
 import Tree from "@/components/fileTree";
 import modelAside from "@/components/modelAside";
+import { error } from 'util';
 export default {
   data() {
     return {
@@ -153,7 +154,20 @@ export default {
     // 手动添加
     manualAdd() {
       console.log(this.addVoteParams);
-      classVoteSave(this.addVoteParams);
+      classVoteSave(this.addVoteParams)
+      .then(response=> {
+        if(response.code === 200) {
+          this.$message({
+            message: '添加成功',
+            type: "success"
+          })
+        }else{
+          this.$message({
+            message: '添加错误，请检查信息',
+            type: "error"
+          })
+        }
+      })
     },
     // 添加选项
     addOption() {
@@ -178,8 +192,32 @@ export default {
         this.voteObj = response.data;
       });
     },
-    beginVote() {},
-
+    beginVote(value) {
+      this.subClassroom()
+      console.log(value)
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/vote",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: { voteId: value.voteId},
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
+    endVote() {
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/vote/close",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: { voteId: this.voteObj.voteId},
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
     // 递归渲染试题
     filterData(data) {
       let getFilter = data => {
@@ -235,7 +273,37 @@ export default {
           this.dialogVisible = false;
         });
       }
-    }
+    },
+    subClassroom(){
+      let userId = sessionStorage.getItem('userId');
+      var that = this
+      window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+        let data = result.body
+        JSON.parse(data)
+        console.log(JSON.parse(data).data.socketType)
+        if(JSON.parse(data).data.socketType == 601){
+          that.$message({message:'开始投票',type: 'success'})
+        }
+        else if(JSON.parse(data).data.socketType == 603){
+          that.$message({message:'结束投票',type: 'success'})
+        }
+        else if(JSON.parse(data).data.socketType == 604){
+          that.$message({message:'收到一条投票信息',type: 'success'})
+          that.voteObj.voteQuizzes.forEach(element => {
+            element.voteQuizOptions.forEach(option => {
+              JSON.parse(data).data.socketData.forEach(newData => {
+                if(newData.optionId === option.optionId){
+                  console.log(newData.userCount, option)
+                  option.userCount = newData.userCount
+                  option.percent = newData.percent
+                }
+              });
+            })
+          });
+          console.log(that.voteObj.voteQuizzes)
+        }
+      });
+    },
   },
   components: {
     modelAside,

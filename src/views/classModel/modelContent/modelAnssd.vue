@@ -47,16 +47,19 @@ export default {
     return {
       students: [
         {
-          src: require('@/assets/images/avatar.jpg'),
-          userName: '张三'
+          src: require("@/assets/images/qd.png"),
+          userName: "抢答哥",
+          userId: 1
         },
         {
-          src: require('@/assets/images/avatar.jpg'),
-          userName: 'li四'
+          src: require("@/assets/images/sj.png"),
+          userName: "随机妹",
+          userId: 2
         },
         {
-          src: require('@/assets/images/avatar.jpg'),
-          userName: '王五'
+          src: require("@/assets/images/sd.png"),
+          userName: "手动姐",
+          userId: 3
         }
       ],
       subject: {
@@ -64,20 +67,10 @@ export default {
         status: 'ready'
       },
       answerAvatar: require('@/assets/images/answer.png'),
-      imgList: [
-        {
-          src: require("@/assets/images/qd.png")
-        },
-        {
-          src: require("@/assets/images/sj.png")
-        },
-        {
-          src: require("@/assets/images/sd.png")
-        }
-      ],
       answer: {
         userName: '',
-        src: ''
+        src: '',
+        userId: ''
       },
       timer: '',
       isChoose: false,
@@ -90,6 +83,20 @@ export default {
     choose(info) {
       console.log(info)
       this.answer = info
+      this.subClassroom()
+      var that = this
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/rushanswer/selection",
+        {
+          token: sessionStorage.getItem("token")
+        },
+        JSON.stringify({
+          bean: {topicTitle: that.subject.title, selectedUserId: that.answer.userId},
+          classroomId: that.$route.query.classroomId,
+          courseId: that.$route.query.id,
+          userId: sessionStorage.getItem("userId")
+        })
+      );
     },
     begin(e) {
       console.log(e.currentTarget.innerHTML)
@@ -102,6 +109,24 @@ export default {
     },
     getAnswer() {
       this.isChoose = true
+    },
+    subClassroom() {
+      let userId = sessionStorage.getItem("userId");
+      var that = this;
+      window.STOMP_CLIENT.subscribe(
+        "/user/" + userId + "/teamsking/classroom",
+        function(result) {
+          let socketData = JSON.parse(result.body).data.socketData;
+          let socketType = JSON.parse(result.body).data.socketType;
+          console.log(socketType, socketData);
+          if (socketType === 903) {
+            that.$message({
+              message: `那么今天的受害者是：${that.answer.answerName}！！！`,
+              type: 'success'
+            })
+          }
+        }
+      );
     }
   }
 };
