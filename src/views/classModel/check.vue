@@ -172,16 +172,6 @@
           signId = sessionStorage.getItem('signId'),
           classroomId = sessionStorage.getItem('classroom');
 
-<<<<<<< HEAD
-                   let testTag = sessionStorage.STOMP_CLIENT;
-        
-           let newTag = JSON.parse(testTag)
-          console.log(typeof newTag);
-=======
-         // let testTag = sessionStorage.STOMP_CLIENT;
-         // let newTag = JSON.parse(testTag)
-         //  console.log(typeof newTag);
->>>>>>> zone98f
         tagClient.send('/teamsking/course/sign/close',{'token': token},
           JSON.stringify({
             "bean":signId,
