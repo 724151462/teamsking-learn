@@ -46,7 +46,7 @@ overflow: hidden; font-size: 1.2em"
             type="primary"
             @click.stop="beginInteract(item)"
           >{{textObj.interactItemBtn}}</el-button>
-          <el-button v-else-if="item.interactionStatus === 20" type>进行中...</el-button>
+          <el-button v-else-if="item.interactionStatus === 20" :disabled="true">进行中...</el-button>
           <el-button v-else :disabled="true" style="background: rgb(158,167,180);color: #fff">已结束</el-button>
         </div>
       </el-aside>
@@ -57,6 +57,7 @@ export default {
     data() {
         return {
             activeIndex: "",
+            parentStatus: this.status
         }
     },
     methods: {
@@ -64,16 +65,31 @@ export default {
             this.$emit('dialogShow', true)
         },
         activeEvent(item) {
-            console.log(item[this.dataKey.itemId])
+            if(item.interactionStatus === 10) {
+                this.$emit('activeEvent', item)
+            }
             this.activeIndex = item[this.dataKey.itemId]
-            this.$emit('activeEvent', item)
         },
         beginInteract(item) {
             this.activeIndex = item[this.dataKey.itemId]
             this.$emit('beginEvent', item)
         }
     },
-    props: ['sourceList','textObj','dataKey']
+    props: ['sourceList','textObj','dataKey','status'],
+    computed: {
+        interactionStatus() {
+    　　　　return this.status.interactionStatus
+    　　}
+    },
+    watch: {
+        interactionStatus(newVal) {
+            this.sourceList.forEach(element => {
+                if(element[this.dataKey.itemId] === this.status[this.dataKey.itemId]) {
+                    element.interactionStatus = newVal
+                }
+            });
+        }
+    }
         
 }
 </script>

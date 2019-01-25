@@ -72,6 +72,7 @@ export default {
         });
         let connect = new Promise((resolve, reject)=>{
           let url = 'ws://192.168.10.48:9008/websocket',
+            // let url = 'ws://120.36.137.90:9008/websocket',
             token = sessionStorage.getItem('token'),
             userId = sessionStorage.getItem('userId'),
             courseId = sessionStorage.getItem('courseId');

@@ -6,6 +6,7 @@
         :sourceList="voteList"
         :textObj="textObj"
         :dataKey="dataKey"
+        :status="voteObj"
         @activeEvent="activeVote"
         @beginEvent="beginVote"
       ></modelAside>
@@ -39,7 +40,7 @@
           <div
             v-for="(quiz, i) in voteObj.voteQuizzes"
             :key="quiz.quizId"
-            style="border-bottom: 1px solid rgb(215,215,215);width: 80%"
+            style="border-bottom: 1px solid rgb(215,215,215);width: 80%;min-height: 500px"
           >
             <p style="margin: 20px 0">{{i+1}}. {{quiz.quizTitle}}</p>
             <div
@@ -61,17 +62,31 @@
               </div>
             </div>
           </div>
-        </div>
-        <el-footer>
-          <span style="color: rgb(254,192,105)">学生参与即获得90分</span>
-          <div class="footer-right" style="float: right">
-            <div>
-              <span style="margin-right: 20px">4/42人</span>
-              <el-button type="primary" @click="endVote">结束投票</el-button>
+          <el-footer>
+            <span style="color: rgb(254,192,105)">学生参与即获得90分</span>
+            <div class="footer-right" style="float: right">
+              <div>
+                <span style="margin-right: 20px">4/42人</span>
+                <el-button
+                  type="primary"
+                  v-if="voteObj.interactionStatus === 10"
+                  @click="beginVote('rightSide')"
+                >开始投票</el-button>
+                <el-button
+                  type="primary"
+                  v-else-if="voteObj.interactionStatus === 20"
+                  @click="endVote('rightSide')"
+                >结束投票</el-button>
+                <el-button
+                  type="primary"
+                  v-else-if="voteObj.interactionStatus === 30"
+                  :disabled="true"
+                >已结束</el-button>
+              </div>
+              <span style="font-size: 12px">结束后学生不能再回答</span>
             </div>
-            <span style="font-size: 12px">结束后学生不能再回答</span>
-          </div>
-        </el-footer>
+          </el-footer>
+        </div>
         <el-dialog title="选择题目" top="30vh" :visible.sync="dialogVisible" width="55%">
           <div>
             <div>
@@ -107,7 +122,7 @@ import { voteList, interactVote, classVoteSave } from "@/api/course";
 
 import Tree from "@/components/fileTree";
 import modelAside from "@/components/modelAside";
-import { error } from 'util';
+import { error } from "util";
 export default {
   data() {
     return {
@@ -116,6 +131,7 @@ export default {
         addBtn: "添加投票",
         interactItemBtn: "开始活动"
       },
+      rightSideStatus: {},
       dataKey: {
         itemId: "voteId",
         itemTitle: "voteTitle"
@@ -154,20 +170,20 @@ export default {
     // 手动添加
     manualAdd() {
       console.log(this.addVoteParams);
-      classVoteSave(this.addVoteParams)
-      .then(response=> {
-        if(response.code === 200) {
+      classVoteSave(this.addVoteParams).then(response => {
+        if (response.code === 200) {
+          this.getVoteList()
           this.$message({
-            message: '添加成功',
+            message: "添加成功",
             type: "success"
-          })
-        }else{
+          });
+        } else {
           this.$message({
-            message: '添加错误，请检查信息',
+            message: "添加错误，请检查信息",
             type: "error"
-          })
+          });
         }
-      })
+      });
     },
     // 添加选项
     addOption() {
@@ -187,12 +203,23 @@ export default {
       });
     },
     // 点击获取测试
-    activeVote(item) {
+    activeVote(item, isStart) {
       interactVote({ voteId: item.voteId }).then(response => {
         this.voteObj = response.data;
+        console.log(this.voteObj.interactionStatus);
       });
     },
     beginVote(value) {
+      if (value === "rightSide") {
+        this.voteObj.interactionStatus = 20;
+        this.rightSideStatus = this.voteObj;
+        // this.rightSideStatus.id = this.voteObj.voteId
+      } else {
+        // if(this.voteObj === '') {
+          this.activeVote(value)
+        // }
+        console.log(value)
+      }
       this.subClassroom()
       console.log(value)
       window.STOMP_CLIENT.send(
@@ -206,17 +233,24 @@ export default {
         })
       );
     },
-    endVote() {
-      window.STOMP_CLIENT.send(
-        "/teamsking/course/vote/close",
-        { token: sessionStorage.getItem('token') },
-        JSON.stringify({
-          bean: { voteId: this.voteObj.voteId},
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
-          userId: sessionStorage.getItem('userId')
-        })
-      );
+    endVote(value) {
+      if (value === "rightSide") {
+        this.voteObj.interactionStatus = 30;
+        this.rightSideStatus = this.voteObj;
+        // this.rightSideStatus.id = this.voteObj.voteId
+      } else {
+        this.voteObj.interactionStatus = 30;
+        window.STOMP_CLIENT.send(
+          "/teamsking/course/vote/close",
+          { token: sessionStorage.getItem("token") },
+          JSON.stringify({
+            bean: { voteId: this.voteObj.voteId },
+            classroomId: this.$route.query.classroomId,
+            courseId: this.$route.query.id,
+            userId: sessionStorage.getItem("userId")
+          })
+        );
+      }
     },
     // 递归渲染试题
     filterData(data) {
@@ -265,7 +299,7 @@ export default {
         return;
       } else {
         classVoteSave(this.addVoteParams).then(response => {
-          this.testList.push(response.data);
+          this.getVoteList()
           this.$message({
             message: "添加成功",
             type: "success"
@@ -274,36 +308,40 @@ export default {
         });
       }
     },
-    subClassroom(){
-      let userId = sessionStorage.getItem('userId');
-      var that = this
-      window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
-        let data = result.body
-        JSON.parse(data)
-        console.log(JSON.parse(data).data.socketType)
-        if(JSON.parse(data).data.socketType == 601){
-          that.$message({message:'开始投票',type: 'success'})
-        }
-        else if(JSON.parse(data).data.socketType == 603){
-          that.$message({message:'结束投票',type: 'success'})
-        }
-        else if(JSON.parse(data).data.socketType == 604){
-          that.$message({message:'收到一条投票信息',type: 'success'})
-          that.voteObj.voteQuizzes.forEach(element => {
-            element.voteQuizOptions.forEach(option => {
-              JSON.parse(data).data.socketData.forEach(newData => {
-                if(newData.optionId === option.optionId){
-                  console.log(newData.userCount, option)
-                  option.userCount = newData.userCount
-                  option.percent = newData.percent
-                }
+    subClassroom() {
+      let userId = sessionStorage.getItem("userId");
+      var that = this;
+      window.STOMP_CLIENT.subscribe(
+        "/user/" + userId + "/teamsking/classroom",
+        function(result) {
+          let data = result.body;
+          JSON.parse(data);
+          console.log(JSON.parse(data).data.socketType);
+          if (JSON.parse(data).data.socketType == 601) {
+            that.$message({ message: "开始投票", type: "success" });
+            that.getVoteList();
+            if(that.voteObj !== '') that.voteObj.interactionStatus = 20;
+            that.rightSideStatus = that.voteObj;
+          } else if (JSON.parse(data).data.socketType == 603) {
+            that.$message({ message: "结束投票", type: "success" });
+          } else if (JSON.parse(data).data.socketType == 604) {
+            that.$message({ message: "收到一条投票信息", type: "success" });
+            that.voteObj.voteQuizzes.forEach(element => {
+              element.voteQuizOptions.forEach(option => {
+                JSON.parse(data).data.socketData.forEach(newData => {
+                  if (newData.optionId === option.optionId) {
+                    console.log(newData.userCount, option);
+                    option.userCount = newData.userCount;
+                    option.percent = newData.percent;
+                  }
+                });
               });
-            })
-          });
-          console.log(that.voteObj.voteQuizzes)
+            });
+            console.log(that.voteObj.voteQuizzes);
+          }
         }
-      });
-    },
+      );
+    }
   },
   components: {
     modelAside,

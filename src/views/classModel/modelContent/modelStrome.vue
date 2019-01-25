@@ -6,10 +6,11 @@
         :sourceList="stormList"
         :textObj="textObj"
         :dataKey="dataKey"
+        :status="stormObj"
         @activeEvent="activeStrome"
         @beginEvent="beginStorm"
       ></modelAside>
-      <el-main style="padding-left: 300px;">
+      <el-main style="padding-left: 300px; min-height: 600px;">
         <div v-if="stormObj.stormTitle === undefined && stormObj !== 'add'">
           <span>请选择或添加头脑风暴</span>
         </div>
@@ -67,8 +68,21 @@
               <div class="footer-right">
                 <div>
                   <span style="margin-right: 20px">4/42人</span>
-                  <el-button type="primary" @click="beginStorm(stormObj)" v-if="stormObj.interactionStatus===10">开始头脑风暴</el-button>
-                  <el-button type="primary" @click="endStorm" v-else>结束头脑风暴</el-button>
+                  <el-button
+                  type="primary"
+                  v-if="stormObj.interactionStatus === 10"
+                  @click="beginStorm('rightSide')"
+                >开始头脑风暴</el-button>
+                <el-button
+                  type="primary"
+                  v-else-if="stormObj.interactionStatus === 20"
+                  @click="endStorm('rightSide')"
+                >结束头脑风暴</el-button>
+                <el-button
+                  type="primary"
+                  v-else-if="stormObj.interactionStatus === 30"
+                  :disabled="true"
+                >已结束</el-button>
                 </div>
                 <span style="font-size: 12px">结束后学生不能再回答</span>
               </div>
@@ -137,6 +151,7 @@ export default {
         addBtn: "添加头脑风暴",
         interactItemBtn: "开始活动"
       },
+      rightSideStatus: {},
       dataKey: {
         itemId: "stormId",
         itemTitle: "stormTitle"
@@ -157,10 +172,16 @@ export default {
     },
     beginStorm(value) {
       console.log(value)
-      let socket = JSON.parse(sessionStorage.getItem('STOMP_CLIENT'))
-      // console.log(socket)
-      this.stormObj = value;
-      this.stormObj.interactionStatus = 20
+      if (value === "rightSide") {
+        this.stormObj.interactionStatus = 20;
+        this.rightSideStatus = this.stormObj;
+        // this.rightSideStatus.id = this.stormObj.voteId
+      } else {
+        // if(this.stormObj === '') {
+          this.activeStrome(value)
+        // }
+        console.log(value)
+      }
       this.subClassroom()
       window.STOMP_CLIENT.send(
         "/teamsking/course/storm",
@@ -173,17 +194,23 @@ export default {
         })
       );
     },
-    endStorm() {
-      window.STOMP_CLIENT.send(
-        "/teamsking/course/storm/close",
-        { token: sessionStorage.getItem('token') },
-        JSON.stringify({
-          bean: {stormId: this.stormObj.stormId},
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
-          userId: sessionStorage.getItem('userId')
-        })
-      );
+    endStorm(value) {
+      if (value === "rightSide") {
+        this.stormObj.interactionStatus = 30;
+        this.rightSideStatus = this.stormObj;
+        // this.rightSideStatus.id = this.voteObj.voteId
+      } else {
+        window.STOMP_CLIENT.send(
+          "/teamsking/course/storm/close",
+          { token: sessionStorage.getItem('token') },
+          JSON.stringify({
+            bean: {stormId: this.stormObj.stormId},
+            classroomId: this.$route.query.classroomId,
+            courseId: this.$route.query.id,
+            userId: sessionStorage.getItem('userId')
+          })
+        );
+      }
     },
     subClassroom(){
       var that = this
@@ -193,6 +220,7 @@ export default {
         if(JSON.parse(result.body).data.socketType === 506) {
           that.stormObj.answerList.push(JSON.parse(result.body).data.socketData)
         }else if(JSON.parse(result.body).data.socketType === 502) {
+          that.getStormList()
           that.$message({
             message: "已结束头脑风暴",
             type: "success"

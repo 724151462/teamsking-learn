@@ -6,6 +6,7 @@
         :sourceList="testList"
         :textObj="textObj"
         :dataKey="dataKey"
+        :status="testObj"
         @activeEvent="activeTest"
         @beginEvent="beginTest"
       ></modelAside>
@@ -20,23 +21,40 @@
             <img :src="require('@/assets/images/clock.png')" width="25" alt>
             <span>00:00</span>
           </div>
-          <div v-for="(item,i) in testObj.libraryQuizVOS" :key="item.quizId">
-            <p>
-              <span class="option-type" v-if="item.quizType === 10">单选</span>
-              <span class="option-type" v-else>多选</span>
-              第{{i+1}}题:
-              <span
-                style="display: inline-block; margin-left: 10px"
-              >{{matchReg(item.quizTitle)}}</span>
-            </p>
-            <div v-for="(option,oid) in item.quizOption" :key="option.optionId">
-              <p style="margin:5px">
-                <span style="margin-right: 5px">{{optionItem[oid]}}</span>
-                {{option.optionTitle}}
+          <div style="min-height: 500px">
+            <div v-for="(item,i) in testObj.libraryQuizVOS" :key="item.quizId">
+              <p>
+                <span class="option-type" v-if="item.quizType === 10">单选</span>
+                <span class="option-type" v-else>多选</span>
+                第{{i+1}}题:
+                <span
+                  style="display: inline-block; margin-left: 10px"
+                >{{matchReg(item.quizTitle)}}</span>
               </p>
+              <div v-for="(option,oid) in item.quizOption" :key="option.optionId">
+                <p style="margin:5px">
+                  <span style="margin-right: 5px">{{optionItem[oid]}}</span>
+                  {{option.optionTitle}}
+                </p>
+              </div>
             </div>
           </div>
-          <el-button style="margin-left: 45%" type="primary" @click="endTest">结束测试</el-button>
+          
+          <el-button
+            type="primary"
+            v-if="testObj.interactionStatus === 10"
+            @click="beginTest('rightSide')"
+          >开始测试</el-button>
+          <el-button
+            type="primary"
+            v-else-if="testObj.interactionStatus === 20"
+            @click="endTest('rightSide')"
+          >结束测试</el-button>
+          <el-button
+            type="primary"
+            v-else-if="testObj.interactionStatus === 30"
+            :disabled="true"
+          >已结束</el-button>
 
           <el-collapse v-if="testObj.interactionStatus === 20">
             <el-collapse-item title="40/44位同学答题情况排名" name="1">
@@ -44,8 +62,6 @@
                 <span>排名</span>
                 <span>姓名</span>
                 <span>学号</span>
-                <!-- <span>正确题数</span> -->
-                <!-- <span>正确率</span> -->
                 <span>提交时间</span>
                 <span>分数</span>
               </div>
@@ -61,8 +77,6 @@
                   <span>{{item.realName}}</span>
                 </div>
                 <span>{{item.studentNo}}</span>
-                <!-- <span>{{item.correctCount}}</span> -->
-                <!-- <span>{{item.correctRate}}</span> -->
                 <span>{{item.createTime}}</span>
                 <span>{{item.score}}</span>
               </div>
@@ -142,6 +156,7 @@ export default {
         addBtn: "添加测试",
         interactItemBtn: "开始活动"
       },
+      rightSideStatus: {},
       dataKey: {
         itemId: "examId",
         itemTitle: "examTitle"
@@ -231,6 +246,17 @@ export default {
     },
     // 获取并开始
     beginTest(value) {
+      console.log(value)
+      if (value === "rightSide") {
+        this.testObj.interactionStatus = 20;
+        this.rightSideStatus = this.testObj;
+        // this.rightSideStatus.id = this.testObj.voteId
+      } else {
+        // if(this.testObj === '') {
+          this.activeTest(value)
+        // }
+        console.log(value)
+      }
       this.getQuiz(value);
       this.examParams.classroomId = this.$route.query.classroomId;
       this.examParams.bean = value.examId
@@ -249,7 +275,12 @@ export default {
       );
     },
     // 结束测试
-    endTest() {
+    endTest(value) {
+      if (value === "rightSide") {
+        this.testObj.interactionStatus = 30;
+        this.rightSideStatus = this.testObj;
+        // this.rightSideStatus.id = this.voteObj.voteId
+      } else {
       window.STOMP_CLIENT.send(
         "/teamsking/course/exam/finish",
         { token: sessionStorage.getItem('token') },
@@ -260,6 +291,7 @@ export default {
           userId: sessionStorage.getItem('userId')
         })
       );
+      }
     },
     // 获取测试
     getQuiz(item) {
@@ -376,6 +408,7 @@ export default {
     },
     // 去富文本HTML标签
     matchReg(str) {
+      console.log(str)
       let reg = /<\/?.+?\/?>/g;
       return str.replace(reg, "");
     },
@@ -397,16 +430,14 @@ export default {
     },
     subClassroom(){
       let userId = sessionStorage.getItem('userId');
+      var that = this
       window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
         console.log(result)
-        let data = result.body
-        JSON.parse(data)
-        console.log(JSON.parse(data))
-        if(data.socketType == 301){
-          this.$message.info('开始测试')
-        }
-        else if(data.socketType == 302){
-          this.$message.info('结束测试')
+        let data = JSON.parse(result.body)
+        console.log('========', data.data.socketData)
+        if(data.data.socketType === 303){
+          that.$message.info('开始测试')
+          that.students.push(data.data.socketData[0])
         }
       });
     },
@@ -431,6 +462,7 @@ export default {
 
 .el-main {
   padding-left: 300px;
+  min-height: 600px;
 }
 
 .option-type {

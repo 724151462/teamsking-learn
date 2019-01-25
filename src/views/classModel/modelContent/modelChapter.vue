@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-aside style="width:280px; border: 1px solid gray; position: fixed;height:85%">
-      <el-menu :default-active="activeSection" class="el-menu-vertical-demo" @select="menuSelect">
+      <el-menu :default-active="activeSection" class="el-menu-vertical-demo" @select="menuSelect" :unique-opened="true">
         <el-submenu
           :index="String(chapter.chapterId)"
           v-for="(chapter, index) in chapterList"
@@ -26,7 +26,7 @@
           <span>{{selectedSection}}</span>
         </div>
         <el-tabs type="border-card" @tab-click="viewSource">
-          <el-tab-pane v-for="item in itemList" :name="String(item.itemId)">
+          <el-tab-pane v-for="item in itemList" :name="String(item.itemId)" style="min-height: 500px;">
             <span slot="label">
               <el-popover
                 placement="top-start"
@@ -92,6 +92,9 @@ export default {
       console.log(x)
         Cookie.set('chapterId', x[0]) 
       this.chapterList.forEach(element => {
+        if(String(element.chapterId) === x[0]) {
+          this.$emit('showChapterName', element.chapterName)
+        }
         element.seactions.forEach(section => {
           console.log(section.sectionId, secId);
           if (section.sectionId === Number(secId)) {

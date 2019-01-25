@@ -2,7 +2,9 @@
     <div style="height: 100%">
         <el-container style="height: 100%">
             <el-header>
-                <span class="course-name">{{courseName}}</span>
+                <span class="course-name">{{courseName}}
+                    <span style="font-size: 0.7em">{{chapterName}}</span>
+                </span>
                 <div class="icon-div">
                   <div class="icon-inner" style="cursor: pointer;" @click="goCheck">
                     <img :src="require('@/assets/images/user1.png')" height="35px" alt="">
@@ -29,7 +31,7 @@
                         <el-menu-item index="6">资源库</el-menu-item>
                     </el-menu> 
                 </div>
-                <router-view></router-view>
+                <router-view @showChapterName="getCNanme"></router-view>
             </el-main>
         </el-container>
     </div>
@@ -41,13 +43,18 @@
     data(){
         return{
             courseName: sessionStorage.getItem('courseName'),
-            active: this.$store.state.modelActive
+            active: this.$store.state.modelActive,
+            chapterName: ''
         }
     },
     created() {
         this.handleSelect(this.$store.state.modelActive)
     },
+    
     methods: {
+       getCNanme(value) {
+           this.chapterName = value
+      },
       handleSelect(key, keyPath) {
         console.log(key, keyPath);
           console.log('当前链接状态',this.$store.state.socket.isConnect)
@@ -178,7 +185,7 @@
         display flex
         align-items center
         justify-content space-between
-        width 120px
+        width 200px
         .icon-inner
             display flex
             flex-direction column 
