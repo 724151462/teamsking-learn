@@ -834,13 +834,18 @@
       },
       //成绩权重设置完毕
       sysTemOver () {
-        let arr = Object.values(this.Course.CourseSetEntity)
-        console.log(arr)
+        let arr = Object.values(this.CourseSetEntity),
+            totle = 0;
         arr.forEach((item)=>{
-          console.log(item)
+          totle += Number(item)
         })
-        return false
-        // isSysTem = false
+
+        if(totle>100){
+          this.$message.warning('权重不可超过100%')
+          return false
+        }else{
+          this.isSysTem = false
+        }
       }
     },
     mounted(){
