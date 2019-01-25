@@ -293,7 +293,7 @@
         </div>
       </el-row>
       <el-row style="text-align: right;">
-        <el-button type="primary" @click="isSysTem = false">确 定</el-button>
+        <el-button type="primary" @click="sysTemOver">确 定</el-button>
         <el-button @click="isSysTem = false">取 消</el-button>
       </el-row>
     </el-dialog>
@@ -502,6 +502,7 @@
       },
       //创建课程
       goUpCourseResource(){
+        //课程父分类为必选
         if(!this.Course.courseCategoryParent){
           this.$message.warning('请选择课程分类')
           return false;
@@ -509,29 +510,32 @@
 
         let data = this.goDataFilter()
         console.log(data)
-        //课程父分类为必选
-
-
-        let loading = this.$loading({
-          lock: true,
-          text: 'loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
-        console.log(data)
-
-        saveCourse(data).then(res=>{
-            loading.close()
-          if(Number(res.code) === 200) {
-            this.$message.success('课程创建成功')
-            this.$router.push({
-              path:'/course/list'
+        this.$refs['Course'].validate((valid) => {
+          if (valid) {
+            let loading = this.$loading({
+              lock: true,
+              text: 'loading',
+              spinner: 'el-icon-loading',
+              background: 'rgba(0, 0, 0, 0.7)'
+            });
+            console.log(data)
+            saveCourse(data).then(res=>{
+              loading.close()
+              if(Number(res.code) === 200) {
+                this.$message.success('课程创建成功')
+                this.$router.push({
+                  path:'/course/list'
+                })
+              }else{
+                let msg = data.msg[0] || data.msg
+                this.$message.error('课程创建失败')
+              }
             })
-          }else{
-            let msg = data.msg[0] || data.msg
-            this.$message.error('课程创建失败')
+          } else {
+            this.$message.error('请补全必填项')
+            return false;
           }
-        })
+        });
       },
       //弹出设置
       isSys(){
@@ -827,6 +831,16 @@
         }).catch(error=>{
           console.log(error)
         })
+      },
+      //成绩权重设置完毕
+      sysTemOver () {
+        let arr = Object.values(this.Course.CourseSetEntity)
+        console.log(arr)
+        arr.forEach((item)=>{
+          console.log(item)
+        })
+        return false
+        // isSysTem = false
       }
     },
     mounted(){

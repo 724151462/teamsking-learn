@@ -24,7 +24,20 @@
         <div><span style="margin-left: 20px">李某人</span></div>
       </div>
       <div class="user-item">898989898</div>
-      <div class="user-item">565656666</div>
+      <div class="user-item">
+        <!--<el-popover-->
+          <!--placement="bottom"-->
+          <!--width="100"-->
+          <!--trigger="click">-->
+          <!--<el-table :data="gridData">-->
+            <!--<el-table-column width="150" property="date" label="日期"></el-table-column>-->
+            <!--<el-table-column width="100" property="name" label="姓名"></el-table-column>-->
+            <!--<el-table-column width="300" property="address" label="地址"></el-table-column>-->
+          <!--</el-table>-->
+          <!--<el-button size="small" slot="reference">click 激活</el-button>-->
+        <!--</el-popover>-->
+        <el-button size="small" slot="reference">缺勤</el-button>
+      </div>
     </div>
 
     <div class="gary-mask">
@@ -34,8 +47,42 @@
 </template>
 
 <script>
+  import {signList} from '@/api/course'
   export default {
     name: "modelChecked",
+    data(){
+      return {
+        search:''
+      }
+    },
+    created(){
+      this.init()
+    },
+    methods:{
+      init(pageNum){
+        let page = pageNum || 1
+        let data = {
+          signId : 154,
+          data:{
+            pageParam: {
+              pageIndex: page,
+              pageSize: 10
+            }
+          }
+        }
+        let loading = this.$loading(this.loadingCss)
+        signList(data).then(res=>{
+          loading.close()
+          if(Number(res.code) === 200){
+            console.log(res)
+          }else{
+            this.$message.error('获取签到数据失败')
+          }
+        }).catch(error=>{
+          console.log(error)
+        })
+      },
+    },
   }
 </script>
 

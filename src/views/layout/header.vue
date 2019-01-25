@@ -43,7 +43,7 @@
   import {menuList, logout} from '@/api/login'
   import {constantRouterMap} from '@/router/index'
   import { removeToken , getUserId, removeUserId} from '@/utils/auth'
-  import {getUserInfo,getMeInfo} from "../../api/user";
+  import {getUserInfo,getMeInfo,userInit} from "../../api/user";
 
   export default {
     props:['navs'],
@@ -73,12 +73,14 @@
           }
         ],
         realName:'',
-        menuList: constantRouterMap
+        menuList: constantRouterMap,
+        nameInit:'',
+        nameDialog:true
       }
     },
     created(){
       // menuList().then((response)=>{
-      //   console.log(this.storeNav, '``````', response.data)
+      // console.log(this.storeNav, '``````', response.data)
       this.$store.commit('setAllMenu',this.menuList)
       this.fetchNavData();
       this.getUserInfo();
