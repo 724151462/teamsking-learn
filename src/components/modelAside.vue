@@ -65,9 +65,9 @@ export default {
             this.$emit('dialogShow', true)
         },
         activeEvent(item) {
-            if(item.interactionStatus === 10) {
+            // if(item.interactionStatus === 10) {
                 this.$emit('activeEvent', item)
-            }
+            // }
             this.activeIndex = item[this.dataKey.itemId]
         },
         beginInteract(item) {
@@ -84,6 +84,7 @@ export default {
     watch: {
         interactionStatus(newVal) {
             this.sourceList.forEach(element => {
+                console.log(element[this.dataKey.itemId], '...........', this.status[this.dataKey.itemId])
                 if(element[this.dataKey.itemId] === this.status[this.dataKey.itemId]) {
                     element.interactionStatus = newVal
                 }

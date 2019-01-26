@@ -80,7 +80,7 @@
                 >结束头脑风暴</el-button>
                 <el-button
                   type="primary"
-                  v-else-if="stormObj.interactionStatus === 30"
+                  v-else
                   :disabled="true"
                 >已结束</el-button>
                 </div>
@@ -199,18 +199,17 @@ export default {
         this.stormObj.interactionStatus = 30;
         this.rightSideStatus = this.stormObj;
         // this.rightSideStatus.id = this.voteObj.voteId
-      } else {
-        window.STOMP_CLIENT.send(
-          "/teamsking/course/storm/close",
-          { token: sessionStorage.getItem('token') },
-          JSON.stringify({
-            bean: {stormId: this.stormObj.stormId},
-            classroomId: this.$route.query.classroomId,
-            courseId: this.$route.query.id,
-            userId: sessionStorage.getItem('userId')
-          })
-        );
       }
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/storm/close",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: {stormId: this.stormObj.stormId},
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
     },
     subClassroom(){
       var that = this

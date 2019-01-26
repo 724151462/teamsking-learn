@@ -167,6 +167,7 @@ export default {
     });
   },
   methods: {
+    
     // 手动添加
     manualAdd() {
       console.log(this.addVoteParams);
@@ -218,10 +219,9 @@ export default {
         // if(this.voteObj === '') {
           this.activeVote(value)
         // }
-        console.log(value)
+        console.log('//////////////////////', value)
       }
       this.subClassroom()
-      console.log(value)
       window.STOMP_CLIENT.send(
         "/teamsking/course/vote",
         { token: sessionStorage.getItem('token') },
@@ -237,9 +237,7 @@ export default {
       if (value === "rightSide") {
         this.voteObj.interactionStatus = 30;
         this.rightSideStatus = this.voteObj;
-        // this.rightSideStatus.id = this.voteObj.voteId
-      } else {
-        this.voteObj.interactionStatus = 30;
+      }
         window.STOMP_CLIENT.send(
           "/teamsking/course/vote/close",
           { token: sessionStorage.getItem("token") },
@@ -250,7 +248,6 @@ export default {
             userId: sessionStorage.getItem("userId")
           })
         );
-      }
     },
     // 递归渲染试题
     filterData(data) {
@@ -319,9 +316,9 @@ export default {
           console.log(JSON.parse(data).data.socketType);
           if (JSON.parse(data).data.socketType == 601) {
             that.$message({ message: "开始投票", type: "success" });
-            that.getVoteList();
-            if(that.voteObj !== '') that.voteObj.interactionStatus = 20;
-            that.rightSideStatus = that.voteObj;
+            // that.getVoteList();
+            // if(that.voteObj !== '') that.voteObj.interactionStatus = 20;
+            // that.rightSideStatus = that.voteObj;
           } else if (JSON.parse(data).data.socketType == 603) {
             that.$message({ message: "结束投票", type: "success" });
           } else if (JSON.parse(data).data.socketType == 604) {
