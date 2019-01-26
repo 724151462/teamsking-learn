@@ -8,7 +8,7 @@
     </div>
     <div class="check-btn" style="">
       <el-button type="primary" @click="closeSign">结束签到进入课堂</el-button>
-      <el-button type="primary" @click="startSign">开始签到</el-button>
+      <!--<el-button type="primary" @click="startSign">开始签到</el-button>-->
     </div>
     <div class="check-num"> <span style="color: #409EFF;">{{studenlist.length}}</span>人已加入</div>
     <div class="check-avatar-warp">
@@ -111,7 +111,6 @@
               })
             );
           }else{
-            console.log('创建签到失败')
             this.$message.error('保存签到失败')
             // let msg = data.msg
             // this.$message.error(msg)
@@ -198,6 +197,7 @@
     },
     created(){
       this.timeAdd()
+      this.startSign()
       // this.startSign()
       // this.getClass()
     },

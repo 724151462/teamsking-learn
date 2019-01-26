@@ -6,7 +6,7 @@
             <div style="font-size: 2em">陈老师</div>
             <div style="font-size: 2.5em;cursor: pointer" @click="enterClass">进入课堂</div>
             <div style="display:flex; align-items: flex-start; width: 100%; font-size: 2em"><span style="margin-left:1em">课程号:{{this.courseCode}}</span></div>
-            <div class="fullScreen" @click="fullScreen">
+            <div class="fullScreen" @click="toggleFullScreen">
               <img :src="isFullScreen ? imgSrc.unfull : imgSrc.full" alt="">
             </div>
         </div>
@@ -178,10 +178,48 @@ export default {
             classroomId: sessionStorage.getItem('classroom')
           }
         });
-      }
+      },
+      toggleFullScreen() {
+        if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
+          if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+          } else if (document.documentElement.msRequestFullscreen) {
+            document.documentElement.msRequestFullscreen();
+
+          } else if (document.documentElement.mozRequestFullScreen) {
+            document.documentElement.mozRequestFullScreen();
+
+          } else if (document.documentElement.webkitRequestFullscreen) {
+            document.documentElement.webkitRequestFullscreen();
+          }
+            this.isFullScreen = true
+          // console.log('全屏')
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+          this.isFullScreen = false
+          // console.log('退出全屏')
+        }
+      },
     },
     created(){
       // this.enterClass()
+      document.onkeyup = (e)=> {
+        console.log(e)
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        if (e && e.keyCode == 122) {//捕捉F11键盘动作
+          e.preventDefault();  //阻止F11默认动作
+          this.toggleFullScreen()
+        }
+      }
+
     },
     mounted() {
       this.initCourse()
