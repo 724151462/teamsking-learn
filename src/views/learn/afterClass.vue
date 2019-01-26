@@ -141,7 +141,7 @@
         var item = plantCap[i];
         var itemToStyle = datalist[i];
         datas.push({
-          name: item.value + '\n' + item.name,
+          name: item.name + '\n' + item.value,
           value: itemToStyle.offset,
           symbolSize: itemToStyle.symbolSize,
           label: {
@@ -162,14 +162,12 @@
       console.log(datas)
       var option = {
         grid: {
-          show: false,
-          top: 10,
-          bottom: 10
+          show: true,
         },
         xAxis: [{
           gridIndex: 0,
           type: 'value',
-          show: false,
+          show: true,
           min: 0,
           max: 100,
           nameLocation: 'middle',
@@ -178,7 +176,7 @@
         yAxis: [{
           gridIndex: 0,
           min: 0,
-          show: false,
+          show: true,
           max: 100,
           nameLocation: 'middle',
           nameGap: 30
