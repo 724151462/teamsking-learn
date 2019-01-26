@@ -12,7 +12,7 @@
           </el-input>
         </div>
         <div>
-          <el-button icon="el-icon-search" class="search-btn" @click="getList(0,input)"></el-button>
+          <el-button icon="el-icon-search" class="search-btn" @click="newList(0,input)"></el-button>
         </div>
       </div>
     </div>
@@ -41,6 +41,8 @@
             @check-change = "nodeCheck"
             accordion
             draggable
+            :allow-drop="allowDrop"
+            @node-drop="handleDrop"
             :default-expanded-keys="expan"
             node-key="catalogId"
             ref="tree">
@@ -53,7 +55,7 @@
                 <span class="quiz-tag" v-else-if="data.interactionType == 60">投票问卷</span>
                 <span class="quiz-tag" v-else-if="data.interactionType == 70">讨论</span>
                 <span>{{ node.label }}</span>
-                <span v-if="data.interactionId" class="golook" style="margin-left: 20px" @click="showAc(data.interactionId,data.interactionType)">查看</span>
+                <!--<span v-if="data.interactionId" class="golook" style="margin-left: 20px" @click="showAc(data.interactionId,data.interactionType)">查看</span>-->
               </span>
               <span>
                 <span v-if="data.catalogLevel" class="hide-button">
@@ -254,10 +256,30 @@
                     });
                 }
             })
-                .catch(error => {
-                    console.log(error);
-                });
+            .catch(error => {
+                console.log(error);
+            });
         },
+      // 获取所有活动列表,无loading效果
+      newList(id,key){
+        let data = {
+          interactionType : id,
+          searchKey:key
+        }
+        getAcList(data).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            let data = JSON.parse(JSON.stringify(res.data))
+            this.activityData = this.filterData(data)
+            // console.log(this.activityData)
+          } else {
+            this.$message({
+              message: "数据获取失败",
+              type: "error"
+            });
+          }
+        })
+      },
         //新建文件夹
         newFileFold(){
             let data = this.newCatalog
@@ -415,6 +437,75 @@
             console.log(res)
           } else {
             this.$message.error(res.data.message);
+          }
+        })
+      },
+      //拖拽相关
+      handleDrop(draggingNode, dropNode, dropType, ev) {
+        let beforeType= draggingNode.data.resourceId ? 2 :1,
+          beforeId = beforeType ==1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
+          afterType = dropNode.data.resourceId ? 2 :1,
+          afterId = afterType ==1 ? dropNode.data.catalogId: dropNode.data.resourceId;
+
+        let expanId = draggingNode.data.catalogId || draggingNode.data.parentId
+        this.expan=[expanId]
+
+        if(dropType == 'after'){
+          let data = {
+            id:beforeId,
+            type:beforeType,
+            previous: {
+              id: afterId,
+              type:afterType
+            }
+          }
+          console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的后面')
+          console.log(data)
+          this.move(data)
+        }else if(dropType == 'before'){
+          let data = {
+            id:beforeId,
+            type:beforeType,
+            previous: {
+              id: afterId,
+              type:afterType
+            }
+          }
+          console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的前面')
+          console.log(data)
+          // this.move(data)
+        }else if(dropType == 'inner'){
+          let data = {
+            id:beforeId,
+            type:beforeType,
+            inCatalogId:afterId
+          }
+          console.log(data)
+          console.log('移入操作')
+          this.move(data)
+        }
+      },
+      allowDrop(draggingNode, dropNode, dropType) {
+        // console.log(draggingNode,dropNode,dropType)
+        let type = draggingNode.data.resourceId ? 2 :1
+        if(type ==2 && dropNode.data.catalogLevel == 1){
+          return false
+        }else if (dropType == 'prev' || dropType == 'next'){
+          return false
+        }else{
+          return true
+        }
+      },
+      //文件夹/文件 移动操作
+      move(data){
+        removeAc(data).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.$message.success('移动成功')
+            this.newList(0)
+          } else {
+            this.$message.error('移动失败');
+            this.newList(0)
           }
         })
       }

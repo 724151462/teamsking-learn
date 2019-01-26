@@ -47,6 +47,14 @@
         user-select none
         &:hover
           color: #409EFF!important
+    .model-checked
+      .header
+        .nav-search
+          .el-input__inner
+            height 32px
+            line-height 32px
+
+
   .el-table .warning-row {
     background: oldlace !important;
   }

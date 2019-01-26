@@ -44,10 +44,8 @@
             accordion
             draggable
             :default-expanded-keys="expan"
+            :allow-drop="allowDrop"
             @node-drop="handleDrop"
-            @node-drag-end="handleDragEnd"
-            @node-drag-enter="handleDragEnter"
-            @node-drag-start="handleDragStart"
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
@@ -127,7 +125,8 @@
 
 <script>
   import { ossAliSts } from '@/api/oss'
-  import {getResList, newResFileFold, reResFileFold, delResFileFold, deleteRes ,localUpload, moveRes} from "@/api/library";
+  import {getResList, newResFileFold, reResFileFold,
+          delResFileFold, deleteRes ,localUpload, moveRes} from "@/api/library";
   import UpOss from "@/components/up-oss";
   import Cookie from 'js-cookie';
   export default {
@@ -204,17 +203,6 @@
       };
     },
     methods: {
-      //新建文件夹test
-      test(){
-        let data = [{catalogId: 38,
-        catalogLevel: 2,
-        catalogName: "王永新测试章6",
-        childCatalogList: [],
-        count: 23,
-        parentId: 25}]
-        this.resourceData[1].childCatalogList = data
-        // this.$set( this.$data,this.resourceData[1], data )
-      },
       //获取数据
       getResource(id,key) {
         let data = {
@@ -257,14 +245,7 @@
           resourceType: this.radio,
           searchKey: key,
         }
-        let loading = this.$loading({
-          lock: true,
-          text: 'loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
         getResList(data).then(res => {
-          loading.close()
           // console.log(res)
           if (Number(res.code) === 200) {
             //如果试题库为空，则初始化新建一个默认的文件夹
@@ -411,14 +392,14 @@
         });
         delResFileFold(this.deleteArr).then(res => {
           loading.close()
-            if (Number(res.code) === 200) {
-                this.$message.success('删除成功');
-                this.allDelete = false
-                this.getResource(0)
-            } else {
-                this.$message.error('删除失败');
-            }
-          })
+          if (Number(res.code) === 200) {
+            this.$message.success('删除成功');
+            this.allDelete = false
+            this.getResource(0)
+          } else {
+            this.$message.error('删除失败');
+          }
+        })
       },
       //清洗数据
       filterData(data){
@@ -532,24 +513,6 @@
         return sizestr;
       },
       //拖拽相关
-      //开始拖拽
-      handleDragStart(node) {
-        let type= node.data.resourceId ? 2 :1,
-            id = type ==1 ? node.data.catalogId: node.data.resourceId;
-        let data = {id,type}
-        // console.log('开始拖拽',node.label)
-        this.$store.commit('SAVE_DRAG',data)
-      },
-      // handleDragEnter(draggingNode, dropNode, ev) {
-      //   console.log('enter---进入')
-      //   console.log('被拖拽的节点',draggingNode)
-      //   console.log('目标节点',dropNode)
-      // },
-      // handleDragEnd(draggingNode, dropNode, dropType, ev) {
-      //   console.log('被拖拽的节点',draggingNode)
-      //   console.log('目标节点',dropNode)
-      //   console.log('操作',dropType)
-      // },
       handleDrop(draggingNode, dropNode, dropType, ev) {
 
         console.log(draggingNode)
@@ -560,8 +523,10 @@
             beforeId = beforeType ==1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
             afterType = dropNode.data.resourceId ? 2 :1,
             afterId = afterType ==1 ? dropNode.data.catalogId: dropNode.data.resourceId;
+
         let expanId = draggingNode.data.catalogId || draggingNode.data.parentId
         this.expan=[expanId]
+
         if(dropType == 'after'){
           let data = {
             id:beforeId,
@@ -573,7 +538,7 @@
           }
           console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的后面')
           console.log(data)
-          // this.move(data)
+          this.move(data)
         }else if(dropType == 'before'){
           let data = {
             id:beforeId,
@@ -594,16 +559,15 @@
           }
           console.log(data)
           console.log('移入操作')
-          // this.move(data)
+          this.move(data)
         }
       },
       allowDrop(draggingNode, dropNode, dropType) {
-        //拖拽验证，情况复杂
         // console.log(draggingNode,dropNode,dropType)
         let type = draggingNode.data.resourceId ? 2 :1
         if(type ==2 && dropNode.data.catalogLevel == 1){
           return false
-        }else if (dropType == 'prev'){
+        }else if (dropType == 'prev' || dropType == 'next'){
           return false
         }else{
           return true
@@ -611,21 +575,14 @@
       },
       //文件夹/文件 移动操作
       move(data){
-        let loading = this.$loading({
-          lock: true,
-          text: 'loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
         moveRes(data).then(res => {
-          loading.close()
           console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('移动成功')
-            this.getResource(0)
+            this.searchResource('')
           } else {
             this.$message.error('移动失败');
-            this.getResource(0)
+            this.searchResource('')
           }
         })
       }

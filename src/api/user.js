@@ -20,6 +20,15 @@ export function getUserInfo (id) {
   // return commonsAjax(url, '', 'get')
   return commonsAjax(url, '', 'get')
 }
+
+/**
+ * 初始化用户名
+ * */
+export function userInit (data) {
+
+  let url = `${infoUrl}user/init`
+  return commonsAjax(url, data, 'post')
+}
 /**
  * 获取用户信息(不需要权限)
  * */

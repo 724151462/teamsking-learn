@@ -55,6 +55,9 @@
           :default-expanded-keys="expan"
           @check-change	="nodeCheck"
           accordion
+          draggable
+          :allow-drop="allowDrop"
+          @node-drop="handleDrop"
           node-key="catalogId"
           ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
@@ -149,7 +152,8 @@
   import {
     getTestFileFold, newTestFileFold ,
     deleteTestFileFold, deleteQuiz,
-    upQuiz, testFileFoldRename
+    upQuiz, testFileFoldRename,
+    moveTest,
   } from "../../../../api/library";
 
   export default {
@@ -232,7 +236,7 @@
           }
         })
       },
-      //全选操作
+      // 全选操作
       checkAll(flag){
         //获取所有文件夹节点的id用于全选
         let idArr = []
@@ -305,18 +309,11 @@
         });
       },
       searchTestList(id,key){
-        let loading = this.$loading({
-          lock: true,
-          text: 'loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
         let data = {
           quizType: id,
           searchKey:key
         }
         getTestFileFold(data).then(res => {
-          loading.close()
           if (Number(res.code) === 200) {
             let data = JSON.parse(JSON.stringify(res.data))
             this.catalogData = this.filterData(data)
@@ -375,15 +372,6 @@
       },
       //文件上传验证
       beforTestUpload(file) {
-
-        // if (!this.courseId) {
-        //   this.$notify.error({
-        //     title: '错误',
-        //     message: '请先搜索相关课程，再导入该课程的试题模板'
-        //   });
-        //   return false
-        // }
-
         console.log(file.file.name, '文件');
         this.files = file;
         const extension = file.file.name.split('.')[1] === 'xls'
@@ -474,6 +462,82 @@
         let curData = getFilter(data)
         return curData
       },
+      //拖拽相关
+      handleDrop(draggingNode, dropNode, dropType, ev) {
+
+        console.log(draggingNode)
+        console.log(dropNode)
+        console.log(dropType)
+
+        let beforeType= draggingNode.data.resourceId ? 2 :1,
+          beforeId = beforeType ==1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
+          afterType = dropNode.data.resourceId ? 2 :1,
+          afterId = afterType ==1 ? dropNode.data.catalogId: dropNode.data.resourceId;
+
+        let expanId = draggingNode.data.catalogId || draggingNode.data.parentId
+        this.expan=[expanId]
+
+        if(dropType == 'after'){
+          let data = {
+            id:beforeId,
+            type:beforeType,
+            previous: {
+              id: afterId,
+              type:afterType
+            }
+          }
+          console.log(draggingNode.data.catalogId,
+            draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的后面')
+          console.log(data)
+          this.move(data)
+        }else if(dropType == 'before'){
+          let data = {
+            id:beforeId,
+            type:beforeType,
+            previous: {
+              id: afterId,
+              type:afterType
+            }
+          }
+          console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的前面')
+          console.log(data)
+          // this.move(data)
+        }else if(dropType == 'inner'){
+          let data = {
+            id:beforeId,
+            type:beforeType,
+            inCatalogId:afterId
+          }
+          console.log(data)
+          console.log('移入操作')
+          this.move(data)
+        }
+      },
+      allowDrop(draggingNode, dropNode, dropType) {
+        // 拖拽验证，情况复杂
+        // console.log(draggingNode,dropNode,dropType)
+        let type = draggingNode.data.resourceId ? 2 :1
+        if(type ==2 && dropNode.data.catalogLevel == 1){
+          return false
+        }else if (dropType == 'prev' || dropType == 'next'){
+          return false
+        }else{
+          return true
+        }
+      },
+      //文件夹/文件 移动操作
+      move(data){
+        moveTest(data).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.$message.success('移动成功')
+            this.searchTestList(0)
+          } else {
+            this.$message.error('移动失败');
+            this.searchTestList(0)
+          }
+        })
+      }
     }
   }
 </script>
