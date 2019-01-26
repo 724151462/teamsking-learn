@@ -14,6 +14,9 @@ module.exports = {
     config.resolve.alias
       .set('@', resolve('src'))
   },
+  configureWebpack: {
+    devtool: 'source-map'
+  },
   devServer: {
 /*
     overlay: {

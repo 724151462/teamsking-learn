@@ -1,42 +1,65 @@
 <template>
   <div>
     <el-container>
-      <modelAside
+      <div style="position: fixed; left: 100px; z-index: 999">
+        <span @click="menuShow">{{isInteractStart === true? '展开': '收起'}}</span>  
+      </div>
+      <transition name="slide-fade">
+      <modelAside v-if="isInteractStart === false"
         @dialogShow="dialogShow"
         :sourceList="testList"
         :textObj="textObj"
         :dataKey="dataKey"
+        :status="testObj"
         @activeEvent="activeTest"
         @beginEvent="beginTest"
       ></modelAside>
-      <el-main>
+      </transition>
+      <el-main :class="isInteractStart === true ? 'full': 'hide'">
         <div v-if="testObj === ''">
-          <span>请选择或添加测试</span>
+          <span></span>
         </div>
         <div v-else-if="testObj.interactionStatus === 10 || testObj.interactionStatus === 20">
           <!-- <div v-else-if="testObj.interactionStatus === 60 || testObj.interactionStatus === 70"> -->
           <!-- {{testObj}} -->
           <div class="count-down">
             <img :src="require('@/assets/images/clock.png')" width="25" alt>
-            <span>00:00</span>
+            <span>{{countDownShow}}</span>
           </div>
-          <div v-for="(item,i) in testObj.libraryQuizVOS" :key="item.quizId">
-            <p>
-              <span class="option-type" v-if="item.quizType === 10">单选</span>
-              <span class="option-type" v-else>多选</span>
-              第{{i+1}}题:
-              <span
-                style="display: inline-block; margin-left: 10px"
-              >{{matchReg(item.quizTitle)}}</span>
-            </p>
-            <div v-for="(option,oid) in item.quizOption" :key="option.optionId">
-              <p style="margin:5px">
-                <span style="margin-right: 5px">{{optionItem[oid]}}</span>
-                {{option.optionTitle}}
+          <div style="min-height: 500px">
+            <div v-for="(item,i) in testObj.libraryQuizVOS" :key="item.quizId">
+              <p>
+                <span class="option-type" v-if="item.quizType === 10">单选</span>
+                <span class="option-type" v-else>多选</span>
+                第{{i+1}}题:
+                <span
+                  style="display: inline-block; margin-left: 10px"
+                >{{matchReg(item.quizTitle)}}</span>
               </p>
+              <div v-for="(option,oid) in item.quizOption" :key="option.optionId">
+                <p style="margin:5px">
+                  <span style="margin-right: 5px">{{optionItem[oid]}}</span>
+                  {{option.optionTitle}}
+                </p>
+              </div>
             </div>
           </div>
-          <el-button style="margin-left: 45%" type="primary" @click="endTest">结束测试</el-button>
+
+          <el-button
+            type="primary"
+            v-if="testObj.interactionStatus === 10"
+            @click="beginTest('rightSide')"
+          >开始测试</el-button>
+          <el-button
+            type="primary"
+            v-else-if="testObj.interactionStatus === 20"
+            @click="endTest('rightSide')"
+          >结束测试</el-button>
+          <el-button
+            type="primary"
+            v-else-if="testObj.interactionStatus === 30"
+            :disabled="true"
+          >已结束</el-button>
 
           <el-collapse v-if="testObj.interactionStatus === 20">
             <el-collapse-item title="40/44位同学答题情况排名" name="1">
@@ -44,33 +67,31 @@
                 <span>排名</span>
                 <span>姓名</span>
                 <span>学号</span>
-                <!-- <span>正确题数</span> -->
-                <!-- <span>正确率</span> -->
                 <span>提交时间</span>
                 <span>分数</span>
               </div>
-              <div
-                v-for="(item, index) in sortStudents"
-                :class="{'answer-container': true, 'answer-first': index === 0, 'answer-second': index === 1, 'answer-third': index === 2}"
-                :key="item.id"
-                style="margin-top:30px"
-              >
-                <span>{{index+1}}</span>
-                <div class="user-avatar">
-                  <img :src="item.avatar" width="30" alt>
-                  <span>{{item.realName}}</span>
+              <template v-if="students.length !== 0">
+                <div
+                  v-for="(item, index) in sortStudents"
+                  :class="{'answer-container': true, 'answer-first': index === 0, 'answer-second': index === 1, 'answer-third': index === 2}"
+                  :key="index"
+                  style="margin-top:30px"
+                >
+                  <span>{{index+1}}</span>
+                  <div class="user-avatar">
+                    <img :src="item.avatar" width="30" alt>
+                    <span>{{item.realName}}</span>
+                  </div>
+                  <span>{{item.studentNo}}</span>
+                  <span>{{item.createTime}}</span>
+                  <span>{{item.score}}</span>
                 </div>
-                <span>{{item.studentNo}}</span>
-                <!-- <span>{{item.correctCount}}</span> -->
-                <!-- <span>{{item.correctRate}}</span> -->
-                <span>{{item.createTime}}</span>
-                <span>{{item.score}}</span>
-              </div>
+              </template>
             </el-collapse-item>
           </el-collapse>
         </div>
         <div v-else>
-          <div v-for="(item,i) in testObj" :key="item.quizId">
+          <div v-for="(item,i) in answerObj" :key="item.quizId">
             <div :id="'subject'+i" style="width: 1000px;height: 400px;"></div>
             <p>
               <span class="option-type" v-if="item.quizType === 10">单选1</span>
@@ -95,7 +116,8 @@
                 
             </div>
             </div>
-          </div>
+        </div>
+
         </div>
         <el-dialog title="选择题目" top="30vh" :visible.sync="dialogVisible" width="55%">
           <div>
@@ -135,6 +157,7 @@ import { getTestFileFold } from "@/api/library";
 import Tree from "@/components/fileTree";
 
 import modelAside from "@/components/modelAside";
+import { setTimeout } from 'timers';
 export default {
   data() {
     return {
@@ -142,6 +165,7 @@ export default {
         addBtn: "添加测试",
         interactItemBtn: "开始活动"
       },
+      rightSideStatus: {},
       dataKey: {
         itemId: "examId",
         itemTitle: "examTitle"
@@ -149,17 +173,8 @@ export default {
       testList: [],
       activeIndex: "",
       testObj: "",
-      optionItem: [
-        "A",
-        "B",
-        "C",
-        "D",
-        "E",
-        "F",
-        "G",
-        "H",
-        "I",
-      ],
+      answerObj: {},
+      optionItem: ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
       examParams: {
         courseId: this.$route.query.id,
         examId: ""
@@ -178,30 +193,68 @@ export default {
         courseId: this.$route.query.id,
         examTitle: "课堂测试",
         quizIds: []
-      }
+      },
+      isInteractStart: false,
+      isEnd:false,//倒计时是否结束
+      endTime:1,//应为接口获取到的结束时间
+      time: {},
+      countDownShow: '00:00'
     };
   },
   computed: {
     sortStudents: function() {
-      return this.students.sort(this.sortBy("grade", "time"));
+      if (this.students.length === 0) {
+        return
+      }else{
+        alert(1)
+        return this.students.sort(this.sortBy("grade", "time"));
+      }
     }
   },
   mounted() {},
   created() {
     Cookie.set("modelActive", "2");
     console.log(this.$route.query);
-    // 总的测试列表
-    classTest({
-      classroomId: this.$route.query.classroomId,
-      chapterId: Cookie.get("chapterId")
-    }).then(response => {
-      this.testList = response.data;
-    });
+    this.getTest()
     getTestFileFold({ parentId: 0, searchKey: "" }).then(response => {
       this.fileList = this.filterData(response.data);
     });
   },
   methods: {
+    menuShow() {
+      this.isInteractStart = !this.isInteractStart
+    },
+    getTest() {
+      // 总的测试列表
+      classTest({
+        classroomId: this.$route.query.classroomId,
+        chapterId: Cookie.get("chapterId")
+      }).then(response => {
+        this.testList = response.data;
+      });
+    },
+    setEndTime(){
+        var date = this.endTime * 60 //计算总秒数
+        var interval = setInterval(() =>{
+        if(date == 0){
+          this.isEnd = true;
+          clearInterval(interval)
+        }else{
+          date --;
+          this.time.m = parseInt(date / 60 % 60);//计算剩余的分钟
+          if(this.time.m < 10){
+            this.time.m = "0" +this.time.m
+          } 
+          this.time.s = parseInt(date % 60);//计算剩余的秒数 
+          if(this.time.s < 10){
+            this.time.s = "0" +this.time.s
+          }
+          console.log(this.time.m+this.time.s)
+          this.countDownShow = this.time.m+':'+this.time.s;
+          return this.time.m+this.time.s;	
+        }
+      },1000);
+    },
     // 递归渲染试题
     filterData(data) {
       let getFilter = data => {
@@ -227,11 +280,18 @@ export default {
     },
     // 点击获取测试
     activeTest(item) {
+      console.log(item)
       this.getQuiz(item);
     },
     // 获取并开始
     beginTest(value) {
-      this.getQuiz(value);
+      console.log(value)
+      this.activeTest(value)
+      if (value === "rightSide") {
+        this.testObj.interactionStatus = 20;
+        this.rightSideStatus = this.testObj;
+        // this.rightSideStatus.id = this.testObj.voteId
+      }
       this.examParams.classroomId = this.$route.query.classroomId;
       this.examParams.bean = value.examId
       this.examParams.userId = Cookie.get('userId')
@@ -248,50 +308,68 @@ export default {
         })
       );
     },
+
     // 结束测试
-    endTest() {
+    endTest(value) {
+      this.isInteractStart = false
+      if (value === "rightSide") {
+        console.log(this.testObj)
+        this.testObj.interactionStatus = 30;
+        this.rightSideStatus = this.testObj;
+        // this.rightSideStatus.id = this.voteObj.voteId
+      } 
       window.STOMP_CLIENT.send(
         "/teamsking/course/exam/finish",
-        { token: sessionStorage.getItem('token') },
+        { token: sessionStorage.getItem("token") },
         JSON.stringify({
           bean: this.testObj.examId,
           classroomId: this.$route.query.classroomId,
           courseId: this.$route.query.id,
-          userId: sessionStorage.getItem('userId')
+          userId: sessionStorage.getItem("userId")
         })
       );
     },
     // 获取测试
     getQuiz(item) {
-      this.examParams.examId = item.examId;
+      console.log(item.examId)
       interactExam({ examId: item.examId }).then(response => {
         this.testObj = response.data;
-      });
-      if (item.interactionStatus === 30) {
-        classTestRes({ examId: item.examId }).then(response => {
-          this.testObj = response.data;
-          this.$nextTick(function() {
-            this.drawPie(this.testObj);
+        if (item.interactionStatus === 30) {
+          classTestRes({ examId: item.examId }).then(response => {
+            this.answerObj = response.data;
+            console.log(this.answerObj)
+            this.$nextTick(function() {
+              this.drawPie(this.answerObj);
+            });
           });
-        });
-      } else if (item.interactionStatus === 20) {
-        interactExamRes(this.examParams).then(response => {
-          this.students = response.data.pageData;
-        });
-      }
+        } else if (item.interactionStatus === 20) {
+          // interactExamRes(this.examParams).then(response => {
+          //   this.students = response.data.pageData;
+          // });
+        }
+      });
+      
     },
     drawPie(items) {
-      console.log(items);
+      // setTimeout(()=>{
+      //   console.log(document.getElementById('subject0'));
+      // },1000)
       let num = 0;
       items.forEach((element, i) => {
         num += 1;
         let chart = "chart" + num;
         chart = echarts.init(document.getElementById(`subject${i}`));
-        console.log(chart);
+        console.log(element.options);
+        let pieData = []
+        let legend = []
+        element.options.forEach((item)=> {
+          legend.push(item.optionTitle)
+          pieData.push({name:item.optionTitle, value: item.answerPercent})
+        })
         chart.setOption({
           title: {
-            text: "某站点用户访问来源",
-            subtext: "纯属虚构",
+            text: `第${num}题`,
+            subtext: "",
             x: "center"
           },
           tooltip: {
@@ -301,21 +379,15 @@ export default {
           legend: {
             orient: "vertical",
             left: "left",
-            data: ["直接访问", "邮件营销", "联盟广告", "视频广告", "搜索引擎"]
+            data: legend
           },
           series: [
             {
-              name: "访问来源",
+              name: "回答情况",
               type: "pie",
               radius: "55%",
               center: ["50%", "60%"],
-              data: [
-                { value: 335, name: "直接访问" },
-                { value: 310, name: "邮件营销" },
-                { value: 234, name: "联盟广告" },
-                { value: 135, name: "视频广告" },
-                { value: 1548, name: "搜索引擎" }
-              ],
+              data: pieData,
               itemStyle: {
                 emphasis: {
                   shadowBlur: 10,
@@ -376,40 +448,50 @@ export default {
     },
     // 去富文本HTML标签
     matchReg(str) {
+      console.log(str);
       let reg = /<\/?.+?\/?>/g;
       return str.replace(reg, "");
     },
     // 正确答案
     correctAnswer(item) {
-        console.log(item)
-        let arr = ""
-        let correctArr = item.filter(element=> {
-            if(element.correctFlag === 1) {
-                arr += element.optionTitle + ','
-            }
-        })
-        return arr.substring(0, arr.length-1)
-        // let ansArr = []
-        // if(item.correctFlag === 2) {
-        //     ansArr.push(item.optionTitle)
-        // }
-        // return ansArr
-    },
-    subClassroom(){
-      let userId = sessionStorage.getItem('userId');
-      window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
-        console.log(result)
-        let data = result.body
-        JSON.parse(data)
-        console.log(JSON.parse(data))
-        if(data.socketType == 301){
-          this.$message.info('开始测试')
-        }
-        else if(data.socketType == 302){
-          this.$message.info('结束测试')
+      console.log(item);
+      let arr = "";
+      let correctArr = item.filter(element => {
+        if (element.correctFlag === 1) {
+          arr += element.optionTitle + ",";
         }
       });
+      return arr.substring(0, arr.length - 1);
+      // let ansArr = []
+      // if(item.correctFlag === 2) {
+      //     ansArr.push(item.optionTitle)
+      // }
+      // return ansArr
     },
+    subClassroom() {
+      let userId = sessionStorage.getItem("userId");
+      var that = this;
+      window.STOMP_CLIENT.subscribe(
+        "/user/" + userId + "/teamsking/classroom",
+        function(result) {
+          console.log(result);
+          let data = JSON.parse(result.body);
+          console.log("========", data.data.socketData);
+          if (data.data.socketType === 303) {
+            that.$message.info("收到一个学生提交");
+            that.students.push(data.data.socketData[0]);
+          }else if(data.data.socketType === 302) {
+            that.$message.info("结束测试");
+            that.getQuiz(data.data.socketData)
+            that.getTest()
+          }else if(data.data.socketType === 301) {
+            that.$message.info("开始测试");
+            that.getTest()
+            that.isInteractStart = true
+          }
+        }
+      );
+    }
   },
   components: {
     Tree,
@@ -431,6 +513,29 @@ export default {
 
 .el-main {
   padding-left: 300px;
+  min-height: 600px;
+}
+
+.full {
+  animation:aside-show 1s;
+  padding-left: 0px
+}
+
+.hide {
+  animation:aside-hide 1s;
+  padding-left: 300px
+}
+
+@keyframes aside-show{
+  from {padding-left: 300px}
+  to {padding-left: 0px}
+  animation-fill-mode: forwards
+}
+
+@keyframes aside-hide{
+  from {padding-left: 0px}
+  to {padding-left: 300px}
+  animation-fill-mode: forwards
 }
 
 .option-type {
@@ -490,13 +595,27 @@ export default {
   color: rgb(110, 169, 170);
 }
 
-  .answer-group>p:first-child
-    margin 10px
-    .analysis-group span
-      display inline-block
-      width 60px
-      border 1px solid red
-      padding 10px 10px
-      color red
+.answer-group>p:first-child {
+  margin: 10px;
+
+  .analysis-group span {
+    display: inline-block;
+    width: 60px;
+    border: 1px solid red;
+    padding: 10px 10px;
+    color: red;
+  }
+}
+.slide-fade-enter-active {
+  transition: all .2s ease;
+}
+.slide-fade-leave-active {
+  transition: all .2s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active 用于 2.1.8 以下版本 */ {
+  transform: translateX(-50px);
+  opacity: 0;
+}
 </style>
 

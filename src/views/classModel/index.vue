@@ -50,6 +50,7 @@ export default {
           this.courseName = res.data.courseName
           this.courseCode = res.data.courseCode
           this.$store.commit('SAVE_NAME',res.data.courseName)
+          sessionStorage.setItem('courseName',res.data.courseName)
         })
       },
       //获取教师
