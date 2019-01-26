@@ -651,12 +651,13 @@ export function voteSave(data) {
  * 保存课堂投票
  */
 export function classVoteSave(data) {
-  data.quizOptions.forEach((element, i) => {
-    data.quizOptions[i] = element.text
+  let params = JSON.parse(JSON.stringify(data))
+  params.quizOptions.forEach((element, i) => {
+    params.quizOptions[i] = element.text
   });
-  console.log(data)
+  console.log(params)
   let url = `${baseUrl}vote/classroom`
-  return commonsAjax(url, data, 'post')
+  return commonsAjax(url, params, 'post')
 }
 
 /**

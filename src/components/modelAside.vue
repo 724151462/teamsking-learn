@@ -69,7 +69,7 @@ export default {
             this.$emit('activeEvent', item)
         },
         beginInteract(item) {
-            this.activeIndex = item.examId
+            this.activeIndex = item[this.dataKey.itemId]
             this.$emit('beginEvent', item)
         }
     },

@@ -36,7 +36,7 @@
               </p>
             </div>
           </div>
-          <el-button style="margin-left: 45%" type="primary">结束测试</el-button>
+          <el-button style="margin-left: 45%" type="primary" @click="endTest">结束测试</el-button>
 
           <el-collapse v-if="testObj.interactionStatus === 20">
             <el-collapse-item title="40/44位同学答题情况排名" name="1">
@@ -130,7 +130,7 @@ import Cookie from "js-cookie";
 import echarts from "echarts";
 
 import { testList, interactExam, interactExamRes } from "@/api/course";
-import { classTest, classTestSave, classTestRes, classTestStart } from "../../../api/course";
+import { classTest, classTestSave, classTestRes } from "../../../api/course";
 import { getTestFileFold } from "@/api/library";
 import Tree from "@/components/fileTree";
 
@@ -230,14 +230,36 @@ export default {
       this.getQuiz(item);
     },
     // 获取并开始
-    beginTest(item) {
-      this.getQuiz(item);
+    beginTest(value) {
+      this.getQuiz(value);
       this.examParams.classroomId = this.$route.query.classroomId;
-      this.examParams.bean = item.examId
+      this.examParams.bean = value.examId
       this.examParams.userId = Cookie.get('userId')
       console.log(this.examParams)
-      classTestStart(this.examParams)
-      exam()
+      this.subClassroom()
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/exam/start",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: value.examId,
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
+    // 结束测试
+    endTest() {
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/exam/finish",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: this.testObj.examId,
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
     },
     // 获取测试
     getQuiz(item) {
@@ -372,7 +394,22 @@ export default {
         //     ansArr.push(item.optionTitle)
         // }
         // return ansArr
-    }
+    },
+    subClassroom(){
+      let userId = sessionStorage.getItem('userId');
+      window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+        console.log(result)
+        let data = result.body
+        JSON.parse(data)
+        console.log(JSON.parse(data))
+        if(data.socketType == 301){
+          this.$message.info('开始测试')
+        }
+        else if(data.socketType == 302){
+          this.$message.info('结束测试')
+        }
+      });
+    },
   },
   components: {
     Tree,

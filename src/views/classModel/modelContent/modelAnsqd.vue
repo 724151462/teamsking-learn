@@ -20,7 +20,8 @@
                 }}">{{subject.status === 'ready' || subject.status === 'finished' ? '返回' : '结束并返回'}}</router-link>
         </div>
         <div class="avatar-btn">
-          <img :src="answerAvatar" width="300px" alt="">
+          <img :src="answer.answerAvatar" width="300px" alt="">
+          <span>{{answer.answerName}}</span>
           <el-button type="primary" style="margin-top: 30px" @click="begin($event)">{{subject.status === 'ready' ? '开始抢答' : '完成'}}</el-button>
         </div>
       </div>
@@ -36,7 +37,10 @@ export default {
         title: this.$route.query.subject || "",
         status: 'ready'
       },
-      answerAvatar: require('@/assets/images/answer.png'),
+      answer: {
+        answerAvatar: require('@/assets/images/answer.png'),
+        answerName: ''
+      },
       imgList: [
         {
           src: require("@/assets/images/qd.png")
@@ -57,19 +61,40 @@ export default {
   methods: {
     begin(e) {
       console.log(e.currentTarget.innerHTML)
+      var that = this
       if(e.currentTarget.innerHTML === '<!----><!----><span>开始抢答</span>'){
         this.subject.status = 'begin'
-        this.timer = setTimeout(
-          this.getAnswer 
-        ,3000)
+        this.subClassroom()
+        window.STOMP_CLIENT.send(
+          "/teamsking/course/rushanswer/rush",
+          {
+            token: sessionStorage.getItem("token")
+          },
+          JSON.stringify({
+            bean: { topicTitle: that.subject.title },
+            classroomId: that.$route.query.classroomId,
+            courseId: that.$route.query.id,
+            userId: sessionStorage.getItem("userId")
+          })
+        );
       }else{
         this.subject.status = 'finished'
       }
     },
-    getAnswer() {
-      console.log(Math.random()*3)
-      this.answerAvatar = this.imgList[Math.floor(Math.random() * 3)].src
-    }
+    subClassroom(){
+      let userId = sessionStorage.getItem('userId');
+      var that = this
+      window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+        let socketData = JSON.parse(result.body).data.socketData
+        let socketType = JSON.parse(result.body).data.socketType
+        console.log(socketType, socketData)
+        if(socketType === 901) {
+          // that.answerAvatar = socketData.username
+          that.answer.answerName = socketData.realName
+          that.answer.answerAvatar = socketData.avatar
+        }
+      });
+    },
   }
 };
 </script>

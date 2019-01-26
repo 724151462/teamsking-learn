@@ -11,7 +11,7 @@
       ></modelAside>
       <el-main>
         <div v-if="voteObj === ''">
-            <span>请选择或添加投票</span>
+          <span>请选择或添加投票</span>
         </div>
         <div v-else-if="voteObj === 'add'">
           <div>
@@ -35,21 +35,43 @@
           <el-button @click="manualAdd" type="primary">开始投票</el-button>
         </div>
         <div v-else>
-            <p>{{voteObj.voteTitle}}</p>
-            <div v-for="(quiz, i) in voteObj.voteQuizzes" :key="quiz.quizId" style="border-bottom: 1px solid rgb(215,215,215);width: 80%">
-              <p style="margin: 20px 0">{{i+1}}.  {{quiz.quizTitle}}</p>
-              <div style="margin: 10px 0" v-for="(option, optionIndex) in quiz.voteQuizOptions" :key="option.optionId">
-                <div class="answer-item">
-                  <span>{{optionItem[optionIndex]}}.  {{option.optionTitle}}</span>
-                  <div class="progress-container">
-                      <el-progress :text-inside="true" class="progress" :stroke-width="18" :percentage="option.percent"></el-progress>
-                      <span style="margin-left: 5px;color:rgb(130,178,198)">{{option.userCount}}人</span>
-                  </div>
+          <p>{{voteObj.voteTitle}}</p>
+          <div
+            v-for="(quiz, i) in voteObj.voteQuizzes"
+            :key="quiz.quizId"
+            style="border-bottom: 1px solid rgb(215,215,215);width: 80%"
+          >
+            <p style="margin: 20px 0">{{i+1}}. {{quiz.quizTitle}}</p>
+            <div
+              style="margin: 10px 0"
+              v-for="(option, optionIndex) in quiz.voteQuizOptions"
+              :key="option.optionId"
+            >
+              <div class="answer-item">
+                <span>{{optionItem[optionIndex]}}. {{option.optionTitle}}</span>
+                <div class="progress-container">
+                  <el-progress
+                    :text-inside="true"
+                    class="progress"
+                    :stroke-width="18"
+                    :percentage="option.percent"
+                  ></el-progress>
+                  <span style="margin-left: 5px;color:rgb(130,178,198)">{{option.userCount}}人</span>
                 </div>
-                
               </div>
             </div>
+          </div>
         </div>
+        <el-footer>
+          <span style="color: rgb(254,192,105)">学生参与即获得90分</span>
+          <div class="footer-right" style="float: right">
+            <div>
+              <span style="margin-right: 20px">4/42人</span>
+              <el-button type="primary" @click="endVote">结束投票</el-button>
+            </div>
+            <span style="font-size: 12px">结束后学生不能再回答</span>
+          </div>
+        </el-footer>
         <el-dialog title="选择题目" top="30vh" :visible.sync="dialogVisible" width="55%">
           <div>
             <div>
@@ -85,6 +107,7 @@ import { voteList, interactVote, classVoteSave } from "@/api/course";
 
 import Tree from "@/components/fileTree";
 import modelAside from "@/components/modelAside";
+import { error } from 'util';
 export default {
   data() {
     return {
@@ -104,10 +127,10 @@ export default {
         label: "catalogName"
       },
       addVoteParams: {
-        chapterId: Cookie.get('chapterId'),
+        chapterId: Cookie.get("chapterId"),
         classroomId: this.$route.query.classroomId,
         courseId: this.$route.query.id,
-        quizOptions: [{text: ''},{text: ''}]
+        quizOptions: [{ text: "" }, { text: "" }]
       },
       voteList: [
         {
@@ -117,17 +140,7 @@ export default {
       ],
 
       voteObj: "",
-      optionItem: [
-        "A",
-        "B",
-        "C",
-        "D",
-        "E",
-        "F",
-        "G",
-        "H",
-        "I"
-      ],
+      optionItem: ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
     };
   },
   created() {
@@ -140,35 +153,71 @@ export default {
   methods: {
     // 手动添加
     manualAdd() {
-      console.log(this.addVoteParams)
+      console.log(this.addVoteParams);
       classVoteSave(this.addVoteParams)
+      .then(response=> {
+        if(response.code === 200) {
+          this.$message({
+            message: '添加成功',
+            type: "success"
+          })
+        }else{
+          this.$message({
+            message: '添加错误，请检查信息',
+            type: "error"
+          })
+        }
+      })
     },
     // 添加选项
     addOption() {
-      this.addVoteParams.quizOptions.push({text: ''})
+      this.addVoteParams.quizOptions.push({ text: "" });
     },
     // 删除选项
     delOption(index) {
-      console.log(this.addVoteParams.quizOptions)
-      this.addVoteParams.quizOptions.splice(index, 1)
+      console.log(this.addVoteParams.quizOptions);
+      this.addVoteParams.quizOptions.splice(index, 1);
     },
     dialogShow(value) {
       this.voteObj = "add";
     },
     getVoteList() {
       voteList(this.addVoteParams).then(response => {
-          this.voteList = response.data
+        this.voteList = response.data;
       });
     },
     // 点击获取测试
     activeVote(item) {
-      interactVote({voteId: item.voteId})
-      .then(response => {
+      interactVote({ voteId: item.voteId }).then(response => {
         this.voteObj = response.data;
       });
     },
-    beginVote() {},
-
+    beginVote(value) {
+      this.subClassroom()
+      console.log(value)
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/vote",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: { voteId: value.voteId},
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
+    endVote() {
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/vote/close",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: { voteId: this.voteObj.voteId},
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
     // 递归渲染试题
     filterData(data) {
       let getFilter = data => {
@@ -225,6 +274,36 @@ export default {
         });
       }
     },
+    subClassroom(){
+      let userId = sessionStorage.getItem('userId');
+      var that = this
+      window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
+        let data = result.body
+        JSON.parse(data)
+        console.log(JSON.parse(data).data.socketType)
+        if(JSON.parse(data).data.socketType == 601){
+          that.$message({message:'开始投票',type: 'success'})
+        }
+        else if(JSON.parse(data).data.socketType == 603){
+          that.$message({message:'结束投票',type: 'success'})
+        }
+        else if(JSON.parse(data).data.socketType == 604){
+          that.$message({message:'收到一条投票信息',type: 'success'})
+          that.voteObj.voteQuizzes.forEach(element => {
+            element.voteQuizOptions.forEach(option => {
+              JSON.parse(data).data.socketData.forEach(newData => {
+                if(newData.optionId === option.optionId){
+                  console.log(newData.userCount, option)
+                  option.userCount = newData.userCount
+                  option.percent = newData.percent
+                }
+              });
+            })
+          });
+          console.log(that.voteObj.voteQuizzes)
+        }
+      });
+    },
   },
   components: {
     modelAside,
@@ -234,18 +313,26 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.el-main 
-  padding-left 300px
-.answer-item
-  display flex
-  justify-content space-between
-  width 100%
+.el-main {
+  padding-left: 300px;
+}
+
+.answer-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
   // margin 0 auto
-  .progress-container
-    display flex
-    justify-content space-between
-    width 350px
-    .progress
-      width: 300px; display: inline-block
+  .progress-container {
+    display: flex;
+    justify-content: space-between;
+    width: 350px;
+
+    .progress {
+      width: 300px;
+      display: inline-block;
+    }
+  }
+}
 </style>
 

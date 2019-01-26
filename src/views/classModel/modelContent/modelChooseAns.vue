@@ -11,17 +11,7 @@
       </div>
       <div class="answer-type">
         <div class="type-item" v-for="(item, n) in imgList" :key="n">
-          <router-link
-            :to="{
-                path:item.url, 
-                query: {
-                id: $route.query.id,
-                classroomId: $route.query.classroomId,
-                subject: subject.title
-                }}"
-          >
-            <img :src="item.src" alt>
-          </router-link>
+          <img @click="ansTypeBtn(item)" :src="item.src" alt>
         </div>
       </div>
     </div>
@@ -144,6 +134,17 @@ export default {
     // 确认添加试题
     addEnsure() {
       this.dialogVisible = false;
+    },
+    ansTypeBtn(item) {
+      var that = this;
+      this.$router.push({
+        path: item.url,
+        query: {
+          id: this.$route.query.id,
+          classroomId: this.$route.query.classroomId,
+          subject: this.subject.title
+        }
+      });
     }
   },
   components: {
