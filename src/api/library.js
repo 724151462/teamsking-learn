@@ -52,6 +52,13 @@ export function deleteTestFileFold(data) {
   return commonsAjax(url, data, 'delete')
 }
 /**
+ * 移动试题
+ */
+export function moveTest(data) {
+  let url = `${baseUrl}/catalog/quiz`
+  return commonsAjax(url, data, 'patch')
+}
+/**
  * 批量删除试题
  */
 export function deleteQuiz(data) {
@@ -157,7 +164,7 @@ export function deleteAc(data) {
  */
 export function removeAc(data) {
   console.log(data)
-    let url = `${baseUrl}interaction/catalog`
+    let url = `${baseUrl}catalog/interaction`
     return commonsAjax(url, data, 'patch')
 }
 /**

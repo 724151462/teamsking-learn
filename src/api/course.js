@@ -949,8 +949,9 @@ export function saveSign(data) {
  * 获取签到用户信息列表
  */
 export function signList(data) {
-  let url = `${baseUrl}sign/${data}/page`
-  return commonsAjax(url, data, 'post')
+  console.log(data)
+  let url = `${baseUrl}sign/${data.signId}/page`
+  return commonsAjax(url, data.data, 'post')
 }
 /**
  * 老师修改签到
