@@ -9,7 +9,7 @@
             v-model="search">
           </el-input>
           <div>
-            <el-button icon="el-icon-search" class="search-btn" size="small" @click="getResource(0,0,search)"></el-button>
+            <el-button icon="el-icon-search" class="search-btn" size="small" @click="init(1,1,search)"></el-button>
           </div>
         </div>
       </div>
@@ -52,14 +52,17 @@
     name: "modelChecked",
     data(){
       return {
-        search:''
+        search:'',
+        yesCheck:[],
+        noCheck:[]
       }
     },
     created(){
-      this.init()
+      this.init(1,1)
+      this.noInit(1,2)
     },
     methods:{
-      init(pageNum){
+      init(pageNum,type,searchKey){
         let page = pageNum || 1
         let data = {
           signId : 154,
@@ -67,19 +70,40 @@
             pageParam: {
               pageIndex: page,
               pageSize: 10
-            }
+            },
+            searchKey,
+            type,
           }
         }
-        let loading = this.$loading(this.loadingCss)
         signList(data).then(res=>{
-          loading.close()
           if(Number(res.code) === 200){
             console.log(res)
+            this.yesCheck = res.data.pageData
           }else{
             this.$message.error('获取签到数据失败')
           }
-        }).catch(error=>{
-          console.log(error)
+        })
+      },
+      noInit(pageNum,type,searchKey){
+        let page = pageNum || 1
+        let data = {
+          signId : 154,
+          data:{
+            pageParam: {
+              pageIndex: page,
+              pageSize: 5
+            },
+            searchKey,
+            type,
+          }
+        }
+        signList(data).then(res=>{
+          if(Number(res.code) === 200){
+            console.log(res)
+            this.noCheck = res.data.pageData
+          }else{
+            this.$message.error('获取签到数据失败')
+          }
         })
       },
     },
