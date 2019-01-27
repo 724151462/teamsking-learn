@@ -23,7 +23,6 @@ export function saveUserInfo (data) {
   //保存用户ID和真实姓名
   return Cookie.set('userId', data, { expires: 14 })
 }
-
 //获取用户名ID
 export function getUserId () {
   return Cookie.get('userId')

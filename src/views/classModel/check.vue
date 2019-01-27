@@ -65,9 +65,6 @@
           miao=parseInt(miaoNum%60);
           miao = miao >= 10 ? String(miao) : '0'+miao
           fen = fen >= 10 ? String (fen) : '0'+fen
-
-          // console.log(miaoNum)
-          // console.log(fen + miao);
           _this_.time = (`${fen}:${miao}`)
         }, 1000)
       },
@@ -99,9 +96,7 @@
             beanId = sessionStorage.getItem('signId');
 
             this.subClassroom()
-            // let testTag = sessionStorage.STOMP_CLIENT;
-            // let newTag = JSON.parse(testTag)
-            //  console.log(typeof newTag);
+
             tagClient.send('/teamsking/course/sign/start',{'token': token},
               JSON.stringify({
                 "bean":beanId,
@@ -112,8 +107,6 @@
             );
           }else{
             this.$message.error('保存签到失败')
-            // let msg = data.msg
-            // this.$message.error(msg)
           }
         })
       },
