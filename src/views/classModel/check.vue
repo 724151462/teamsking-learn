@@ -1,6 +1,6 @@
 <template>
   <div class="check">
-    <div class="class-info">{{$store.state.socket.courseName}}</div>
+    <div class="class-info">{{courseName}}</div>
     <div class="check-time">
       <div class="time">
         <div class="time-text">{{this.time}}</div>
@@ -30,13 +30,11 @@
     saveSign, signList, changeSign
   } from "@/api/course";
   import {getUserInfo} from '@/api/user'
-  import {sign,signClose, connect} from "../../utils/utils";
-  import Cookie from "js-cookie";
-
   export default {
     name: "check",
     data(){
       return{
+        courseName:'',
         isFullScreen: false,//是否全屏
         time:'00:00',
         imgSrc :{
@@ -137,7 +135,8 @@
           if(data.data.socketType == 802){
             console.log('结束签到')
             console.log(data.data)
-            _this_.$message.error('签到结束')
+            _this_.$message.success('签到结束')
+            window.STOMP_CLIENT.unsubscribe();
             _this_.$router.push({
               path: "/course/modelChecked",
               query: {
@@ -186,10 +185,8 @@
       // this.getClass()
     },
     created(){
-      this.timeAdd()
+      this.courseName = sessionStorage.getItem('courseName')
       this.startSign()
-      // this.startSign()
-      // this.getClass()
     },
   }
 </script>

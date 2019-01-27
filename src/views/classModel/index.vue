@@ -29,7 +29,6 @@
 import { classingInfo, classOver, classSave ,courseBaseInfo} from "@/api/course";
 import {connect} from "@/utils/utils"
 import Cookie from "js-cookie";
-import {reResFileFold} from "../../api/library";
 export default {
     data(){
       return {
@@ -219,7 +218,6 @@ export default {
           this.toggleFullScreen()
         }
       }
-
     },
     mounted() {
       this.initCourse()

@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import '@babel/polyfill';
 import App from './App.vue'
 import router from './router/'
 import store from './store/'
@@ -7,18 +8,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import 'vue-video-player/src/custom-theme.css'
 import 'video.js/dist/video-js.css'
 import Cookie from 'js-cookie'
-import VueSocketIO from 'vue-socket.io';
-// import socketio from 'socket.io-client';
 
-// Vue.use(VueSocketIO , new VueSocketIO({
-//   debug: true,
-//   connection: 'http://120.36.137.90:9008/websocket',
-//   // vuex: {
-//   //     store,
-//   //     actionPrefix: 'SOCKET_',
-//   //     mutationPrefix: 'SOCKET_'
-//   // }
-// }));
 Vue.use(ElementUI)
 
 Vue.prototype.loadingCss = {
@@ -61,9 +51,9 @@ export default Globe_VM
 
 if(process.env.NODE_ENV === "development"){
   //开发测试
-  // window.onerror = function(errorMessage, scriptURI, lineNumber,columnNumber,errorObj) {
-    // alert("开发环境：错误信息：" +errorMessage+";出错文件："+scriptURI+";出错行号："+lineNumber);
-    // new Error(errorObj);
-  // }
+  window.onerror = function(errorMessage, scriptURI, lineNumber,columnNumber,errorObj) {
+    alert("开发环境：错误信息：" +errorMessage+";出错文件："+scriptURI+";出错行号："+lineNumber);
+    new Error(errorObj);
+  }
 }
 
