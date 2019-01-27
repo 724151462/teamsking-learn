@@ -144,12 +144,9 @@
         console.log(res)
         if(Number(res.code) === 200) {
           this.realName = res.data.realName
+          sessionStorage.setItem('realName',res.data.realName)
         }else if(Number(res.code) === 440){
-          let msgs = JSON.parse(res.msg)
-          this.$message({
-            message:msgs[0].message,
-            type:'error'
-          })
+          this.$message.error('获取用户信息失败')
         }
       })
     }

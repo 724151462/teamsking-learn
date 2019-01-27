@@ -3,7 +3,7 @@
         <div class="inner-container">
             <div style="font-size: 1.5em">课堂模式已开启，课程资源及课程活动将自动投至大屏幕。</div>
             <div style="font-size: 3em">{{this.courseName}}</div>
-            <div style="font-size: 2em">陈老师</div>
+            <div style="font-size: 2em">{{this.teacherName}}</div>
             <div style="font-size: 2.5em;cursor: pointer" @click="enterClass">进入课堂</div>
             <div style="display:flex; align-items: flex-start; width: 100%; font-size: 2em"><span style="margin-left:1em">课程号:{{this.courseCode}}</span></div>
             <div class="fullScreen" @click="toggleFullScreen">
@@ -35,6 +35,7 @@ export default {
       return {
         courseName:'',
         courseCode:'',
+        teacherName:'',
         isFullScreen: false,//是否全屏
         imgSrc :{
           full: require("@/assets/images/full.png"),
@@ -82,9 +83,6 @@ export default {
           //禁用控制台调试信息
           // stompClient.debug = null
           stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
-              // stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
-              //   console.log(result);
-              // });
               window.STOMP_CLIENT = stompClient
               resolve('连接成功');
             },
@@ -211,6 +209,7 @@ export default {
       },
     },
     created(){
+      this.teacherName = sessionStorage.getItem('realName')
       // this.enterClass()
       document.onkeyup = (e)=> {
         console.log(e)
