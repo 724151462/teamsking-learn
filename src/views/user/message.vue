@@ -34,15 +34,6 @@
             @current-change="handleCurrentChange"
             :total="totalPage">
           </el-pagination>
-
-          <!--<el-pagination-->
-            <!--background-->
-            <!--layout="prev, pager, next"-->
-            <!--:page-size="tableData.pageSize"-->
-            <!--:page-count="tableData.totalPage"-->
-            <!--:current-page="tableData.pageIndex"-->
-            <!--@current-change="handleCurrentChange">-->
-          <!--</el-pagination>-->
         </div>
 
         <!--查看消息对话框-->

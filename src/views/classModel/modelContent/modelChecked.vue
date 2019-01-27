@@ -18,30 +18,53 @@
       <span>未签到(1人)</span>
       <span style="float: right;">点击可变更状态</span>
     </div>
-    <div class="user-box">
-      <div class="user-item" style="display: flex;justify-items: center;align-items: center">
-        <div><img :src="require('@/assets/images/pdf.png')" alt="" class="user-avatar"></div>
-        <div><span style="margin-left: 20px">李某人</span></div>
+    <div>
+      <div class="user-box" v-for="item in noCheck" :key="item.id">
+        <div class="user-item" style="display: flex;justify-items: center;align-items: center">
+          <div><img :src="item.avatar" alt="" class="user-avatar"></div>
+          <div><span style="margin-left: 20px">{{item.realName}}</span></div>
+        </div>
+        <div class="user-item">{{item.studentNo}}</div>
+        <div class="user-item">
+          <el-tooltip class="item" effect="dark" content="" placement="bottom">
+            <el-button slot="reference" size="small" type="warning" plain>缺勤</el-button>
+          </el-tooltip>
+        </div>
       </div>
-      <div class="user-item">898989898</div>
-      <div class="user-item">
-        <!--<el-popover-->
-          <!--placement="bottom"-->
-          <!--width="100"-->
-          <!--trigger="click">-->
-          <!--<el-table :data="gridData">-->
-            <!--<el-table-column width="150" property="date" label="日期"></el-table-column>-->
-            <!--<el-table-column width="100" property="name" label="姓名"></el-table-column>-->
-            <!--<el-table-column width="300" property="address" label="地址"></el-table-column>-->
-          <!--</el-table>-->
-          <!--<el-button size="small" slot="reference">click 激活</el-button>-->
-        <!--</el-popover>-->
-        <el-button size="small" slot="reference">缺勤</el-button>
-      </div>
+      <el-pagination
+        style="margin-top: 20px;text-align: right;margin-right: 40px;"
+        background
+        layout="prev, pager, next"
+        :current-page="noCheckPage.currentPage"
+        @current-change="noCheckChange"
+        :total="noCheckPage.totalPage">
+      </el-pagination>
     </div>
-
     <div class="gary-mask">
       <div>已签到(37人)</div>
+    </div>
+    <div>
+      <div class="user-box" v-for="item in noCheck" :key="item.id">
+        <div class="user-item" style="display: flex;justify-items: center;align-items: center">
+          <div><img :src="item.avatar" alt="" class="user-avatar"></div>
+          <div><span style="margin-left: 20px">{{item.realName}}</span></div>
+        </div>
+        <div class="user-item">{{item.studentNo}}</div>
+        <div class="user-item">
+          <!--<el-tooltip class="item" effect="dark" content="点面更换状态为‘’" placement="bottom">-->
+            <!--<el-button slot="reference" size="small" type="warning" plain>正常</el-button>-->
+          <!--</el-tooltip>-->
+          <el-button size="small" type="info" plain>正常</el-button>
+        </div>
+      </div>
+      <el-pagination
+        style="margin-top: 20px;text-align: right;margin-right: 40px;"
+        background
+        layout="prev, pager, next"
+        :current-page="checkPage.currentPage"
+        @current-change="checkChange"
+        :total="checkPage.totalPage">
+      </el-pagination>
     </div>
   </div>
 </template>
@@ -54,57 +77,73 @@
       return {
         search:'',
         yesCheck:[],
-        noCheck:[]
+        noCheck:[],
+        noCheckPage:{
+          totalPage:1,
+          currentPage:1,
+        },
+        checkPage:{
+          totalPage:1,
+          currentPage:1,
+        }
       }
     },
     created(){
-      this.init(1,1)
-      this.noInit(1,2)
+      this.init(1)
+      this.noInit(1)
     },
     methods:{
-      init(pageNum,type,searchKey){
-        let page = pageNum || 1
+      init(pageNum,searchKey){
+        let key = searchKey || ''
         let data = {
           signId : 154,
           data:{
             pageParam: {
-              pageIndex: page,
+              pageIndex: pageNum,
               pageSize: 10
             },
-            searchKey,
-            type,
+            searchKey:key,
+            type:1,
           }
         }
         signList(data).then(res=>{
+          console.log(res)
           if(Number(res.code) === 200){
-            console.log(res)
             this.yesCheck = res.data.pageData
           }else{
             this.$message.error('获取签到数据失败')
           }
         })
       },
-      noInit(pageNum,type,searchKey){
-        let page = pageNum || 1
+      noInit(pageNum,searchKey){
+        let key = searchKey || ''
         let data = {
           signId : 154,
           data:{
             pageParam: {
-              pageIndex: page,
+              pageIndex: pageNum,
               pageSize: 5
             },
-            searchKey,
-            type,
+            searchKey:key,
+            type:2,
           }
         }
         signList(data).then(res=>{
+          console.log(res)
           if(Number(res.code) === 200){
-            console.log(res)
             this.noCheck = res.data.pageData
+            this.noCheckPage.totalPage =res.data.pageIndex
+            this.noCheckPage.currentPage = res.data.totalPage * 10
           }else{
             this.$message.error('获取签到数据失败')
           }
         })
+      },
+      noCheckChange(page){
+        this.noInit(page)
+      },
+      checkChange(page){
+        this.init(page)
       },
     },
   }
