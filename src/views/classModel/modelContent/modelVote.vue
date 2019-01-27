@@ -70,7 +70,7 @@
                 <el-button
                   type="primary"
                   v-if="voteObj.interactionStatus === 10"
-                  @click="beginVote('rightSide')"
+                  @click="beginVote(voteObj)"
                 >开始投票</el-button>
                 <el-button
                   type="primary"
@@ -203,7 +203,7 @@ export default {
         this.voteList = response.data;
       });
     },
-    // 点击获取测试
+    // 点击获取投票
     activeVote(item, isStart) {
       interactVote({ voteId: item.voteId }).then(response => {
         this.voteObj = response.data;
@@ -211,22 +211,19 @@ export default {
       });
     },
     beginVote(value) {
-      if (value === "rightSide") {
-        this.voteObj.interactionStatus = 20;
-        this.rightSideStatus = this.voteObj;
-        // this.rightSideStatus.id = this.voteObj.voteId
-      } else {
+      this.voteObj = value
         // if(this.voteObj === '') {
-          this.activeVote(value)
-        // }
-        console.log('//////////////////////', value)
-      }
+      this.activeVote(this.voteObj)
       this.subClassroom()
+      this.socketVoteStart()
+    },
+    // 开始投票
+    socketVoteStart() {
       window.STOMP_CLIENT.send(
         "/teamsking/course/vote",
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
-          bean: { voteId: value.voteId},
+          bean: { voteId: this.voteObj.voteId},
           classroomId: this.$route.query.classroomId,
           courseId: this.$route.query.id,
           userId: sessionStorage.getItem('userId')

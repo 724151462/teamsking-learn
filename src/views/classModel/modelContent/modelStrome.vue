@@ -10,7 +10,7 @@
         @activeEvent="activeStrome"
         @beginEvent="beginStorm"
       ></modelAside>
-      <el-main style="padding-left: 300px; min-height: 600px;">
+      <el-main style="padding-left: 300px; margin-left: 25px">
         <div v-if="stormObj.stormTitle === undefined && stormObj !== 'add'">
           <span>请选择或添加头脑风暴</span>
         </div>
@@ -71,7 +71,7 @@
                   <el-button
                   type="primary"
                   v-if="stormObj.interactionStatus === 10"
-                  @click="beginStorm('rightSide')"
+                  @click="beginStorm(stormObj)"
                 >开始头脑风暴</el-button>
                 <el-button
                   type="primary"
@@ -172,27 +172,10 @@ export default {
     },
     beginStorm(value) {
       console.log(value)
-      if (value === "rightSide") {
-        this.stormObj.interactionStatus = 20;
-        this.rightSideStatus = this.stormObj;
-        // this.rightSideStatus.id = this.stormObj.voteId
-      } else {
-        // if(this.stormObj === '') {
-          this.activeStrome(value)
-        // }
-        console.log(value)
-      }
+      this.stormObj = value
+      this.activeStrome(value)
       this.subClassroom()
-      window.STOMP_CLIENT.send(
-        "/teamsking/course/storm",
-        { token: sessionStorage.getItem('token') },
-        JSON.stringify({
-          bean: value.stormId,
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
-          userId: sessionStorage.getItem('userId')
-        })
-      );
+      this.socketStromStart()
     },
     endStorm(value) {
       if (value === "rightSide") {
@@ -200,6 +183,23 @@ export default {
         this.rightSideStatus = this.stormObj;
         // this.rightSideStatus.id = this.voteObj.voteId
       }
+      this.socketStromEnd()
+    },
+    // 开始头脑风暴
+    socketStromStart() {
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/storm",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: this.stormObj.stormId,
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
+    // 结束头脑风暴
+    socketStromEnd() {
       window.STOMP_CLIENT.send(
         "/teamsking/course/storm/close",
         { token: sessionStorage.getItem('token') },
@@ -219,7 +219,8 @@ export default {
         if(JSON.parse(result.body).data.socketType === 506) {
           that.stormObj.answerList.push(JSON.parse(result.body).data.socketData)
         }else if(JSON.parse(result.body).data.socketType === 502) {
-          that.getStormList()
+          that.stormObj.interactionStatus = 30
+          that.activeStrome(that.stormObj)
           that.$message({
             message: "已结束头脑风暴",
             type: "success"
@@ -334,7 +335,7 @@ export default {
       };
       let curData = getFilter(data);
       return curData;
-    }
+    },
   },
   created() {
     Cookie.set("modelActive", "3");
@@ -362,7 +363,7 @@ export default {
   display: flex;
   flex-flow: row wrap;
   align-content: flex-start;
-
+  min-height: 500px;
   .item {
     box-sizing: border-box;
     background-color: white;

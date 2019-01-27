@@ -3,7 +3,9 @@
         <el-container style="height: 100%">
             <el-header>
                 <span class="course-name">{{courseName}}
-                    <span style="font-size: 0.7em">{{chapterName}}</span>
+                    <span style="font-size: 0.7em">{{currentInfo.chapterName}}</span>
+                    
+                    <span style="font-size: 0.7em; margin-left: 15px">{{currentInfo.sectionName}}</span>
                 </span>
                 <div class="icon-div">
                   <div class="icon-inner" style="cursor: pointer;" @click="goCheck">
@@ -22,7 +24,7 @@
             </el-header>
             <el-main>
                 <div style="height: 61px; width: 100%; background: #fff;">
-                   <el-menu active-text-color="#fff" text-color="#000" :default-active="active" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+                   <el-menu active-text-color="#409EFF" text-color="#000" :default-active="active" mode="horizontal" @select="handleSelect">
                         <el-menu-item index="1">章节</el-menu-item>
                         <el-menu-item index="2">测验</el-menu-item>
                         <el-menu-item index="3">头脑风暴</el-menu-item>
@@ -31,7 +33,7 @@
                         <el-menu-item index="6">资源库</el-menu-item>
                     </el-menu> 
                 </div>
-                <router-view @showChapterName="getCNanme"></router-view>
+                <router-view @showCurrentInfo="getCNanme"></router-view>
             </el-main>
         </el-container>
     </div>
@@ -44,7 +46,10 @@
         return{
             courseName: sessionStorage.getItem('courseName'),
             active: this.$store.state.modelActive,
-            chapterName: ''
+            currentInfo: {
+                chapterName: '',
+                sectionName: ''
+            }
         }
     },
     created() {
@@ -53,7 +58,7 @@
     
     methods: {
        getCNanme(value) {
-           this.chapterName = value
+           this.currentInfo = value
       },
       handleSelect(key, keyPath) {
         console.log(key, keyPath);
@@ -169,8 +174,7 @@
     width 200px
 }
 .el-menu-item.is-active {
-    background: #409eff !important
-    border none
+    border-bottom: 2px solid #409EFF
 }
 .el-header
     display flex
