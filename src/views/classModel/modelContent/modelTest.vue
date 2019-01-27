@@ -1,11 +1,11 @@
 <template>
   <div>
     <el-container>
-      <div style="position: fixed; left: 100px; z-index: 999">
-        <span @click="menuShow">{{isInteractStart === true? '展开': '收起'}}</span>  
+      <div class="menu-switch">
+        <i :class="isInteractStart === true ? ['full','el-icon-caret-right']: ['hide','el-icon-caret-left']" @click.stop="menuShow"></i>  
       </div>
       <transition name="slide-fade">
-      <modelAside v-if="isInteractStart === false"
+      <modelAside v-show="isInteractStart === false"
         @dialogShow="dialogShow"
         :sourceList="testList"
         :textObj="textObj"
@@ -26,10 +26,11 @@
             <img :src="require('@/assets/images/clock.png')" width="25" alt>
             <span>{{countDownShow}}</span>
           </div>
-          <div style="min-height: 500px">
+          <div style="min-height: 500px;margin-left: 25px">
             <div v-for="(item,i) in testObj.libraryQuizVOS" :key="item.quizId">
               <p>
                 <span class="option-type" v-if="item.quizType === 10">单选</span>
+                <span class="option-type" v-else-if="item.quizType === 30">主观题</span>
                 <span class="option-type" v-else>多选</span>
                 第{{i+1}}题:
                 <span
@@ -48,12 +49,12 @@
           <el-button
             type="primary"
             v-if="testObj.interactionStatus === 10"
-            @click="beginTest('rightSide')"
+            @click="beginTest(testObj)"
           >开始测试</el-button>
           <el-button
             type="primary"
             v-else-if="testObj.interactionStatus === 20"
-            @click="endTest('rightSide')"
+            @click="endTest"
           >结束测试</el-button>
           <el-button
             type="primary"
@@ -94,8 +95,9 @@
           <div v-for="(item,i) in answerObj" :key="item.quizId">
             <div :id="'subject'+i" style="width: 1000px;height: 400px;"></div>
             <p>
-              <span class="option-type" v-if="item.quizType === 10">单选1</span>
-              <span class="option-type" v-else>多选1</span>
+              <span class="option-type" v-if="item.quizType === 10">单选</span>
+              <span class="option-type" v-else-if="item.quizType === 30">主观题</span>
+                <span class="option-type" v-else>多选</span>
               第{{i+1}}题:
               <span
                 style="display: inline-block; margin-left: 10px"
@@ -165,7 +167,6 @@ export default {
         addBtn: "添加测试",
         interactItemBtn: "开始活动"
       },
-      rightSideStatus: {},
       dataKey: {
         itemId: "examId",
         itemTitle: "examTitle"
@@ -278,46 +279,34 @@ export default {
       let curData = getFilter(data);
       return curData;
     },
-    // 点击获取测试
+    /* 点击获取测试
+       点击后由子组件emit出的信息做为参数传入getQuiz
+    */
     activeTest(item) {
-      console.log(item)
       this.getQuiz(item);
     },
-    // 获取并开始
-    beginTest(value) {
-      console.log(value)
-      this.activeTest(value)
-      if (value === "rightSide") {
-        this.testObj.interactionStatus = 20;
-        this.rightSideStatus = this.testObj;
-        // this.rightSideStatus.id = this.testObj.voteId
-      }
-      this.examParams.classroomId = this.$route.query.classroomId;
-      this.examParams.bean = value.examId
-      this.examParams.userId = Cookie.get('userId')
-      console.log(this.examParams)
+    /* 获取并开始
+       侧边栏开始点击时由子组件传入整个测试对象
+       右边开始按钮点击时为选中的测试对象传入
+       每次调用getQuiz获取信息时获取到的是原始状态值
+       需要手动设置状态20来改变视图的显示
+    */
+    beginTest(value) {  
+      this.testObj = value
+      this.getQuiz(this.testObj)
+      this.testObj.interactionStatus = 20;
       this.subClassroom()
-      window.STOMP_CLIENT.send(
-        "/teamsking/course/exam/start",
-        { token: sessionStorage.getItem('token') },
-        JSON.stringify({
-          bean: value.examId,
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
-          userId: sessionStorage.getItem('userId')
-        })
-      );
+      this.socketTestStart()
     },
 
     // 结束测试
-    endTest(value) {
+    endTest() {
       this.isInteractStart = false
-      if (value === "rightSide") {
-        console.log(this.testObj)
-        this.testObj.interactionStatus = 30;
-        this.rightSideStatus = this.testObj;
-        // this.rightSideStatus.id = this.voteObj.voteId
-      } 
+      this.socketTestEnd()
+      
+    },
+    // 发起socket测试结束
+    socketTestEnd() {
       window.STOMP_CLIENT.send(
         "/teamsking/course/exam/finish",
         { token: sessionStorage.getItem("token") },
@@ -329,12 +318,28 @@ export default {
         })
       );
     },
+    // 发起socket测试开始
+    socketTestStart() {
+      window.STOMP_CLIENT.send(
+        "/teamsking/course/exam/start",
+        { token: sessionStorage.getItem('token') },
+        JSON.stringify({
+          bean: this.testObj.examId,
+          classroomId: this.$route.query.classroomId,
+          courseId: this.$route.query.id,
+          userId: sessionStorage.getItem('userId')
+        })
+      );
+    },
     // 获取测试
     getQuiz(item) {
       console.log(item.examId)
       interactExam({ examId: item.examId }).then(response => {
         this.testObj = response.data;
+        console.log(this.testObj)
+        console.log('0000000000', item)
         if (item.interactionStatus === 30) {
+          console.log(1111111111111)
           classTestRes({ examId: item.examId }).then(response => {
             this.answerObj = response.data;
             console.log(this.answerObj)
@@ -350,6 +355,7 @@ export default {
       });
       
     },
+    // 结束后绘制echarts
     drawPie(items) {
       // setTimeout(()=>{
       //   console.log(document.getElementById('subject0'));
@@ -468,6 +474,9 @@ export default {
       // }
       // return ansArr
     },
+    /**
+     * 订阅消息，返回状态的处都写在这里
+     */
     subClassroom() {
       let userId = sessionStorage.getItem("userId");
       var that = this;
@@ -482,11 +491,13 @@ export default {
             that.students.push(data.data.socketData[0]);
           }else if(data.data.socketType === 302) {
             that.$message.info("结束测试");
-            that.getQuiz(data.data.socketData)
-            that.getTest()
+            // data.data.socketData.interactionStatus = 30
+            that.testObj.interactionStatus = 30
+            console.log(that.testObj, 'bbbbbb', data.data.socketData)
+            that.getQuiz(that.testObj)
           }else if(data.data.socketType === 301) {
             that.$message.info("开始测试");
-            that.getTest()
+            that.testObj.interactionStatus = 20
             that.isInteractStart = true
           }
         }
@@ -512,29 +523,29 @@ export default {
 }
 
 .el-main {
-  padding-left: 300px;
+  margin-left: 280px;
   min-height: 600px;
 }
 
 .full {
   animation:aside-show 1s;
-  padding-left: 0px
+  margin-left: 0px
 }
 
 .hide {
   animation:aside-hide 1s;
-  padding-left: 300px
+  margin-left: 280px
 }
 
 @keyframes aside-show{
-  from {padding-left: 300px}
-  to {padding-left: 0px}
+  from {margin-left: 280px}
+  to {margin-left: 0px}
   animation-fill-mode: forwards
 }
 
 @keyframes aside-hide{
-  from {padding-left: 0px}
-  to {padding-left: 300px}
+  from {margin-left: 0px}
+  to {margin-left: 280px}
   animation-fill-mode: forwards
 }
 
@@ -617,5 +628,12 @@ export default {
   transform: translateX(-50px);
   opacity: 0;
 }
+.menu-switch
+  position absolute
+  & i
+    position absolute
+    top 300px
+    z-index 10
+    font-size 25px
 </style>
 

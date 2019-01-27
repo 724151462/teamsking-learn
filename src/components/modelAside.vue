@@ -24,7 +24,7 @@ beginEvent
 */
 
 <template>
-    <el-aside style="width:280px; border: 1px solid gray; position: fixed;height:85%">
+    <el-aside class="side" style="width:280px; border: 1px solid #F2F6FC; position: fixed;height:85%">
         <div style="margin: 20px 50px">
           <el-button type="primary" style="width: 150px;font-size: 1.2em" @click="addEvent">{{textObj.addBtn}}</el-button>
           <p style="margin-top: 5px">点击题目查看详细情况</p>
@@ -108,6 +108,8 @@ export default {
   padding: 15px;
   margin: 10px auto;
 }
+
+.side::-webkit-scrollbar {display:none}
 
 .test-active {
   border-color: rgb(63, 159, 255);

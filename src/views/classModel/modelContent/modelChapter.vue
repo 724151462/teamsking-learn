@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-aside style="width:280px; border: 1px solid gray; position: fixed;height:85%">
+    <el-aside class="side" style="width:280px; border: 1px solid #F2F6FC; position: fixed;height:85%">
       <el-menu :default-active="activeSection" class="el-menu-vertical-demo" @select="menuSelect" :unique-opened="true">
         <el-submenu
           :index="String(chapter.chapterId)"
@@ -20,43 +20,56 @@
       </el-menu>
     </el-aside>
     <el-main>
-      <div v-if="selectedSection === ''">请选择一个章节</div>
+      <div v-if="selectedSection === ''">
+        <div class="no-content">
+            <img :src="require('@/assets/images/noResource.png')" alt="">
+            <span>请选择一个章节</span>
+          </div>
+      </div>
       <div v-else>
         <div class="secTitle">
           <span>{{selectedSection}}</span>
         </div>
-        <el-tabs type="border-card" @tab-click="viewSource">
-          <el-tab-pane v-for="item in itemList" :name="String(item.itemId)" style="min-height: 500px;">
-            <span slot="label">
-              <el-popover
-                placement="top-start"
-                width="200"
-                trigger="hover"
-                :content="item.itemName"
-              >
-              <template v-if="item.resourceType === 10">
-                  <img :src="require('@/assets/images/play.png')" height="20" slot="reference">
-                  <span>{{item.itemName}}</span>
-              </template>
-                <template v-else>
-                    <img :src="require('@/assets/images/watch.png')" height="20" slot="reference">
+        <template v-if="itemList.length !== 0">
+          <el-tabs type="border-card" v-model="activeName" @tab-click="viewSource">
+            <el-tab-pane v-for="(item,index) in itemList" :name="String(index)" :key="index" style="min-height: 500px;">
+              <span slot="label">
+                <el-popover
+                  placement="top-start"
+                  width="200"
+                  trigger="hover"
+                  :content="item.itemName"
+                >
+                <template v-if="item.resourceType === 10">
+                    <img :src="require('@/assets/images/play.png')" height="20" slot="reference">
                     <span>{{item.itemName}}</span>
                 </template>
-              </el-popover>
-            </span>
-            <template v-if="item.resourceType === 10">
-                  <videoPlayer :isMp4="item.resourceUrl"></videoPlayer>
-              </template>
-              <template v-else-if="item.resourceType === 40">
-                <div style="display: flex; align-item: center;justify-content: center">
-                  <img  :src="item.resourceUrl" height="500px" alt="">
-                </div> 
-              </template>
-                <template v-else>
-                    <iframe style="height:800px;width:100%" :src="viewUrl" frameborder="0"></iframe>
+                  <template v-else>
+                      <img :src="require('@/assets/images/watch.png')" height="20" slot="reference">
+                      <span>{{item.itemName}}</span>
+                  </template>
+                </el-popover>
+              </span>
+              <template v-if="item.resourceType === 10">
+                    <videoPlayer :isMp4="item.resourceUrl"></videoPlayer>
                 </template>
-          </el-tab-pane>
-        </el-tabs>
+                <template v-else-if="item.resourceType === 40">
+                  <div style="display: flex; align-item: center;justify-content: center">
+                    <img  :src="item.resourceUrl" height="500px" alt="">
+                  </div> 
+                </template>
+                  <template v-else>
+                      <iframe style="height:800px;width:100%" :src="viewUrl" frameborder="0"></iframe>
+                  </template>
+            </el-tab-pane>
+          </el-tabs>
+        </template>
+        <template v-else>
+          <div class="no-content">
+            <img :src="require('@/assets/images/noResource.png')" alt="">
+            <span>空空如也~</span>
+          </div>
+        </template>
       </div>
     </el-main>
   </el-container>
@@ -72,6 +85,7 @@ export default {
   data() {
     return {
       chapterList: [],
+      activeName: '0',
       activeSection: null,
       selectedSection: "",
       itemList: [],
@@ -91,20 +105,23 @@ export default {
     menuSelect(secId, x) {
       console.log(x)
         Cookie.set('chapterId', x[0]) 
+        Cookie.set('sectionId', secId) 
       this.chapterList.forEach(element => {
-        if(String(element.chapterId) === x[0]) {
-          this.$emit('showChapterName', element.chapterName)
-        }
         element.seactions.forEach(section => {
-          console.log(section.sectionId, secId);
           if (section.sectionId === Number(secId)) {
             this.selectedSection = section.sectionName;
+            console.log(element.chapterName, section.sectionName)
+            this.$emit(
+              'showCurrentInfo', 
+              {chapterName: element.chapterName,sectionName: section.sectionName}
+            )
           }
         });
       });
       classItem({ sectionId: secId }).then(response => {
         this.itemList = response.data;
       });
+      this.activeName = '0'
     },
     viewSource(value) {
       chapterView({itemId: value.name})
@@ -131,6 +148,21 @@ export default {
   text-align: center;
   font-size: 1.73em;
 }
-
+.no-content {
+  display flex
+  align-items center
+  justify-content center
+  flex-direction column
+  width 100%
+  height 500px
+  & img {
+    height 300px
+  }
+  & span {
+    font-size 30px
+    margin-top 20px
+  }
+}
+.side::-webkit-scrollbar {display:none}
 </style>
 
