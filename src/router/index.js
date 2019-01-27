@@ -784,7 +784,14 @@ export const constantRouterMap = [{
     name: 'modelCheck',
   },
   {
+    path: '/course/checked',
+    //签退
+    component: _import('classModel/checked'),
+    name: 'modelChecked',
+  },
+  {
     path: '/course/classend',
+    //课堂结束，课堂数据展示
     component: _import('classModel/classOver'),
     name: 'classEnd',
   },
@@ -796,6 +803,7 @@ export const constantRouterMap = [{
     children: [
       {
         path: '/course/modelChecked',
+        //签到结束，数据展示
         component: _import('classModel/modelContent/modelChecked'),
         name: 'modelChecked',
       },
@@ -844,17 +852,12 @@ export const constantRouterMap = [{
         component: _import('classModel/modelContent/modelResource'),
         name: 'modelMain',
       },
-      {
-        path: '/course/checked',
-        component: _import('classModel/checked'),
-        name: 'modelChecked',
-      }
     ]
   },
-  // {
-  //   path:'/*',
-  //   redirect:'/login'
-  // },
+  {
+    path:'/*',
+    redirect:'/login'
+  },
 ]
 
 export default new Router({

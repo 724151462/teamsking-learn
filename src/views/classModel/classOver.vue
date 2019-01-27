@@ -79,7 +79,6 @@
       <el-table-column label="课堂出勤">
         <template slot-scope="scope">
           {{ scope.row.name }}
-          <el-button size="mini">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -91,6 +90,7 @@
     name: "classOver",
     data (){
       return {
+        courseName:'',
         tableData: [{
           id: '20160502',
           name: '王小虎',
@@ -101,6 +101,9 @@
         },
         ]
       }
+    },
+    created(){
+      this.courseName = sessionStorage.getItem('courseName')
     },
     methods:{
       back(){
