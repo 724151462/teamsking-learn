@@ -101,6 +101,7 @@ export default {
     });
     
   },
+  mounted(){},
   methods: {
     menuSelect(secId, x) {
       console.log(x)

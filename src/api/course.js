@@ -928,6 +928,14 @@ export function classTestRes(data) {
   let url = `http://120.36.137.90:9008/api/v1/classroom/course/exam/${data.examId}/statics`
   return commonsAjax(url, data, 'post')
 }
+/**
+ * 课堂小结
+ */
+export function classRoomData(data) {
+  // let url = `${baseUrl}classroom/${data.classroomId}/statics`
+  let url = 'http://120.36.137.90:9008/api/v1/course/classroom/135/statics'
+  return commonsAjax(url, data, 'post')
+}
 
 // =======讨论======
 /**

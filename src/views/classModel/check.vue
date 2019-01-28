@@ -8,7 +8,6 @@
     </div>
     <div class="check-btn" style="">
       <el-button type="primary" @click="closeSign">结束签到进入课堂</el-button>
-      <!--<el-button type="primary" @click="startSign">开始签到</el-button>-->
     </div>
     <div class="check-num"> <span style="color: #409EFF;">{{studenlist.length}}</span>人已加入</div>
     <div class="check-avatar-warp">
@@ -119,8 +118,8 @@
 
           if(data.data.socketType == 801){
             console.log('--开始签到--')
+            _this_.timeAdd()
             console.log(data.data)
-            _this_.$message.success('开始签到')
           }
           if(data.data.socketType == 803){
             console.log('学生签到')
@@ -134,16 +133,10 @@
           }
           if(data.data.socketType == 802){
             console.log('结束签到')
+            sessionStorage.setItem('isSign','YES')
             console.log(data.data)
-            _this_.$message.success('签到结束')
             window.STOMP_CLIENT.unsubscribe();
-            _this_.$router.push({
-              path: "/course/modelChecked",
-              query: {
-                id: _this_.$route.query.id,
-                classroomId: sessionStorage.getItem('classroom')
-              }
-            });
+            _this_.$router.push('/course/modelChecked');
           }
         });
       },

@@ -71,8 +71,8 @@ export default {
           background: 'rgba(0, 0, 0, 0.7)'
         });
         let connect = new Promise((resolve, reject)=>{
-          // let url = 'ws://192.168.10.48:9008/websocket',
-          let url = 'ws://120.36.137.90:9008/websocket',
+          let url = 'ws://192.168.10.48:9008/websocket',
+          // let url = 'ws://120.36.137.90:9008/websocket',
             token = sessionStorage.getItem('token'),
             userId = sessionStorage.getItem('userId'),
             courseId = sessionStorage.getItem('courseId');
@@ -96,6 +96,7 @@ export default {
               if (response.code === 200) {
                 console.log('保存课堂',response)
                 sessionStorage.setItem('classroom',response.data.classroomId)
+                sessionStorage.setItem('isSign','NO')
                 this.$router.push({
                   path: "/course/classchapter",
                   query: {
@@ -157,7 +158,6 @@ export default {
         classOver({ classroomId: sessionStorage.getItem('classroom') }).then((res)=>{
           loading.close()
           console.log(res)
-            this.$message.success('课堂已结束')
             this.$router.push({
               path: "/course/classend",
               query: {
