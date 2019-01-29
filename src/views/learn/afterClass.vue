@@ -7,7 +7,8 @@
       <span>成员人数：65人</span>
     </div>
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
-    <div id="studyLong" style="width: 400px;height:400px;"></div>
+    <p>学习时段</p>
+    <div id="studyLong" style="min-height:400px;"></div>
     <p>其他统计</p>
     <div id="studyOther" style="min-height: 400px"></div>
   </div>
@@ -15,6 +16,8 @@
 
 <script>
   import echarts from "echarts";
+  import {afterOther} from '@/api/study'
+  import {myCourseList} from '@/api/course'
   export default {
   data() {
     return {
@@ -43,97 +46,127 @@
           name: '人均日行为学习数',
           value: '100'
         }
-      ]
+      ],
+      studyTime:{
+        "courseUserCount": null,
+        "staticsDate": null,
+        "cmpTime": null,
+        "zeroPoint": 0,
+        "onePoint": 5,
+        "twoPoint": 0,
+        "threePoint": 0,
+        "fourPoint": 0,
+        "fivePoint": 0,
+        "sixPoint": 0,
+        "sevenPoint": 0,
+        "eightPoint": 0,
+        "ninePoint": 0,
+        "tenPoint": 0,
+        "elevenPoint": 0,
+        "twelvePoint": 0,
+        "thirteenPoint": 0,
+        "fourteenPoint": 0,
+        "fifteenPoint": 0,
+        "sixteenPoint": 0,
+        "seventeenPoint": 0,
+        "eighteenPoint": 0,
+        "nineteenPoint": 0,
+        "twentyPoint": 0,
+        "twentyOnePoint": 0,
+        "twentyTwoPoint": 0,
+        "twentyThreePoint": 0,
+        "tstudyDaytimeId": null
+      },
+      other:{
+        docWatchCount: 0,  //教案观看
+        libraryCount: 2,  //人均参加活动
+        loginCount: 3,  //登录次数
+        noteRate: 1900,  //人均笔记
+        studyBehaviorthRate: 0, // 人均日行为
+        studyLengthRate: 13,  //人均学习时长
+      }
     };
   },
   mounted() {
+    this.testChartInit()
+    this.otherChartInit()
     this.chartInit()
-    this.otherInit()
-
   },
   created () {
+    this.myCourseData()
+    this.otherData()
   },
   methods: {
-    testInit(){
+    testChartInit(){
 
     },
     chartInit () {
       var myChart = echarts.init(document.getElementById('studyLong'));
       // 指定图表的配置项和数据
       var option = {
-        title : {
-          text: '课后学习时长',
-          x:'center'
+        xAxis: {
+          type: 'category',
+          data: ['0:00', '1:00','2:00','3:00','4:00','5:00','6:00',
+                  '7:00','8:00','9:00','10:00','11:00','12:00',
+                  '13:00','14:00','15:00','16:00','17:00','18:00',
+                  '19:00','20:00','21:00','22:00','23:00','24:00']
         },
-        tooltip : {
-          trigger: 'item',
-          formatter: "{a} <br/>{b} : {c} ({d}%)"
+        yAxis: {
+          type: 'category',
+          data: [0, 10,20,30,40,50,60]
         },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
-          data: ['直接访问','邮件营销','联盟广告']
-        },
-        series : [
-          {
-            name: '访问来源',
-            type: 'pie',
-            radius : '55%',
-            center: ['50%', '60%'],
-            data:[
-              {value:335, name:'直接访问'},
-              {value:310, name:'邮件营销'},
-              {value:234, name:'联盟广告'},
-            ],
-            itemStyle: {
-              emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            }
-          }
-        ]
+        series: [{
+          data: [this.studyTime.zeroPoint, this.studyTime.onePoint,this.studyTime.twoPoint,
+                  this.studyTime.threePoint,this.studyTime.fourPoint,this.studyTime.fivePoint,
+                  this.studyTime.sixPoint,this.studyTime.sevenPoint,this.studyTime.eightPoint,
+                  this.studyTime.ninePoint,this.studyTime.tenPoint,this.studyTime.elevenPoint,],
+          type: 'line'
+        }]
       };
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
     },
     //其它数据的图标init
-    otherInit (){
+    otherChartInit (){
       let plantCap = this.planCap
-      //计算圆球偏移次数
+      //圆球偏移,大小，在一定范围内随机
       var datalist = [
-      {
+      {//人均学习
         offset: [Math.random() * 5 , Math.random() * (65 - 60) + 60],
         symbolSize: Math.random() * (180 - 120) + 120,
         opacity: 1,
         color: '#447eda'
       },
-      {
-        offset: [30, 80],
+      {//人均笔记
+        offset: [Math.random() * (40 - 30) + 30, Math.random() * (90 - 80) + 80],
         symbolSize: 80,
         opacity: 1,
         color: 'rgb(244, 123, 193)'
       },
         {
-        offset: [50, 70],
-        symbolSize: 70,
+        //登录次数
+        offset: [Math.random() * (60 - 50) + 50, Math.random() * (85 - 70) + 70],
+        symbolSize: Math.random() * (90 - 70) + 70,
         opacity: 1,
         color: 'rgb(110, 213, 230)'
       }, {
+        //人均日学习
         offset: [80, 30],
         symbolSize: 100,
         opacity: .8,
         color: 'rgb(241, 86, 85)'
       }, {
+        //作业完成次数
         offset: [25, 20],
         symbolSize: 160,
         color: 'rgb(97, 200, 127)'
       }, {
-        offset: [50, 10],
+        //教案资源观看
+        offset: [50, 15],
         symbolSize: 100,
         color: 'rgb(112, 83, 182)'
       }, {
+        //人均参加活动
         offset: [75, 75],
         symbolSize: 120,
         color: 'rgb(252, 134, 64)'
@@ -161,7 +194,6 @@
           },
         })
       }
-      console.log(datas)
       var option = {
         grid: {
           show: false,
@@ -208,9 +240,34 @@
       var myChart = echarts.init(document.getElementById('studyOther'));
       myChart.setOption(option);
     },
+    //获取我可以管理的课程列表
+    myCourseData(name){
+      name = name || ''
+      let data = {
+        "courseName": name,
+        "pageParam": {
+          "pageIndex": 1,
+          "pageSize": 10
+        }
+      }
+      myCourseList(data).then(res=>{
+        console.log(res)
+      }).catch(err=>{
+        console.log(err)
+      })
+    },
     //获取其它行为的课堂数据
-    otherData(){
+    otherData(courseId,startTime,endTime){
+      let data = {
+        "courseId": "0608367675f54267aa6960fd0557cc1b",
+        "endTime": "2019-01-26 07:23:51",
+        "startTime": "2019-01-23 07:23:51"
+      }
+      afterOther(data).then(res=>{
+        console.log(res)
+      }).catch((err)=>{
 
+      })
     },
   }
 };

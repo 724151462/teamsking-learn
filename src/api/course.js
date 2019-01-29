@@ -25,6 +25,12 @@ import {
 export function coursePage(data) {
   return commonsAjax(`${baseUrl}page`, data, 'get')
 }
+/**
+ * 获取我能管理的课程列表
+ */
+export function myCourseList(data) {
+  return commonsAjax(`${commonBaseUrl}me/course/list`, data, 'post')
+}
 
 /**
  * 获取课程列表
@@ -942,10 +948,10 @@ export function classRoomData(data) {
  * 讨论列表
  */
 export function discussGet(data) {
-  let url = `${studyUrl}${data.courseId}/discussion/page`
+  let ul = `${studyUrl}${data.courseId}/discussion/page`
   return commonsAjax(url, data, 'get')
 }
-//======长连接签到相关
+//======长连接签到相关w
 /**
  * 保存签到
  */
