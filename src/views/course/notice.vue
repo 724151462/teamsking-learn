@@ -155,7 +155,7 @@ export default {
         if(response.code === 200) {
           this.tableData.push(response.data)
           this.$message({
-            message: '添加成功',
+            message: '添加成功，耗时操作，请稍后刷新页面查看',
             type: 'success'
           })
         }else if(response.code === 440){
