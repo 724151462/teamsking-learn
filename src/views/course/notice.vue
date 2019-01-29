@@ -160,7 +160,7 @@ export default {
           })
         }else if(response.code === 440){
             this.$message({
-                message: '标题或内容过短',
+                message: '内容限制在10-1000字符之间|标题限制在5-100字符之间',
                 type: 'warning'
             })
         }

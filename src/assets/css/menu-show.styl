@@ -1,0 +1,82 @@
+.main-full {
+  animation:main-show 1s;
+  margin-left: 0px
+}
+
+.main-hide {
+  animation:main-hide 1s;
+  margin-left: 280px
+}
+
+@keyframes main-show{
+  from {margin-left: 280px}
+  to {margin-left: 0px}
+  animation-fill-mode: forwards
+}
+
+@keyframes main-hide{
+  from {margin-left: 0px}
+  to {margin-left: 280px}
+  animation-fill-mode: forwards
+}
+
+.full {
+  animation:aside-show 1s;
+  margin-left: -280px
+}
+
+.hide {
+  animation:aside-hide 1s;
+  margin-left: 0px
+}
+
+@keyframes aside-show{
+  from {margin-left: 0px}
+  to {margin-left: -280px}
+  animation-fill-mode: forwards
+}
+
+@keyframes aside-hide{
+  from {margin-left: -280px}
+  to {margin-left: 0px}
+  animation-fill-mode: forwards
+}
+  
+  .slide-fade-enter-active {
+    transition: all .2s ease;
+  }
+  .slide-fade-leave-active {
+    transition: all .2s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  }
+  .slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active 用于 2.1.8 以下版本 */ {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  .menu-switch
+    position absolute
+    &:hover .el-icon-caret-left
+      display inline-block
+    & div
+      position relative
+      top 300px
+      left 280px
+      z-index 9
+      font-size 20px
+      & i
+        position relative
+        z-index 10
+        top 35px
+    .switch-outer
+      display: inline-block;
+      border 1px solid #C0C4CC;
+      border-radius 5px
+      width: 15px;background: #C0C4CC;
+      height: 100px
+    .el-icon-caret-left
+      display none
+
+.el-icon-caret-right
+  cursor pointer
+.el-icon-caret-left
+  cursor pointer

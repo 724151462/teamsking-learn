@@ -175,8 +175,15 @@ export default {
         }
       );
     }
+    this.preventBack()
   },
   methods: {
+    preventBack() {
+      history.pushState(null, null, document.URL); 
+      window.addEventListener('popstate', function() { 
+        history.pushState(null, null, document.URL); 
+      });
+    },
     // 添加评分点
     addScorePoint() {
       this.homeWork.homeworkMarks.push({

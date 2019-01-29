@@ -134,8 +134,15 @@ export default {
     chaptersListSimple({ courseId: this.voteObj.courseId }).then(response => {
       this.chapterList = response.data;
     });
+    this.preventBack()
   },
   methods: {
+    preventBack() {
+      history.pushState(null, null, document.URL); 
+      window.addEventListener('popstate', function() { 
+        history.pushState(null, null, document.URL); 
+      });
+    },
     addTab(targetName) {
       let newTabName = ++this.tabIndex + "";
       console.log("newTabName", newTabName);

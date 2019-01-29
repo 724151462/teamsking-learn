@@ -92,8 +92,15 @@ export default {
     chaptersListSimple({ courseId: this.$route.query.id }).then(response => {
       this.chapterList = response.data;
     })
+    this.preventBack()
   },
   methods: {
+    preventBack() {
+      history.pushState(null, null, document.URL); 
+      window.addEventListener('popstate', function() { 
+        history.pushState(null, null, document.URL); 
+      });
+    },
     getUrl(url, fileName) {
       console.log("资源链接：" + url);
       this.addImgList.push(url);

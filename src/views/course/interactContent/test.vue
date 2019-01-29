@@ -183,8 +183,15 @@ export default {
         this.testObj = response.data;
       });
     }
+    this.preventBack()
   },
   methods: {
+    preventBack() {
+      history.pushState(null, null, document.URL); 
+      window.addEventListener('popstate', function() { 
+        history.pushState(null, null, document.URL); 
+      });
+    },
     addTab(params) {
       let activeName = this.testContentArrValue;
       params.forEach((element, i) => {
