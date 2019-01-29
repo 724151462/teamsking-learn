@@ -148,6 +148,7 @@
         })
       },
       closeSign(){
+
         let tagClient = window.STOMP_CLIENT,
           token = sessionStorage.getItem('token'),
           userId = sessionStorage.getItem('userId'),
