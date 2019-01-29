@@ -933,7 +933,7 @@ export function classTestRes(data) {
  */
 export function classRoomData(data) {
   // let url = `${baseUrl}classroom/${data.classroomId}/statics`
-  let url = 'http://120.36.137.90:9008/api/v1/course/classroom/135/statics'
+  let url = `http://120.36.137.90:9008/api/v1/course/classroom/${data.classroomId}/statics`
   return commonsAjax(url, data, 'post')
 }
 
@@ -967,7 +967,6 @@ export function changeSign(data) {
   let url = `${baseUrl}sign`
   return commonsAjax(url, data, 'put')
 }
-
 
 /**
  * 讨论详情页主题

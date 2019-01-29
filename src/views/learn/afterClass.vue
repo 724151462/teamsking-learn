@@ -98,43 +98,45 @@
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
     },
+    //其它数据的图标init
     otherInit (){
       let plantCap = this.planCap
-      var datalist = [{
-        offset: [56, 48],
-        symbolSize: 120,
-        opacity: .95,
-        color: '#f467ce'
+      //计算圆球偏移次数
+      var datalist = [
+      {
+        offset: [Math.random() * 5 , Math.random() * (65 - 60) + 60],
+        symbolSize: Math.random() * (180 - 120) + 120,
+        opacity: 1,
+        color: '#447eda'
+      },
+      {
+        offset: [30, 80],
+        symbolSize: 80,
+        opacity: 1,
+        color: 'rgb(244, 123, 193)'
+      },
+        {
+        offset: [50, 70],
+        symbolSize: 70,
+        opacity: 1,
+        color: 'rgb(110, 213, 230)'
       }, {
-        offset: [35, 80],
-        symbolSize: 100,
-        opacity: .88,
-        color: '#7aabe2'
-      }, {
-        offset: [0, 0],
-        symbolSize: 100,
-        opacity: .84,
-        color: '#ff7123'
-      }, {
-        offset: [68, 30],
+        offset: [80, 30],
         symbolSize: 100,
         opacity: .8,
-        color: '#ffc400'
+        color: 'rgb(241, 86, 85)'
       }, {
-        offset: [36, 20],
-        symbolSize: 100,
-        opacity: .75,
-        color: '#5e333f'
+        offset: [25, 20],
+        symbolSize: 160,
+        color: 'rgb(97, 200, 127)'
       }, {
-        offset: [64, 10],
+        offset: [50, 10],
         symbolSize: 100,
-        opacity: .7,
-        color: '#6b3442'
+        color: 'rgb(112, 83, 182)'
       }, {
         offset: [75, 75],
-        symbolSize: 100,
-        opacity: .68,
-        color: '#8a3647'
+        symbolSize: 120,
+        color: 'rgb(252, 134, 64)'
       }];
       var datas = [];
       for (var i = 0; i < plantCap.length; i++) {
@@ -162,12 +164,12 @@
       console.log(datas)
       var option = {
         grid: {
-          show: true,
+          show: false,
         },
         xAxis: [{
           gridIndex: 0,
           type: 'value',
-          show: true,
+          show: false,
           min: 0,
           max: 100,
           nameLocation: 'middle',
@@ -176,7 +178,7 @@
         yAxis: [{
           gridIndex: 0,
           min: 0,
-          show: true,
+          show: false,
           max: 100,
           nameLocation: 'middle',
           nameGap: 30
@@ -205,7 +207,11 @@
       };
       var myChart = echarts.init(document.getElementById('studyOther'));
       myChart.setOption(option);
-    }
+    },
+    //获取其它行为的课堂数据
+    otherData(){
+
+    },
   }
 };
 </script>

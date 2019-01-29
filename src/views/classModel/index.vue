@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { classingInfo, classOver, classSave ,courseBaseInfo} from "@/api/course";
+import { classingInfo, classOver, classSave ,courseBaseInfo } from "@/api/course";
 import {connect} from "@/utils/utils"
 import Cookie from "js-cookie";
 export default {

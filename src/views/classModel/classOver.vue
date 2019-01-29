@@ -128,7 +128,7 @@
       },
       init(pageIndex){
         let data = {
-          classroomId: 135,
+          classroomId: sessionStorage.getItem('classroom'),
           pageParam: {
             pageIndex: pageIndex,
             pageSize: 10
@@ -171,7 +171,7 @@
     //导出表格时对数据进行处理
       excelInit(){
         let pagedata = {
-          classroomId: 135,
+          classroomId: sessionStorage.getItem('classroom'),
           pageParam: {
             pageIndex: 1,
             pageSize: 10000
