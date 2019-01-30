@@ -155,12 +155,12 @@ export default {
         if(response.code === 200) {
           this.tableData.push(response.data)
           this.$message({
-            message: '添加成功',
+            message: '添加成功，耗时操作，请稍后刷新页面查看',
             type: 'success'
           })
         }else if(response.code === 440){
             this.$message({
-                message: '标题或内容过短',
+                message: '内容限制在10-1000字符之间|标题限制在5-100字符之间',
                 type: 'warning'
             })
         }

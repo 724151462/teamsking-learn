@@ -1,8 +1,8 @@
 <template>
   <div style="height: 100%;width:100%;background:#F6F7F9;">
-    <el-header style="padding:0">
+    <!-- <el-header style="padding:0">
       <headers :navs="nav"></headers>
-    </el-header>
+    </el-header> -->
     <el-container
         style="
           background:#ffffff;

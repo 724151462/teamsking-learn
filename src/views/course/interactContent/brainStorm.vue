@@ -16,8 +16,16 @@
         <i class="el-icon-picture"></i>
         <span>添加图片</span>
         <upOss @ossUp="getUrl" :fileType="'image/jpeg,image/png'"></upOss>
-        <div>
-          <img v-for="(item, index) in addImgList" :src="item" :width="50" :key="index" alt>
+        <div class="all-img-list">
+          <template v-for="(item,i) in addImgList">
+            <div :key="i" style="display: flex; flex-direction: column; align-items: center">
+              <div class="img-list">
+                <img style="width:50px" :src="item.assetUrl" class="img">
+              </div>
+            </div>
+            <span :key="item.userId" class="delAsset" @click="delAsset(item)">×</span>
+          </template>
+          <!-- <img v-for="(item, index) in addImgList" :src="item.assetUrl" :width="50" :key="index" alt> -->
         </div>
       </div>
       <div class="margin-sides">标题</div>
@@ -44,11 +52,11 @@
 
 <script>
 import upOss from "@/components/up-oss";
-import Cookie from 'js-cookie'
-import { 
+import Cookie from "js-cookie";
+import {
   interactStorm,
-  assetCreate, 
-  chaptersListSimple, 
+  assetCreate,
+  chaptersListSimple,
   stormSave,
   stormPut
 } from "@/api/course";
@@ -79,95 +87,223 @@ export default {
         resourceLength: 0,
         updateId: 0
       },
-      routerType: 'cancel'
+      routerType: "cancel"
     };
   },
   mounted() {
-    if(this.$route.query.operation === 'edit') {
-      interactStorm({stormId: this.$route.query.interactId})
-      .then(response=> {
-        this.brainStorm = response.data
-      })
+    if (this.$route.query.operation === "edit") {
+      interactStorm({ stormId: this.$route.query.interactId }).then(
+        response => {
+          this.brainStorm = response.data;
+          this.addImgList = response.data.assetList;
+          console.log(this.addImgList);
+        }
+      );
     }
     chaptersListSimple({ courseId: this.$route.query.id }).then(response => {
       this.chapterList = response.data;
-    })
+    });
+    this.preventBack();
   },
   methods: {
-    getUrl(url, fileName) {
-      console.log("资源链接：" + url);
-      this.addImgList.push(url);
-      this.asset.assetTitle = fileName;
-      this.asset.assetUrl = url;
-      assetCreate(this.asset).then(response => {
-        this.brainStorm.assetIds.push(response.data.assetId);
+    // 删附件
+    delAsset(item) {
+      this.brainStorm.assetList.forEach((element, i) => {
+        if(element.assetId === item.assetId) {
+          this.brainStorm.assetList.splice(i, 1)
+        }
       });
     },
-    handleSuccess() {
-      this.routerType = 'success'
-      let chapterArr = JSON.parse(localStorage.getItem('localInteractId'))
-      Cookie.set('interactionStatus', "10")
-      let index = ''
-      let findFlag = chapterArr.some((element, i)=> {
-        if(element === this.brainStorm.chapterId) {
-          index = i
-        }
-      })
-      if(index !== '') {
-        Cookie.set('interactActiveIndex', index)
-      }else{
-        Cookie.set('interactActiveIndex', chapterArr.length)
+    preventBack() {
+      history.pushState(null, null, document.URL);
+      window.addEventListener("popstate", function() {
+        history.pushState(null, null, document.URL);
+      });
+    },
+    getUrl(url, fileName) {
+      console.log("资源链接：" + url);
+      this.asset.assetTitle = fileName;
+      this.asset.assetUrl = url;
+      this.asset.contentType = this.resType(fileName);
+      assetCreate(this.asset).then(response => {
+        this.brainStorm.assetList.push(response.data);
+        console.log(this.brainStorm);
+      });
+    },
+    resType(name) {
+      let index = name.lastIndexOf("."),
+        imgArr = ["jpeg", "jpg", "png"],
+        audioArr = ["mp3", "wav"],
+        videoArr = ["mp4", "avi", "rmvb", "wmv", "mkv"],
+        docArr = ["pdf", "txt", "doc", "docx", "xls", "xlsx", "ppt", "pptx"],
+        typeNumber = "";
+      let curType = name.substring(index + 1, name.length).toLowerCase();
+
+      if (
+        imgArr.find(item => {
+          return curType == item;
+        })
+      ) {
+        typeNumber = 40;
+      } else if (
+        videoArr.find(item => {
+          return curType == item;
+        })
+      ) {
+        typeNumber = 10;
+      } else if (
+        docArr.find(item => {
+          return curType == item;
+        })
+      ) {
+        typeNumber = 20;
+      } else if (
+        audioArr.find(item => {
+          return curType == item;
+        })
+      ) {
+        typeNumber = 30;
+      } else {
+        this.$message.error("请上传受支持的资源文件");
       }
-      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
+      return typeNumber;
+    },
+    handleSuccess() {
+      this.routerType = "success";
+      let chapterArr = JSON.parse(localStorage.getItem("localInteractId"));
+      Cookie.set("interactionStatus", "10");
+      let index = "";
+      let findFlag = chapterArr.some((element, i) => {
+        if (element === this.brainStorm.chapterId) {
+          index = i;
+        }
+      });
+      if (index !== "") {
+        Cookie.set("interactActiveIndex", index);
+      } else {
+        Cookie.set("interactActiveIndex", chapterArr.length);
+      }
+      this.$router.push({
+        path: "/course/list/interact",
+        query: { id: this.$route.query.id }
+      });
     },
     brainStormSave() {
-      if(this.$route.query.operation === 'edit'){
+      let newAssets = JSON.parse(JSON.stringify(this.brainStorm.assetList));
+      let imgList = [];
+      newAssets.forEach(element => {
+        console.log(element);
+        imgList.push(element.assetId);
+      });
+      this.brainStorm.assetIds = imgList;
+      if (this.$route.query.operation === "edit") {
+        console.log(this.brainStorm);
         stormPut(this.brainStorm).then(response => {
           if (response.code === 200) {
             this.$message({
               message: "修改投票成功",
               type: "success"
             });
-            this.handleSuccess()
+            this.handleSuccess();
           }
         });
-      }else{
+      } else {
         stormSave(this.brainStorm).then(response => {
-        if (response.code === 200) {
-          this.$message({
-            message: "成功",
-            type: "success"
-          });
-          this.handleSuccess()
-        }
-      });
+          if (response.code === 200) {
+            this.$message({
+              message: "成功",
+              type: "success"
+            });
+            this.handleSuccess();
+          }
+        });
       }
     },
     // 取消
     cancel() {
-      this.routerType = "cancel"
-      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
+      this.routerType = "cancel";
+      this.$router.push({
+        path: "/course/list/interact",
+        query: { id: this.$route.query.id }
+      });
     }
   },
-  beforeRouteLeave (to, from, next) {
-    let msg = '跳转将丢失未保存数据，是否跳转'
-    if(this.routerType === 'cancel') {
-      msg = '跳转将丢失未保存数据，是否跳转'
-    }else {
-      msg = '添加成功，是否跳活动转列表页'
+  beforeRouteLeave(to, from, next) {
+    let msg = "跳转将丢失未保存数据，是否跳转";
+    if (this.routerType === "cancel") {
+      msg = "跳转将丢失未保存数据，是否跳转";
+    } else {
+      msg = "添加成功，是否跳活动转列表页";
     }
-    this.$confirm(msg, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }).then(() => {
-      next()
-    }).catch(() => {      
-    });
+    this.$confirm(msg, "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    })
+      .then(() => {
+        next();
+      })
+      .catch(() => {});
   },
   components: { upOss }
 };
 </script>
 
-<style>
+<style  lang="stylus" scoped>
+.all-img-list {
+  padding-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+
+
+    .img {
+      width: auto;
+    }
+  
+
+  .add-img {
+    font-size: 50px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    line-height: 40px;
+    border: 1px solid #D8D8D8;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+}
+
+.delAsset {
+  height: 20px;
+  line-height: 18px;
+  width: 20px;
+  font-size: 20px;
+  position: relative;
+  top: -25px;
+  cursor: pointer;
+  background: rgb(99, 99, 99);
+  color: #fff;
+  text-align: center;
+  border: 1px solid rgb(99, 99, 99);
+  border-radius: 50%;
+}
+
+.add-img {
+  font-size: 50px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  line-height: 40px;
+  border: 1px solid #D8D8D8;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  margin-left: 10px;
+  cursor: pointer;
+}
 </style>

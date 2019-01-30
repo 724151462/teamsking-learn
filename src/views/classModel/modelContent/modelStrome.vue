@@ -1,7 +1,13 @@
 <template>
   <div class="modelStrome">
     <el-container>
-      <modelAside
+      <div class="menu-switch">
+        <div :class="isInteractStart === true ? ['switch-outer','full']: ['switch-outer','no-full']">
+          <i :class="isInteractStart === true ? 'el-icon-caret-right' : 'el-icon-caret-left'" @click.stop="menuShow"></i>
+        </div> 
+      </div>
+      <transition name="slide-fade">
+      <modelAside v-show="isInteractStart === false"
         @dialogShow="dialogShow"
         :sourceList="stormList"
         :textObj="textObj"
@@ -10,7 +16,8 @@
         @activeEvent="activeStrome"
         @beginEvent="beginStorm"
       ></modelAside>
-      <el-main style="padding-left: 300px; margin-left: 25px">
+      </transition>
+      <el-main :class="isInteractStart === true ? 'main-full': 'main-hide'">
         <div v-if="stormObj.stormTitle === undefined && stormObj !== 'add'">
           <span>请选择或添加头脑风暴</span>
         </div>
@@ -136,7 +143,7 @@ export default {
         classroomId: this.$route.query.classroomId,
         courseId: this.$route.query.id
       },
-
+      isInteractStart: false,
       stormObj: {
         // socket实时消息列表
         answerList: []
@@ -160,6 +167,9 @@ export default {
     };
   },
   methods: {
+    menuShow() {
+      this.isInteractStart = !this.isInteractStart
+    },
     dialogShow(value) {
       this.stormObj = "add";
     },
@@ -183,6 +193,7 @@ export default {
         this.rightSideStatus = this.stormObj;
         // this.rightSideStatus.id = this.voteObj.voteId
       }
+      this.isInteractStart = false
       this.socketStromEnd()
     },
     // 开始头脑风暴
@@ -225,6 +236,9 @@ export default {
             message: "已结束头脑风暴",
             type: "success"
           })
+        }else if(JSON.parse(result.body).data.socketType === 501) {
+          that.$message({ message: "开始头脑风暴", type: "success" });
+          that.isInteractStart = true
         }
       });
     },
@@ -235,7 +249,7 @@ export default {
           this.$message({
             message: "加分成功",
             type: "success"
-          });
+          });p
         }
       });
     },
@@ -351,6 +365,7 @@ export default {
 };
 </script>
 
+<style lang="stylus" scoped src="@/assets/css/menu-show.styl"></style>
 <style lang="stylus" scoped>
 .el-header {
   border-bottom: 1px solid rgb(215, 215, 215);

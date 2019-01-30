@@ -2,7 +2,9 @@
   <div>
     <el-container>
       <div class="menu-switch">
-        <i :class="isInteractStart === true ? ['full','el-icon-caret-right']: ['hide','el-icon-caret-left']" @click.stop="menuShow"></i>  
+        <div :class="isInteractStart === true ? ['switch-outer','full']: ['switch-outer','no-full']">
+          <i :class="isInteractStart === true ? 'el-icon-caret-right' : 'el-icon-caret-left'" @click.stop="menuShow"></i>
+        </div> 
       </div>
       <transition name="slide-fade">
       <modelAside v-show="isInteractStart === false"
@@ -15,7 +17,7 @@
         @beginEvent="beginTest"
       ></modelAside>
       </transition>
-      <el-main :class="isInteractStart === true ? 'full': 'hide'">
+      <el-main :class="isInteractStart === true ? 'main-full': 'main-hide'">
         <div v-if="testObj === ''">
           <span></span>
         </div>
@@ -207,7 +209,6 @@ export default {
       if (this.students.length === 0) {
         return
       }else{
-        alert(1)
         return this.students.sort(this.sortBy("grade", "time"));
       }
     }
@@ -235,26 +236,31 @@ export default {
       });
     },
     setEndTime(){
-        var date = this.endTime * 60 //计算总秒数
-        var interval = setInterval(() =>{
-        if(date == 0){
-          this.isEnd = true;
-          clearInterval(interval)
-        }else{
-          date --;
-          this.time.m = parseInt(date / 60 % 60);//计算剩余的分钟
-          if(this.time.m < 10){
-            this.time.m = "0" +this.time.m
-          } 
-          this.time.s = parseInt(date % 60);//计算剩余的秒数 
-          if(this.time.s < 10){
-            this.time.s = "0" +this.time.s
-          }
-          console.log(this.time.m+this.time.s)
-          this.countDownShow = this.time.m+':'+this.time.s;
-          return this.time.m+this.time.s;	
+        console.log(this.endTime)
+        if(this.endTime !== null) {
+          var date = this.endTime * 60 //计算总秒数
+          var interval = setInterval(() =>{
+            if(date == 0){
+              this.isEnd = true;
+              this.endTest()
+              clearInterval(interval)
+            }else{
+              date --;
+              this.time.m = parseInt(date / 60 % 60);//计算剩余的分钟
+              if(this.time.m < 10){
+                this.time.m = "0" +this.time.m
+              } 
+              this.time.s = parseInt(date % 60);//计算剩余的秒数 
+              if(this.time.s < 10){
+                this.time.s = "0" +this.time.s
+              }
+              console.log(this.time.m+this.time.s)
+              this.countDownShow = this.time.m+':'+this.time.s;
+              return this.time.m+this.time.s;	
+            }
+          },1000);
         }
-      },1000);
+        
     },
     // 递归渲染试题
     filterData(data) {
@@ -333,13 +339,11 @@ export default {
     },
     // 获取测试
     getQuiz(item) {
-      console.log(item.examId)
+      console.log(item.interactionStatus)
       interactExam({ examId: item.examId }).then(response => {
         this.testObj = response.data;
-        console.log(this.testObj)
-        console.log('0000000000', item)
-        if (item.interactionStatus === 30) {
-          console.log(1111111111111)
+        this.endTime = response.data.limitTime
+        if (response.data.interactionStatus === 30) {
           classTestRes({ examId: item.examId }).then(response => {
             this.answerObj = response.data;
             console.log(this.answerObj)
@@ -347,10 +351,11 @@ export default {
               this.drawPie(this.answerObj);
             });
           });
-        } else if (item.interactionStatus === 20) {
+        } else if (response.data.interactionStatus === 10) {
           // interactExamRes(this.examParams).then(response => {
           //   this.students = response.data.pageData;
           // });
+          
         }
       });
       
@@ -497,6 +502,7 @@ export default {
             that.getQuiz(that.testObj)
           }else if(data.data.socketType === 301) {
             that.$message.info("开始测试");
+            that.setEndTime()
             that.testObj.interactionStatus = 20
             that.isInteractStart = true
           }
@@ -511,6 +517,7 @@ export default {
 };
 </script>
 
+<style lang="stylus" scoped src="@/assets/css/menu-show.styl"></style>
 <style lang="stylus" scoped>
 @media screen and (min-width: 1200px) and (max-width: 1500px) {
   .el-container {
@@ -520,33 +527,6 @@ export default {
   .count-down {
     left: 92% !important;
   }
-}
-
-.el-main {
-  margin-left: 280px;
-  min-height: 600px;
-}
-
-.full {
-  animation:aside-show 1s;
-  margin-left: 0px
-}
-
-.hide {
-  animation:aside-hide 1s;
-  margin-left: 280px
-}
-
-@keyframes aside-show{
-  from {margin-left: 280px}
-  to {margin-left: 0px}
-  animation-fill-mode: forwards
-}
-
-@keyframes aside-hide{
-  from {margin-left: 0px}
-  to {margin-left: 280px}
-  animation-fill-mode: forwards
 }
 
 .option-type {
@@ -628,12 +608,5 @@ export default {
   transform: translateX(-50px);
   opacity: 0;
 }
-.menu-switch
-  position absolute
-  & i
-    position absolute
-    top 300px
-    z-index 10
-    font-size 25px
 </style>
 

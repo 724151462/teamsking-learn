@@ -19,6 +19,9 @@
         <upOss @ossUp="getUrl" :btnText="'添加附件'"></upOss>
       </div>
       <div>
+        <div><img v-for="item in homeWork.assets" width="50" :src="item.assetUrl"></div>
+      </div>
+      <div>
         <span>标题</span>
         <div>
           <el-input
@@ -166,17 +169,24 @@ export default {
       homeWorkDetail({ homeworkId: this.$route.query.interactId }).then(
         response => {
           this.homeWork = response.data;
-          let assetArr = []
-          this.homeWork.assets.forEach(element => {
-            assetArr.push(element.assetId)
-          });
-          this.homeWork.assets = assetArr
+          // let assetArr = []
+          // this.homeWork.assets.forEach(element => {
+          //   assetArr.push(element.assetId)
+          // });
+          // this.homeWork.assets = assetArr
           console.log(this.homeWork.assets)
         }
       );
     }
+    this.preventBack()
   },
   methods: {
+    preventBack() {
+      history.pushState(null, null, document.URL); 
+      window.addEventListener('popstate', function() { 
+        history.pushState(null, null, document.URL); 
+      });
+    },
     // 添加评分点
     addScorePoint() {
       this.homeWork.homeworkMarks.push({
@@ -198,10 +208,25 @@ export default {
       this.asset.assetTitle = fileName;
       this.asset.assetUrl = url;
       assetCreate(this.asset).then(response => {
-        this.homeWork.assets.push(response.data.assetId);
+        this.homeWork.assets.push(response.data);
         console.log("asset", this.homeWork);
       });
     },
+    // 下载
+    // funDownload(content, filename) {
+    //     // 创建隐藏的可下载链接
+    //     var eleLink = document.createElement('a');
+    //     eleLink.download = filename;
+    //     eleLink.style.display = 'none';
+    //     // 字符内容转变成blob地址
+    //     var blob = new Blob([content]);
+    //     eleLink.href = URL.createObjectURL(blob);
+    //     // 触发点击
+    //     document.body.appendChild(eleLink);
+    //     eleLink.click();
+    //     // 然后移除
+    //     document.body.removeChild(eleLink);
+    // },
     handleSuccess() {
       this.routerType = 'success'
       let chapterArr = JSON.parse(localStorage.getItem('localInteractId'))
@@ -220,6 +245,13 @@ export default {
       this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
     },
     hwSave() {
+      let newAssets = JSON.parse(JSON.stringify(this.homeWork.assets));
+        let imgList = [];
+        newAssets.forEach(element => {
+          console.log(element);
+          imgList.push(element.assetId);
+        });
+        this.homeWork.assets = imgList;
       if (this.$route.query.operation === "edit") {
         homeworkPut(this.homeWork).then(response => {
           if (response.code === 200) {
