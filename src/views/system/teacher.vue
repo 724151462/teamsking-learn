@@ -43,7 +43,7 @@
             background
             layout="prev, pager, next"
             :total="totalCount"
-            :page-size="2"
+            :page-size="10"
             :current-page="searchForm.pageIndex"
             @current-change="pageChange">
     </el-pagination>
@@ -67,16 +67,9 @@
       return{
         dialogVisible: false,
         tableOperate:[
-          {
-            content:'添加教师',
-            type:'addTeacher'
-          },
         ],
         tableTitle:'教师管理列表',
         columnNameList:[
-          {
-            type:"selection"
-          },
           {
             name:'姓名',
             prop:'teacherName'
@@ -267,9 +260,6 @@
             //console.log(info);
             this.popContentItem = this.info;
             this.check(info);
-            break;
-          case 'addTeacher':
-            this.$router.push({path: '/school/system/addteacher'})
             break;
           case 'resetPassword':
             this.resetPassword(info)

@@ -34,6 +34,20 @@ export function sysRoleEdit (data) {
 }
 
 /**
+ * 设置权限 
+ * */
+export function sysRolePower (data) {
+  return commonsAjax(`${baseUrl}role/edit`,data,'post')
+}
+
+/**
+ * 设置权限 
+ * */
+export function sysRolePowerGet (data) {
+  return commonsAjax(`${baseUrl}role/info/${data.roleId}`,data,'get')
+}
+
+/**
  * 删除角色
  * */
 export function sysRoleDelete (list) {

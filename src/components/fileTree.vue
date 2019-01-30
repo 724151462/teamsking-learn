@@ -1,5 +1,5 @@
 <template>
-    <el-tree :data="sourceData" :accordion="isAccordion" :ref="treeName" @check="test" show-checkbox :props="props">
+    <el-tree :data="sourceData" :node-key="nodeKey" :default-checked-keys="dataActNode" :accordion="isAccordion" :ref="treeName" @check="test" show-checkbox :props="props">
         <span class="custom-tree-node" slot-scope="{ node, data }">
             <img
             :width="15"
@@ -15,9 +15,14 @@
 
 <script>
 export default {
-    props: ['sourceData', 'props', 'treeName','isAccordion'],
+    data() {
+        return{
+            dataActNode: []
+        }
+    },
+    props: ['sourceData', 'props', 'treeName','isAccordion', 'activeNode','nodeKey'],
     mounted() {
-        console.log(this.sourceData,this.props)
+        console.log(this.sourceData,this.activeNode)
     },
     methods: {
         test(...params) {
@@ -25,6 +30,12 @@ export default {
                 return element.catalogId === undefined
             })
             this.$emit('checkedList', checkedList)
+        }
+    },
+    watch: {
+        activeNode(val) {
+            this.dataActNode = val
+            console.log(this.dataActNode)
         }
     }
 }

@@ -68,20 +68,21 @@
         <br>
         <br>
 
-        <Tree :sourceData="allMenuList" :isAccordion="true" @checkedList="checkedFiles" :props="defaultProps"></Tree>
+        <Tree :sourceData="allMenuList" :nodeKey="'menuId'" :activeNode="selectedPower" :isAccordion="true" @checkedList="checkedFiles" :props="defaultProps"></Tree>
 
         <!--{{ addForm.data.menuList }}-->
       </div>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="menuDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="menuDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="ensurePower">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import Cookie from 'js-cookie';
 import headerTheAgain from "@/components/header-theAgain";
 import tableTheAgain from "@/components/table-theAgain";
 import Tree from "@/components/fileTree";
@@ -90,7 +91,7 @@ import { sysRoleList } from "../../api/system";
 import { sysRoleAdd } from "../../api/system";
 import { sysRoleEdit } from "../../api/system";
 import { sysRoleDelete } from "../../api/system";
-import { sysUserMenuList, sysUserMenuTree } from "../../api/system";
+import { sysUserMenuList, sysUserMenuTree, sysRolePower, sysRolePowerGet } from "../../api/system";
 
 export default {
   name: "role",
@@ -156,6 +157,8 @@ export default {
       ],
       tableData: [],
       allMenuList: [],
+      selectedPower: [],
+      addPowerParams: {},
       defaultProps: {
         children: "list",
         label: "name"
@@ -244,14 +247,26 @@ export default {
   methods: {
     // 选中的文件
     checkedFiles(checkedList) {
-      let quizArr = [];
+      let powerArr = [];
       checkedList.forEach(element => {
-        quizArr.push(element.quizId);
+        powerArr.push(element.menuId);
       });
-      this.addTestParams.quizIds = quizArr;
-      this.addTestParams.interactionId = null;
+      this.addPowerParams.menuIdList = powerArr;
     },
-    
+    // 确认权限
+    ensurePower() {
+      console.log(this.addPowerParams)
+      sysRolePower(this.addPowerParams)
+      .then(response=> {
+        if (response.code === 200) {
+          this.open2("设置成功");
+          this.menuDialogVisible = false;
+          this.queryRoleList();
+        } else {
+          this.open4("设置失败:" + response.msg);
+        }
+      })
+    },
     showComponentInfo: function(type, info) {
       console.log("type", type, "info", info);
       switch (type) {
@@ -279,7 +294,7 @@ export default {
       sysRoleList(this.form)
         .then(res => {
           if (res.code === 200) {
-            this.tableData = res.data;
+            this.tableData = res.data.pageData;
           } else {
             this.open4("查询失败:" + res.msg);
           }
@@ -302,7 +317,19 @@ export default {
       console.log("this.addForm.data", this.addForm.data);
     },
     editMenu: function(roleInfo) {
+      this.selectedPower = []
+      sysRolePowerGet(roleInfo)
+      .then(response=> {
+        let arr = []
+        response.data.menuList.forEach(item=> {
+          arr.push(item.menuId)
+        })
+        this.selectedPower = arr
+        console.log(this.selectedPower)
+      })
       this.menuDialogVisible = true;
+      this.addPowerParams.createdId = Number(Cookie.get('userId'))
+      this.addPowerParams.roleId = roleInfo.roleId
       this.addForm.title = "设置权限";
       this.addForm.data = roleInfo;
       console.log("this.addForm.data.menuList", this.addForm.data.menuList);
