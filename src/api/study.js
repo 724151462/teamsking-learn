@@ -33,8 +33,7 @@ export function timeBucketOther(data) {
 /**
  * 学情质量列表
  */
-export function timeBucketOther(data) {
-  return commonsAjax(`${baseUrl}classafter`, data, 'post')
-}
-
-/api/v1/course/classquality/page
+// export function timeBucketOther(data) {
+//   return commonsAjax(`${baseUrl}classafter`, data, 'post')
+// }
+//
