@@ -5,11 +5,10 @@ import {
   commonsAjax
 } from '../utils/requery'
 
-/************
- * 数据统计模块
- *************/
-
-
+/***************
+ **数据统计模块**
+ * **数据统计模块**
+ **************/
 
 /**
  * 课后数据
@@ -17,3 +16,25 @@ import {
 export function afterOther(data) {
   return commonsAjax(`${baseUrl}classafter/other`, data, 'post')
 }
+/**
+ * 学习度
+ */
+export function leanRate(data) {
+  return commonsAjax(`${baseUrl}classafter/page`, data, 'post')
+}
+
+/**
+ * 学习时间段
+ */
+export function timeBucketOther(data) {
+  return commonsAjax(`${baseUrl}classafter`, data, 'post')
+}
+
+/**
+ * 学情质量列表
+ */
+export function timeBucketOther(data) {
+  return commonsAjax(`${baseUrl}classafter`, data, 'post')
+}
+
+/api/v1/course/classquality/page

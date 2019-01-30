@@ -6,7 +6,10 @@
       </el-select>
       <span>成员人数：65人</span>
     </div>
-    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <p>课后平均学习进度</p>
+    <div id="afterLean" style="min-height:400px;"></div>
+    <p>课后平均学习时长</p>
+    <div id="afterNum" style="min-height:400px;"></div>
     <p>学习时段</p>
     <div id="studyLong" style="min-height:400px;"></div>
     <p>其他统计</p>
@@ -16,7 +19,7 @@
 
 <script>
   import echarts from "echarts";
-  import {afterOther} from '@/api/study'
+  import {afterOther, timeBucketOther, leanRate} from '@/api/study'
   import {myCourseList} from '@/api/course'
   export default {
   data() {
@@ -48,15 +51,12 @@
         }
       ],
       studyTime:{
-        "courseUserCount": null,
-        "staticsDate": null,
-        "cmpTime": null,
         "zeroPoint": 0,
         "onePoint": 5,
         "twoPoint": 0,
-        "threePoint": 0,
+        "threePoint": 3,
         "fourPoint": 0,
-        "fivePoint": 0,
+        "fivePoint": 2,
         "sixPoint": 0,
         "sevenPoint": 0,
         "eightPoint": 0,
@@ -65,17 +65,16 @@
         "elevenPoint": 0,
         "twelvePoint": 0,
         "thirteenPoint": 0,
-        "fourteenPoint": 0,
+        "fourteenPoint": 5,
         "fifteenPoint": 0,
         "sixteenPoint": 0,
         "seventeenPoint": 0,
-        "eighteenPoint": 0,
+        "eighteenPoint": 1,
         "nineteenPoint": 0,
-        "twentyPoint": 0,
+        "twentyPoint": 2,
         "twentyOnePoint": 0,
         "twentyTwoPoint": 0,
         "twentyThreePoint": 0,
-        "tstudyDaytimeId": null
       },
       other:{
         docWatchCount: 0,  //教案观看
@@ -88,22 +87,26 @@
     };
   },
   mounted() {
+    //初始化图表
     this.testChartInit()
     this.otherChartInit()
-    this.chartInit()
+    this.timeBucketChartInit()
   },
   created () {
     this.myCourseData()
+    //获取图表的数据
     this.otherData()
+    this.timeBucketData()
   },
   methods: {
     testChartInit(){
-
     },
-    chartInit () {
-      var myChart = echarts.init(document.getElementById('studyLong'));
+    timeBucketChartInit () {
+      let myChart = echarts.init(document.getElementById('studyLong'));
+      let seriesData = []
+      for(let i in this.studyTime) {seriesData.push(this.studyTime[i])}
       // 指定图表的配置项和数据
-      var option = {
+      let option = {
         xAxis: {
           type: 'category',
           data: ['0:00', '1:00','2:00','3:00','4:00','5:00','6:00',
@@ -116,17 +119,14 @@
           data: [0, 10,20,30,40,50,60]
         },
         series: [{
-          data: [this.studyTime.zeroPoint, this.studyTime.onePoint,this.studyTime.twoPoint,
-                  this.studyTime.threePoint,this.studyTime.fourPoint,this.studyTime.fivePoint,
-                  this.studyTime.sixPoint,this.studyTime.sevenPoint,this.studyTime.eightPoint,
-                  this.studyTime.ninePoint,this.studyTime.tenPoint,this.studyTime.elevenPoint,],
+          data: seriesData,
           type: 'line'
         }]
       };
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
     },
-    //其它数据的图标init
+    //其它统计的图表init
     otherChartInit (){
       let plantCap = this.planCap
       //圆球偏移,大小，在一定范围内随机
@@ -256,7 +256,21 @@
         console.log(err)
       })
     },
-    //获取其它行为的课堂数据
+    //获取学习时段数据
+    timeBucketData(courseId,startTime,endTime){
+      let data = {
+        "courseId": "0608367675f54267aa6960fd0557cc1b",
+        "endTime": "2019-01-26 07:23:51",
+        "startTime": "2019-01-23 07:23:51"
+      }
+      timeBucketOther(data).then(res=>{
+        console.log(res)
+
+      }).catch((err)=>{
+      })
+    },
+    //获取
+    //获取其它行为的统计数据
     otherData(courseId,startTime,endTime){
       let data = {
         "courseId": "0608367675f54267aa6960fd0557cc1b",
@@ -266,7 +280,6 @@
       afterOther(data).then(res=>{
         console.log(res)
       }).catch((err)=>{
-
       })
     },
   }

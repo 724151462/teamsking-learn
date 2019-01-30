@@ -136,7 +136,13 @@
             sessionStorage.setItem('isSign','YES')
             console.log(data.data)
             window.STOMP_CLIENT.unsubscribe();
-            _this_.$router.push('/course/modelChecked');
+            _this_.$router.push({
+              path: "/course/classchapter",
+              query: {
+                id: sessionStorage.getItem('courseId'),
+                classroomId: sessionStorage.getItem('classroom')
+              }
+            });
           }
         });
       },
