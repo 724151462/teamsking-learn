@@ -6,14 +6,13 @@
       </el-select>
       <span>成员人数：65人</span>
     </div>
-    <p>课后平均学习进度</p>
-    <div id="afterLean" style="min-height:400px;"></div>
-    <p>课后平均学习时长</p>
-    <div id="afterNum" style="min-height:400px;"></div>
+    <div id="afterLean" style="min-height:400px;margin-bottom: 40px;"></div>
+    <p></p>
+    <div id="afterNum" style="min-height:400px;margin-bottom: 40px;"></div>
     <p>学习时段</p>
-    <div id="studyLong" style="min-height:400px;"></div>
+    <div id="studyLong" style="min-height:400px;margin-bottom: 40px;"></div>
     <p>其他统计</p>
-    <div id="studyOther" style="min-height: 400px"></div>
+    <div id="studyOther" style="min-height: 400px;margin-bottom: 40px;"></div>
   </div>
 </template>
 
@@ -76,6 +75,12 @@
         "twentyTwoPoint": 0,
         "twentyThreePoint": 0,
       },
+      learn:[{
+        studyDocCount:[],
+        studyDocRate:[],
+        studyVideoDuration:[],
+        studyVideoRate:[]
+      }],
       other:{
         docWatchCount: 0,  //教案观看
         libraryCount: 2,  //人均参加活动
@@ -88,19 +93,158 @@
   },
   mounted() {
     //初始化图表
-    this.testChartInit()
+    this.numChartInit()
     this.otherChartInit()
     this.timeBucketChartInit()
   },
   created () {
     this.myCourseData()
+    this.learnRateData()
     //获取图表的数据
     this.otherData()
     this.timeBucketData()
   },
   methods: {
-    testChartInit(){
+    learnChartInit(){
+      let myChart = echarts.init(document.getElementById('afterLean'));
+      let timeData = [], //横轴数据
+        studyDocRate=[],  //视频观看进度
+        studyVideoRate=[]; //文档观看进度
+      this.learn[0].studyDocRate.forEach(item=>{
+        let date =  Object.keys(item)[0]
+        studyDocRate.push(Object.values(item)[0])
+        timeData.push(Object.keys(item)[0].substring(0,10))
+      })
+      this.learn[0].studyVideoRate.forEach(item=>{
+        studyVideoRate.push(`${Object.values(item)[0]}`)
+      })
+      let option = {
+        title: {
+          text: '课后平均学习度'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          data:['视频观看进度','文档观看进度']
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: timeData
+        },
+        yAxis: {
+          type: 'value',
+          min: 0,
+          max: 100,
+          interval: 10,
+          boundaryGap: false,
+          axisLabel: {
+            formatter: '{value} %',
+            fontFamily: 'Arial',
+          },
+          // nameTextStyle:{
+          //   fontStyle:'italic',
+          //   fontFamily:'monospace',
+          // },
+        },
+        series: [
+          {
+            name:'视频观看进度',
+            type:'line',
+            stack: '总量',
+            data:studyVideoRate
+          },
+          {
+            name:'文档观看进度',
+            type:'line',
+            stack: '总量',
+            data:studyDocRate
+          },
+        ]
+      };
+      myChart.setOption(option);
     },
+    //
+    numChartInit(){
+      let myChart = echarts.init(document.getElementById('afterNum'));
+
+      let option = {
+        title: {
+          text: '课后平均学习量'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          data:['邮件营销','联盟广告','视频广告','直接访问','搜索引擎']
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['周一','周二','周三','周四','周五','周六','周日']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            name:'邮件营销',
+            type:'line',
+            stack: '总量',
+            data:[120, 132, 101, 134, 90, 230, 210]
+          },
+          {
+            name:'联盟广告',
+            type:'line',
+            stack: '总量',
+            data:[220, 182, 191, 234, 290, 330, 310]
+          },
+          {
+            name:'视频广告',
+            type:'line',
+            stack: '总量',
+            data:[150, 232, 201, 154, 190, 330, 410]
+          },
+          {
+            name:'直接访问',
+            type:'line',
+            stack: '总量',
+            data:[320, 332, 301, 334, 390, 330, 320]
+          },
+          {
+            name:'搜索引擎',
+            type:'line',
+            stack: '总量',
+            data:[820, 932, 901, 934, 1290, 1330, 1320]
+          }
+        ]
+      };
+      myChart.setOption(option);
+    },
+    //学习时段图表
     timeBucketChartInit () {
       let myChart = echarts.init(document.getElementById('studyLong'));
       let seriesData = []
@@ -241,6 +385,9 @@
       myChart.setOption(option);
     },
     //获取我可以管理的课程列表
+    /*******
+     * ↓ ↓ ↓数据获取
+     * *****/
     myCourseData(name){
       name = name || ''
       let data = {
@@ -256,7 +403,20 @@
         console.log(err)
       })
     },
-    //获取学习时段数据
+    learnRateData(courseId,startTime,endTime){
+      let data = {
+        "courseId": "0608367675f54267aa6960fd0557cc1b",
+        "endTime": "2019-01-26 07:23:51",
+        "startTime": "2019-01-23 07:23:51"
+      }
+      leanRate(data).then(res=>{
+        this.learn = res.data
+        console.log(res)
+        this.learnChartInit()
+      }).catch((err)=>{
+
+      })
+    },
     timeBucketData(courseId,startTime,endTime){
       let data = {
         "courseId": "0608367675f54267aa6960fd0557cc1b",
@@ -265,11 +425,9 @@
       }
       timeBucketOther(data).then(res=>{
         console.log(res)
-
       }).catch((err)=>{
       })
     },
-    //获取
     //获取其它行为的统计数据
     otherData(courseId,startTime,endTime){
       let data = {

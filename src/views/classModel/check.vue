@@ -26,7 +26,7 @@
 <script>
   import {
     classingInfo, classOver, classSave ,
-    saveSign, signList, changeSign
+    saveSign, signList, changeSign, checkUser
   } from "@/api/course";
   import {getUserInfo} from '@/api/user'
   export default {
@@ -136,23 +136,17 @@
             sessionStorage.setItem('isSign','YES')
             console.log(data.data)
             window.STOMP_CLIENT.unsubscribe();
-            _this_.$router.push({
-              path: "/course/classchapter",
-              query: {
-                id: sessionStorage.getItem('courseId'),
-                classroomId: sessionStorage.getItem('classroom')
-              }
-            });
+            _this_.$router.push({path: "/course/classchapter"});
           }
         });
       },
       //有学生签到签到
       studentSign(data){
         console.log('开始查找用户信息')
-        getUserInfo(data).then((res)=>{
+        checkUser(data).then((res)=>{
           if (res.code === 200) {
             console.log(res)
-            let data = {usreName:res.data.userName,imgSrc:res.data.avatar}
+            let data = {usreName:res.data.realName,imgSrc:res.data.avatar}
             this.studenlist.push(data)
           }else{
             this.$message.error('学生签到信息获取失败')

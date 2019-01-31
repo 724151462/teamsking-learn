@@ -23,7 +23,7 @@
 <script>
   import {
     classingInfo, classOver, classSave ,
-    saveSign, signList, changeSign
+    saveSign, signList, changeSign, checkUser
   } from "@/api/course";
   import {getUserInfo} from '@/api/user'
   export default {
@@ -135,7 +135,7 @@
       //有学生签到签到
       studentSign(data){
         console.log('开始查找用户信息')
-        getUserInfo(data).then((res)=>{
+        checkUser(data).then((res)=>{
           if (res.code === 200) {
             console.log(res)
             let data = {usreName:res.data.userName,imgSrc:res.data.avatar}

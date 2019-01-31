@@ -18,6 +18,12 @@ import {
   commonsAjax
 } from '../utils/requery'
 
+/**
+ * 课堂模式下获取签到用户信息列表
+ */
+export function checkUser(data) {
+  return commonsAjax(`${commonBaseUrl}user/${data}/classroom/userinfo`, '', 'get')
+}
 
 /**
  * 获取课程列表
