@@ -28,6 +28,7 @@
         </el-menu>
       </div>
       <el-dropdown class="avator">
+        <div style="margin-right: 10px"><router-link :to="{path: '/user/message'}"><el-badge is-dot><i class="el-icon-bell" style="font-size: 30px;cursor: pointer"></i></el-badge></router-link></div>
         <span class="el-dropdown-link userinfo-inner">
           <img :src="require('../../assets/images/user.png')" alt>
           <span>{{this.realName}}</span>

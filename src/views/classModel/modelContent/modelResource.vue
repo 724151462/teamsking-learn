@@ -28,14 +28,27 @@
     <div class="empty-data" v-show="data.catalogList.length == 0 && data.resourceList.length == 0">
       <div >暂无数据</div>
     </div>
-    <div class="warp">
+    <div style="width: 100%" v-if="showContent === true">
+      <!-- {{resourceObj}} -->
+      <div style="margin: 0 auto; width: 80%" v-if="resourceObj.resourceType === 40">
+        <img :src="resourceObj.resourceUrl" style="height: 600px;width: 100%"/>
+      </div>
+      <div style="margin: 0 auto; width: 80%" v-else-if="resourceObj.resourceType === 20">
+        <iframe :src="resourceObj.docUrl" frameborder="0" style="height: 600px;width: 100%"></iframe>
+      </div>
+      <!-- <img :src="imgSrc.mp4" alt="" class="res-img" v-show="resource.resourceType == 10">
+        <img :src="imgSrc.word" alt="" class="res-img" v-show="resource.resourceType == 20">
+        <img :src="imgSrc.mp4" alt="" class="res-img" v-show="resource.resourceType == 30">
+        <img :src="imgSrc.img" alt="" class="res-img" v-show="resource.resourceType == 40"> -->
+    </div>
+    <div class="warp"  v-else-if="showContent === false">
       <div class="box"
            v-for="catalog in data.catalogList"
            :key="catalog.id" @click="goCatalog(catalog.catalogId,catalog.catalogName)">
         <img :src="imgSrc.folder" alt="" class="box-img">
         <p class="box-title">{{catalog.catalogName}}</p>
       </div>
-      <div class="box" v-for="resource in data.resourceList" :key="resource.id">
+      <div class="box" v-for="resource in data.resourceList" :key="resource.id" @click="resourceView(resource)">
         <img :src="imgSrc.mp4" alt="" class="res-img" v-show="resource.resourceType == 10">
         <img :src="imgSrc.word" alt="" class="res-img" v-show="resource.resourceType == 20">
         <img :src="imgSrc.mp4" alt="" class="res-img" v-show="resource.resourceType == 30">
@@ -49,6 +62,7 @@
 <script>
 import Cookie from 'js-cookie'
 import {classRes} from "@/api/library";
+import {classModeResourceView} from "@/api/sourceView"
 
 export default {
   created() {
@@ -64,6 +78,10 @@ export default {
         word: require("@/assets/images/word.png"),
         img: require("@/assets/images/img.png")
       },
+      resourceObj: {
+        docUrl: ''
+      },
+      showContent: false,
       routerList:[],
       search:'',
       data : {
@@ -102,20 +120,36 @@ export default {
     },
     //资源库被点击
     goRoot(){
+      this.showContent = false
       this.getResource(0,0)
       this.routerList = []
     },
     goCatalog(id,name){
+      this.showContent = false
       this.routerList.push({id,name})
       this.getResource(id,0)
     },
     routerClick(id,index){
+      this.showContent = false
       if(index+1 == this.routerList.length){
         return false
       }else{
         this.routerList.splice(index+1,this.routerList.length)
         this.getResource(id,0)
       }
+    },
+    resourceView(resource) {
+      console.log(resource)
+      if(resource.resourceType === 20) {
+        classModeResourceView({url: resource.resourceUrl})
+        .then(response=> {
+          this.resourceObj.docUrl = response.data
+          console.log(response.data)
+          this.showContent = true
+        })
+      }
+      this.resourceObj = resource
+      this.showContent = true
     }
   }
 }
