@@ -13,8 +13,9 @@
         :textObj="textObj"
         :dataKey="dataKey"
         :status="stormObj"
-        @activeEvent="activeStrome"
+        @activeEvent="activeStorme"
         @beginEvent="beginStorm"
+        ref="modelAside"
       ></modelAside>
       </transition>
       <el-main :class="isInteractStart === true ? 'main-full': 'main-hide'">
@@ -140,8 +141,9 @@ export default {
         label: "catalogName"
       },
       addStormParams: {
-        classroomId: this.$route.query.classroomId,
-        courseId: this.$route.query.id
+        classroomId: this.$route.query.classroomId || sessionStorage.get("classroomId"),
+        courseId: this.$route.query.id || sessionStorage.get("courseId"),
+        stormTitle: ''
       },
       isInteractStart: false,
       stormObj: {
@@ -151,12 +153,12 @@ export default {
       stormList: [
         {
           stormId: 1,
-          stromTitle: "测试头脑风暴"
+          stormTitle: "测试头脑风暴"
         }
       ],
       textObj: {
         addBtn: "添加头脑风暴",
-        interactItemBtn: "开始活动"
+        interactItemBtn: "开始头脑风暴"
       },
       rightSideStatus: {},
       dataKey: {
@@ -173,7 +175,7 @@ export default {
     dialogShow(value) {
       this.stormObj = "add";
     },
-    activeStrome(value) {
+    activeStorme(value) {
       console.log(value);
       storm({ stormId: value.stormId }).then(response => {
         response.data.stormTitle = this.matchReg(response.data.stormTitle);
@@ -183,7 +185,7 @@ export default {
     beginStorm(value) {
       console.log(value)
       this.stormObj = value
-      this.activeStrome(value)
+      this.activeStorme(value)
       this.subClassroom()
       this.socketStromStart()
     },
@@ -231,7 +233,7 @@ export default {
           that.stormObj.answerList.push(JSON.parse(result.body).data.socketData)
         }else if(JSON.parse(result.body).data.socketType === 502) {
           that.stormObj.interactionStatus = 30
-          that.activeStrome(that.stormObj)
+          that.activeStorme(that.stormObj)
           that.$message({
             message: "已结束头脑风暴",
             type: "success"
@@ -283,16 +285,14 @@ export default {
     getStormList() {
       classStromeGet(this.addStormParams).then(response => {
         response.data.forEach(element => {
-          console.log(element);
           element.stormTitle = this.matchReg(element.stormTitle);
         });
         this.stormList = response.data;
       });
     },
-    // 确认添加试题
+    // 确认添加头脑风暴
     addEnsure() {
       console.log(this.addStormParams);
-      this.addStormParams.stromTitle = "";
       if (this.addStormParams.quizId === null) {
         this.$message({
           message: "试题选择有误",
@@ -306,19 +306,25 @@ export default {
     },
     // 手动添加
     manualAdd() {
-      this.addStormParams.quizId = "";
       this.postStorm();
     },
     // 添加请求
     postStorm() {
+      console.log(111,this.addStormParams)
       classStromeSave(this.addStormParams).then(response => {
         if (response.code === 200) {
+          console.log(this.addStormParams);
           this.$message({
             message: "添加头脑风暴成功",
             type: "success"
           });
+          this.$refs.modelAside.activeEvent(response.data);
+          this.addStormParams.stormTitle = "";
+          console.log(this.addStormParams.stormTitle)
           this.dialogVisible = false;
           this.getStormList();
+          // 返回的对象做为参数传入获取方法
+          this.activeStorme(response.data)
         } else if (response.code === 1000) {
           this.$message({
             message: response.msg,
@@ -378,7 +384,7 @@ export default {
   display: flex;
   flex-flow: row wrap;
   align-content: flex-start;
-  min-height: 500px;
+  min-height: 400px;
   .item {
     box-sizing: border-box;
     background-color: white;
