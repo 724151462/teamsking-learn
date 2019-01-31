@@ -84,7 +84,6 @@ export default {
     watch: {
         interactionStatus(newVal) {
             this.sourceList.forEach(element => {
-                console.log(element[this.dataKey.itemId], '...........', this.status[this.dataKey.itemId])
                 if(element[this.dataKey.itemId] === this.status[this.dataKey.itemId]) {
                     element.interactionStatus = newVal
                 }
