@@ -15,6 +15,7 @@
         :status="testObj"
         @activeEvent="activeTest"
         @beginEvent="beginTest"
+        ref="modelAside"
       ></modelAside>
       </transition>
       <el-main :class="isInteractStart === true ? 'main-full': 'main-hide'">
@@ -28,7 +29,7 @@
             <img :src="require('@/assets/images/clock.png')" width="25" alt>
             <span>{{countDownShow}}</span>
           </div>
-          <div style="min-height: 500px;margin-left: 25px">
+          <div style="min-height: 400px;margin-left: 25px">
             <div v-for="(item,i) in testObj.libraryQuizVOS" :key="item.quizId">
               <p>
                 <span class="option-type" v-if="item.quizType === 10">单选</span>
@@ -167,7 +168,7 @@ export default {
     return {
       textObj: {
         addBtn: "添加测试",
-        interactItemBtn: "开始活动"
+        interactItemBtn: "开始测试"
       },
       dataKey: {
         itemId: "examId",
@@ -179,7 +180,7 @@ export default {
       answerObj: {},
       optionItem: ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
       examParams: {
-        courseId: this.$route.query.id,
+        courseId: this.$route.query.id || sessionStorage.get("courseId"),
         examId: ""
       },
       students: [],
@@ -193,7 +194,7 @@ export default {
       addTestParams: {
         chapterId: Cookie.get("chapterId"),
         classroomId: this.$route.query.classroomId,
-        courseId: this.$route.query.id,
+        courseId: this.$route.query.id || sessionStorage.get("courseId"),
         examTitle: "课堂测试",
         quizIds: []
       },
@@ -318,9 +319,9 @@ export default {
         { token: sessionStorage.getItem("token") },
         JSON.stringify({
           bean: this.testObj.examId,
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
-          userId: sessionStorage.getItem("userId")
+          classroomId: this.$route.query.classroomId || sessionStorage.get('classroomId'),
+          courseId: this.$route.query.id || sessionStorage.get("courseId"),
+          userId: sessionStorage.getItem('userId')
         })
       );
     },
@@ -331,8 +332,8 @@ export default {
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
           bean: this.testObj.examId,
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
+          classroomId: this.$route.query.classroomId || sessionStorage.get('classroomId'),
+          courseId: this.$route.query.id || sessionStorage.get("courseId"),
           userId: sessionStorage.getItem('userId')
         })
       );
@@ -453,6 +454,7 @@ export default {
             message: "添加成功",
             type: "success"
           });
+          this.$refs.modelAside.activeEvent(response.data);
           this.dialogVisible = false;
         });
       }
@@ -492,16 +494,15 @@ export default {
           let data = JSON.parse(result.body);
           console.log("========", data.data.socketData);
           if (data.data.socketType === 303) {
-            that.$message.info("收到一个学生提交");
+            that.$message({message: "收到一个学生提交", type: "success"});
             that.students.push(data.data.socketData[0]);
           }else if(data.data.socketType === 302) {
-            that.$message.info("结束测试");
+            that.$message({message: "结束测试", type: "success"});
             // data.data.socketData.interactionStatus = 30
             that.testObj.interactionStatus = 30
-            console.log(that.testObj, 'bbbbbb', data.data.socketData)
             that.getQuiz(that.testObj)
           }else if(data.data.socketType === 301) {
-            that.$message.info("开始测试");
+            that.$message({message: "开始测试", type: "success"});
             that.setEndTime()
             that.testObj.interactionStatus = 20
             that.isInteractStart = true
