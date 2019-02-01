@@ -1,8 +1,17 @@
 <template>
   <div class="after-class">
     <!--<div style="margin-bottom: 20px">-->
-      <!--<el-select>-->
-        <!--<el-option>123</el-option>-->
+      <!--<el-select-->
+        <!--filterable-->
+        <!--v-model="data.tenantId"-->
+        <!--:filter-method="searchTenant"-->
+        <!--placeholder="请选择">-->
+        <!--<el-option-->
+          <!--v-for="item in schoolList"-->
+          <!--:key="item.tenantId"-->
+          <!--:label="item.tenantName"-->
+          <!--:value="item.tenantId">-->
+        <!--</el-option>-->
       <!--</el-select>-->
       <!--<span>成员人数：65人</span>-->
     <!--</div>-->
@@ -289,13 +298,11 @@
     //其它统计的图表init
     otherChartInit (){
       let colorArr1=['rgb(241, 86, 85)','rgb(24, 207, 202)','#447eda'],
-        colorArr2=[],
-        colorArr3=[],
+        colorArr2=['#F4A460','#F4A460','#800000','#C0C0C0','#FF6347'],
+        colorArr3=['#00FFFF','#00FF7F','#006400','#FFD700','#DAA520'],
         colorArr4=[],
         colorArr5=[],
-        colorArr6=[	'#FFC125','#FFC0CB','#FFBBFF','#FFB90F','rgb(252, 134, 64)'];
-
-
+        colorArr6=['#FFC125','#FFC0CB','#FFBBFF','#FFB90F','rgb(252, 134, 64)'];
 
       let plantCap =[
         {
@@ -324,20 +331,20 @@
         offset: [Math.random() * 10 , Math.random() * (65 - 60) + 60],
         symbolSize: Math.random() * (180 - 120) + 120,
         opacity: 1,
-        color: colorArr6[Math.random() * 3-1]
+        color: colorArr1[Math.floor(Math.random() * 3-1)]
       },
       {//人均笔记
         offset: [Math.random() * (45 - 35) + 35, Math.random() * (90 - 80) + 80],
         symbolSize: 90,
         opacity: 1,
-        color: 'rgb(244, 123, 193)'
+        color: colorArr2[Math.floor(Math.random() * 5-1)]
       },
         {
         //登录次数
         offset: [Math.random() * (75 - 60) + 60, Math.random() * (85 - 85) + 70],
         symbolSize: Math.random() * (110 - 90) + 90,
         opacity: 1,
-        color: 'rgb(110, 213, 230)'
+        color: colorArr3[Math.floor(Math.random() * 5-1)]
       },
         {
         //视频资源
@@ -355,7 +362,7 @@
         //人均日学习
         offset: [75, Math.random() * 35],
         symbolSize: 120,
-        color: colorArr6[Math.random() * 4]
+        color: colorArr6[Math.floor(Math.random() * 5-1)]
       }
       ];
       var datas = [];
