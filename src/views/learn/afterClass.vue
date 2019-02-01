@@ -461,7 +461,7 @@
         console.log(err)
       })
     },
-    
+
     learnRateData(courseId,startTime,endTime){
       let data = {
         "courseId": "0608367675f54267aa6960fd0557cc1b",
