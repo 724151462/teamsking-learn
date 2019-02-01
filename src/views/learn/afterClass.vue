@@ -1,17 +1,15 @@
 <template>
   <div class="after-class">
-    <div style="margin-bottom: 20px">
-      <el-select>
-        <el-option>123</el-option>
-      </el-select>
-      <span>成员人数：65人</span>
-    </div>
+    <!--<div style="margin-bottom: 20px">-->
+      <!--<el-select>-->
+        <!--<el-option>123</el-option>-->
+      <!--</el-select>-->
+      <!--<span>成员人数：65人</span>-->
+    <!--</div>-->
     <div id="afterLean" style="min-height:400px;margin-bottom: 40px;"></div>
     <p></p>
     <div id="afterNum" style="min-height:400px;margin-bottom: 40px;"></div>
-    <p>学习时段</p>
     <div id="studyLong" style="min-height:400px;margin-bottom: 40px;"></div>
-    <p>其他统计</p>
     <div id="studyOther" style="min-height: 400px;margin-bottom: 40px;"></div>
   </div>
 </template>
@@ -24,78 +22,58 @@
   data() {
     return {
       id: "",
-      //其它统计的数据初始化
-      planCap:[
-        {
-          name: '人均学习时长',
-          value: '222'
-        }, {
-          name: '人均笔记数',
-          value: '115'
-        }, {
-          name: '登录次数',
-          value: '113'
-        }, {
-          name: '人均参加活动次数',
-          value: '100'
-        }, {
-          name: '作业完成次数',
-          value: '100'
-        }, {
-          name: '教案资源观看次数',
-          value: '100'
-        }, {
-          name: '人均日行为学习数',
-          value: '100'
-        }
-      ],
+      value:'',
       studyTime:{
-        "zeroPoint": 0,
-        "onePoint": 5,
-        "twoPoint": 0,
-        "threePoint": 3,
-        "fourPoint": 0,
-        "fivePoint": 2,
-        "sixPoint": 0,
-        "sevenPoint": 0,
-        "eightPoint": 0,
-        "ninePoint": 0,
-        "tenPoint": 0,
-        "elevenPoint": 0,
-        "twelvePoint": 0,
-        "thirteenPoint": 0,
-        "fourteenPoint": 5,
-        "fifteenPoint": 0,
-        "sixteenPoint": 0,
-        "seventeenPoint": 0,
-        "eighteenPoint": 1,
-        "nineteenPoint": 0,
-        "twentyPoint": 2,
-        "twentyOnePoint": 0,
-        "twentyTwoPoint": 0,
-        "twentyThreePoint": 0,
+        zeroPoint: 0,
+        onePoint: 5,
+        twoPoint: 0,
+        threePoint: 3,
+        fourPoint: 0,
+        fivePoint: 2,
+        sixPoint: 0,
+        sevenPoint: 0,
+        eightPoint: 0,
+        ninePoint: 0,
+        tenPoint: 0,
+        elevenPoint: 0,
+        twelvePoint: 0,
+        thirteenPoint: 0,
+        fourteenPoint: 5,
+        fifteenPoint: 0,
+        sixteenPoint: 0,
+        seventeenPoint: 0,
+        eighteenPoint: 1,
+        nineteenPoint: 0,
+        twentyPoint: 2,
+        twentyOnePoint: 0,
+        twentyTwoPoint: 0,
+        twentyThreePoint: 0,
       },
-      learn:[{
+      learn:{
         studyDocCount:[],
         studyDocRate:[],
         studyVideoDuration:[],
         studyVideoRate:[]
-      }],
+      },
       other:{
-        docWatchCount: 0,  //教案观看
-        libraryCount: 2,  //人均参加活动
-        loginCount: 3,  //登录次数
-        noteRate: 1900,  //人均笔记
-        studyBehaviorthRate: 0, // 人均日行为
-        studyLengthRate: 13,  //人均学习时长
+        docWatchCount: 2,//文档资源观看
+        loginCount: 3,
+        noteRate: "1,900",
+        studyBehaviorthRate: null,
+        studyLengthRate: "13",
+        videoCount: 2,
+
+
+        //docWatchCount: 2,//教案观看
+        // libraryCount: 2,  //人均参加活动
+        // loginCount: 3,  //登录次数
+        // noteRate: 1900,  //人均笔记
+        // studyBehaviorthRate: 0, // 人均日行为
+        // studyLengthRate: 13,  //人均学习时长
       }
     };
   },
   mounted() {
-    //初始化图表
-    this.numChartInit()
-    this.otherChartInit()
-    this.timeBucketChartInit()
   },
   created () {
     this.myCourseData()
@@ -110,14 +88,15 @@
       let timeData = [], //横轴数据
         studyDocRate=[],  //视频观看进度
         studyVideoRate=[]; //文档观看进度
-      this.learn[0].studyDocRate.forEach(item=>{
+      this.learn.studyDocRate.forEach(item=>{
         let date =  Object.keys(item)[0]
-        studyDocRate.push(Object.values(item)[0])
+        studyDocRate.push(Number(Object.values(item)[0]))
         timeData.push(Object.keys(item)[0].substring(0,10))
       })
-      this.learn[0].studyVideoRate.forEach(item=>{
-        studyVideoRate.push(`${Object.values(item)[0]}`)
+      this.learn.studyVideoRate.forEach(item=>{
+        studyVideoRate.push(Number(Object.values(item)[0]))
       })
+
       let option = {
         title: {
           text: '课后平均学习度'
@@ -126,7 +105,7 @@
           trigger: 'axis'
         },
         legend: {
-          data:['视频观看进度','文档观看进度']
+          data:['文档观看进度','视频观看进度',]
         },
         grid: {
           left: '3%',
@@ -154,24 +133,18 @@
             formatter: '{value} %',
             fontFamily: 'Arial',
           },
-          // nameTextStyle:{
-          //   fontStyle:'italic',
-          //   fontFamily:'monospace',
-          // },
         },
         series: [
           {
-            name:'视频观看进度',
-            type:'line',
-            stack: '总量',
-            data:studyVideoRate
-          },
-          {
             name:'文档观看进度',
             type:'line',
-            stack: '总量',
             data:studyDocRate
           },
+          {
+            name:'视频观看进度',
+            type:'line',
+            data:studyVideoRate
+          }
         ]
       };
       myChart.setOption(option);
@@ -179,6 +152,27 @@
     //
     numChartInit(){
       let myChart = echarts.init(document.getElementById('afterNum'));
+
+      let timeData = [], //横轴数据
+        minMAxArr = [],
+        yMin = 0,   //Y轴数据
+        yMax= 0 ,   //Y轴数据
+        studyDocNum=[],  //视频观看进度
+        studyVideoNum=[]; //文档观看进度
+      //计算Y轴的最大，最小值
+      this.learn.studyDocCount.forEach(item=>{
+        studyDocNum.push(Number(Object.values(item)[0]))
+        minMAxArr.push(Number(Object.values(item)[0]))
+        timeData.push(Object.keys(item)[0].substring(0,10))
+      })
+      this.learn.studyVideoDuration.forEach(item=>{
+        minMAxArr.push(Number(Object.values(item)[0]))
+        studyVideoNum.push(Number(Object.values(item)[0]))
+      })
+      //对数组进行排序，取出最大值和最小值填充到Y轴
+      minMAxArr.sort((a,b)=> {return a - b})
+      yMin = minMAxArr[0]
+      yMax = minMAxArr[minMAxArr.length-1]
 
       let option = {
         title: {
@@ -188,7 +182,7 @@
           trigger: 'axis'
         },
         legend: {
-          data:['邮件营销','联盟广告','视频广告','直接访问','搜索引擎']
+          data:['文档观看次数','视频观看次数',]
         },
         grid: {
           left: '3%',
@@ -204,41 +198,23 @@
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['周一','周二','周三','周四','周五','周六','周日']
+          data: timeData
         },
         yAxis: {
-          type: 'value'
+          type: 'value',
+          min: yMin,
+          max: yMax,
         },
         series: [
           {
-            name:'邮件营销',
+            name:'文档观看次数',
             type:'line',
-            stack: '总量',
-            data:[120, 132, 101, 134, 90, 230, 210]
+            data:studyDocNum
           },
           {
-            name:'联盟广告',
+            name:'视频观看次数',
             type:'line',
-            stack: '总量',
-            data:[220, 182, 191, 234, 290, 330, 310]
-          },
-          {
-            name:'视频广告',
-            type:'line',
-            stack: '总量',
-            data:[150, 232, 201, 154, 190, 330, 410]
-          },
-          {
-            name:'直接访问',
-            type:'line',
-            stack: '总量',
-            data:[320, 332, 301, 334, 390, 330, 320]
-          },
-          {
-            name:'搜索引擎',
-            type:'line',
-            stack: '总量',
-            data:[820, 932, 901, 934, 1290, 1330, 1320]
+            data:studyVideoNum
           }
         ]
       };
@@ -247,23 +223,63 @@
     //学习时段图表
     timeBucketChartInit () {
       let myChart = echarts.init(document.getElementById('studyLong'));
-      let seriesData = []
-      for(let i in this.studyTime) {seriesData.push(this.studyTime[i])}
+      let seriesData = [],
+        timeArr = [],
+        yMin = 0,
+        yMax = 0;
+      seriesData = Object.keys(this.studyTime)
+      timeArr =  Object.values(this.studyTime)
+      //对数组进行排序，取出最大值和最小值填充到Y轴
+      timeArr.sort((a,b)=> {return a - b})
+      yMin = timeArr[0]
+      yMax = timeArr[timeArr.length-1]
       // 指定图表的配置项和数据
       let option = {
+        title: {
+          text: '学习时段'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          data:['学习时段']
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
+        },
         xAxis: {
           type: 'category',
+          boundaryGap: false,
           data: ['0:00', '1:00','2:00','3:00','4:00','5:00','6:00',
                   '7:00','8:00','9:00','10:00','11:00','12:00',
                   '13:00','14:00','15:00','16:00','17:00','18:00',
-                  '19:00','20:00','21:00','22:00','23:00','24:00']
+                  '19:00','20:00','21:00','22:00','23:00']
         },
         yAxis: {
-          type: 'category',
+          type: 'value',
+          boundaryGap: false,
+          min: yMin,
+          max: yMax,
           data: [0, 10,20,30,40,50,60]
         },
         series: [{
-          data: seriesData,
+          name:'学习时段',
+          data: [this.studyTime.zeroPoint,
+            this.studyTime.onePoint,this.studyTime.twoPoint,this.studyTime.threePoint,this.studyTime.fourPoint,
+            this.studyTime.fivePoint,this.studyTime.sixPoint,this.studyTime.sevenPoint,this.studyTime.eightPoint,
+            this.studyTime.ninePoint,this.studyTime.tenPoint,this.studyTime.elevenPoint,this.studyTime.twelvePoint,
+            this.studyTime.thirteenPoint,this.studyTime.fourteenPoint,this.studyTime.fifteenPoint,this.studyTime.sixteenPoint,
+            this.studyTime.seventeenPoint,this.studyTime.eighteenPoint,this.studyTime.nineteenPoint,this.studyTime.twentyPoint,
+            this.studyTime.twentyOnePoint,this.studyTime.twentyTwoPoint,this.studyTime.twentyThreePoint
+          ],
           type: 'line'
         }]
       };
@@ -272,49 +288,76 @@
     },
     //其它统计的图表init
     otherChartInit (){
-      let plantCap = this.planCap
+      let colorArr1=['rgb(241, 86, 85)','rgb(24, 207, 202)','#447eda'],
+        colorArr2=[],
+        colorArr3=[],
+        colorArr4=[],
+        colorArr5=[],
+        colorArr6=[	'#FFC125','#FFC0CB','#FFBBFF','#FFB90F','rgb(252, 134, 64)'];
+
+
+
+      let plantCap =[
+        {
+          name: '人均学习时长',
+          value: this.other.studyLengthRate
+        }, {
+          name: '人均笔记数',
+          value: this.other.noteRate
+        }, {
+          name: '登录次数',
+          value: this.other.loginCount
+        }, {
+          name: '视频资源观看次数',
+          value: this.other.videoCount
+        }, {
+          name: '文档资源观看次数',
+          value: this.other.docWatchCount
+        }, {
+          name: '人均日行为学习数',
+          value: this.other.studyBehaviorthRate
+        }
+      ]
       //圆球偏移,大小，在一定范围内随机
-      var datalist = [
+      let datalist = [
       {//人均学习
-        offset: [Math.random() * 5 , Math.random() * (65 - 60) + 60],
+        offset: [Math.random() * 10 , Math.random() * (65 - 60) + 60],
         symbolSize: Math.random() * (180 - 120) + 120,
         opacity: 1,
-        color: '#447eda'
+        color: colorArr6[Math.random() * 3-1]
       },
       {//人均笔记
-        offset: [Math.random() * (40 - 30) + 30, Math.random() * (90 - 80) + 80],
-        symbolSize: 80,
+        offset: [Math.random() * (45 - 35) + 35, Math.random() * (90 - 80) + 80],
+        symbolSize: 90,
         opacity: 1,
         color: 'rgb(244, 123, 193)'
       },
         {
         //登录次数
-        offset: [Math.random() * (60 - 50) + 50, Math.random() * (85 - 70) + 70],
-        symbolSize: Math.random() * (90 - 70) + 70,
+        offset: [Math.random() * (75 - 60) + 60, Math.random() * (85 - 85) + 70],
+        symbolSize: Math.random() * (110 - 90) + 90,
         opacity: 1,
         color: 'rgb(110, 213, 230)'
-      }, {
-        //人均日学习
-        offset: [80, 30],
-        symbolSize: 100,
-        opacity: .8,
-        color: 'rgb(241, 86, 85)'
-      }, {
-        //作业完成次数
-        offset: [25, 20],
-        symbolSize: 160,
+      },
+        {
+        //视频资源
+        offset: [Math.random() * (35 - 25) + 25, Math.random() * (40 - 30) + 30],
+        symbolSize:  Math.random() * (150 - 140) + 140,
         color: 'rgb(97, 200, 127)'
-      }, {
+      },
+        {
         //教案资源观看
         offset: [50, 15],
         symbolSize: 100,
         color: 'rgb(112, 83, 182)'
-      }, {
-        //人均参加活动
-        offset: [75, 75],
+      },
+        {
+        //人均日学习
+        offset: [75, Math.random() * 35],
         symbolSize: 120,
-        color: 'rgb(252, 134, 64)'
-      }];
+        color: colorArr6[Math.random() * 4]
+      }
+      ];
       var datas = [];
       for (var i = 0; i < plantCap.length; i++) {
         var item = plantCap[i];
@@ -339,6 +382,14 @@
         })
       }
       var option = {
+        title: {
+          text: '课后平均学习度'
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {}
+          }
+        },
         grid: {
           show: false,
         },
@@ -398,7 +449,7 @@
         }
       }
       myCourseList(data).then(res=>{
-        console.log(res)
+        // console.log(res)
       }).catch(err=>{
         console.log(err)
       })
@@ -411,8 +462,9 @@
       }
       leanRate(data).then(res=>{
         this.learn = res.data
-        console.log(res)
+        // console.log(res)
         this.learnChartInit()
+        this.numChartInit()
       }).catch((err)=>{
 
       })
@@ -424,7 +476,14 @@
         "startTime": "2019-01-23 07:23:51"
       }
       timeBucketOther(data).then(res=>{
-        console.log(res)
+        delete res.data.cmpTime
+        delete res.data.courseId
+        delete res.data.courseUserCount
+        delete res.data.tstudyDaytimeId
+        delete res.data.staticsDate
+
+        this.studyTime = res.data
+        this.timeBucketChartInit()
       }).catch((err)=>{
       })
     },
@@ -437,6 +496,8 @@
       }
       afterOther(data).then(res=>{
         console.log(res)
+        this.other = res.data
+        this.otherChartInit()
       }).catch((err)=>{
       })
     },
