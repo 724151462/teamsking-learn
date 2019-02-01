@@ -68,6 +68,7 @@
                 </span>
                 <span v-else >
                   <span class="hide-button">
+                    <el-button size="mini" type="primary" @click.stop="preView(data)">预览</el-button>
                     <el-button size="mini" type="primary" @click.stop="" v-if="data.resourceType.type ==10 && !data.srtUrl"> 添加字幕 </el-button>
                     <el-button size="mini" type="primary" @click.stop="delRes(data.resourceId,data.parentId)">删除</el-button>
                   </span>
@@ -120,25 +121,47 @@
           <el-button type="primary" @click="reFileFold">确 定</el-button>
         </span>
     </el-dialog>
+    <!--预览弹窗-->
+    <el-dialog
+        title="资源预览"
+        :visible.sync="resourceViewDialog"
+        width="60%">
+      <div style="width: 100%">
+        <div style="margin: 0 auto; width: 80%" v-if="resourceObj.resourceType === 40">
+          <img :src="resourceObj.resourceUrl" style="height: 600px;width: 100%"/>
+        </div>
+        <div style="margin: 0 auto; width: 80%" v-else-if="resourceObj.resourceType === 20">
+          <iframe :src="resourceObj.docUrl" frameborder="0" style="height: 600px;width: 100%"></iframe>
+        </div>
+        <div style="margin: 0 auto; width: 80%" v-else-if="resourceObj.resourceType === 10">
+          <videoPlayer ref="video" :isMp4="resourceObj.resourceUrl"></videoPlayer>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import { ossAliSts } from '@/api/oss'
   import {getResList, newResFileFold, reResFileFold,
-          delResFileFold, deleteRes ,localUpload, moveRes} from "@/api/library";
+          delResFileFold, deleteRes ,localUpload, moveRes, getFileDetail} from "@/api/library";
+  import {getResourceViewByUrl} from '@/api/sourceView'
+  import videoPlayer from '@/components/video-pay'
   import UpOss from "@/components/up-oss";
   import Cookie from 'js-cookie';
+import { setTimeout } from 'timers';
   export default {
     name: "resource",
     created() {
       this.getResource(0);
     },
     components:{
-      UpOss
+      UpOss,
+      videoPlayer
     },
     data() {
       return {
+        resourceViewDialog: false,
         fileKind:'resource',
         imgSrc: {
           folder: require("../../../../assets/images/folder.png"),
@@ -200,9 +223,48 @@
         fileArr:[],
         uploadArr:[],
         ossData:null,
+        resourceObj: {
+          docUrl: ''
+        },
       };
     },
     methods: {
+      // 弹窗关闭时暂停video
+      // videoPause() {
+      //   if(this.resourceObj.resourceType === 10) {
+      //     this.$refs.video.onPlayerPause()
+      //   }
+      // },
+      // 预览
+      preView(resource) {
+        console.log(resource)
+        getFileDetail({resourceId: resource.resourceId})
+        .then(response=>{
+          this.resourceView(response.data)
+          this.resourceViewDialog = true
+        })
+      },
+      resourceView(resource) {
+        console.log(resource)
+        if(resource.resourceType === 20) {
+          getResourceViewByUrl({url: resource.resourceUrl})
+          .then(response=> {
+            this.resourceObj = resource
+            this.resourceObj.docUrl = response.data
+            console.log(response.data)
+          })
+        }
+        else if(resource.resourceType === 10) {
+          this.resourceObj = resource
+          // this.$refs.video.getParentUrl(resource.resourceUrl)
+          this.$nextTick(() => {
+            this.$refs.video.getParentUrl(resource.resourceUrl)
+          });
+        }
+        else {
+          this.resourceObj = resource
+        }
+      },
       //获取数据
       getResource(id,key) {
         let data = {

@@ -15,6 +15,7 @@
         :status="voteObj"
         @activeEvent="activeVote"
         @beginEvent="beginVote"
+        ref="modelAside"
       ></modelAside>
       </transition>
       <el-main :class="isInteractStart === true ? 'main-full': 'main-hide'">
@@ -47,7 +48,7 @@
           <div
             v-for="(quiz, i) in voteObj.voteQuizzes"
             :key="quiz.quizId"
-            style="border-bottom: 1px solid rgb(215,215,215);width: 80%;min-height: 500px"
+            style="border-bottom: 1px solid rgb(215,215,215);width: 80%;min-height: 400px"
           >
             <p style="margin: 20px 0">{{i+1}}. {{quiz.quizTitle}}</p>
             <div
@@ -136,7 +137,7 @@ export default {
       dialogVisible: false,
       textObj: {
         addBtn: "添加投票",
-        interactItemBtn: "开始活动"
+        interactItemBtn: "开始投票"
       },
       rightSideStatus: {},
       dataKey: {
@@ -152,7 +153,7 @@ export default {
       addVoteParams: {
         chapterId: Cookie.get("chapterId"),
         classroomId: this.$route.query.classroomId,
-        courseId: this.$route.query.id,
+        courseId: this.$route.query.id || sessionStorage.get("courseId"),
         quizOptions: [{ text: "" }, { text: "" }]
       },
       voteList: [
@@ -180,12 +181,24 @@ export default {
     // 手动添加
     manualAdd() {
       console.log(this.addVoteParams);
+      if(this.addVoteParams.chapterId === undefined) {
+        this.$message({
+          message: "请选择一个章",
+          type: "warning"
+        });
+        return
+      }
       classVoteSave(this.addVoteParams).then(response => {
+        this.$refs.modelAside.activeEvent(response.data);
         if (response.code === 200) {
           this.getVoteList()
           this.$message({
             message: "添加成功",
             type: "success"
+          });
+          this.addVoteParams.voteTitle = ''
+          this.addVoteParams.quizOptions.forEach(element => {
+            element.text = ''
           });
         } else {
           this.$message({
@@ -233,8 +246,8 @@ export default {
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
           bean: { voteId: this.voteObj.voteId},
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
+          classroomId: this.$route.query.classroomId || sessionStorage.get('classroomId'),
+          courseId: this.$route.query.id || sessionStorage.get("courseId"),
           userId: sessionStorage.getItem('userId')
         })
       );
@@ -250,8 +263,8 @@ export default {
           { token: sessionStorage.getItem("token") },
           JSON.stringify({
             bean: { voteId: this.voteObj.voteId },
-            classroomId: this.$route.query.classroomId,
-            courseId: this.$route.query.id,
+            classroomId: this.$route.query.classroomId || sessionStorage.get("classroomId"),
+            courseId:  this.$route.query.id || sessionStorage.get("courseId"),
             userId: sessionStorage.getItem("userId")
           })
         );
