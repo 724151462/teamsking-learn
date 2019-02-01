@@ -48,11 +48,11 @@ const Globe_VM = new Vue({
 export default Globe_VM
 
 
-if(process.env.NODE_ENV === "development"){
-  //开发测试
-  window.onerror = function(errorMessage, scriptURI, lineNumber,columnNumber,errorObj) {
-    alert("开发环境：错误信息：" +errorMessage+";出错文件："+scriptURI+";出错行号："+lineNumber);
-    new Error(errorObj);
-  }
-}
+// if(process.env.NODE_ENV === "development"){
+//   //开发测试
+//   window.onerror = function(errorMessage, scriptURI, lineNumber,columnNumber,errorObj) {
+//     alert("开发环境：错误信息：" +errorMessage+";出错文件："+scriptURI+";出错行号："+lineNumber);
+//     new Error(errorObj);
+//   }
+// }
 

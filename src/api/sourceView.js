@@ -15,7 +15,7 @@ export function chapterView(data) {
 /**
  * 资源列表
  */
-export function classModeResourceView(data) {
+export function getResourceViewByUrl(data) {
   let url = `${baseUrl}docview/url`
   return commonsAjax(url, data, 'post')
 }

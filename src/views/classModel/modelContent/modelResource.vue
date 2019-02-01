@@ -29,12 +29,15 @@
       <div >暂无数据</div>
     </div>
     <div style="width: 100%" v-if="showContent === true">
-      <!-- {{resourceObj}} -->
+      {{resourceObj}}
       <div style="margin: 0 auto; width: 80%" v-if="resourceObj.resourceType === 40">
         <img :src="resourceObj.resourceUrl" style="height: 600px;width: 100%"/>
       </div>
       <div style="margin: 0 auto; width: 80%" v-else-if="resourceObj.resourceType === 20">
         <iframe :src="resourceObj.docUrl" frameborder="0" style="height: 600px;width: 100%"></iframe>
+      </div>
+      <div style="margin: 0 auto; width: 80%" v-else-if="resourceObj.resourceType === 10">
+        <videoPlayer :isMp4="resourceObj.resourceUrl"></videoPlayer>
       </div>
       <!-- <img :src="imgSrc.mp4" alt="" class="res-img" v-show="resource.resourceType == 10">
         <img :src="imgSrc.word" alt="" class="res-img" v-show="resource.resourceType == 20">
@@ -62,7 +65,9 @@
 <script>
 import Cookie from 'js-cookie'
 import {classRes} from "@/api/library";
-import {classModeResourceView} from "@/api/sourceView"
+import {getResourceViewByUrl} from "@/api/sourceView"
+
+import videoPlayer from '@/components/video-pay'
 
 export default {
   created() {
@@ -89,6 +94,9 @@ export default {
         resourceList:[],
       }
     }
+  },
+  components: {
+    videoPlayer
   },
   methods:{
     getResource(parentId,resourceType,key) {
@@ -141,15 +149,17 @@ export default {
     resourceView(resource) {
       console.log(resource)
       if(resource.resourceType === 20) {
-        classModeResourceView({url: resource.resourceUrl})
+        getResourceViewByUrl({url: resource.resourceUrl})
         .then(response=> {
+          this.resourceObj = resource
           this.resourceObj.docUrl = response.data
           console.log(response.data)
           this.showContent = true
         })
+      }else {
+        this.resourceObj = resource
+        this.showContent = true
       }
-      this.resourceObj = resource
-      this.showContent = true
     }
   }
 }

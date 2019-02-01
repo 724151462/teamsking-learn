@@ -112,6 +112,13 @@ export function newResFileFold(data) {
   return commonsAjax(url, data, 'post')
 }
 /**
+ * 资源id获取资源信息
+ */
+export function getFileDetail(data) {
+  let url = `${baseUrl}resource/${data.resourceId}`
+  return commonsAjax(url, '', 'get')
+}
+/**
  * 移动资源
  */
 export function moveRes(data) {

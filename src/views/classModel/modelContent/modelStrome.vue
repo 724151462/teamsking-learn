@@ -45,10 +45,11 @@
                 :key="index"
                 :body-style="{ padding: '10px' }"
               >
-                <div style="display: flex; align-items: center">
+              {{item}}
+                <!-- <div style="display: flex; align-items: center">
                   <img :src="require('@/assets/images/vote.png')" class="stu-image">
                   <span style="margin-left: 20px">{{item.userId}}</span>
-                </div>
+                </div> -->
                 <div>
                   <div
                     style="padding: 20px 0;min-height: 30px; border-bottom: 1px solid rgb(222,222,222)"
@@ -179,6 +180,7 @@ export default {
       console.log(value);
       storm({ stormId: value.stormId }).then(response => {
         response.data.stormTitle = this.matchReg(response.data.stormTitle);
+        response.data.answerList = []
         this.stormObj = response.data;
       });
     },
@@ -200,6 +202,7 @@ export default {
     },
     // 开始头脑风暴
     socketStromStart() {
+      console.log(this.stormObj)
       window.STOMP_CLIENT.send(
         "/teamsking/course/storm",
         { token: sessionStorage.getItem('token') },
@@ -227,10 +230,19 @@ export default {
     subClassroom(){
       var that = this
       let userId = sessionStorage.getItem('userId');
+      console.log(this.stormObj)
       window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
         console.log(JSON.parse(result.body))
         if(JSON.parse(result.body).data.socketType === 506) {
-          that.stormObj.answerList.push(JSON.parse(result.body).data.socketData)
+          console.log(that.stormObj)
+          let socketData = JSON.parse(result.body)
+          let socketObj = {}
+          socketObj.entity = socketData.data.socketData.entity
+          socketObj.userName = socketData.data.socketData.name
+          socketObj.assets = socketData.data.socketData.assets || []
+          console.log(socketObj)
+          that.stormObj.answerList.push(socketObj)
+          console.log('storm========',that.stormObj.answerList)
         }else if(JSON.parse(result.body).data.socketType === 502) {
           that.stormObj.interactionStatus = 30
           that.activeStorme(that.stormObj)
@@ -240,6 +252,7 @@ export default {
           })
         }else if(JSON.parse(result.body).data.socketType === 501) {
           that.$message({ message: "开始头脑风暴", type: "success" });
+          that.$set(that.stormObj, "answerList", [])
           that.isInteractStart = true
         }
       });
