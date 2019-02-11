@@ -235,7 +235,7 @@ export default {
           this.$message({
             message: "加分成功",
             type: "success"
-          });
+          });p
         }
       });
     },

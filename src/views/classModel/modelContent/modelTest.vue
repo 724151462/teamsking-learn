@@ -336,10 +336,7 @@ export default {
       console.log(item.examId)
       interactExam({ examId: item.examId }).then(response => {
         this.testObj = response.data;
-        console.log(this.testObj)
-        console.log('0000000000', item)
         if (item.interactionStatus === 30) {
-          console.log(1111111111111)
           classTestRes({ examId: item.examId }).then(response => {
             this.answerObj = response.data;
             console.log(this.answerObj)
