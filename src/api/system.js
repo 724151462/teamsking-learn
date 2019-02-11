@@ -34,6 +34,20 @@ export function sysRoleEdit (data) {
 }
 
 /**
+ * 设置权限 
+ * */
+export function sysRolePower (data) {
+  return commonsAjax(`${baseUrl}role/edit`,data,'post')
+}
+
+/**
+ * 设置权限 
+ * */
+export function sysRolePowerGet (data) {
+  return commonsAjax(`${baseUrl}role/info/${data.roleId}`,data,'get')
+}
+
+/**
  * 删除角色
  * */
 export function sysRoleDelete (list) {
@@ -275,4 +289,36 @@ export function tenantGet(data) {
 export function tenantAdd(data) {
   let url = `http://120.36.137.90:9008/api/v1/tenant`
   return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 获取标签
+ */
+export function getTag(data) {
+  let url = `http://120.36.137.90:9008/api/v1/sys/tag/page`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 新增标签
+ */
+export function setTag(data) {
+  let url = `http://120.36.137.90:9008/api/v1/sys/tag`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 修改标签
+ */
+export function modTag(data) {
+  let url = `http://120.36.137.90:9008/api/v1/sys/tag`
+  return commonsAjax(url, data, 'put')
+}
+
+/**
+ * 删除标签
+ */
+export function delTag(data) {
+  let url = `http://120.36.137.90:9008/api/v1/sys/tag`
+  return commonsAjax(url, data, 'delete')
 }

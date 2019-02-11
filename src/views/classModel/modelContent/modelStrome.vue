@@ -1,16 +1,24 @@
 <template>
   <div class="modelStrome">
     <el-container>
-      <modelAside
+      <div class="menu-switch">
+        <div :class="isInteractStart === true ? ['switch-outer','full']: ['switch-outer','no-full']">
+          <i :class="isInteractStart === true ? 'el-icon-caret-right' : 'el-icon-caret-left'" @click.stop="menuShow"></i>
+        </div> 
+      </div>
+      <transition name="slide-fade">
+      <modelAside v-show="isInteractStart === false"
         @dialogShow="dialogShow"
         :sourceList="stormList"
         :textObj="textObj"
         :dataKey="dataKey"
         :status="stormObj"
-        @activeEvent="activeStrome"
+        @activeEvent="activeStorme"
         @beginEvent="beginStorm"
+        ref="modelAside"
       ></modelAside>
-      <el-main style="padding-left: 300px; margin-left: 25px">
+      </transition>
+      <el-main :class="isInteractStart === true ? 'main-full': 'main-hide'">
         <div v-if="stormObj.stormTitle === undefined && stormObj !== 'add'">
           <span>请选择或添加头脑风暴</span>
         </div>
@@ -37,10 +45,11 @@
                 :key="index"
                 :body-style="{ padding: '10px' }"
               >
-                <div style="display: flex; align-items: center">
+              {{item}}
+                <!-- <div style="display: flex; align-items: center">
                   <img :src="require('@/assets/images/vote.png')" class="stu-image">
                   <span style="margin-left: 20px">{{item.userId}}</span>
-                </div>
+                </div> -->
                 <div>
                   <div
                     style="padding: 20px 0;min-height: 30px; border-bottom: 1px solid rgb(222,222,222)"
@@ -133,10 +142,11 @@ export default {
         label: "catalogName"
       },
       addStormParams: {
-        classroomId: this.$route.query.classroomId,
-        courseId: this.$route.query.id
+        classroomId: this.$route.query.classroomId || sessionStorage.get("classroomId"),
+        courseId: this.$route.query.id || sessionStorage.get("courseId"),
+        stormTitle: ''
       },
-
+      isInteractStart: false,
       stormObj: {
         // socket实时消息列表
         answerList: []
@@ -144,12 +154,12 @@ export default {
       stormList: [
         {
           stormId: 1,
-          stromTitle: "测试头脑风暴"
+          stormTitle: "测试头脑风暴"
         }
       ],
       textObj: {
         addBtn: "添加头脑风暴",
-        interactItemBtn: "开始活动"
+        interactItemBtn: "开始头脑风暴"
       },
       rightSideStatus: {},
       dataKey: {
@@ -160,20 +170,24 @@ export default {
     };
   },
   methods: {
+    menuShow() {
+      this.isInteractStart = !this.isInteractStart
+    },
     dialogShow(value) {
       this.stormObj = "add";
     },
-    activeStrome(value) {
+    activeStorme(value) {
       console.log(value);
       storm({ stormId: value.stormId }).then(response => {
         response.data.stormTitle = this.matchReg(response.data.stormTitle);
+        response.data.answerList = []
         this.stormObj = response.data;
       });
     },
     beginStorm(value) {
       console.log(value)
       this.stormObj = value
-      this.activeStrome(value)
+      this.activeStorme(value)
       this.subClassroom()
       this.socketStromStart()
     },
@@ -183,10 +197,12 @@ export default {
         this.rightSideStatus = this.stormObj;
         // this.rightSideStatus.id = this.voteObj.voteId
       }
+      this.isInteractStart = false
       this.socketStromEnd()
     },
     // 开始头脑风暴
     socketStromStart() {
+      console.log(this.stormObj)
       window.STOMP_CLIENT.send(
         "/teamsking/course/storm",
         { token: sessionStorage.getItem('token') },
@@ -214,17 +230,30 @@ export default {
     subClassroom(){
       var that = this
       let userId = sessionStorage.getItem('userId');
+      console.log(this.stormObj)
       window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
         console.log(JSON.parse(result.body))
         if(JSON.parse(result.body).data.socketType === 506) {
-          that.stormObj.answerList.push(JSON.parse(result.body).data.socketData)
+          console.log(that.stormObj)
+          let socketData = JSON.parse(result.body)
+          let socketObj = {}
+          socketObj.entity = socketData.data.socketData.entity
+          socketObj.userName = socketData.data.socketData.name
+          socketObj.assets = socketData.data.socketData.assets || []
+          console.log(socketObj)
+          that.stormObj.answerList.push(socketObj)
+          console.log('storm========',that.stormObj.answerList)
         }else if(JSON.parse(result.body).data.socketType === 502) {
           that.stormObj.interactionStatus = 30
-          that.activeStrome(that.stormObj)
+          that.activeStorme(that.stormObj)
           that.$message({
             message: "已结束头脑风暴",
             type: "success"
           })
+        }else if(JSON.parse(result.body).data.socketType === 501) {
+          that.$message({ message: "开始头脑风暴", type: "success" });
+          that.$set(that.stormObj, "answerList", [])
+          that.isInteractStart = true
         }
       });
     },
@@ -269,16 +298,14 @@ export default {
     getStormList() {
       classStromeGet(this.addStormParams).then(response => {
         response.data.forEach(element => {
-          console.log(element);
           element.stormTitle = this.matchReg(element.stormTitle);
         });
         this.stormList = response.data;
       });
     },
-    // 确认添加试题
+    // 确认添加头脑风暴
     addEnsure() {
       console.log(this.addStormParams);
-      this.addStormParams.stromTitle = "";
       if (this.addStormParams.quizId === null) {
         this.$message({
           message: "试题选择有误",
@@ -292,19 +319,25 @@ export default {
     },
     // 手动添加
     manualAdd() {
-      this.addStormParams.quizId = "";
       this.postStorm();
     },
     // 添加请求
     postStorm() {
+      console.log(111,this.addStormParams)
       classStromeSave(this.addStormParams).then(response => {
         if (response.code === 200) {
+          console.log(this.addStormParams);
           this.$message({
             message: "添加头脑风暴成功",
             type: "success"
           });
+          this.$refs.modelAside.activeEvent(response.data);
+          this.addStormParams.stormTitle = "";
+          console.log(this.addStormParams.stormTitle)
           this.dialogVisible = false;
           this.getStormList();
+          // 返回的对象做为参数传入获取方法
+          this.activeStorme(response.data)
         } else if (response.code === 1000) {
           this.$message({
             message: response.msg,
@@ -351,6 +384,7 @@ export default {
 };
 </script>
 
+<style lang="stylus" scoped src="@/assets/css/menu-show.styl"></style>
 <style lang="stylus" scoped>
 .el-header {
   border-bottom: 1px solid rgb(215, 215, 215);
@@ -363,7 +397,7 @@ export default {
   display: flex;
   flex-flow: row wrap;
   align-content: flex-start;
-  min-height: 500px;
+  min-height: 400px;
   .item {
     box-sizing: border-box;
     background-color: white;

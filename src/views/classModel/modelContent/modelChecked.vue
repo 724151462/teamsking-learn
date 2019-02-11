@@ -5,7 +5,7 @@
       <div class="nav-search">
         <div style="display: flex">
           <el-input
-            placeholder="输入课程名称查询资源"
+            placeholder="输入学号/名字查询"
             v-model="search">
           </el-input>
           <div>
@@ -15,10 +15,11 @@
       </div>
     </div>
     <div class="gary-mask">
-      <span>未签到(1人)</span>
-      <span style="float: right;">点击可变更状态</span>
+      <span>未签到({{this.noCheck.length}}人)</span>
+      <!--<span style="float: right;">点击可变更状态</span>-->
     </div>
     <div>
+      <div v-show="noCheck.length == 0" style="text-align: center">暂无数据</div>
       <div class="user-box" v-for="item in noCheck" :key="item.id">
         <div class="user-item" style="display: flex;justify-items: center;align-items: center">
           <div><img :src="item.avatar" alt="" class="user-avatar"></div>
@@ -26,13 +27,13 @@
         </div>
         <div class="user-item">{{item.studentNo}}</div>
         <div class="user-item">
-          <el-tooltip class="item" effect="dark" content="" placement="bottom">
-            <el-button slot="reference" size="small" type="warning" plain>缺勤</el-button>
+          <el-tooltip class="item" effect="dark" content="点击可变更状态为正常" placement="bottom">
+            <el-button size="small" type="warning" plain @click="signChange(item)">缺勤</el-button>
           </el-tooltip>
         </div>
       </div>
       <el-pagination
-        style="margin-top: 20px;text-align: right;margin-right: 40px;"
+        style="margin-top: 20px;text-align: center;margin-right: 40px;"
         background
         layout="prev, pager, next"
         :current-page="noCheckPage.currentPage"
@@ -41,24 +42,22 @@
       </el-pagination>
     </div>
     <div class="gary-mask">
-      <div>已签到(37人)</div>
+      <div>已签到({{this.yesCheck.length}}人)</div>
     </div>
     <div>
-      <div class="user-box" v-for="item in noCheck" :key="item.id">
+      <div v-show="yesCheck.length == 0" style="text-align: center">暂无数据</div>
+      <div class="user-box" v-for="item in yesCheck" :key="item.id">
         <div class="user-item" style="display: flex;justify-items: center;align-items: center">
           <div><img :src="item.avatar" alt="" class="user-avatar"></div>
           <div><span style="margin-left: 20px">{{item.realName}}</span></div>
         </div>
         <div class="user-item">{{item.studentNo}}</div>
         <div class="user-item">
-          <!--<el-tooltip class="item" effect="dark" content="点面更换状态为‘’" placement="bottom">-->
-            <!--<el-button slot="reference" size="small" type="warning" plain>正常</el-button>-->
-          <!--</el-tooltip>-->
           <el-button size="small" type="info" plain>正常</el-button>
         </div>
       </div>
       <el-pagination
-        style="margin-top: 20px;text-align: right;margin-right: 40px;"
+        style="margin-top: 20px;text-align: center;margin-right: 40px;"
         background
         layout="prev, pager, next"
         :current-page="checkPage.currentPage"
@@ -70,7 +69,7 @@
 </template>
 
 <script>
-  import {signList} from '@/api/course'
+  import {signList,changeSign} from '@/api/course'
   export default {
     name: "modelChecked",
     data(){
@@ -96,7 +95,7 @@
       init(pageNum,searchKey){
         let key = searchKey || ''
         let data = {
-          signId : 154,
+          signId : sessionStorage.getItem('signId'),
           data:{
             pageParam: {
               pageIndex: pageNum,
@@ -110,6 +109,8 @@
           console.log(res)
           if(Number(res.code) === 200){
             this.yesCheck = res.data.pageData
+            this.noCheckPage.currentPage =res.data.pageIndex
+            this.noCheckPage.totalPage = res.data.totalPage * 10
           }else{
             this.$message.error('获取签到数据失败')
           }
@@ -118,7 +119,7 @@
       noInit(pageNum,searchKey){
         let key = searchKey || ''
         let data = {
-          signId : 154,
+          signId : sessionStorage.getItem('signId'),
           data:{
             pageParam: {
               pageIndex: pageNum,
@@ -132,10 +133,30 @@
           console.log(res)
           if(Number(res.code) === 200){
             this.noCheck = res.data.pageData
-            this.noCheckPage.totalPage =res.data.pageIndex
-            this.noCheckPage.currentPage = res.data.totalPage * 10
+            this.noCheckPage.currentPage =res.data.pageIndex
+            this.noCheckPage.totalPage = res.data.totalPage * 10
           }else{
             this.$message.error('获取签到数据失败')
+          }
+        })
+      },
+      signChange(item){
+        console.log(item)
+        let data = {
+          "signId": item.signId,
+          "signStatus": 1,
+          "userId": item.userId
+        }
+        changeSign(data).then((res)=>{
+          console.log(res)
+          if(Number(res.code) === 200){
+            this.init(1)
+            this.noInit(1)
+          }else{
+            this.$message({
+              message:'更改状态失败',
+              type:'error'
+            })
           }
         })
       },
@@ -160,7 +181,7 @@
       overflow hidden
       .nav-search
         float right
-        width 250px
+        width 300px
         padding-right 20px;
         .search-btn
           border-left 0

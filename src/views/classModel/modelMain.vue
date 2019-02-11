@@ -31,7 +31,12 @@
                         <el-menu-item index="4">投票</el-menu-item>
                         <el-menu-item index="5">选答</el-menu-item>
                         <el-menu-item index="6">资源库</el-menu-item>
-                    </el-menu> 
+                        <img :src="require('@/assets/images/back.png')"
+                             v-show="isBack === true"
+                             height="30px"
+                             @click="$router.push({path: '/course/modelChapter'})"
+                             style="margin: 0 20px;margin-top:15px;cursor: pointer" alt="">
+                    </el-menu>
                 </div>
                 <router-view @showCurrentInfo="getCNanme"></router-view>
             </el-main>
@@ -49,13 +54,21 @@
             currentInfo: {
                 chapterName: '',
                 sectionName: ''
-            }
+            },
+            isBack:false
         }
     },
     created() {
-        this.handleSelect(this.$store.state.modelActive)
+      this.handleSelect(this.$store.state.modelActive)
+      // if(sessionStorage.getItem('isSign') === 'NO'){
+      //   this.goCheck()
+      // }
     },
-    
+    watch: {
+      $route (to, from) {
+        to.path === '/course/modelChecked' ? this.isBack = true : this.isBack = false
+      }
+    },
     methods: {
        getCNanme(value) {
            this.currentInfo = value
@@ -123,38 +136,21 @@
       },
       closeClass(){
         this.$confirm('是否开启课堂签退?', '结束课堂', {
+          distinguishCancelAndClose: true,
           confirmButtonText: '直接结束',
           cancelButtonText: '开启签退',
           type: 'warning'
         }).then(() => {
-          let loading = this.$loading({
-            lock: true,
-            text: '正在结束课堂',
-            spinner: 'el-icon-loading',
-            background: 'rgba(0, 0, 0, 0.7)'
-          });
-          // this.$store.state.socket.classroomId
-          classOver({ classroomId:  this.$route.query.classroomId}).then((res)=>{
-            loading.close()
-            console.log(res)
-            this.$message.success('课堂已结束')
             this.$router.push({
               path: "/course/classend",
-              query: {
-                id: this.$route.query.id,
-                classroomId: this.$store.state.socket.classroomId
-              }
             });
-          })
-        }).catch(() => {
-          this.$router.push({
-            path: "/course/checked",
-            query: {
-              id: this.$route.query.id,
-              classroomId: this.$store.state.socket.classroomId
-            }
-          });
-        });
+        }).catch((action => {
+          if(action === 'cancel'){
+            this.$router.push({
+              path: "/course/checked",
+            });
+          }
+        }))
       },
       goCheck(){
         this.$router.push({
@@ -166,10 +162,9 @@
         });
       },
       goUser(){
-        this.$router.push({path: "/course/modelChecked",});
+        this.$router.push({path: "/course/modelChecked"});
       },
-    },
-    mounted(){}
+    }
 }
 </script>
 

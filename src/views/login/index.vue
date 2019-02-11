@@ -3,15 +3,6 @@
     <div class="login-center">
       <el-form :model="data" :rules="rules" ref="data" label-width="100px">
         <el-form-item label="所属学校：" prop="tenantId">
-          <!--<el-select v-model="data.tenantId" filterable  placeholder="请选择">-->
-            <!--<el-option-->
-              <!--v-for="item in schoolList"-->
-              <!--:key="item.tenantId"-->
-              <!--:label="item.tenantName"-->
-              <!--filter-method=""-->
-              <!--:value="item.tenantId">-->
-            <!--</el-option>-->
-          <!--</el-select>-->
           <el-select
             filterable
             v-model="data.tenantId"

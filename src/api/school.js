@@ -222,7 +222,7 @@ export function sysTeacherPage(data){
   let department = data.department || -1
   let teacherInfo = data.teacherInfo || ''
   //return commonsAjax('${baseUrl}student/page',{ studentId:1,pageIndex:1,pageSize:10  },'get')
-  let url = `${baseUrl}teacher/page?collegeId=${college}&departmentId=${department}&search=${teacherInfo}&pageSize=2&pageIndex=${data.pageIndex}`
+  let url = `${baseUrl}teacher/page?collegeId=${college}&departmentId=${department}&search=${teacherInfo}&pageIndex=${data.pageIndex}`
   return commonsAjax(url,'','get')
 }
 

@@ -20,7 +20,6 @@ export function getUserInfo (id) {
   // return commonsAjax(url, '', 'get')
   return commonsAjax(url, '', 'get')
 }
-
 /**
  * 初始化用户名
  * */

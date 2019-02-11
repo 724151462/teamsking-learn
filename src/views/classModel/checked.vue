@@ -2,7 +2,7 @@
   <div class="checked">
     <div class="class-info">{{courseName}}</div>
     <div style="padding: 40px;margin-bottom: 20px;">
-      <div class="check-num">已签:15/43</div>
+      <div class="check-num">已签:{{this.studenlist.length}}/43</div>
       <div class="check-avatar-warp">
         <div class="check-avatar-box"
              v-for="(student) in studenlist" :key="student.id">
@@ -23,7 +23,7 @@
 <script>
   import {
     classingInfo, classOver, classSave ,
-    saveSign, signList, changeSign
+    saveSign, signList, changeSign, checkUser
   } from "@/api/course";
   import {getUserInfo} from '@/api/user'
   export default {
@@ -37,10 +37,7 @@
           full: require("@/assets/images/full.png"),
           unfull: require("@/assets/images/unfull.png"),
         },
-        studenlist:[
-          {usreName:'wang',imgSrc:require("@/assets/images/full.png")},
-          {usreName:'wang',imgSrc:require("@/assets/images/full.png")},
-        ]
+        studenlist:[]
       }
     },
     methods:{
@@ -88,9 +85,7 @@
             console.log('保存签到成功')
             if(Number(res.code) === 200){
               this.subClassroom()
-
               sessionStorage.setItem('signOutId',res.data.signId)
-
               tagClient.send('/teamsking/course/sign/start',{'token': token},
                 JSON.stringify({
                   "bean":res.data.signId,
@@ -116,7 +111,6 @@
           if(data.data.socketType == 801){
             console.log('--开始签退--')
             console.log(data.data)
-            _this_.$message.success('开始签到')
           }
           if(data.data.socketType == 803){
             console.log('学生签到')
@@ -129,10 +123,9 @@
             _this_.$message.error('签到错误')
           }
           if(data.data.socketType == 802){
-            console.log('结束签到')
+            console.log('结束签退')
             console.log(data.data)
             window.STOMP_CLIENT.unsubscribe();
-            _this_.$message.error('签退结束')
             _this_.$router.push({
               path: "/course/classend",
             });
@@ -142,7 +135,7 @@
       //有学生签到签到
       studentSign(data){
         console.log('开始查找用户信息')
-        getUserInfo(data).then((res)=>{
+        checkUser(data).then((res)=>{
           if (res.code === 200) {
             console.log(res)
             let data = {usreName:res.data.userName,imgSrc:res.data.avatar}
@@ -155,6 +148,7 @@
         })
       },
       closeSign(){
+
         let tagClient = window.STOMP_CLIENT,
           token = sessionStorage.getItem('token'),
           userId = sessionStorage.getItem('userId'),

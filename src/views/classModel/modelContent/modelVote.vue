@@ -1,7 +1,13 @@
 <template>
   <div class="modelVote">
     <el-container>
-      <modelAside
+      <div class="menu-switch">
+        <div :class="isInteractStart === true ? ['switch-outer','full']: ['switch-outer','no-full']">
+          <i :class="isInteractStart === true ? 'el-icon-caret-right' : 'el-icon-caret-left'" @click.stop="menuShow"></i>
+        </div> 
+      </div>
+      <transition name="slide-fade">
+      <modelAside v-show="isInteractStart === false"
         @dialogShow="dialogShow"
         :sourceList="voteList"
         :textObj="textObj"
@@ -9,8 +15,10 @@
         :status="voteObj"
         @activeEvent="activeVote"
         @beginEvent="beginVote"
+        ref="modelAside"
       ></modelAside>
-      <el-main>
+      </transition>
+      <el-main :class="isInteractStart === true ? 'main-full': 'main-hide'">
         <div v-if="voteObj === ''">
           <span>请选择或添加投票</span>
         </div>
@@ -40,7 +48,7 @@
           <div
             v-for="(quiz, i) in voteObj.voteQuizzes"
             :key="quiz.quizId"
-            style="border-bottom: 1px solid rgb(215,215,215);width: 80%;min-height: 500px"
+            style="border-bottom: 1px solid rgb(215,215,215);width: 80%;min-height: 400px"
           >
             <p style="margin: 20px 0">{{i+1}}. {{quiz.quizTitle}}</p>
             <div
@@ -129,7 +137,7 @@ export default {
       dialogVisible: false,
       textObj: {
         addBtn: "添加投票",
-        interactItemBtn: "开始活动"
+        interactItemBtn: "开始投票"
       },
       rightSideStatus: {},
       dataKey: {
@@ -145,7 +153,7 @@ export default {
       addVoteParams: {
         chapterId: Cookie.get("chapterId"),
         classroomId: this.$route.query.classroomId,
-        courseId: this.$route.query.id,
+        courseId: this.$route.query.id || sessionStorage.get("courseId"),
         quizOptions: [{ text: "" }, { text: "" }]
       },
       voteList: [
@@ -154,7 +162,7 @@ export default {
           voteTitle: "测试投票"
         }
       ],
-
+      isInteractStart: false,
       voteObj: "",
       optionItem: ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
     };
@@ -167,16 +175,30 @@ export default {
     });
   },
   methods: {
-    
+    menuShow() {
+      this.isInteractStart = !this.isInteractStart
+    },
     // 手动添加
     manualAdd() {
       console.log(this.addVoteParams);
+      if(this.addVoteParams.chapterId === undefined) {
+        this.$message({
+          message: "请选择一个章",
+          type: "warning"
+        });
+        return
+      }
       classVoteSave(this.addVoteParams).then(response => {
+        this.$refs.modelAside.activeEvent(response.data);
         if (response.code === 200) {
           this.getVoteList()
           this.$message({
             message: "添加成功",
             type: "success"
+          });
+          this.addVoteParams.voteTitle = ''
+          this.addVoteParams.quizOptions.forEach(element => {
+            element.text = ''
           });
         } else {
           this.$message({
@@ -224,8 +246,8 @@ export default {
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
           bean: { voteId: this.voteObj.voteId},
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
+          classroomId: this.$route.query.classroomId || sessionStorage.get('classroomId'),
+          courseId: this.$route.query.id || sessionStorage.get("courseId"),
           userId: sessionStorage.getItem('userId')
         })
       );
@@ -235,13 +257,14 @@ export default {
         this.voteObj.interactionStatus = 30;
         this.rightSideStatus = this.voteObj;
       }
+      this.isInteractStart = false
         window.STOMP_CLIENT.send(
           "/teamsking/course/vote/close",
           { token: sessionStorage.getItem("token") },
           JSON.stringify({
             bean: { voteId: this.voteObj.voteId },
-            classroomId: this.$route.query.classroomId,
-            courseId: this.$route.query.id,
+            classroomId: this.$route.query.classroomId || sessionStorage.get("classroomId"),
+            courseId:  this.$route.query.id || sessionStorage.get("courseId"),
             userId: sessionStorage.getItem("userId")
           })
         );
@@ -313,6 +336,7 @@ export default {
           console.log(JSON.parse(data).data.socketType);
           if (JSON.parse(data).data.socketType == 601) {
             that.$message({ message: "开始投票", type: "success" });
+            that.isInteractStart = true
             // that.getVoteList();
             // if(that.voteObj !== '') that.voteObj.interactionStatus = 20;
             // that.rightSideStatus = that.voteObj;
@@ -344,11 +368,8 @@ export default {
 };
 </script>
 
+<style lang="stylus" scoped src="@/assets/css/menu-show.styl"></style>
 <style lang="stylus" scoped>
-.el-main {
-  padding-left: 300px;
-}
-
 .answer-item {
   display: flex;
   justify-content: space-between;

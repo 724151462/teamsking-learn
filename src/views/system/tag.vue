@@ -1,133 +1,182 @@
 <template>
   <div class="tag">
     <header-the-again headerTitle="标签管理"></header-the-again>
+    <table-the-again
+      :tableTitle="tableTitle"
+      :tableOperate="tableOperate"
+      :columnNameList="columnNameList"
+      :tableData="tableData"
+      :operateList="operateList"
+      @showComponentInfo="showComponentInfo"
+    ></table-the-again>
 
-
- <el-table
-    :data="tableData5"
-    border
-    style="width:100%">
-    <el-table-column type="expand">
-      <template slot-scope="props">
-        <el-form label-position="left" inline class="demo-table-expand">
-          <el-form-item label="商品名称">
-            <span>{{ props.row.name }}</span>
-          </el-form-item>
-          <el-form-item label="所属店铺">
-            <span>{{ props.row.shop }}</span>
-          </el-form-item>
-          <el-form-item label="商品 ID">
-            <span>{{ props.row.id }}</span>
-          </el-form-item>
-          <el-form-item label="店铺 ID">
-            <span>{{ props.row.shopId }}</span>
-          </el-form-item>
-          <el-form-item label="商品分类">
-            <span>{{ props.row.category }}</span>
-          </el-form-item>
-          <el-form-item label="店铺地址">
-            <span>{{ props.row.address }}</span>
-          </el-form-item>
-          <el-form-item label="商品描述">
-            <span>{{ props.row.desc }}</span>
-          </el-form-item>
-        </el-form>
-      </template>
-    </el-table-column>
-    <el-table-column
-      label="标签名"
-      prop="id">
-    </el-table-column>
-    <el-table-column
-      label="创建时间"
-      prop="name">
-    </el-table-column>
-    <el-table-column
-      label="操作"
-      prop="desc">
-    </el-table-column>
-  </el-table>
-
-
-    <!-- <el-pagination
-        background
-        layout="prev, pager, next"
-        :page-size="tableData.pageSize"
-        :page-count="tableData.totalPage"
-        :current-page="tableData.pageIndex"
-        @current-change="handleCurrentChange">
-    </el-pagination> -->
-
-
+    <el-dialog :title="dialog.title" :visible.sync="dialog.dialogVisible">
+      <el-input v-model="tagObj.tagName"></el-input>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="ensureBtn">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-   import headerTheAgain from '@/components/header-theAgain'
+import tableTheAgain from "../../components/table-theAgain";
+import headerTheAgain from "@/components/header-theAgain";
+import {
+  getTag,
+  setTag,
+  modTag,
+  delTag
+} from "@/api/system"
 
+export default {
+  data() {
+    return {
+      dialog: {
+        dialogVisible: false,
+        title: ''
+      },
+      tagObj: {},
+      page: {
+        "pageParam": {
+          "pageIndex": 1,
+          "pageSize": 10
+        },
+        "searchKey": ""
+      },
+      tableTitle: '标签管理',
+      columnNameList:[
+          {
+            type:"selection"
+          },
+          {
+            name:'标签名',
+            prop:'tagName'
+          },
+          {
+            name:'创建时间',
+            prop:'createTime'
+          },
 
-  export default {
-    data(){
-      return{
-        tableData5: [{
-          id: '12987122',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }, {
-          id: '12987123',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }, {
-          id: '12987125',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }, {
-          id: '12987126',
-          name: '好滋好味鸡蛋仔',
-          category: '江浙小吃、小吃零食',
-          desc: '荷兰优质淡奶，奶香浓而不腻',
-          address: '上海市普陀区真北路',
-          shop: '王小虎夫妻店',
-          shopId: '10333'
-        }]
+        ],
+      tableData: [
+        
+      ],
+      tableOperate:[
+        {
+          content:'添加标签',
+          type:'addTag'
+        },
+      ],
+      operateList:[
+          {
+            content:'修改',
+            type:'editTag'
+          },
+          {
+            content:'删除',
+            type:'delTag'
+          }
+        ],
+    };
+  },
+  components: {
+    headerTheAgain,
+    tableTheAgain
+  },
+  mounted() {
+    this.getTagList()
+  },
+  methods: {
+    getTagList() {
+      getTag(this.page)
+      .then(response=> {
+        this.tableData = response.data.pageData
+      })
+    },
+    showComponentInfo(...params) {
+      console.log(params)
+      switch (params[0]) {
+        case 'addTag':
+          this.tagObj.tagName = ''
+          this.dialog.title = '添加标签'
+          this.dialog.dialogVisible = true
+          break;
+        case 'editTag':
+          this.tagObj = params[1]
+          this.dialog.title = '修改标签'
+          this.dialog.dialogVisible = true
+          break;
+        case 'delTag':
+          this.$confirm('删除标签, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            delTag([params[1].tagId])
+            .then(response=> {
+              if (response.code === 200) {
+                this.getTagList()
+                this.$message({
+                  type: 'success',
+                  message: '删除成功!'
+                });
+              }
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });          
+          });
+        default:
+          break;
       }
     },
-    components:{
-      headerTheAgain
-    },
-    methods:{
-      handleCurrentChange:function( number ){
-        this.form.pageIndex = number;
-      },
+    ensureBtn() {
+      if(this.dialog.title === '添加标签') {
+        setTag(this.tagObj)
+        .then(response=> {
+          if(response.code === 200) {
+            this.dialog.dialogVisible = false
+            this.getTagList()
+            this.$message({
+              message: '添加成功',
+              type: 'success'
+            })
+          }
+        })
+      } else {
+        modTag(this.tagObj)
+        .then(response=> {
+          if(response.code === 200) {
+            this.dialog.dialogVisible = false
+            this.getTagList()
+            this.$message({
+              message: '修改成功',
+              type: 'success'
+            })
+          }
+        })
+      }
+      
     }
-
   }
+};
 </script>
 
 <style scoped>
-  .tag
-    .demo-table-expand {
-      font-size: 0;
-    }
-    .demo-table-expand label {
-      width: 90px;
-      color: #99a9bf;
-    }
-    .demo-table-expand .el-form-item {
-      margin-right: 0;
-      margin-bottom: 0;
-      width: 50%;
-    }
+.tag .demo-table-expand {
+  font-size: 0;
+}
+.demo-table-expand label {
+  width: 90px;
+  color: #99a9bf;
+}
+.demo-table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 50%;
+}
 </style>

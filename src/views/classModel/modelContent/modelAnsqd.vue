@@ -71,7 +71,7 @@ export default {
             token: sessionStorage.getItem("token")
           },
           JSON.stringify({
-            bean: { topicTitle: that.subject.title },
+            bean: that.subject.title || '抢答',
             classroomId: that.$route.query.classroomId,
             courseId: that.$route.query.id,
             userId: sessionStorage.getItem("userId")

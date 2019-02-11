@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { classingInfo, classOver, classSave ,courseBaseInfo} from "@/api/course";
+import { classingInfo, classOver, classSave ,courseBaseInfo } from "@/api/course";
 import {connect} from "@/utils/utils"
 import Cookie from "js-cookie";
 export default {
@@ -96,6 +96,7 @@ export default {
               if (response.code === 200) {
                 console.log('保存课堂',response)
                 sessionStorage.setItem('classroom',response.data.classroomId)
+                sessionStorage.setItem('isSign','NO')
                 this.$router.push({
                   path: "/course/classchapter",
                   query: {
@@ -157,7 +158,6 @@ export default {
         classOver({ classroomId: sessionStorage.getItem('classroom') }).then((res)=>{
           loading.close()
           console.log(res)
-            this.$message.success('课堂已结束')
             this.$router.push({
               path: "/course/classend",
               query: {

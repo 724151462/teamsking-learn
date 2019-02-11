@@ -46,10 +46,16 @@
         }
       }
     },
+    mounted() {
+      console.log(this.isMp4)
+    },
     components: {
       videoPlayer
     },
     methods: {
+      getParentUrl(url) {
+        this.playerOptions.sources[0].src = url
+      },
       onPlayerPlay(player) {
         this.playerOptions.sources[0].src = this.isMp4
         console.log('play', this.isMp4)
@@ -57,9 +63,10 @@
       },
       onPlayerPause(player){
         // alert("pause");
+        console.log(this.$refs.videoPlayer.player)
       },
       onPlayerEnded(player) {
-        // alert()
+        console.log(player)
       }
     },
     computed: {

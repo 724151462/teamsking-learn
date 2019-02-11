@@ -36,7 +36,7 @@
     </div>
     <div class="collapse-container">
       <el-collapse v-model="activeNames" accordion @change="collapseChange">
-        <el-collapse-item v-for="(item, index) in interactList" :key="item.chapterId" :name="index">
+        <el-collapse-item style="margin: 5px 0" v-for="(item, index) in interactList" :key="item.chapterId" :name="index">
           <template slot="title">
             <span style="margin-left: 20px">{{item.chapterName}}</span>
           </template>

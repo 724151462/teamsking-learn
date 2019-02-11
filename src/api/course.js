@@ -18,12 +18,24 @@ import {
   commonsAjax
 } from '../utils/requery'
 
+/**
+ * 课堂模式下获取签到用户信息列表
+ */
+export function checkUser(data) {
+  return commonsAjax(`${commonBaseUrl}user/${data}/classroom/userinfo`, '', 'get')
+}
 
 /**
  * 获取课程列表
  */
 export function coursePage(data) {
   return commonsAjax(`${baseUrl}page`, data, 'get')
+}
+/**
+ * 获取我能管理的课程列表
+ */
+export function myCourseList(data) {
+  return commonsAjax(`${commonBaseUrl}me/course/list`, data, 'post')
 }
 
 /**
@@ -928,16 +940,24 @@ export function classTestRes(data) {
   let url = `http://120.36.137.90:9008/api/v1/classroom/course/exam/${data.examId}/statics`
   return commonsAjax(url, data, 'post')
 }
+/**
+ * 课堂小结
+ */
+export function classRoomData(data) {
+  // let url = `${baseUrl}classroom/${data.classroomId}/statics`
+  let url = `http://120.36.137.90:9008/api/v1/course/classroom/${data.classroomId}/statics`
+  return commonsAjax(url, data, 'post')
+}
 
 // =======讨论======
 /**
  * 讨论列表
  */
 export function discussGet(data) {
-  let url = `${studyUrl}${data.courseId}/discussion/page`
+  let ul = `${studyUrl}${data.courseId}/discussion/page`
   return commonsAjax(url, data, 'get')
 }
-//======长连接签到相关
+//======长连接签到相关w
 /**
  * 保存签到
  */
@@ -959,7 +979,6 @@ export function changeSign(data) {
   let url = `${baseUrl}sign`
   return commonsAjax(url, data, 'put')
 }
-
 
 /**
  * 讨论详情页主题

@@ -2,7 +2,9 @@
   <div>
     <el-container>
       <div class="menu-switch">
-        <i :class="isInteractStart === true ? ['full','el-icon-caret-right']: ['hide','el-icon-caret-left']" @click.stop="menuShow"></i>  
+        <div :class="isInteractStart === true ? ['switch-outer','full']: ['switch-outer','no-full']">
+          <i :class="isInteractStart === true ? 'el-icon-caret-right' : 'el-icon-caret-left'" @click.stop="menuShow"></i>
+        </div> 
       </div>
       <transition name="slide-fade">
       <modelAside v-show="isInteractStart === false"
@@ -13,9 +15,10 @@
         :status="testObj"
         @activeEvent="activeTest"
         @beginEvent="beginTest"
+        ref="modelAside"
       ></modelAside>
       </transition>
-      <el-main :class="isInteractStart === true ? 'full': 'hide'">
+      <el-main :class="isInteractStart === true ? 'main-full': 'main-hide'">
         <div v-if="testObj === ''">
           <span></span>
         </div>
@@ -26,7 +29,7 @@
             <img :src="require('@/assets/images/clock.png')" width="25" alt>
             <span>{{countDownShow}}</span>
           </div>
-          <div style="min-height: 500px;margin-left: 25px">
+          <div style="min-height: 400px;margin-left: 25px">
             <div v-for="(item,i) in testObj.libraryQuizVOS" :key="item.quizId">
               <p>
                 <span class="option-type" v-if="item.quizType === 10">单选</span>
@@ -165,7 +168,7 @@ export default {
     return {
       textObj: {
         addBtn: "添加测试",
-        interactItemBtn: "开始活动"
+        interactItemBtn: "开始测试"
       },
       dataKey: {
         itemId: "examId",
@@ -177,7 +180,7 @@ export default {
       answerObj: {},
       optionItem: ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
       examParams: {
-        courseId: this.$route.query.id,
+        courseId: this.$route.query.id || sessionStorage.get("courseId"),
         examId: ""
       },
       students: [],
@@ -191,7 +194,7 @@ export default {
       addTestParams: {
         chapterId: Cookie.get("chapterId"),
         classroomId: this.$route.query.classroomId,
-        courseId: this.$route.query.id,
+        courseId: this.$route.query.id || sessionStorage.get("courseId"),
         examTitle: "课堂测试",
         quizIds: []
       },
@@ -207,7 +210,6 @@ export default {
       if (this.students.length === 0) {
         return
       }else{
-        alert(1)
         return this.students.sort(this.sortBy("grade", "time"));
       }
     }
@@ -235,26 +237,31 @@ export default {
       });
     },
     setEndTime(){
-        var date = this.endTime * 60 //计算总秒数
-        var interval = setInterval(() =>{
-        if(date == 0){
-          this.isEnd = true;
-          clearInterval(interval)
-        }else{
-          date --;
-          this.time.m = parseInt(date / 60 % 60);//计算剩余的分钟
-          if(this.time.m < 10){
-            this.time.m = "0" +this.time.m
-          } 
-          this.time.s = parseInt(date % 60);//计算剩余的秒数 
-          if(this.time.s < 10){
-            this.time.s = "0" +this.time.s
-          }
-          console.log(this.time.m+this.time.s)
-          this.countDownShow = this.time.m+':'+this.time.s;
-          return this.time.m+this.time.s;	
+        console.log(this.endTime)
+        if(this.endTime !== null) {
+          var date = this.endTime * 60 //计算总秒数
+          var interval = setInterval(() =>{
+            if(date == 0){
+              this.isEnd = true;
+              this.endTest()
+              clearInterval(interval)
+            }else{
+              date --;
+              this.time.m = parseInt(date / 60 % 60);//计算剩余的分钟
+              if(this.time.m < 10){
+                this.time.m = "0" +this.time.m
+              } 
+              this.time.s = parseInt(date % 60);//计算剩余的秒数 
+              if(this.time.s < 10){
+                this.time.s = "0" +this.time.s
+              }
+              console.log(this.time.m+this.time.s)
+              this.countDownShow = this.time.m+':'+this.time.s;
+              return this.time.m+this.time.s;	
+            }
+          },1000);
         }
-      },1000);
+        
     },
     // 递归渲染试题
     filterData(data) {
@@ -312,9 +319,9 @@ export default {
         { token: sessionStorage.getItem("token") },
         JSON.stringify({
           bean: this.testObj.examId,
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
-          userId: sessionStorage.getItem("userId")
+          classroomId: this.$route.query.classroomId || sessionStorage.get('classroomId'),
+          courseId: this.$route.query.id || sessionStorage.get("courseId"),
+          userId: sessionStorage.getItem('userId')
         })
       );
     },
@@ -325,18 +332,19 @@ export default {
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
           bean: this.testObj.examId,
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
+          classroomId: this.$route.query.classroomId || sessionStorage.get('classroomId'),
+          courseId: this.$route.query.id || sessionStorage.get("courseId"),
           userId: sessionStorage.getItem('userId')
         })
       );
     },
     // 获取测试
     getQuiz(item) {
-      console.log(item.examId)
+      console.log(item.interactionStatus)
       interactExam({ examId: item.examId }).then(response => {
         this.testObj = response.data;
-        if (item.interactionStatus === 30) {
+        this.endTime = response.data.limitTime
+        if (response.data.interactionStatus === 30) {
           classTestRes({ examId: item.examId }).then(response => {
             this.answerObj = response.data;
             console.log(this.answerObj)
@@ -344,10 +352,11 @@ export default {
               this.drawPie(this.answerObj);
             });
           });
-        } else if (item.interactionStatus === 20) {
+        } else if (response.data.interactionStatus === 10) {
           // interactExamRes(this.examParams).then(response => {
           //   this.students = response.data.pageData;
           // });
+          
         }
       });
       
@@ -445,6 +454,7 @@ export default {
             message: "添加成功",
             type: "success"
           });
+          this.$refs.modelAside.activeEvent(response.data);
           this.dialogVisible = false;
         });
       }
@@ -484,16 +494,16 @@ export default {
           let data = JSON.parse(result.body);
           console.log("========", data.data.socketData);
           if (data.data.socketType === 303) {
-            that.$message.info("收到一个学生提交");
+            that.$message({message: "收到一个学生提交", type: "success"});
             that.students.push(data.data.socketData[0]);
           }else if(data.data.socketType === 302) {
-            that.$message.info("结束测试");
+            that.$message({message: "结束测试", type: "success"});
             // data.data.socketData.interactionStatus = 30
             that.testObj.interactionStatus = 30
-            console.log(that.testObj, 'bbbbbb', data.data.socketData)
             that.getQuiz(that.testObj)
           }else if(data.data.socketType === 301) {
-            that.$message.info("开始测试");
+            that.$message({message: "开始测试", type: "success"});
+            that.setEndTime()
             that.testObj.interactionStatus = 20
             that.isInteractStart = true
           }
@@ -508,6 +518,7 @@ export default {
 };
 </script>
 
+<style lang="stylus" scoped src="@/assets/css/menu-show.styl"></style>
 <style lang="stylus" scoped>
 @media screen and (min-width: 1200px) and (max-width: 1500px) {
   .el-container {
@@ -517,33 +528,6 @@ export default {
   .count-down {
     left: 92% !important;
   }
-}
-
-.el-main {
-  margin-left: 280px;
-  min-height: 600px;
-}
-
-.full {
-  animation:aside-show 1s;
-  margin-left: 0px
-}
-
-.hide {
-  animation:aside-hide 1s;
-  margin-left: 280px
-}
-
-@keyframes aside-show{
-  from {margin-left: 280px}
-  to {margin-left: 0px}
-  animation-fill-mode: forwards
-}
-
-@keyframes aside-hide{
-  from {margin-left: 0px}
-  to {margin-left: 280px}
-  animation-fill-mode: forwards
 }
 
 .option-type {
@@ -625,12 +609,5 @@ export default {
   transform: translateX(-50px);
   opacity: 0;
 }
-.menu-switch
-  position absolute
-  & i
-    position absolute
-    top 300px
-    z-index 10
-    font-size 25px
 </style>
 
