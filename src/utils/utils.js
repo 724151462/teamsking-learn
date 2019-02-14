@@ -98,3 +98,8 @@ export function signClose(resolve,reject) {
   );
 }
 
+// 去富文本HTML标签
+export function matchReg(str) {
+  let reg = /<\/?.+?\/?>/g;
+  return str.replace(reg, "");
+}

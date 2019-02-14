@@ -118,7 +118,7 @@ import {
   examPut
 } from "@/api/course";
 import { getTestFileFold, getAnswer } from "@/api/library";
-import { log } from "util";
+import { matchReg } from "@/utils/utils";
 import Cookie from "js-cookie"
 export default {
   data() {
@@ -183,6 +183,7 @@ export default {
         this.testObj = response.data;
       });
     }
+    // 禁用浏览器返回行为
     this.preventBack()
   },
   methods: {
@@ -336,7 +337,7 @@ export default {
           if (item.quizList.length !== 0) {
             item.quizList.forEach(list => {
               item.catalogList.push({
-                catalogName: list.quizTitle,
+                catalogName: matchReg(list.quizTitle),
                 quizId: list.quizId
                 // disabled: true,
               });

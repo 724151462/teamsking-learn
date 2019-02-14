@@ -130,6 +130,7 @@
 import Cookie from "js-cookie";
 import modelAside from "@/components/modelAside";
 import { getTestFileFold } from "@/api/library";
+import { matchReg } from "@/utils/utils";
 import { classStromeGet, classStromeSave, storm, stormAddScore } from "@/api/course";
 import Tree from "@/components/fileTree";
 export default {
@@ -179,7 +180,7 @@ export default {
     activeStorme(value) {
       console.log(value);
       storm({ stormId: value.stormId }).then(response => {
-        response.data.stormTitle = this.matchReg(response.data.stormTitle);
+        response.data.stormTitle = matchReg(response.data.stormTitle);
         response.data.answerList = []
         this.stormObj = response.data;
       });
@@ -268,11 +269,6 @@ export default {
         }
       });
     },
-    // 去富文本HTML标签
-    matchReg(str) {
-      let reg = /<\/?.+?\/?>/g;
-      return str.replace(reg, "");
-    },
     // 选中的文件
     checkedFiles(checkedList) {
       console.log(checkedList);
@@ -298,7 +294,7 @@ export default {
     getStormList() {
       classStromeGet(this.addStormParams).then(response => {
         response.data.forEach(element => {
-          element.stormTitle = this.matchReg(element.stormTitle);
+          element.stormTitle = matchReg(element.stormTitle);
         });
         this.stormList = response.data;
       });

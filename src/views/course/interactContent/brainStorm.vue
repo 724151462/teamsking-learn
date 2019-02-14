@@ -64,6 +64,7 @@ export default {
   data() {
     return {
       brainStorm: {
+        assetList: [],
         courseId: this.$route.query.id,
         stormTitle: "",
         stormDescribe: "",
