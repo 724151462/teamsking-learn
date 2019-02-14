@@ -472,13 +472,13 @@ export const constantRouterMap = [{
           name: '课后',
           menuShow: true,
         },
-        {
-          path: '/learn/teachdata',
-          leaf: true,
-          component: _import('learn/teachData'),
-          name: '教学数据',
-          menuShow: true,
-        }
+        // {
+        //   path: '/learn/teachdata',
+        //   leaf: true,
+        //   component: _import('learn/teachData'),
+        //   name: '教学数据',
+        //   menuShow: true,
+        // }
       ]
     }]
   },

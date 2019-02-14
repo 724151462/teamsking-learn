@@ -1,20 +1,37 @@
 <template>
   <div class="after-class">
-    <!--<div style="margin-bottom: 20px">-->
-      <!--<el-select-->
-        <!--filterable-->
-        <!--v-model="data.tenantId"-->
-        <!--:filter-method="searchTenant"-->
-        <!--placeholder="请选择">-->
-        <!--<el-option-->
-          <!--v-for="item in schoolList"-->
-          <!--:key="item.tenantId"-->
-          <!--:label="item.tenantName"-->
-          <!--:value="item.tenantId">-->
-        <!--</el-option>-->
-      <!--</el-select>-->
-      <!--<span>成员人数：65人</span>-->
-    <!--</div>-->
+    <div style="margin-bottom: 20px">
+      <el-select
+        filterable
+        v-model="course"
+        placeholder="请选择">
+        <el-option
+          v-for="item in courseList"
+          :key="item.courseId"
+          :label="item.courseName"
+          :value="item.courseId">
+        </el-option>
+      </el-select>
+      <span style="margin-left: 40px">成员人数：65人</span>
+    </div>
+    <div>
+      <span>时间：</span>
+      <el-radio-group v-model="beforeDate" @change="changeDate">
+        <el-radio-button :label="7">7天</el-radio-button>
+        <el-radio-button :label="14">14天</el-radio-button>
+        <el-radio-button :label="30">30天</el-radio-button>
+      </el-radio-group>
+      <el-date-picker
+          style="margin-left: 40px"
+          v-model="date"
+          format="yyyy 年 MM 月 dd 日"
+          value-format="yyyy-MM-dd 00:00:00"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期">
+      </el-date-picker>
+    </div>
     <div id="afterLean" style="min-height:400px;margin-bottom: 40px;"></div>
     <p></p>
     <div id="afterNum" style="min-height:400px;margin-bottom: 40px;"></div>
@@ -25,13 +42,17 @@
 
 <script>
   import echarts from "echarts";
+  import {getBeforeDate} from "../../utils/utils";
   import {afterOther, timeBucketOther, leanRate} from '@/api/study'
   import {myCourseList} from '@/api/course'
   export default {
   data() {
     return {
       id: "",
-      value:'',
+      course:'',
+      courseList:'',
+      date:'',
+      beforeDate:7,
       studyTime:{
         zeroPoint: 0,
         onePoint: 5,
@@ -83,6 +104,8 @@
     };
   },
   mounted() {
+    //获取前七天的数据
+    this.changeDate(7)
   },
   created () {
     this.myCourseData()
@@ -92,6 +115,11 @@
     this.timeBucketData()
   },
   methods: {
+    //改变时间段
+    changeDate(n){
+      let data = getBeforeDate(n)
+      this.date = [data.beforeTime,data.nowTime]
+    },
     learnChartInit(){
       let myChart = echarts.init(document.getElementById('afterLean'));
       let timeData = [], //横轴数据
@@ -158,7 +186,6 @@
       };
       myChart.setOption(option);
     },
-    //
     numChartInit(){
       let myChart = echarts.init(document.getElementById('afterNum'));
 
@@ -442,26 +469,26 @@
       var myChart = echarts.init(document.getElementById('studyOther'));
       myChart.setOption(option);
     },
-    //获取我可以管理的课程列表
     /*******
      * ↓ ↓ ↓数据获取
      * *****/
+    //获取我可以管理的课程列表
     myCourseData(name){
       name = name || ''
       let data = {
         "courseName": name,
         "pageParam": {
           "pageIndex": 1,
-          "pageSize": 10
+          "pageSize": 1000
         }
       }
       myCourseList(data).then(res=>{
-        // console.log(res)
+        console.log(res)
+        this.courseList = res.data.pageData
       }).catch(err=>{
         console.log(err)
       })
     },
-
     learnRateData(courseId,startTime,endTime){
       let data = {
         "courseId": "0608367675f54267aa6960fd0557cc1b",

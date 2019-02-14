@@ -40,61 +40,15 @@ export function formatDate (time) {
   return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + seconds
 }
 
-export function connect(resolve,reject){
-    let socket = new SockJS('http://120.36.137.90:9008/websocket'),
-        token = sessionStorage.getItem('token'),
-        userId = sessionStorage.getItem('userId'),
-        courseId = sessionStorage.getItem('courseId');
-    let stompClient = Stomp.over(socket);
-    console.log(this)
+//获取当前日期,及前n天
+export function getBeforeDate(n) {
+    let nowTime = formatDate(new Date())
+    let nowMs = new Date().getTime()
+    let beforeMs =  nowMs -  1000 * 60 * 60 * 24 * parseInt(n)
+    let beforeTime = formatDate(beforeMs)
 
-  stompClient.connect({'token': token,'courseId':courseId}, function (frame) {
-        stompClient.subscribe('/teamsking/helloWorld', function (result) {
-          console.log(result);
-        },{'token': token});
-        stompClient.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
-          console.log(result);
-        });
-      // this.$store.commit('SAVE_CLASSROME',res.data.classroomId)
-      resolve('连接成功');
-      },
-      function errorCallBack (error) {
-        // 连接失败时（服务器响应 ERROR 帧）的回调方法
-        reject('连接失败');
-      }
-    )
-  console.log(this)
-
+    return {
+        nowTime,
+        beforeTime
+    }
 }
-
-export function sign(resolve,reject) {
-    let tagClient = this.STOMP_CLIENT,
-        token = sessionStorage.getItem('token'),
-        userId = sessionStorage.getItem('userId'),
-        courseId = sessionStorage.getItem('courseId'),
-        classroomId = sessionStorage.getItem('classroom');
-
-  tagClient.send('/teamsking/course/sign/start',{'token': token},
-        JSON.stringify({
-          "classroomId":1,
-          "courseId":classroomId,
-          "userId":userId
-        })
-  );
-}
-
-export function signClose(resolve,reject) {
-  let tagClient = this.STOMP_CLIENT,
-      token = sessionStorage.getItem('token'),
-      userId = sessionStorage.getItem('userId'),
-      courseId = sessionStorage.getItem('courseId'),
-      classroomId = sessionStorage.getItem('classroom');
-  tagClient.send('/teamsking/course/sign/close',{'token': token},
-    JSON.stringify({
-      "classroomId":classroomId,
-      "courseId":courseId,
-      "userId":userId
-    })
-  );
-}
-
