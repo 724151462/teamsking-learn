@@ -670,7 +670,6 @@ import { setTimeout } from 'timers';
     &:hover
       opacity  1
   .resource
-    padding: 0 5% 20px 50px
     .title
       border-bottom 2px solid gray
       padding-bottom 20px

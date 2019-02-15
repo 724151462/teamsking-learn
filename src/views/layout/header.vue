@@ -151,7 +151,7 @@ export default {
     getUserInfo() {
       let data = getUserId();
       getMeInfo().then(res => {
-        console.log(res);
+        // console.log(res);
         if (Number(res.code) === 200) {
           this.realName = res.data.realName;
           sessionStorage.setItem("realName", res.data.realName);

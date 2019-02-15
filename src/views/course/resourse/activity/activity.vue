@@ -523,7 +523,6 @@
     background-color: #409EFF;
     border-color: #409EFF;
   .activity
-    padding:0 5% 20px 50px
     .title
       border-bottom 2px solid gray
       padding-bottom 20px
