@@ -144,7 +144,6 @@ export default {
         itemId: "voteId",
         itemTitle: "voteTitle"
       },
-      dialogVisible: false,
       fileList: [],
       defaultProps: {
         children: "catalogList",

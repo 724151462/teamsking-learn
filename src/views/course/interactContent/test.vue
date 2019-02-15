@@ -33,50 +33,42 @@
           </el-tab-pane>
         </el-tabs>
       </div>
-      <div class="margin-sides">
-        <span>标题</span>
-      </div>
-      <div>
-        <el-input style="width:600px" v-model="testObj.examTitle"></el-input>
-      </div>
-      <div class="margin-sides">
-        <span>所属章</span>
-        <div style="display: inline-block; margin-left: 15px">
-        <el-select v-model="testObj.chapterId">
-          <el-option
-            v-for="item in chapterList"
-            :key="item.chapterId"
-            :label="item.chapterName"
-            :value="item.chapterId"
-          >{{item.chapterName}}</el-option>
-        </el-select>
-      </div>
-      </div>
-      
-      <div>
-        <el-checkbox v-model="testObj.disorderOrder" :true-label="1" :false-label="2"><span style="font-size 20px !important">题目乱序</span></el-checkbox>
-      </div>
-      <div class="margin-sides">
-        <span>测试时长</span>
-        <el-input class="small-input" size="small" style="margin:10px" v-model="testObj.testHour"></el-input>小时
-        <el-input class="small-input" size="small" style="margin:10px" v-model="testObj.testMinute"></el-input>分钟
+      <el-form :model="testObj" :rules="rules" ref="testForm" label-width="100px">
+        <el-form-item label="标题" prop="examTitle">
+          <el-input style="width:600px" v-model="testObj.examTitle"></el-input>
+        </el-form-item>
+        <el-form-item label="所属章" prop="chapterId">
+          <el-select v-model="testObj.chapterId">
+            <el-option
+              v-for="item in chapterList"
+              :key="item.chapterId"
+              :label="item.chapterName"
+              :value="item.chapterId"
+            >{{item.chapterName}}</el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="题目乱序">
+          <el-checkbox v-model="testObj.disorderOrder" :true-label="1" :false-label="2"></el-checkbox>
+        </el-form-item>
+      <el-form-item label="测试时长">
+        <el-input class="small-input" size="small" style="margin:0 10px" v-model="testObj.testHour"></el-input>小时
+        <el-input class="small-input" size="small" style="margin:0 10px" v-model="testObj.testMinute"></el-input>分钟
         <span class="tip">测试总时长，学生需在此时间内完成作答。</span>
-      </div>
-      <div class="margin-sides">
-        <span>重做次数</span>
+      </el-form-item>
+      <el-form-item label="重做次数">
         <el-input
           v-model="testObj.repeatTimes"
           class="small-input"
           size="small"
-          style="margin:10px"
+          style="margin:0 10px"
         ></el-input>次
         <span class="tip">学生可重复答题次数，成绩取最高分</span>
-      </div>
-      <div class="margin-sides">
-        <span style="margin-right:10px">查看时机</span>
+      </el-form-item>
+      <el-form-item label="查看时机">
         <el-radio v-model="testObj.showAnswer" label="10">测试活动结束后查看答案</el-radio>
         <el-radio v-model="testObj.showAnswer" label="20">交卷后查看答案</el-radio>
-      </div>
+      </el-form-item>
+      </el-form>
     </div>
     <el-button type="primary" @click="savetestArr">保存</el-button>
     <el-dialog title="添加题目" :visible.sync="dialogVisible" width="50%">
@@ -123,6 +115,14 @@ import Cookie from "js-cookie"
 export default {
   data() {
     return {
+      rules: {
+        examTitle: [
+          { required: true, message: '请填写测试标题', trigger: 'blur' }
+        ],
+        chapterId: [
+          { required: true, message: '请选择一个章节', trigger: 'change' }
+        ]
+      },
       fileList: [],
       defaultProps: {
         children: "catalogList",
@@ -289,19 +289,26 @@ export default {
         });
         this.testObj.quizIds = idArr;
         console.log(this.testObj);
-        testAdd(this.testObj).then(response => {
-          console.log(response.data);
-          if (response.code === 200) {
-            this.$message({
-              message: "添加测试成功",
-              type: "success"
+        this.$refs['testForm'].validate((valid) => {
+          if (valid) {
+            testAdd(this.testObj).then(response => {
+              console.log(response.data);
+              if (response.code === 200) {
+                this.$message({
+                  message: "添加测试成功",
+                  type: "success"
+                });
+                this.handleSuccess()
+              } else if (response.code === 200006) {
+                this.$message({
+                  message: response.msg,
+                  type: "warning"
+                });
+              }
             });
-            this.handleSuccess()
-          } else if (response.code === 1000) {
-            this.$message({
-              message: response.msg,
-              type: "warning"
-            });
+          } else {
+            console.log('error submit!!');
+            return false;
           }
         });
       }

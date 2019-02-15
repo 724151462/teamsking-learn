@@ -45,16 +45,19 @@
                 :key="index"
                 :body-style="{ padding: '10px' }"
               >
-              {{item}}
-                <!-- <div style="display: flex; align-items: center">
-                  <img :src="require('@/assets/images/vote.png')" class="stu-image">
-                  <span style="margin-left: 20px">{{item.userId}}</span>
-                </div> -->
+              <!-- {{item}} -->
+                <div style="display: flex; align-items: center">
+                  <img :src="item.avatar" height="100" class="stu-image">
+                  <span style="margin-left: 20px">{{item.userName}}</span>
+                </div>
                 <div>
                   <div
                     style="padding: 20px 0;min-height: 30px; border-bottom: 1px solid rgb(222,222,222)"
                   >
-                    <span>{{item.stormContent}}</span>
+                    <div>
+                      <img :src="item.asset[0]" alt="">
+                    </div>
+                    <span>{{item.entity.stormContent}}</span>
                   </div>
 
                   <div class="bottom clearfix">
@@ -239,8 +242,9 @@ export default {
           let socketData = JSON.parse(result.body)
           let socketObj = {}
           socketObj.entity = socketData.data.socketData.entity
-          socketObj.userName = socketData.data.socketData.name
-          socketObj.assets = socketData.data.socketData.assets || []
+          socketObj.userName = socketData.data.socketData.userName
+          socketObj.asset = socketData.data.socketData.asset
+          socketObj.avatar = socketData.data.socketData.avatar
           console.log(socketObj)
           that.stormObj.answerList.push(socketObj)
           console.log('storm========',that.stormObj.answerList)
@@ -259,8 +263,8 @@ export default {
       });
     },
     addScore(answer) {
-      console.log(answer.id);
-      stormAddScore({ recordId: answer.id }).then(response => {
+      console.log(answer);
+      stormAddScore({ recordId: answer.entity.id }).then(response => {
         if (response.code === 200) {
           this.$message({
             message: "加分成功",

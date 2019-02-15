@@ -4,46 +4,45 @@
       <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 头脑风暴
     </span>
     <div>
-      <div class="margin-sides">题目</div>
-      <el-input
-        type="textarea"
-        v-model="brainStorm.stormTitle"
-        placeholder="请输入题目"
-        style="width:600px;"
-        autofocus="autofocus"
-      />
-      <div class="margin-sides">
-        <i class="el-icon-picture"></i>
-        <span>添加图片</span>
-        <upOss @ossUp="getUrl" :fileType="'image/jpeg,image/png'"></upOss>
-        <div class="all-img-list">
-          <template v-for="(item,i) in addImgList">
-            <div :key="i" style="display: flex; flex-direction: column; align-items: center">
-              <div class="img-list">
-                <img style="width:50px" :src="item.assetUrl" class="img">
+      <el-form :model="brainStorm" ref="brainStormForm" :rules="rules" label-width="100px">
+        <el-form-item label="题目" prop="title">
+          <el-input
+            type="textarea"
+            v-model="brainStorm.stormTitle"
+            placeholder="请输入题目"
+            style="width:600px;"
+            autofocus="autofocus"
+          />
+        </el-form-item>
+        <el-form-item label="添加图片">
+          <upOss @ossUp="getUrl" :fileType="'image/jpeg,image/png'"></upOss>
+          <div class="all-img-list">
+            <template v-for="(item,i) in addImgList">
+              <div :key="i" style="display: flex; flex-direction: column; align-items: center">
+                <div class="img-list">
+                  <img style="width:50px" :src="item.assetUrl" class="img">
+                </div>
               </div>
-            </div>
-            <span :key="item.userId" class="delAsset" @click="delAsset(item)">×</span>
-          </template>
-          <!-- <img v-for="(item, index) in addImgList" :src="item.assetUrl" :width="50" :key="index" alt> -->
-        </div>
-      </div>
-      <div class="margin-sides">标题</div>
-      <el-input placeholder="请添加标题" v-model="brainStorm.stormDescribe" style="width:600px;"></el-input>
-      <div class="margin-sides">
-        <span>所属章</span>
-      </div>
-      <div class="margin-sides">
-        <el-select v-model="brainStorm.chapterId">
-          <el-option
-            v-for="item in chapterList"
-            :key="item.chapterId"
-            :label="item.chapterName"
-            :value="item.chapterId"
-          ></el-option>
-        </el-select>
-      </div>
-      <span style="color: red">提示：学生参与默认活动90分基础分</span>
+              <span :key="item.userId" class="delAsset" @click="delAsset(item)">×</span>
+            </template>
+            <!-- <img v-for="(item, index) in addImgList" :src="item.assetUrl" :width="50" :key="index" alt> -->
+          </div>
+        </el-form-item>
+        <el-form-item label="描述" prop="describe">
+          <el-input placeholder="请添加描述" v-model="brainStorm.stormDescribe" style="width:600px;"></el-input>
+        </el-form-item>
+        <el-form-item label="所属章" prop="chapterId">
+            <el-select v-model="brainStorm.chapterId">
+              <el-option
+                v-for="item in chapterList"
+                :key="item.chapterId"
+                :label="item.chapterName"
+                :value="item.chapterId"
+              ></el-option>
+            </el-select>
+        </el-form-item>
+        <span style="color: red">提示：学生参与默认活动90分基础分</span>
+      </el-form>
     </div>
     <el-button @click="brainStormSave">保存</el-button>
     <el-button @click="cancel">取消</el-button>
@@ -63,6 +62,17 @@ import {
 export default {
   data() {
     return {
+      rules: {
+        describe: [
+          { required: true, message: '请填写题目', trigger: 'blur' }
+        ],
+        title: [
+          { required: true, message: '请填写头脑风暴标题', trigger: 'blur' }
+        ],
+        chapterId: [
+          { required: true, message: '请选择一个章节', trigger: 'change' }
+        ]
+      },
       brainStorm: {
         assetList: [],
         courseId: this.$route.query.id,
@@ -209,13 +219,20 @@ export default {
           }
         });
       } else {
-        stormSave(this.brainStorm).then(response => {
-          if (response.code === 200) {
-            this.$message({
-              message: "成功",
-              type: "success"
+        this.$refs['brainStormForm'].validate((valid) => {
+          if (valid) {
+            stormSave(this.brainStorm).then(response => {
+              if (response.code === 200) {
+                this.$message({
+                  message: "成功",
+                  type: "success"
+                });
+                this.handleSuccess();
+              }
             });
-            this.handleSuccess();
+          } else {
+            console.log('error submit!!');
+            return false;
           }
         });
       }
