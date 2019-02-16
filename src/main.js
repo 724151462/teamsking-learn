@@ -22,6 +22,7 @@ window.STOMP_CLIENT = ''
 var routeList = []
 
 router.beforeEach((to, from, next) => {
+
   var index = routeList.indexOf(to.name)
   if (index !== -1) {
     //如果存在路由列表，则把之后的路由都删掉
@@ -31,9 +32,9 @@ router.beforeEach((to, from, next) => {
   }
   to.meta.routeList = routeList
   store.commit('setNav', to.path)
-  var n=(to.path.split('/')).length-1;
+  var n = (to.path.split('/')).length - 1;
   console.log('timess', n)
-  if(n <= 3) {
+  if (n <= 3) {
     Cookie.set('path', to.path)
   }
   next()

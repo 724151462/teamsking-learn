@@ -1,7 +1,7 @@
 <template>
     <div>
       <el-row>
-        <el-button round size="small" @click="courseType()">全部课程</el-button>
+        <el-button round size="small" :class="{'active':isActice}" @click="courseType()">全部课程</el-button>
         <el-button round size="small" @click="courseType(30)">已发布</el-button>
         <el-button round size="small" @click="courseType(10)">未发布</el-button>
         <el-button round size="small" @click="courseType(40)">已关闭</el-button>
@@ -104,6 +104,7 @@ export default {
         label: '双皮奶'
       }],
       isDialog: false,
+      isActice:true,
       listQuery: {
         pageIndex: 1,
         pageSize: 10,
@@ -122,6 +123,7 @@ export default {
       this.getList()
     },
     courseType(type = '') {
+      type ? this.isActice = false : this.isActice = true
       this.listQuery.courseStatus = type
       coursePage(this.listQuery).then(res => {
         if (res.code === 200) {
@@ -254,7 +256,10 @@ export default {
 <style scoped lang="stylus" type="text/stylus">
   .list-search
     display: inline-block
-
+  .active
+    color: #409EFF;
+    border-color: #c6e2ff;
+    background-color: #ecf5ff;
   .course-table
     overflow hidden
     margin-bottom:10px

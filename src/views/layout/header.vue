@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="header">
-      <div style="display: flex">
+      <div style="display: flex;flex: 1">
         <router-link to="/course" class="login">
           <span>天擎智教</span>
           <span class="sizes">后台管理</span>
@@ -21,19 +21,24 @@
           <el-menu-item index="/learn">学习管理</el-menu-item>
           <el-menu-item index="/school">校管中心</el-menu-item>
           <el-menu-item index="/system">系统管理</el-menu-item>
-          <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" 
-                                >
-                    <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
+          <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" >
+              <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
           </el-menu-item>-->
         </el-menu>
       </div>
+      <div style="margin-right: 30px;margin-top: 15px;color: white;">
+        <router-link :to="{path: '/user/message'}" style="display: inline-block;vertical-align: middle">
+          <el-badge is-dot>
+            <i class="el-icon-bell" style="font-size: 30px;cursor: pointer"></i>
+          </el-badge>
+        </router-link>
+      </div>
       <el-dropdown class="avator">
-        <div style="margin-right: 10px"><router-link :to="{path: '/user/message'}"><el-badge is-dot><i class="el-icon-bell" style="font-size: 30px;cursor: pointer"></i></el-badge></router-link></div>
         <span class="el-dropdown-link userinfo-inner">
-          <img :src="require('../../assets/images/user.png')" alt>
-          <span>{{this.realName}}</span>
-          <i class="el-icon-caret-bottom"></i>
-        </span>
+            <img :src="require('../../assets/images/user.png')" alt>
+            <span>{{this.realName}}</span>
+            <i class="el-icon-caret-bottom"></i>
+          </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item>
             <router-link to="/user/index">个人中心</router-link>
@@ -155,6 +160,7 @@ export default {
         if (Number(res.code) === 200) {
           this.realName = res.data.realName;
           sessionStorage.setItem("realName", res.data.realName);
+          sessionStorage.setItem("tenantId", res.data.gender);
         } else if (Number(res.code) === 440) {
           this.$message.error("获取用户信息失败");
         }

@@ -1,131 +1,127 @@
 <template>
   <div class="userIndex">
-    <el-tabs v-model="activeName" @tab-click="toMessage">
-      <el-tab-pane label="个人设置" name="first" class="tab-name">
-        <div>
-          <p>头像</p>
-          <div  style="padding-left: 100px;width: 100px;margin: 25px 0;">
-            <img :src="infoForm.avatar" alt="" class="user-avatar">
-            <div style="text-align: center;font-size: 14px;">
-              <el-button type="text" @ossUp="changeAvatar"><label for="male" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
-              <up-oss style="display: none" :file-kind="fileKind" @ossUp="changeAvatar"></up-oss>
-            </div>
+    <user-header :active="1"></user-header>
+    <div style="width: 80%;margin: 0 auto;">
+      <div>
+        <p>头像</p>
+        <div  style="padding-left: 100px;width: 100px;margin: 25px 0;">
+          <img :src="infoForm.avatar" alt="" class="user-avatar">
+          <div style="text-align: center;font-size: 14px;">
+            <el-button type="text" @ossUp="changeAvatar"><label for="male" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
+            <up-oss style="display: none" :file-kind="fileKind" @ossUp="changeAvatar"></up-oss>
           </div>
         </div>
-        <div class="form-warp">
-          <p>个人信息</p>
-          <div style="padding-left: 55px;width: 280px">
-            <el-form ref="form" :model="infoForm" label-width="80px">
-              <el-form-item label="姓名：">
-                {{infoForm.realName}}
-              </el-form-item>
-              <el-form-item label="性别：">
-                <el-radio-group v-model="infoForm.gender">
-                  <el-radio :label="1">男</el-radio>
-                  <el-radio :label="2">女</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item label="用户名">
-                <el-input v-model="infoForm.nickName" class="input-width"></el-input>
-              </el-form-item>
-            </el-form>
-          </div>
-          <div style="text-align: right"><el-button type="primary" @click="changeInfo">保存</el-button></div>
+      </div>
+      <div class="form-warp">
+        <p>个人信息</p>
+        <div style="padding-left: 55px;width: 280px">
+          <el-form ref="form" :model="infoForm" label-width="80px">
+            <el-form-item label="姓名：">
+              {{infoForm.realName}}
+            </el-form-item>
+            <el-form-item label="性别：">
+              <el-radio-group v-model="infoForm.gender">
+                <el-radio :label="1">男</el-radio>
+                <el-radio :label="2">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="用户名">
+              <el-input v-model="infoForm.nickName" class="input-width"></el-input>
+            </el-form-item>
+          </el-form>
         </div>
-        <div class="form-warp">
-          <div  style="padding-left: 55px;margin-bottom:22px;width: 400px">
-            <span class="span-label">邮箱</span>
-            <el-input class="input-width" :placeholder="infoForm.email" v-model="newForm.email"> </el-input>
-            <el-button type="text" style="display: inline-block;margin-left: 15px;" @click="goBindEmail">修改邮箱>>></el-button>
-          </div>
-          <div style="padding-left:55px;margin-bottom:22px;width: 400px">
-            <span class="span-label">手机号</span>
-            <el-input class="input-width" :placeholder="infoForm.mobile" v-model="newForm.mobile"> </el-input>
-            <el-button type="text" style="display: inline-block;margin-left: 15px;" @click="goMobile">绑定手机>>></el-button>
-          </div>
-          <div  style="padding-left: 55px;width: 400px;display: flex;align-items: center">
-            <div><span class="span-label">证书添加</span></div>
-            <div><i class="el-icon-picture avatar-uploader-icon"></i></div>
-            <div>
-              <i class="el-icon-circle-plus-outline up-label" @click="uploadDialog = true"></i>
-              <!--<label for="male">-->
-                <!--<i class="el-icon-circle-plus-outline up-label"></i>-->
-              <!--</label>-->
-            </div>
+        <div style="text-align: right"><el-button type="primary" @click="changeInfo">保存</el-button></div>
+      </div>
+      <div class="form-warp">
+        <div  style="padding-left: 55px;margin-bottom:22px;width: 400px">
+          <span class="span-label">邮箱</span>
+          <el-input class="input-width" :placeholder="infoForm.email" v-model="newForm.email"> </el-input>
+          <el-button type="text" style="display: inline-block;margin-left: 15px;" @click="goBindEmail">修改邮箱>>></el-button>
+        </div>
+        <div style="padding-left:55px;margin-bottom:22px;width: 400px">
+          <span class="span-label">手机号</span>
+          <el-input class="input-width" :placeholder="infoForm.mobile" v-model="newForm.mobile"> </el-input>
+          <el-button type="text" style="display: inline-block;margin-left: 15px;" @click="goMobile">绑定手机>>></el-button>
+        </div>
+        <div  style="padding-left: 55px;width: 400px;display: flex;align-items: center">
+          <div><span class="span-label">证书添加</span></div>
+          <div><i class="el-icon-picture avatar-uploader-icon"></i></div>
+          <div>
+            <i class="el-icon-circle-plus-outline up-label" @click="uploadDialog = true"></i>
+            <!--<label for="male">-->
+            <!--<i class="el-icon-circle-plus-outline up-label"></i>-->
+            <!--</label>-->
           </div>
         </div>
-        <!--院系信息-->
-        <div class="form-warp" v-show="jobForm">
-          <div  style="padding-left: 55px;width: 580px">
-            <el-form :model="jobForm" label-width="100px">
-              <el-form-item label="职称">
-                <el-input type="text" class="input-width" v-model="jobForm.positionalTitle" placeholder="请输入"></el-input>
-              </el-form-item>
-              <el-form-item label="职龄">
-                <input class="el-input__inner input-width"
-                       v-model="jobForm.schoolAge"
-                       placeholder="请输入">
-                <!--<el-input type="number" class="input-width"  v-model="jobForm.schoolAge" :placeholder="teacherInfo.schoolAge || '请输入' "></el-input>-->
-              </el-form-item>
-              <el-form-item label="所属院">
-                <el-select v-model="jobForm.collegeId" placeholder="请选择">
-                  <el-option
-                    v-for="item in collegeList"
-                    :key="item.value"
-                    :label="item.collegeName"
-                    :value="item.collegeId">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="所属系">
-                <el-select v-model="jobForm.departmentId" placeholder="请选择" @focus='changeDepartment(jobForm.collegeId)'>
-                  <el-option
-                    v-for="item in departmentList"
-                    :key="item.value"
-                    :label="item.departmentName"
-                    :value="item.departmentId">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="自我介绍">
-                <el-input
-                  type="textarea"
-                  :maxlength="500"
-                  :autosize="{ minRows: 4, maxRows: 6}"
-                  placeholder="请输入"
-                  v-model="jobForm.synopsis">
-                </el-input>
-              </el-form-item>
-            </el-form>
-          </div>
-          <div style="text-align: right"><el-button type="primary" @click="changeTeaInfo">保存</el-button></div>
+      </div>
+      <!--院系信息-->
+      <div class="form-warp" v-show="jobForm">
+        <div  style="padding-left: 55px;width: 580px">
+          <el-form :model="jobForm" label-width="100px">
+            <el-form-item label="职称">
+              <el-input type="text" class="input-width" v-model="jobForm.positionalTitle" placeholder="请输入"></el-input>
+            </el-form-item>
+            <el-form-item label="职龄">
+              <input class="el-input__inner input-width"
+                     v-model="jobForm.schoolAge"
+                     placeholder="请输入">
+              <!--<el-input type="number" class="input-width"  v-model="jobForm.schoolAge" :placeholder="teacherInfo.schoolAge || '请输入' "></el-input>-->
+            </el-form-item>
+            <el-form-item label="所属院">
+              <el-select v-model="jobForm.collegeId" placeholder="请选择">
+                <el-option
+                  v-for="item in collegeList"
+                  :key="item.value"
+                  :label="item.collegeName"
+                  :value="item.collegeId">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="所属系">
+              <el-select v-model="jobForm.departmentId" placeholder="请选择" @focus='changeDepartment(jobForm.collegeId)'>
+                <el-option
+                  v-for="item in departmentList"
+                  :key="item.value"
+                  :label="item.departmentName"
+                  :value="item.departmentId">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="自我介绍">
+              <el-input
+                type="textarea"
+                :maxlength="500"
+                :autosize="{ minRows: 4, maxRows: 6}"
+                placeholder="请输入"
+                v-model="jobForm.synopsis">
+              </el-input>
+            </el-form-item>
+          </el-form>
         </div>
-        <!--密码修改-->
-        <div class="form-warp">
-          <p>修改密码</p>
-          <div style="padding-left:55px;width: 300px">
-            <el-form :model="passForm" :rules="rules" ref="passForm" label-width="100px">
+        <div style="text-align: right"><el-button type="primary" @click="changeTeaInfo">保存</el-button></div>
+      </div>
+      <!--密码修改-->
+      <div class="form-warp">
+        <p>修改密码</p>
+        <div style="padding-left:55px;width: 300px">
+          <el-form :model="passForm" :rules="rules" ref="passForm" label-width="100px">
 
-              <el-form-item label="当前密码" prop="oldPasswd">
-                <el-input type="text" v-model="passForm.oldPasswd"></el-input>
-              </el-form-item>
+            <el-form-item label="当前密码" prop="oldPasswd">
+              <el-input type="text" v-model="passForm.oldPasswd"></el-input>
+            </el-form-item>
 
-              <el-form-item label="新密码" prop="newPasswd">
-                <el-input type="password" v-model="passForm.newPasswd"></el-input>
-              </el-form-item>
+            <el-form-item label="新密码" prop="newPasswd">
+              <el-input type="password" v-model="passForm.newPasswd"></el-input>
+            </el-form-item>
 
-              <el-form-item label="确认密码" prop="checking">
-                <el-input type="password" v-model="passForm.checking"></el-input>
-              </el-form-item>
-            </el-form>
-          </div>
-          <div style="text-align: right"><el-button type="primary" @click="changePassword()">保存</el-button></div>
+            <el-form-item label="确认密码" prop="checking">
+              <el-input type="password" v-model="passForm.checking"></el-input>
+            </el-form-item>
+          </el-form>
         </div>
-      </el-tab-pane>
-      <el-tab-pane label="消息管理" name="second"></el-tab-pane>
-      <el-tab-pane label="我的证书" name="third"></el-tab-pane>
-    </el-tabs>
-
+        <div style="text-align: right"><el-button type="primary" @click="changePassword()">保存</el-button></div>
+      </div>
+    </div>
     <!--绑定手机弹窗-->
     <el-dialog
       :modal="false"
@@ -234,7 +230,7 @@
           <img :src="img.imgUrl" alt="" class="cre-img">
         </span>
         <!--<span><i class="el-icon-picture cre-uploader-icon"></i></span>-->
-        <up-oss @ossUp="upCre" :inputs="'creImg'"></up-oss>
+        <up-oss @ossUp="upCre" :inputs="'creImg'" file-kind="certificate"></up-oss>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="()=>{uploadDialog = false}">取 消</el-button>
@@ -249,12 +245,14 @@
   import Cookie from 'js-cookie'
   import * as userApi from '@/api/user'
   import UpOss from "../../components/up-oss";
+  import userHeader from './userHeader'
   import {teacherInfo} from "../../api/user";
 
   export default {
     name: "index",
     components:{
-      UpOss
+      UpOss,
+      userHeader
     },
     mounted (){
       this.initUserInfo()
@@ -264,7 +262,6 @@
     data() {
       return {
         fileKind: 'avatar',
-        activeName: 'first',
         infoForm:{
           avatar: null,
           email: null,
@@ -759,8 +756,6 @@
   .el-tabs__header
     marging-bottm 0!important
   .userIndex
-    padding 20px;
-    padding-right 200px;
     .user-avatar
       width 100px
       height 100px

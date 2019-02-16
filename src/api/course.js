@@ -119,7 +119,7 @@ export function instructorList(data) {
  * 获取教师列表
  */
 export function teachersList(data) {
-  let url = `${commonBaseUrl}tenant/` + 1 + '/teachers'
+  let url = `${commonBaseUrl}tenant/` + data + '/teachers'
   return commonsAjax(url, '', 'get')
 }
 

@@ -8,6 +8,8 @@ const _import = require('./_import_' + process.env.NODE_ENV)
 
 Vue.use(Router)
 
+
+
 export const constantRouterMap = [{
     path: '/login',
     component: _import('login/index'),
@@ -930,3 +932,4 @@ export const constantRouterMap = [{
 export default new Router({
   routes: constantRouterMap
 })
+

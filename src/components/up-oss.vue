@@ -151,7 +151,7 @@
           this.ossCheck()
         })
       },
-      //判断文件类型
+      //判断文件类型,返回上传目录
       resType(name){
         let dir = ''
         if(this.fileKind==='avatar'){
@@ -176,8 +176,8 @@
             this.$message.error('请上传受支持的资源文件')
             return false
           }
-        } else if (this.fileKind==='img'){
-          dir = 'teskedu/img/'+name
+        } else if (this.fileKind ==='certificate'){
+          dir = 'teskedu/img/certificate/'+name
         } else{
           dir = name
         }

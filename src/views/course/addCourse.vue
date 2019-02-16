@@ -11,7 +11,7 @@
         </el-form-item>
 
         <el-form-item label="课程分类" required>
-          <el-select v-model="Course.courseCategoryParent" placeholder="课程一级分类" @change="yesCategories">
+          <el-select v-model="Course.courseCategoryParent" placeholder="课程一级分类" filterable @change="yesCategories">
             <el-option
               v-for="(item , index) in categoriesList"
               :key="index"
@@ -19,7 +19,7 @@
               :value="item.categoryId">
             </el-option>
           </el-select>
-          <el-select v-model="Course.courseCategory" placeholder="课程二级分类" style="margin-left: 30px" v-show="isCourseChild">
+          <el-select v-model="Course.courseCategory" placeholder="课程二级分类" style="margin-left: 30px" filterable v-show="isCourseChild">
             <el-option
               v-for="item in categoriesChildList"
               :key="item.categoryId"
@@ -125,9 +125,12 @@
         </el-form-item>
 
         <el-form-item label="教学课程授权" label-width="120px" required>
-            <el-button type="text" @click="isAccredit = true">设置</el-button>
+          <el-button type="text" @click="isAccredit = true">设置</el-button>
         </el-form-item>
-
+        <div class="teacher-list">
+          <span v-for="teacher in CourseForm.teacher" :key="teacher.id" class="teacher">{{teacher}}</span>
+        </div>
+        <!--{{this.CourseForm.teacher}}-->
         <el-form-item label="选课名单" required>
           <el-row>
             <span>开放范围：</span>
@@ -208,14 +211,13 @@
     <el-dialog title="教学课程授权" :visible.sync="isAccredit"
                width="50%"
                class="addCourse-dialog teacher-dialog">
-    <el-autocomplete
-                  class="accredit-input"
-                  v-model="accreditTeacher"
-                  suffix-icon="el-icon-search"
-                  :fetch-suggestions="teacherSearch"
-                  placeholder="输入名字进行搜索"
-                  @select="yesTeacher"
-          ></el-autocomplete>
+    <el-autocomplete class="accredit-input"
+        v-model="accreditTeacher"
+        suffix-icon="el-icon-search"
+        :fetch-suggestions="teacherSearch"
+        placeholder="输入名字进行搜索"
+        @select="yesTeacher">
+    </el-autocomplete>
         <div>
           <el-checkbox-group v-model="CourseForm.teacher">
             <el-checkbox v-for="teacher in teachersLists" :label="teacher.teacherName" :value="teacher.teacherId" :name="teacher.teacherNumber" :key="teacher.id"></el-checkbox>
@@ -294,7 +296,7 @@
       </el-row>
       <el-row style="text-align: right;">
         <el-button type="primary" @click="sysTemOver">确 定</el-button>
-        <el-button @click="isSysTem = false">取 消</el-button>
+        <el-button @click="sysTemCancel">取 消</el-button>
       </el-row>
     </el-dialog>
     <!--创建讲师-->
@@ -472,12 +474,11 @@
       yesInstructor (e) {
           console.log(e)
         delete e.value
-
         let flag = this.CourseForm.instructor.find((item)=>{
             return item.instructorId == e.instructorId
         })
 
-        flag ? this.$message.warning('已选择此讲师'):this.CourseForm.instructor.push(e)
+        flag ? this.$message.warning('已选择该讲师'):this.CourseForm.instructor.push(e)
       },
       //标签数据赋值
       yesTages(e){
@@ -490,12 +491,14 @@
           flag ? this.$message.warning('已选择此标签'):this.Course.courseTagIds.push(e)
 
       },
-      //赋值二级课程
+      //一级分类被选择，赋值二级课程
       yesCategories(e){
         let course = e
         this.categoriesList.forEach( (item, index) =>{
-          if(item.categoryId === course){
+          if(item.categoryId === course && item.children !== null){
+            console.info(item)
             this.categoriesChildList = item.children
+            this.Course.courseCategory = ''
             this.isCourseChild = true
           }
         })
@@ -541,10 +544,6 @@
       isSys(){
         this.isSysTem = true
         // this.canvasTab()
-      },
-      //图片上传方法
-      handleAvatarSuccess(res, file) {
-        this.imageUrl = URL.createObjectURL(file.raw);
       },
       //标签移除
       tagRemove(e){
@@ -612,7 +611,6 @@
             })
             // 调用 callback 返回建议列表的数据
             cb(data)
-
           }else{
             this.$message({
               message:'讲师列表获取失败',
@@ -626,20 +624,21 @@
       //从后台获取基础信息
       //授权教师搜索
       teacherSearch(queryString,cb){
-        teachersList().then(res=>{
+        teachersList(sessionStorage.getItem('tenantId'))
+          .then(res=>{
+          console.info('搜索教师',res)
           if(Number(res.code) === 200){
             //给查询到的值加入value字段，用于搜索组件值的显示，数据提交时需将value字段删除
             let data = [],
               rsdata = [];
             res.data.forEach((item)=>{
               item.value = item.teacherName
-
               if(item.teacherName.indexOf(queryString) != -1){
                 data.push(item)
               }
             })
-            console.log(data)
-            // 调用 callback 返回建议列表的数据
+            // console.log(data)
+            // 返回数据
             cb(data)
           }else{
             this.$message({
@@ -703,7 +702,7 @@
           console.log(error)
         })
         //获取教师列表的数据
-        teachersList().then(res=>{
+        teachersList(sessionStorage.getItem('tenantId')).then(res=>{
           // console.log('教师列表:')
           // console.log(res)
           if(Number(res.code) === 200){
@@ -731,10 +730,6 @@
           }
         });
         return data;
-      },
-      //教师授权搜索框
-      accreditSelect(item) {
-        console.log(item);
       },
       //教师授权搜索提示框
       querySearch(queryString, cb) {
@@ -814,10 +809,12 @@
       //修改课程
       goPutCourse () {
         let data = this.goDataFilter()
-        console.log('请求发送前的数据')
-        console.log(data)
+        let loading = this.$loading(this.loadingCss)
+        // console.log('请求发送前的数据')
+        // console.log(data)
         putCourse(data).then(res=>{
-          console.log(res)
+          // console.log(res)
+          loading.close()
           if(Number(res.code) === 200) {
             this.$message.success('课程信息修改成功')
             this.$router.push('/course/list')
@@ -846,7 +843,14 @@
         }else{
           this.isSysTem = false
         }
-      }
+      },
+      //取消成绩权重设置
+      sysTemCancel () {
+        for (let i in this.CourseSetEntity) {
+          this.CourseSetEntity[i] = 0
+        }
+        this.isSysTem = false
+      },
     },
     mounted(){
       //编辑课程
@@ -905,6 +909,13 @@
     padding-bottom 10px
     & span
       margin-right 5px
+  .teacher-list
+    margin-left: 20px
+    font-size: 14px
+    margin-bottom 20px
+    .teacher
+      margin-right 10px
+      color: #b3b3b3;
   .instructor-tag-warp
     width 300px
     border-radius 5px
@@ -1002,7 +1013,6 @@
   .addCourse-center
     .courseExplanation
       color:#b3b3b3
-
     .sysTem
       color:#3EABA8
       margin-left:20px
@@ -1035,9 +1045,9 @@
     height: 178px
     display: block
 
-  .accredit-input{
+  .accredit-input
     margin-right 30px
+    margin-bottom 20px
     margin-left: calc(100% - 220px);
     border-radius 30px
-  }
 </style>
