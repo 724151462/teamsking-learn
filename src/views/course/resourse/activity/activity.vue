@@ -184,82 +184,82 @@
       };
     },
     methods:{
-        //点击弹出新建目录的弹窗
-        goCreateCatalog(data,id) {
-            this.newCatalog.catalogId = id
-            this.createCatalog = true
-        },
-        //点击弹出重命名的弹窗
-        goRenameCatalog(data,id) {
-          let parentId =  data.parentId || 0
-          this.expan = [parentId]
+      //点击弹出新建目录的弹窗
+      goCreateCatalog(data,id) {
           this.newCatalog.catalogId = id
-            this.renameCatalog = true
-        },
-        //全选操作
-        checkAll(flag){
-            //获取所有文件夹节点的id用于全选
-            let idArr = []
-            this.activityData.forEach((item)=>{
-                idArr.push(item.catalogId)
-            })
-            this.isCheckAll = flag
-            this.isCheckAll ? idArr : idArr=[]
-            this.deleteArr= idArr
+          this.createCatalog = true
+      },
+      //点击弹出重命名的弹窗
+      goRenameCatalog(data,id) {
+        let parentId =  data.parentId || 0
+        this.expan = [parentId]
+        this.newCatalog.catalogId = id
+          this.renameCatalog = true
+      },
+      //全选操作
+      checkAll(flag){
+          //获取所有文件夹节点的id用于全选
+          let idArr = []
+          this.activityData.forEach((item)=>{
+              idArr.push(item.catalogId)
+          })
+          this.isCheckAll = flag
+          this.isCheckAll ? idArr : idArr=[]
+          this.deleteArr= idArr
 
-            this.allDelete = flag
-        },
-        //节点复选框被选
-        nodeCheck(data, checked){
-            if(checked){
-                this.deleteArr.push(data.catalogId)
-                this.interactionIdArr.push(data.interactionId)
-            }else{
-                let index = this.deleteArr.indexOf(data.catalogId)
-                this.deleteArr.splice(index,1)
-                let reindex = this.interactionIdArr.indexOf(data.interactionId)
-                this.interactionIdArr.splice(index,1)
-            }
-            this.deleteArr =this.deleteArr.filter((item)=>{
-                return item != undefined
-            })
-            this.interactionIdArr =this.interactionIdArr.filter((item)=>{
-                return item != undefined
-            })
-        },
-        // 获取所有活动列表
-        getList(id,key){
-          let loading = this.$loading(this.loadingCss)
-            let data = {
-              interactionType : id,
-              searchKey:key
-            }
-            getAcList(data).then(res => {
-              loading.close()
-                console.log(res)
-                if (Number(res.code) === 200) {
-                    //如果试题库为空，则初始化新建一个默认的文件夹
-                    if(res.data.length === 0){
-                        this.newCatalog = {
-                            catalogId: 0,
-                            catalogName: "默认文件夹"
-                        }
-                        this.newFileFold()
-                    }
-                    let data = JSON.parse(JSON.stringify(res.data))
-                    this.activityData = this.filterData(data)
-                    // console.log(this.activityData)
-                } else {
-                    this.$message({
-                        message: "数据获取失败",
-                        type: "error"
-                    });
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
-        },
+          this.allDelete = flag
+      },
+      //节点复选框被选
+      nodeCheck(data, checked){
+          if(checked){
+              this.deleteArr.push(data.catalogId)
+              this.interactionIdArr.push(data.interactionId)
+          }else{
+              let index = this.deleteArr.indexOf(data.catalogId)
+              this.deleteArr.splice(index,1)
+              let reindex = this.interactionIdArr.indexOf(data.interactionId)
+              this.interactionIdArr.splice(index,1)
+          }
+          this.deleteArr =this.deleteArr.filter((item)=>{
+              return item != undefined
+          })
+          this.interactionIdArr =this.interactionIdArr.filter((item)=>{
+              return item != undefined
+          })
+      },
+      // 获取所有活动列表
+      getList(id,key){
+        let loading = this.$loading(this.loadingCss)
+          let data = {
+            interactionType : id,
+            searchKey:key
+          }
+          getAcList(data).then(res => {
+            loading.close()
+              console.log(res)
+              if (Number(res.code) === 200) {
+                  //如果试题库为空，则初始化新建一个默认的文件夹
+                  if(res.data.length === 0){
+                      this.newCatalog = {
+                          catalogId: 0,
+                          catalogName: "默认文件夹"
+                      }
+                      this.newFileFold()
+                  }
+                  let data = JSON.parse(JSON.stringify(res.data))
+                  this.activityData = this.filterData(data)
+                  // console.log(this.activityData)
+              } else {
+                  this.$message({
+                      message: "数据获取失败",
+                      type: "error"
+                  });
+              }
+          })
+          .catch(error => {
+              console.log(error);
+          });
+      },
       // 获取所有活动列表,无loading效果
       newList(id,key){
         let data = {

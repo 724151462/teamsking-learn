@@ -69,7 +69,7 @@
                 <span v-else >
                   <span class="hide-button">
                     <el-button size="mini" type="primary" @click.stop="preView(data)">预览</el-button>
-                    <el-button size="mini" type="primary" @click.stop="" v-if="data.resourceType.type ==10 && !data.srtUrl"> 添加字幕 </el-button>
+                    <el-button size="mini" type="primary" @click.stop="" v-if="!data.srtUrl && data.resourceType == 10">添加字幕 </el-button>
                     <el-button size="mini" type="primary" @click.stop="delRes(data.resourceId,data.parentId)">删除</el-button>
                   </span>
 
