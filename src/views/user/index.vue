@@ -255,9 +255,16 @@
       userHeader
     },
     mounted (){
-      this.initUserInfo()
-      this.initTeaInfo()
-      this.initCollege()
+      Promise.all([this.initUserInfo(), this.initTeaInfo(), this.initCollege()])
+        .then((res)=>{
+            console.log(res)
+        })
+        .catch((err)=>{
+          console.log(err)
+        });
+      // this.initUserInfo()
+      // this.initTeaInfo()
+      // this.initCollege()
     },
     data() {
       return {
@@ -336,10 +343,10 @@
             "certificateNo": "string",
             "imgUrls": [
                 {
-                    "certificateImgId": 0,
-                    "imgUrl": "string",
-                    "order": 0,
-                    "saveDate": "string"
+                  "certificateImgId": 0,
+                  "imgUrl": "string",
+                  "order": 0,
+                  "saveDate": "string"
                 }
             ],
             "issuingAuthority": "string",
@@ -381,6 +388,7 @@
               type:'error'
             })
           }
+          return 123
         })
       },
       //获取教师信息
