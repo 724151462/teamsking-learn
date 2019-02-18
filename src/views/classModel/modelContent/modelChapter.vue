@@ -123,8 +123,10 @@ export default {
   },
   created() {
     Cookie.set("modelActive", "1");
-    classChapter({ courseId: this.$route.query.id }).then(response => {
+    classChapter({ courseId: sessionStorage.getItem('courseId') }).then(response => {
       this.chapterList = response.data;
+      this.activeSection = String(Cookie.get("sectionId"));
+      this.menuSelect(this.activeSection)
     });
   },
   mounted(){},
@@ -133,8 +135,6 @@ export default {
       this.isInteractStart = !this.isInteractStart;
     },
     menuSelect(secId, x) {
-      console.log(x);
-      Cookie.set("chapterId", x[0]);
       Cookie.set("sectionId", secId);
       this.chapterList.forEach(element => {
         element.seactions.forEach(section => {
@@ -148,10 +148,13 @@ export default {
           }
         });
       });
+      this.getResource(secId)
+      this.activeName = "0";
+    },
+    getResource(secId) {
       classItem({ sectionId: secId }).then(response => {
         this.itemList = response.data;
       });
-      this.activeName = "0";
     },
     viewSource(value) {
       chapterView({ itemId: value.name }).then(response => {

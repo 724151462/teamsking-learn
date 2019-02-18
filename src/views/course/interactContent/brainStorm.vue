@@ -17,7 +17,7 @@
         <el-form-item label="添加图片">
           <upOss @ossUp="getUrl" :fileType="'image/jpeg,image/png'"></upOss>
           <div class="all-img-list">
-            <template v-for="(item,i) in addImgList">
+            <template v-for="(item,i) in brainStorm.assetList">
               <div :key="i" style="display: flex; flex-direction: column; align-items: center">
                 <div class="img-list">
                   <img style="width:50px" :src="item.assetUrl" class="img">
@@ -106,7 +106,7 @@ export default {
       interactStorm({ stormId: this.$route.query.interactId }).then(
         response => {
           this.brainStorm = response.data;
-          this.addImgList = response.data.assetList;
+          this.brainStorm.assetList = response.data.assetList;
           console.log(this.addImgList);
         }
       );
@@ -138,6 +138,8 @@ export default {
       this.asset.contentType = this.resType(fileName);
       assetCreate(this.asset).then(response => {
         this.brainStorm.assetList.push(response.data);
+        // this.addImgList.push(response.data)
+        console.log(this.addImgList)
         console.log(this.brainStorm);
       });
     },

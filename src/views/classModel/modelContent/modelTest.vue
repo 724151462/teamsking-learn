@@ -180,7 +180,7 @@ export default {
       answerObj: {},
       optionItem: ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
       examParams: {
-        courseId: this.$route.query.id || sessionStorage.get("courseId"),
+        courseId: this.$route.query.id || sessionStorage.getItem("courseId"),
         examId: ""
       },
       students: [],
@@ -193,8 +193,8 @@ export default {
       },
       addTestParams: {
         chapterId: Cookie.get("chapterId"),
-        classroomId: this.$route.query.classroomId,
-        courseId: this.$route.query.id || sessionStorage.get("courseId"),
+        classroomId: this.$route.query.classroomId || sessionStorage.getItem("classroom"),
+        courseId: this.$route.query.id || sessionStorage.getItem("courseId"),
         examTitle: "课堂测试",
         quizIds: []
       },
@@ -230,7 +230,7 @@ export default {
     getTest() {
       // 总的测试列表
       classTest({
-        classroomId: this.$route.query.classroomId,
+        classroomId: this.$route.query.classroomId || sessionStorage.getItem("classroom"),
         chapterId: Cookie.get("chapterId")
       }).then(response => {
         this.testList = response.data;
@@ -319,8 +319,8 @@ export default {
         { token: sessionStorage.getItem("token") },
         JSON.stringify({
           bean: this.testObj.examId,
-          classroomId: this.$route.query.classroomId || sessionStorage.get('classroomId'),
-          courseId: this.$route.query.id || sessionStorage.get("courseId"),
+          classroomId: this.$route.query.classroomId || sessionStorage.getItem('classroom'),
+          courseId: this.$route.query.id || sessionStorage.getItem("courseId"),
           userId: sessionStorage.getItem('userId')
         })
       );
@@ -332,8 +332,8 @@ export default {
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
           bean: this.testObj.examId,
-          classroomId: this.$route.query.classroomId || sessionStorage.get('classroomId'),
-          courseId: this.$route.query.id || sessionStorage.get("courseId"),
+          classroomId: this.$route.query.classroomId || sessionStorage.getItem('classroom'),
+          courseId: this.$route.query.id || sessionStorage.getItem("courseId"),
           userId: sessionStorage.getItem('userId')
         })
       );

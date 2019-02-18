@@ -151,8 +151,8 @@ export default {
       },
       addVoteParams: {
         chapterId: Cookie.get("chapterId"),
-        classroomId: this.$route.query.classroomId,
-        courseId: this.$route.query.id || sessionStorage.get("courseId"),
+        classroomId: this.$route.query.classroomId || sessionStorage.getItem("classroom"),
+        courseId: this.$route.query.id || sessionStorage.getItem("courseId"),
         quizOptions: [{ text: "" }, { text: "" }]
       },
       voteList: [
@@ -245,8 +245,8 @@ export default {
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
           bean: { voteId: this.voteObj.voteId},
-          classroomId: this.$route.query.classroomId || sessionStorage.get('classroomId'),
-          courseId: this.$route.query.id || sessionStorage.get("courseId"),
+          classroomId: this.$route.query.classroomId || sessionStorage.getItem('classroomId'),
+          courseId: this.$route.query.id || sessionStorage.getItem("courseId"),
           userId: sessionStorage.getItem('userId')
         })
       );
@@ -262,8 +262,8 @@ export default {
           { token: sessionStorage.getItem("token") },
           JSON.stringify({
             bean: { voteId: this.voteObj.voteId },
-            classroomId: this.$route.query.classroomId || sessionStorage.get("classroomId"),
-            courseId:  this.$route.query.id || sessionStorage.get("courseId"),
+            classroomId: this.$route.query.classroomId || sessionStorage.getItem("classroomId"),
+            courseId:  this.$route.query.id || sessionStorage.getItem("courseId"),
             userId: sessionStorage.getItem("userId")
           })
         );
