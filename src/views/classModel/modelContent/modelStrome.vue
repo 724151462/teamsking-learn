@@ -146,8 +146,8 @@ export default {
         label: "catalogName"
       },
       addStormParams: {
-        classroomId: this.$route.query.classroomId || sessionStorage.get("classroomId"),
-        courseId: this.$route.query.id || sessionStorage.get("courseId"),
+        classroomId: this.$route.query.classroomId || sessionStorage.getItem("classroom"),
+        courseId: this.$route.query.id || sessionStorage.getItem("courseId"),
         stormTitle: ''
       },
       isInteractStart: false,
@@ -212,8 +212,8 @@ export default {
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
           bean: this.stormObj.stormId,
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
+          classroomId: this.$route.query.classroomId || sessionStorage.getItem("classroom"),
+          courseId: this.$route.query.id || sessionStorage.getItem("courseId"),
           userId: sessionStorage.getItem('userId')
         })
       );
@@ -225,8 +225,8 @@ export default {
         { token: sessionStorage.getItem('token') },
         JSON.stringify({
           bean: {stormId: this.stormObj.stormId},
-          classroomId: this.$route.query.classroomId,
-          courseId: this.$route.query.id,
+          classroomId: this.$route.query.classroomId || sessionStorage.getItem("classroom"),
+          courseId: this.$route.query.id || sessionStorage.getItem("courseId"),
           userId: sessionStorage.getItem('userId')
         })
       );

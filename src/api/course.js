@@ -344,7 +344,7 @@ export function memberEditList(data) {
  */
 export function memberUpload(data) {
   console.log(data)
-  let url = `http://120.36.137.90:9008/api/v1/sys/course/${data.get('courseId')}/user/excel`
+  let url = `http://192.168.10.48:9008/api/v1/sys/course/${data.get('courseId')}/user/excel`
   // let url = `${baseUrl}${data.get('courseId')}/score/excel`
   return commonsAjax(url, data, 'post')
 }

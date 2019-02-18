@@ -223,7 +223,7 @@ export default {
           console.log(index);
           deleteUser(sysInfo).then(response => {
             if (response.code === 200) {
-              tableData.splice(index, 1);
+              this.tableData.splice(index, 1);
             }
           });
         default:
@@ -262,23 +262,34 @@ export default {
       formData.append("courseId", this.$route.query.id);
       memberUpload(formData).then(response => {
         this.resData = response.data;
-        this.dialogShow = true;
-      });
-    },
-    // 确认导入
-    ensureImport(items) {
-      let data = {};
-      data.courseId = this.$route.query.id;
-      userModify(data).then(response => {
-        if (response.code === 400005) {
+        // 查询是否有错误信息
+        for (let value of this.resData.values()) {
+          if(value.errorData.length !== 0)
+          this.dialogShow = true;
+        }
+        // 无错误信息就弹窗成功
+        if(this.dialogShow !== true) {
           this.$message({
             message: "导入成功",
             type: "success"
           });
         }
-        this.dialogShow = false;
       });
     },
+    // // 确认导入
+    // ensureImport(items) {
+    //   let data = {};
+    //   data.courseId = this.$route.query.id;
+    //   userModify(data).then(response => {
+    //     if (response.code === 400005) {
+    //       this.$message({
+    //         message: "导入成功",
+    //         type: "success"
+    //       });
+    //     }
+    //     this.dialogShow = false;
+    //   });
+    // },
     handleCurrentChange(index) {
       this.pageParmas.pageIndex = index;
       this.getPage();
