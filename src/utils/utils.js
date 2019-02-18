@@ -1,4 +1,5 @@
 import store from '@/store/index';
+import Cookie from 'js-cookie'
 
 export function formatDate (time) {
   let date
@@ -102,4 +103,65 @@ export function signClose(resolve,reject) {
 export function matchReg(str) {
   let reg = /<\/?.+?\/?>/g;
   return str.replace(reg, "");
+}
+
+// 下载
+export function downLoadFile(url, fileName) {
+  var oReq = new XMLHttpRequest();
+      oReq.open(
+        "GET",
+        url,
+        true
+      );
+      oReq.setRequestHeader("token", sessionStorage.getItem('token'));
+      oReq.responseType = "blob";
+      oReq.onload = function(oEvent) {
+        var content = oReq.response;
+        console.log(oReq);
+        var elink = document.createElement("a");
+        elink.download = fileName;
+        elink.style.display = "none";
+
+        var blob = new Blob([content]);
+        elink.href = URL.createObjectURL(blob);
+
+        document.body.appendChild(elink);
+        elink.click();
+
+        document.body.removeChild(elink);
+      };
+      oReq.send();
+}
+
+//判断文件类型
+export function fileType(name){
+  
+  let fileType = ''
+  let curType
+  let index= name.lastIndexOf('.'),
+      imgArr = ['jpeg','jpg','png'],
+      audioArr=['mp3','wav'],
+      videoArr=['mp4','avi','rmvb','wmv','mkv'],
+      docArr=['pdf','txt','doc','docx','xls','xlsx','ppt','pptx'];
+  if(name.includes('.')) {
+    curType = name.substring(index+1,name.length).toLowerCase()
+  }else{
+    curType = name
+  }
+  console.log(curType)
+    if(imgArr.find((item)=>{return curType == item})){
+      fileType = "image"
+    }else if(videoArr.find((item)=>{return curType == item})){
+      fileType = "video"
+    }else if(docArr.find((item)=>{return curType == item})){
+      fileType = "doc"
+    }else if(audioArr.find((item)=>{return curType == item})){
+      fileType = "audio"
+    }else{
+      // this.$message.error('请上传受支持的资源文件')
+      return false
+    }
+  
+
+  return fileType
 }

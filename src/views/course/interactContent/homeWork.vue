@@ -63,8 +63,11 @@
         <upOss @ossUp="getUrl" :btnText="'添加附件'"></upOss>
       </el-form-item>
       <div>
-        <div>
-          <img v-for="item in homeWork.assets" width="50" :src="item.assetUrl">
+        <div v-for="item in homeWork.assets">
+          {{item}}
+          {{getFileType(item.assetUrl)}}
+          <img v-if="item.assetUrl === 'jpg' || 'png' || 'jpeg'" width="50" @click="download(item)" :src="item.assetUrl">
+          <span v-else-if="item.contentType === 'word' || 'pdf' || 'doc'"></span>
         </div>
       </div>
       <el-form-item label="参考答案" prop="answer">
@@ -80,6 +83,7 @@
 <script>
 import upOss from "@/components/up-oss";
 import Cookie from "js-cookie";
+import { fileType, downLoadFile } from "@/utils/utils"
 import {
   assetCreate,
   homeWorkDetail,
@@ -202,30 +206,36 @@ export default {
       console.log(this.homeWork);
     },
     getUrl(url, fileName) {
+      console.log(fileName)
       console.log("资源链接：" + url);
       this.addImgList.push(url);
       this.asset.assetTitle = fileName;
       this.asset.assetUrl = url;
+      this.asset.contentType = this.fileTail(this.asset)
       assetCreate(this.asset).then(response => {
         this.homeWork.assets.push(response.data);
         console.log("asset", this.homeWork);
       });
     },
+    // 判断文件后缀
+    fileTail(file) {
+      let url = file.assetUrl, 
+          index= url.lastIndexOf('.')
+      return url.substring(index+1,url.length).toLowerCase()
+    },
+    // 判断文件类型
+    getFileType(name) {
+      fileType(name)
+    },
     // 下载
-    // funDownload(content, filename) {
-    //     // 创建隐藏的可下载链接
-    //     var eleLink = document.createElement('a');
-    //     eleLink.download = filename;
-    //     eleLink.style.display = 'none';
-    //     // 字符内容转变成blob地址
-    //     var blob = new Blob([content]);
-    //     eleLink.href = URL.createObjectURL(blob);
-    //     // 触发点击
-    //     document.body.appendChild(eleLink);
-    //     eleLink.click();
-    //     // 然后移除
-    //     document.body.removeChild(eleLink);
-    // },
+    download(file) {
+      // let fileType = fileType(url.assetUrl)
+      // var FileSaver = require("file-saver");
+      // FileSaver.saveAs(url.assetUrl);
+      let url = file.assetUrl, 
+          index= url.lastIndexOf('.')
+      downLoadFile(url, 'file' + url.substring(index+1,url.length).toLowerCase())
+    },
     handleSuccess() {
       this.routerType = "success";
       let chapterArr = JSON.parse(localStorage.getItem("localInteractId"));
