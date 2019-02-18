@@ -9,6 +9,7 @@
       <el-button size="small" @click ="del">删除</el-button>
       <div style="margin: 15px 0;"></div>
       <div>
+        <div v-show="messageData.length == 0">暂无消息</div>
         <div v-for="(message) in messageData" :key="message.id" class="message-item">
           <div style="padding-right: 20px">
             <el-checkbox v-model="message.selected" @change="checkChange(message.userMessageId, $event)"></el-checkbox>
@@ -73,21 +74,7 @@ export default {
         dialogVisible: false, //消息框的显隐
         currentMessage: 0, //当前被点击的消息的Index,用于弹窗的取值
         checkAll: false,
-        messageData: [
-          {
-            content: "特委屈让我去让我去热武器若",
-            messageId: 70,
-            messageType: 30,
-            orderValue: null,
-            publishTime: "2019-01-17 18:56:11",
-            readCount: 0,
-            selected: false,
-            status: 20,
-            title: "日网签任务特委屈认为其他",
-            totalCount: 39,
-            userMessageId: 15276,
-         }
-        ],
+        messageData: [],
         //10 系统通知 20:学校通知 30:课程通知
         message: 3, //所有消息数量
         checkedMessage: [], //被选中的
@@ -145,9 +132,11 @@ export default {
       },
       //全部标记为已读
       readAll() {
+        let leng = this.checkedMessage.length
         readMsg(this.checkedMessage).then(res => {
           console.log(res)
           if (Number(res.code) === 200) {
+            this.$store.commit('MSG_READY',leng)
             this.initList()
           } else {
             this.$message.error('读取消息失败');
@@ -165,6 +154,7 @@ export default {
 
             getMsg().then(res => {
               if (Number(res.code) === 200) {
+                this.$store.commit('MSG_READY',1)
                 let data = res.data.pageData.forEach(item=>{
                   item.selected = false
                 })

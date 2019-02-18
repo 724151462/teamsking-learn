@@ -124,13 +124,13 @@
               <span style="margin-left: 10px">{{scope.row.voteAverage}}</span>
             </template>
           </el-table-column>
-          <el-table-column
-            label="授课时长"
-            width="120">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{mTran(scope.row.classTime)}}</span>
-            </template>
-          </el-table-column>
+          <!--<el-table-column-->
+            <!--label="授课时长"-->
+            <!--width="120">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span style="margin-left: 10px">{{mTran(scope.row.classTime)}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
         </el-table>
 
         <el-pagination

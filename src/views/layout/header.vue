@@ -28,7 +28,10 @@
       </div>
       <div style="margin-right: 30px;margin-top: 15px;color: white;">
         <router-link :to="{path: '/user/message'}" style="display: inline-block;vertical-align: middle">
-          <el-badge is-dot>
+          <el-badge :value="$store.state.msgNum" class="item" v-if="$store.state.msgNum > 0">
+            <i class="el-icon-bell" style="font-size: 30px;cursor: pointer"></i>
+          </el-badge>
+          <el-badge v-else>
             <i class="el-icon-bell" style="font-size: 30px;cursor: pointer"></i>
           </el-badge>
         </router-link>
@@ -57,6 +60,8 @@ import { menuList, logout } from "@/api/login";
 import { constantRouterMap } from "@/router/index";
 import { removeToken, getUserId, removeUserId } from "@/utils/auth";
 import { getUserInfo, getMeInfo, userInit } from "../../api/user";
+import {unReadyMsg} from '@/api/course'
+import {getErrorMsg} from "../../utils/utils";
 
 export default {
   props: ["navs"],
@@ -88,6 +93,7 @@ export default {
       realName: "",
       menuList: constantRouterMap,
       nameInit: "",
+      msgNumber:1,
       nameDialog: true
     };
   },
@@ -97,6 +103,7 @@ export default {
     this.$store.commit("setAllMenu", this.menuList);
     this.fetchNavData();
     this.getUserInfo();
+    this.getMsg();
   },
   methods: {
     navChange() {
@@ -161,11 +168,26 @@ export default {
           this.realName = res.data.realName;
           sessionStorage.setItem("realName", res.data.realName);
           sessionStorage.setItem("tenantId", res.data.gender);
-        } else if (Number(res.code) === 440) {
-          this.$message.error("获取用户信息失败");
+        } else {
+          this.$message.error(getErrorMsg(res.msg));
         }
       });
-    }
+    },
+    getMsg(){
+      unReadyMsg()
+        .then((res)=>{
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.msgNumber = res.data
+            this.$store.commit('SET_MSG', res.data)
+          } else {
+            this.$message.error(getErrorMsg(res.msg));
+          }
+        })
+        .catch((err)=>{
+          console.log(err)
+        })
+    },
   },
   watch: {
     $route: function(to, from) {
