@@ -59,7 +59,7 @@
         }
     },
     created() {
-      this.handleSelect(this.$store.state.modelActive)
+    //   this.handleSelect(this.$store.state.modelActive)
       // if(sessionStorage.getItem('isSign') === 'NO'){
       //   this.goCheck()
       // }
