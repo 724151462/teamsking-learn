@@ -5,7 +5,7 @@
     </span>
     <div>
       <el-form :model="brainStorm" ref="brainStormForm" :rules="rules" label-width="100px">
-        <el-form-item label="题目" prop="title">
+        <el-form-item label="题目" prop="stormTitle">
           <el-input
             type="textarea"
             v-model="brainStorm.stormTitle"
@@ -28,7 +28,7 @@
             <!-- <img v-for="(item, index) in addImgList" :src="item.assetUrl" :width="50" :key="index" alt> -->
           </div>
         </el-form-item>
-        <el-form-item label="描述" prop="describe">
+        <el-form-item label="描述" prop="stormDescribe">
           <el-input placeholder="请添加描述" v-model="brainStorm.stormDescribe" style="width:600px;"></el-input>
         </el-form-item>
         <el-form-item label="所属章" prop="chapterId">
@@ -63,10 +63,10 @@ export default {
   data() {
     return {
       rules: {
-        describe: [
+        stormDescribe: [
           { required: true, message: '请填写题目', trigger: 'blur' }
         ],
-        title: [
+        stormTitle: [
           { required: true, message: '请填写头脑风暴标题', trigger: 'blur' }
         ],
         chapterId: [
