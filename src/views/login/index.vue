@@ -34,6 +34,8 @@
 <script>
   import { logins, loginDebug, getTenant} from '@/api/login'
   import { setToken, getToken, twoWeeksExchange, twoWeeksGetExchange, saveUserInfo} from '@/utils/auth'
+  import {getErrorMsg} from "@/utils/utils";
+
   export default {
     data () {
       return {
@@ -57,7 +59,7 @@
     },
     created () {
       getTenant().then(res => {
-        console.log(res)
+        // console.log(res)
         if (res.code === 200) {
           this.schoolList = res.data
         }else{
@@ -74,9 +76,8 @@
           loginAccount: this.data.userName,
           passwd: this.data.password
         }
-        //账户：090729
         logins(data).then(res => {
-          console.log(res)
+          // console.log(res)
           if (res.code === 200) {
             console.log('登录成功')
             twoWeeksExchange(res.data.token)
@@ -84,7 +85,7 @@
             this.$router.replace('/course')
           } else {
             this.$message({
-              message: '用户名密码错误，请重新输入',
+              message:getErrorMsg(res.msg),
               type: 'error'
             })
           }
@@ -98,7 +99,7 @@
           password: 'admin'
         }
         loginDebug(data).then(res => {
-          console.log(res)
+          // console.log(res)
           if (res.code === 200) {
             twoWeeksExchange(res.data.token)
             saveUserInfo(res.data.userId)
@@ -116,11 +117,11 @@
       searchTenant(query){
         let data = {searchKey: query}
         getTenant(data).then(res => {
-          console.log(res)
+          // console.log(res)
           if (res.code === 200) {
             this.schoolList = res.data
           }else{
-            this.$message.error('获取学校信息失败，请重试')
+            this.$message.error(getErrorMsg(res.msg))
           }
         }).catch(error => {
           console.log(error)
@@ -135,7 +136,6 @@
     position: relative
     height:100%
     background:#000000
-
     .login-center
       width:500px
       position: absolute

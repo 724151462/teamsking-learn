@@ -530,8 +530,8 @@
                   path:'/course/list'
                 })
               }else{
-                let msg = data.msg[0] || data.msg
-                this.$message.error('课程创建失败')
+                console.log(res.msg)
+                this.$message.error(getErrorMsg(res.msg))
               }
             })
           } else {

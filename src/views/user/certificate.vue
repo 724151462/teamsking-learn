@@ -52,6 +52,7 @@
             </div>
             <div v-show="scope.row.status==3">
               <el-button type="text" @click="delCre(scope.row.certificateId)">撤销</el-button>
+              <el-button type="text" @click="checkCre(scope.row.certificateId)">查看</el-button>
             </div>
           </template>
         </el-table-column>
@@ -106,21 +107,21 @@
       <el-button @click="()=>{uploadDialog = false}">取 消</el-button>
       <el-button type="primary" @click="changeCre">提交</el-button>
       </span>
-  </el-dialog>
+    </el-dialog>
     <!--查看证书-->
     <el-dialog
-      title="提示"
+      title="证书预览"
       width="500px"
+      :before-close="()=>{imgSrc = [],imgDialog = false}"
       :visible.sync="imgDialog">
-        <el-carousel :interval="0" arrow="always" height="350px">
+        <el-carousel :interval="0" arrow="always" height="350px" @change="imgChange">
             <el-carousel-item v-for="creImg in imgSrc" :key="creImg.id">
                 <img :src="creImg.imgUrl" alt="证书图片" style="width: inherit;height: inherit;">
             </el-carousel-item>
         </el-carousel>
         <span slot="footer" class="dialog-footer">
-        <!--<el-button @click="imgDialog = false">取 消</el-button>-->
-        <el-button type="primary" @click="imgDialog = false">确 定</el-button>
-      </span>
+          <el-button icon="el-icon-download" type="info" circle @click="downImg(imgSrc[imgIndex].imgUrl,'1')"></el-button>
+        </span>
     </el-dialog>
   </div>
 </template>
@@ -128,7 +129,9 @@
   import UpOss from "../../components/up-oss";
   import userHeader from './userHeader'
   import {certificateList, delCertificate, cerInfo, changeCer, statusCre} from '@/api/user'
-    export default {
+  import {getErrorMsg} from "../../utils/utils";
+
+  export default {
       name: "certificate",
       components:{
         UpOss,
@@ -143,8 +146,9 @@
           imgDialog:false,
           uploadDialog:false, //上传证书弹窗
           imgSrc: [
-            {imgUrl: 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/154726200084466669.jpeg'}
+            {imgUrl: ''}
           ],
+          imgIndex:0,
           //证书表单
           cerForm:{
             certificateName: "",//证书名称
@@ -172,7 +176,7 @@
               this.data = res.data.pageData
               this.totalPage = res.data.totalPage * 10
             }else {
-              this.$message.error(res.msg)
+              this.$message.error(getErrorMsg(res.msg))
             }
           })
         },
@@ -185,9 +189,18 @@
               this.imgSrc = res.data.imgUrls
               this.imgDialog = true
             }else {
-              this.$message.error(res.msg)
+              this.$message.error(getErrorMsg(res.msg))
             }
           })
+        },
+        //查看证书图片时，证书图片切换
+        imgChange(index){
+          this.imgIndex = index
+        },
+        //证书图片下载
+        downImg(url,filename){
+          var FileSaver = require("file-saver");
+          FileSaver.saveAs(url);
         },
         //修改证书
         changeCre(id){
@@ -198,7 +211,7 @@
             if(Number(res.code) === 200) {
               console.log(res.data)
             }else {
-              this.$message.error(res.data.msg)
+              this.$message.error(getErrorMsg(res.msg))
             }
           })
           cerInfo(id).then(res=>{
@@ -208,7 +221,7 @@
               this.cerForm = res.data
               this.uploadDialog = true
             }else {
-              this.$message.error(res.data.msg)
+              this.$message.error(getErrorMsg(res.msg))
             }
           })
         },
@@ -230,7 +243,7 @@
                 this.$message.success('撤销成功');
                 this.initInfo()
               }else {
-                this.$message.error('撤销失败');
+                this.$message.error(getErrorMsg(res.msg))
               }
             })
             // delCertificate()
