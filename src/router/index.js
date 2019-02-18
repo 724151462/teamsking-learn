@@ -8,6 +8,8 @@ const _import = require('./_import_' + process.env.NODE_ENV)
 
 Vue.use(Router)
 
+
+
 export const constantRouterMap = [{
     path: '/login',
     component: _import('login/index'),
@@ -472,13 +474,13 @@ export const constantRouterMap = [{
           name: '课后',
           menuShow: true,
         },
-        {
-          path: '/learn/teachdata',
-          leaf: true,
-          component: _import('learn/teachData'),
-          name: '教学数据',
-          menuShow: true,
-        }
+        // {
+        //   path: '/learn/teachdata',
+        //   leaf: true,
+        //   component: _import('learn/teachData'),
+        //   name: '教学数据',
+        //   menuShow: true,
+        // }
       ]
     }]
   },
@@ -930,3 +932,4 @@ export const constantRouterMap = [{
 export default new Router({
   routes: constantRouterMap
 })
+

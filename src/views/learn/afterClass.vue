@@ -1,37 +1,62 @@
 <template>
   <div class="after-class">
-    <!--<div style="margin-bottom: 20px">-->
-      <!--<el-select-->
-        <!--filterable-->
-        <!--v-model="data.tenantId"-->
-        <!--:filter-method="searchTenant"-->
-        <!--placeholder="请选择">-->
-        <!--<el-option-->
-          <!--v-for="item in schoolList"-->
-          <!--:key="item.tenantId"-->
-          <!--:label="item.tenantName"-->
-          <!--:value="item.tenantId">-->
-        <!--</el-option>-->
-      <!--</el-select>-->
-      <!--<span>成员人数：65人</span>-->
-    <!--</div>-->
+    <div style="margin-bottom: 20px">
+      <el-select
+        filterable
+        v-model="course"
+        placeholder="请选择">
+        <el-option
+          v-for="item in courseList"
+          :key="item.courseId"
+          :label="item.courseName"
+          :value="item.courseId">
+        </el-option>
+      </el-select>
+      <span style="margin-left: 40px">成员人数：{{this.userCount}}人</span>
+    </div>
+    <div>
+      <span>时间：</span>
+      <el-radio-group v-model="beforeDate" @change="changeDate">
+        <el-radio-button :label="7">7天</el-radio-button>
+        <el-radio-button :label="14">14天</el-radio-button>
+        <el-radio-button :label="30">30天</el-radio-button>
+      </el-radio-group>
+      <el-date-picker
+          style="margin-left: 40px"
+          v-model="date"
+          format="yyyy 年 MM 月 dd 日"
+          value-format="yyyy-MM-dd 00:00:00"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期">
+      </el-date-picker>
+    </div>
+    <br>
     <div id="afterLean" style="min-height:400px;margin-bottom: 40px;"></div>
-    <p></p>
+    <br>
     <div id="afterNum" style="min-height:400px;margin-bottom: 40px;"></div>
+    <br>
     <div id="studyLong" style="min-height:400px;margin-bottom: 40px;"></div>
+    <br>
     <div id="studyOther" style="min-height: 400px;margin-bottom: 40px;"></div>
   </div>
 </template>
 
 <script>
   import echarts from "echarts";
+  import {getBeforeDate} from "../../utils/utils";
   import {afterOther, timeBucketOther, leanRate} from '@/api/study'
-  import {myCourseList} from '@/api/course'
+  import {myCourseList, courseBaseInfo} from '@/api/course'
   export default {
   data() {
     return {
       id: "",
-      value:'',
+      course:'',
+      userCount:0,
+      courseList:'',
+      date:'',
+      beforeDate:7,
       studyTime:{
         zeroPoint: 0,
         onePoint: 5,
@@ -67,12 +92,10 @@
       other:{
         docWatchCount: 2,//文档资源观看
         loginCount: 3,
-        noteRate: "1,900",
+        noteRate: 0,
         studyBehaviorthRate: null,
         studyLengthRate: "13",
         videoCount: 2,
-
-
         //docWatchCount: 2,//教案观看
         // libraryCount: 2,  //人均参加活动
         // loginCount: 3,  //登录次数
@@ -83,15 +106,43 @@
     };
   },
   mounted() {
+    //获取前七天的数据
+    this.changeDate(7)
   },
   created () {
     this.myCourseData()
-    this.learnRateData()
-    //获取图表的数据
-    this.otherData()
-    this.timeBucketData()
+  },
+  watch: {
+    date: function (newdata) {
+      let data = {
+        courseId:this.course,
+        startTime: this.date[0],
+        endTime: this.date[1]
+      }
+      this.learnRateData(data)
+      this.otherData(data)
+      this.timeBucketData(data)
+    },
+    course: function (newData) {
+      let data = {
+        courseId:this.course,
+        startTime: this.date[0],
+        endTime: this.date[1]
+      }
+      courseBaseInfo(this.course).then(res=>{
+        this.userCount = res.data.userCount
+      })
+      this.learnRateData(data)
+      this.otherData(data)
+      this.timeBucketData(data)
+    }
   },
   methods: {
+    //改变时间段
+    changeDate(n){
+      let data = getBeforeDate(n-1)
+      this.date = [data.beforeTime,data.nowTime]
+    },
     learnChartInit(){
       let myChart = echarts.init(document.getElementById('afterLean'));
       let timeData = [], //横轴数据
@@ -105,7 +156,6 @@
       this.learn.studyVideoRate.forEach(item=>{
         studyVideoRate.push(Number(Object.values(item)[0]))
       })
-
       let option = {
         title: {
           text: '课后平均学习度'
@@ -124,6 +174,8 @@
         },
         toolbox: {
           feature: {
+            magicType: {type: ['line', 'bar']},
+            restore: {},
             saveAsImage: {}
           }
         },
@@ -158,7 +210,6 @@
       };
       myChart.setOption(option);
     },
-    //
     numChartInit(){
       let myChart = echarts.init(document.getElementById('afterNum'));
 
@@ -201,6 +252,8 @@
         },
         toolbox: {
           feature: {
+            magicType: {type: ['line', 'bar']},
+            restore: {},
             saveAsImage: {}
           }
         },
@@ -261,6 +314,8 @@
         },
         toolbox: {
           feature: {
+            magicType: {type: ['line', 'bar']},
+            restore: {},
             saveAsImage: {}
           }
         },
@@ -348,7 +403,7 @@
       },
         {
         //视频资源
-        offset: [Math.random() * (35 - 25) + 25, Math.random() * (40 - 30) + 30],
+        offset: [Math.random() * (35 - 25) + 25, Math.random() * (38 - 30) + 30],
         symbolSize:  Math.random() * (150 - 140) + 140,
         color: 'rgb(97, 200, 127)'
       },
@@ -390,7 +445,7 @@
       }
       var option = {
         title: {
-          text: '课后平均学习度'
+          text: '其它统计'
         },
         toolbox: {
           feature: {
@@ -442,48 +497,49 @@
       var myChart = echarts.init(document.getElementById('studyOther'));
       myChart.setOption(option);
     },
-    //获取我可以管理的课程列表
     /*******
      * ↓ ↓ ↓数据获取
      * *****/
+    //获取我可以管理的课程列表
     myCourseData(name){
       name = name || ''
       let data = {
         "courseName": name,
         "pageParam": {
           "pageIndex": 1,
-          "pageSize": 10
+          "pageSize": 1000
         }
       }
       myCourseList(data).then(res=>{
-        // console.log(res)
+        console.log(res)
+        this.courseList = res.data.pageData
+        this.course = res.data.pageData[0].courseId
+        return res.data.pageData[0].courseId
+      }).then(courseId =>{
+        //根据课程ID获取课程成员人数
+        courseBaseInfo(courseId).then(res=>{
+          this.userCount = res.data.userCount
+        })
       }).catch(err=>{
         console.log(err)
       })
     },
-
-    learnRateData(courseId,startTime,endTime){
-      let data = {
-        "courseId": "0608367675f54267aa6960fd0557cc1b",
-        "endTime": "2019-01-26 07:23:51",
-        "startTime": "2019-01-23 07:23:51"
-      }
+    //课后平均学习数据
+    learnRateData(data){
       leanRate(data).then(res=>{
+        console.log('课后平均学习度',res.data)
         this.learn = res.data
         // console.log(res)
         this.learnChartInit()
         this.numChartInit()
       }).catch((err)=>{
-
+        console.log(err)
       })
     },
-    timeBucketData(courseId,startTime,endTime){
-      let data = {
-        "courseId": "0608367675f54267aa6960fd0557cc1b",
-        "endTime": "2019-01-26 07:23:51",
-        "startTime": "2019-01-23 07:23:51"
-      }
+    //学习时段
+    timeBucketData(data){
       timeBucketOther(data).then(res=>{
+        // console.log('学习时段',res.data)
         delete res.data.cmpTime
         delete res.data.courseId
         delete res.data.courseUserCount
@@ -496,14 +552,14 @@
       })
     },
     //获取其它行为的统计数据
-    otherData(courseId,startTime,endTime){
-      let data = {
-        "courseId": "0608367675f54267aa6960fd0557cc1b",
-        "endTime": "2019-01-26 07:23:51",
-        "startTime": "2019-01-23 07:23:51"
-      }
+    otherData(data){
+      // let data = {
+      //   "courseId": "0608367675f54267aa6960fd0557cc1b",
+      //   "endTime": "2019-01-26 07:23:51",
+      //   "startTime": "2019-01-23 07:23:51"
+      // }
       afterOther(data).then(res=>{
-        console.log(res)
+        // console.log('其它行为',res)
         this.other = res.data
         this.otherChartInit()
       }).catch((err)=>{

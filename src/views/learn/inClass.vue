@@ -1,74 +1,169 @@
 <template>
   <div>
     <div style="margin-bottom: 20px">
-      <el-select>
-        <el-option>123</el-option>
+      <el-select
+        filterable
+        v-model="course"
+        placeholder="请选择">
+        <el-option
+          v-for="item in courseList"
+          :key="item.courseId"
+          :label="item.courseName"
+          :value="item.courseId">
+        </el-option>
       </el-select>
-      <span>成员人数：65人</span>
+      <span style="margin-left: 40px">成员人数：{{this.userCount}}人</span>
     </div>
+    <div>
+      <span>时间：</span>
+      <el-radio-group v-model="beforeDate" @change="changeDate">
+        <el-radio-button :label="7">7天</el-radio-button>
+        <el-radio-button :label="14">14天</el-radio-button>
+        <el-radio-button :label="30">30天</el-radio-button>
+      </el-radio-group>
+      <el-date-picker
+        style="margin-left: 40px"
+        v-model="date"
+        format="yyyy 年 MM 月 dd 日"
+        value-format="yyyy-MM-dd 00:00:00"
+        type="daterange"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期">
+      </el-date-picker>
+    </div>
+    <br>
     <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
-      <el-tab-pane label="关键指标" disabled name="first">
-        
-      </el-tab-pane>
+      <el-tab-pane label="关键指标" disabled name="first"></el-tab-pane>
       <el-tab-pane label="课堂行为" name="second">
         <!--为echarts准备一个具备大小的容器dom-->
         <div id="chart1" style="width: 1000px;height: 400px;"></div>
         <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
-        <tableNoHeader
-          :tableData="tableData"
-          :tables="tables"
-        ></tableNoHeader>
+        <el-table
+          :data="tableData"
+          border
+          style="width: 100%">
+          <el-table-column
+            label="授课时间"
+            width="120">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.staticsDate.slice(0,10)}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="签到比例">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.signRate}}%</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="测验参与率">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.examRate}}%</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="头脑风暴参与率">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.stormRate}}%</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="投票参与率">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.voteRate}}%</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="授课时长"
+            width="120">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{mTran(scope.row.classTime)}}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <el-pagination
+          background
+          style="margin-top: 20px;text-align: center"
+          @size-change="behPageChange"
+          @current-change="behPageChange"
+          :current-page.sync="behPage.pageIndex"
+          layout="prev, pager, next, jumper"
+          :total="behPage.totalPage">
+        </el-pagination>
       </el-tab-pane>
       <el-tab-pane label="学情质量" name="third">
-         <div id="chart2" style="width: 1000px;height: 400px;"></div>
+        <!--为echarts准备一个具备大小的容器dom-->
+        <div id="chart2" style="width: 1000px;height: 400px;"></div>
         <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
-        <tableNoHeader
-          :tableData="tableData1"
-          :tables="tables1"
-        ></tableNoHeader>
+        <el-table
+          :data="tableData1"
+          border
+          style="width: 100%">
+          <el-table-column
+            label="授课时间"
+            width="120">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.staticsDate.slice(0,10)}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="课堂平均分">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.classroomAverage}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="测试平均分">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.examAverage}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="头脑风暴平均分">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.stormAverage}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="投票平均分">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{scope.row.voteAverage}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="授课时长"
+            width="120">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{mTran(scope.row.classTime)}}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <el-pagination
+          background
+          style="margin-top: 20px;text-align: center"
+          @size-change="getAnalysisData"
+          @current-change="getAnalysisData"
+          :current-page.sync="Analysis.pageIndex"
+          layout="prev, pager, next, jumper"
+          :total="Analysis.totalPage">
+        </el-pagination>
       </el-tab-pane>
     </el-tabs>
-    
+    <br>
   </div>
 </template>
 <script>
 import echarts from "echarts";
 import tableNoHeader from "@/components/table-no-header.vue"
+import {myCourseList, courseBaseInfo} from '@/api/course'
+import {classBehavior,studyAnalysis} from '@/api/study'
+import {getBeforeDate, formatTime} from "../../utils/utils";
+
 export default {
   name: "",
   data() {
     return {
       activeName: 'second',
-      tables: [
-        {
-          name: "授课时间",
-          prop: "title"
-        },
-        {
-          name: "签到比例",
-          prop: "userName"
-        },
-        {
-          name: "测验参与率",
-          prop: "reviewStatus"
-        },
-        {
-          name: "头脑风暴参与率",
-          prop: "teamName"
-        },
-        {
-          name: "投票参与率",
-          prop: "createTime"
-        },
-        {
-          name: "抢答参与率",
-          prop: "createTime"
-        },
-        {
-          name: "授课时长",
-          prop: "createTime"
-        }
-      ],
+      course:'',
+      userCount:0,
+      courseList:'',
+      date:'',
+      beforeDate:7,
       tables1: [
         {
           name: "授课时间",
@@ -103,43 +198,208 @@ export default {
           title: "数据待填充",
         }
       ],
-      tableData1: [
-        {
-          title: "数据待填充",
-        },
-        {
-          title: "数据待填充",
-        }
-      ]
+      behPage:{
+        currentPage:1,
+        totalPage:1,
+        pageIndex:1
+      },
+      Analysis:{
+        currentPage:1,
+        totalPage:1,
+        pageIndex:1
+      },
+      tableData1: []
     };
   },
+  mounted() {
+    //获取前七天的数据
+    this.changeDate(7)
+    this.getBehaviorData()
+  },
+  created () {
+    this.myCourseData()
+  },
+  watch: {
+    date: function (newdata) {
+      let data = {
+        courseId:this.course,
+        startTime: this.date[0],
+        endTime: this.date[1]
+      }
+    },
+    course: function () {
+      let data = {
+        courseId:this.course,
+        startTime: this.date[0],
+        endTime: this.date[1]
+      }
+      courseBaseInfo(this.course).then(res=>{
+        this.userCount = res.data.userCount
+      })
+    }
+  },
   methods: {
-    drawLine(id) {
-      this.charts = echarts.init(document.getElementById(id));
-      if(id === 'chart1') {
+    //改变时间段
+    changeDate(n){
+      let data = getBeforeDate(n-1)
+      this.date = [data.beforeTime,data.nowTime]
+    },
+    //授课时长秒速转换
+    mTran(time){
+      return formatTime(time)
+    },
+    myCourseData(name){
+      name = name || ''
+      let data = {
+        "courseName": name,
+        "pageParam": {
+          "pageIndex": 1,
+          "pageSize": 1000
+        }
+      }
+      myCourseList(data).then(res=>{
+        // console.log(res)
+        this.courseList = res.data.pageData
+        this.course = res.data.pageData[0].courseId
+        return res.data.pageData[0].courseId
+      }).then(courseId =>{
+        //根据课程ID获取课程成员人数
+        courseBaseInfo(courseId).then(res=>{
+          this.userCount = res.data.userCount
+        })
+      }).catch(err=>{
+        console.log(err)
+      })
+    },
+    //课堂行为数据获取
+    getBehaviorData(pageIndex){
+      let data = {
+        "courseId" : this.course,
+        "startTime" : this.date[0],
+        "endTime": this.date[1],
+        "pageParam": {
+          "pageIndex": pageIndex || 1,
+          "pageSize": 5,
+        },
+      }
+      classBehavior(data)
+        .then(res=>{
+        // console.log('获取数据',res)
+        this.tableData = res.data.pageData
+        this.behPage.totalPage = res.data.totalPage * 10
+        return res.data.pageData
+      })
+        .then(data=>{
+          let XData = [],
+            YData = {
+              sign:[],
+              vote:[],
+              exam:[],
+              storm:[]
+            };
+          data.forEach(item=>{
+            XData.push(item.staticsDate.slice(0,10))
+            YData.sign.push(item.signRate)
+            YData.storm.push(item.stormRate)
+            YData.exam.push(item.examRate)
+            YData.vote.push(item.voteRate)
+          })
+          this.drawBehavior(XData,YData)
+      })
+        .catch(err=>{
+          console.log(err)
+        })
+    },
+    getAnalysisData(pageIndex){
+      // let data = {
+      //   "courseId" : this.course,
+      //   "startTime" : this.date[0],
+      //   "endTime": this.date[1],
+      //   "pageParam": {
+      //     "pageIndex": pageIndex || 1,
+      //     "pageSize": 5,
+      //   },
+      // }
+      let data =
+        {
+          "courseId" : "0608367675f54267aa6960fd0557cc1b",
+          "endTime": "2019-01-26 07:23:51",
+          "pageParam": {
+            "pageIndex": pageIndex || 1,
+            "pageSize": 5,
+          },
+          "startTime" : "2019-01-23 07:23:51"
+        }
+      studyAnalysis(data)
+        .then(res=>{
+        console.log('学情质量',res)
+        this.tableData1 = res.data.pageData
+        this.Analysis.totalPage = res.data.totalPage * 10
+        return res.data.pageData
+      })
+        .then(data=>{
+        let XData = [],
+          YData = {
+            classroom:[],
+            vote:[],
+            exam:[],
+            storm:[]
+          };
+        data.forEach(item=>{
+          XData.push(item.staticsDate.slice(0,10))
+          YData.classroom.push(item.classroomAverage)
+          YData.storm.push(item.stormAverage)
+          YData.exam.push(item.examAverage)
+          YData.vote.push(item.voteAverage)
+        })
+        this.drawAnalysis(XData,YData)
+      }).catch(err=>{
+        console.log(err)
+      })
+    },
+    behPageChange(page){
+      this.getBehaviorData(page)
+    },
+    analysisChange(page){
+      this.getAnalysisData(page)
+    },
+    drawBehavior(X,Y) {
+      this.charts = echarts.init(document.getElementById('chart1'));
         this.charts.setOption({
         title: {
-          text: "┃趋势图"
+          text: "┃课堂行为参与率"
         },
-        tooltip: {},
+        tooltip: {
+          // trigger: 'axis'
+        },
+        toolbox: {
+          feature: {
+            magicType: {type: ['line', 'bar']},
+            restore: {},
+            saveAsImage: {}
+          }
+        },
         xAxis: {
-          type: "",
-          data: ["xx月xx日", "xx月xx日", "xx月xx日", "xx月xx日", "xx月xx日"]
+          type: 'category',
+          boundaryGap: false,
+          data: X
         },
         yAxis: {
-          type: "value",
+          type: 'value',
+          min: 0,
+          max: 100,
+          interval: 10,
+          boundaryGap: false,
           axisLabel: {
-            formatter: function(value) {
-              // Function formatter
-              return value + " %";
-            }
-          }
+            formatter: '{value} %',
+            fontFamily: 'Arial',
+          },
         },
         series: [
           {
-            name: "投票",
+            name: "签到",
             type: "line",
-            data: [11, 11, 15, 13, 12, 13, 10],
+            data: Y.sign,
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
@@ -147,7 +407,7 @@ export default {
           {
             name: "测试",
             type: "line",
-            data: [1, -2, 2, 5, 3, 2, 0],
+            data: Y.exam,
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
@@ -155,57 +415,59 @@ export default {
           {
             name: "头脑风暴",
             type: "line",
-            data: [5, 3, 1, 2, 2, 6, 4],
+            data: Y.storm,
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
           },
           {
-            name: "作业",
+            name: "投票",
             type: "line",
-            data: [6, 5, 3, 7, 4, 5, 6],
+            data: Y.vote,
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
           }
         ],
         legend: {
-          data: ["投票", "测试", "头脑风暴", "作业"]
+          data: ["签到", "测试", "头脑风暴", "投票"]
         }
       });
-      }else if (id === 'chart2') {
-        this.charts.setOption({
+    },
+    drawAnalysis(X,Y) {
+      this.charts = echarts.init(document.getElementById('chart2'));
+      this.charts.setOption({
         title: {
-          text: "┃趋势图"
+          text: "┃学情质量"
         },
-        tooltip: {},
+        toolbox: {
+          feature: {
+            magicType: {type: ['line', 'bar']},
+            restore: {},
+            saveAsImage: {}
+          }
+        },
         xAxis: {
-          type: "",
-          data: ["图2 xx月xx日", "xx月xx日", "xx月xx日", "xx月xx日", "xx月xx日"]
+          type: 'category',
+          boundaryGap: false,
+          data: X
         },
         yAxis: {
-          type: "value",
+          type: 'value',
+          min: 0,
+          max: 100,
+          interval: 10,
+          boundaryGap: false,
+          axisLabel: {
+            // formatter: '{value} %',
+            fontFamily: 'Arial',
+          },
         },
         series: [
           {
-            name: "投票",
+            name: "课堂平均分",
             type: "line",
-            data: [11, 11, 15, 13, 12, 13, 10],
-            // // 显示某个点
-            // markPoint : {
-            //     data : [
-            //         {type : 'max', name: '最大值'},
-            //         {type : 'min', name: '最小值'}
-            //     ]
-            // },
-            markLine: {
-              data: [{ type: "average", name: "平均值" }]
-            }
-          },
-          {
-            name: "投票平均分",
-            type: "line",
-            data: [1, -2, 2, 5, 3, 2, 0],
+            data: Y.classroom,
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
@@ -213,47 +475,41 @@ export default {
           {
             name: "测试平均分",
             type: "line",
-            data: [5, 3, 1, 2, 2, 6, 4],
+            data: Y.exam,
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
           },
           {
-            name: "作业平均分",
+            name: "头脑风暴平均分",
             type: "line",
-            data: [6, 5, 3, 7, 4, 5, 6],
+            data: Y.storm,
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
           },
           {
-            name: "作业平均分",
+            name: "投票平均分",
             type: "line",
-            data: [5, 7, 5, 3, 5, 6, 7],
+            data: Y.vote,
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
           }
         ],
         legend: {
-          data: ["投票平均分", "测试平均分", "头脑风暴平均分", "作业平均分", "课堂平均分"]
+          data: ["课堂平均分", "测试平均分", "头脑风暴平均分", "投票平均分"]
         }
       });
-      }
-      
     },
-    handleClick(tab, event) {
-      console.log(tab, event);
+    handleClick(tab) {
+      if(tab.paneName === 'second'){
+        console.log('课堂行为')
+        this.getBehaviorData()
+      }else{
+        this.getAnalysisData()
+      }
     }
-  },
-  //调用
-  mounted() {
-    this.$nextTick(function() {
-      this.drawLine("chart1");
-    });
-    this.$nextTick(function() {
-      this.drawLine("chart2");
-    });
   },
   components: {
     tableNoHeader

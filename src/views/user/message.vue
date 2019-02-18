@@ -1,72 +1,72 @@
 <template>
   <div class="userMessage">
-    <el-tabs v-model="activeName" @tab-click="toIndex">
-      <el-tab-pane label="个人设置" name="first"></el-tab-pane>
-      <el-tab-pane label="消息管理" name="second">
-        <el-checkbox v-model="checkAll"
-                     :indeterminate="isIndeterminate"
-                     @change="checkAllChange"></el-checkbox>
-        <el-button type="primary" size="small"  style="margin-left: 20px;" @click="readAll">标记已读</el-button>
-        <el-button size="small" @click ="del">删除</el-button>
-        <div style="margin: 15px 0;"></div>
-        <div>
-          <div v-for="(message) in messageData" :key="message.id" class="message-item">
-            <div style="padding-right: 20px">
-              <el-checkbox v-model="message.selected" @change="checkChange(message.userMessageId, $event)"></el-checkbox>
-            </div>
-            <div style="padding-right: 20px">
-              <el-tag type="success" size="small" v-if="message.messageType  == 10">系统通知</el-tag>
-              <el-tag type="success" size="small" v-else-if="message.messageType  == 20 ">学校通知</el-tag>
-              <el-tag type="success" size="small" v-else-if="message.messageType  == 30">课程通知</el-tag>
-            </div>
-            <div style="cursor:pointer" @click="read(message.userMessageId,message)">
-              <p :class="{markread: message.status == 10 }">
-                <span class="red-c" v-show="message.status != 10"></span>{{message.title}}
-              </p>
-              <p class="message-time">{{message.publishTime}}</p>
-            </div>
+    <user-header :active="2"></user-header>
+    <div  style="width: 80%;margin: 0 auto;">
+      <el-checkbox v-model="checkAll"
+                   :indeterminate="isIndeterminate"
+                   @change="checkAllChange"></el-checkbox>
+      <el-button type="primary" size="small"  style="margin-left: 20px;" @click="readAll">标记已读</el-button>
+      <el-button size="small" @click ="del">删除</el-button>
+      <div style="margin: 15px 0;"></div>
+      <div>
+        <div v-for="(message) in messageData" :key="message.id" class="message-item">
+          <div style="padding-right: 20px">
+            <el-checkbox v-model="message.selected" @change="checkChange(message.userMessageId, $event)"></el-checkbox>
           </div>
-          <el-pagination
-            style="margin-top: 20px"
-            background
-            layout="prev, pager, next"
-            :current-page="currentPage"
-            @current-change="handleCurrentChange"
-            :total="totalPage">
-          </el-pagination>
+          <div style="padding-right: 20px">
+            <el-tag type="success" size="small" v-if="message.messageType  == 10">系统通知</el-tag>
+            <el-tag type="success" size="small" v-else-if="message.messageType  == 20 ">学校通知</el-tag>
+            <el-tag type="success" size="small" v-else-if="message.messageType  == 30">课程通知</el-tag>
+          </div>
+          <div style="cursor:pointer" @click="read(message.userMessageId,message)">
+            <p :class="{markread: message.status == 10 }">
+              <span class="red-c" v-show="message.status != 10"></span>{{message.title}}
+            </p>
+            <p class="message-time">{{message.publishTime}}</p>
+          </div>
         </div>
-
-        <!--查看消息对话框-->
-        <el-dialog
-          title="提示"
-          :visible.sync="dialogVisible"
-          width="50%">
-          <div>
-            <span style="margin-right: 20px">
-              <!--<el-tag type="success" size="small">{{messageData[currentMessage].type}}</el-tag>-->
-              <el-tag type="success" size="small" v-if="dialogInfo.messageType  == 10">系统通知</el-tag>
-              <el-tag type="success" size="small" v-else-if="dialogInfo.messageType  == 20 ">学校通知</el-tag>
-              <el-tag type="success" size="small" v-else-if="dialogInfo.messageType  == 30">课程通知</el-tag>
-            </span>
-            {{dialogInfo.title}}
-          </div>
-          <div style="margin-top: 20px">
-            {{dialogInfo.content}}
-          </div>
-          <span slot="footer" class="dialog-footer">
-            <span class="markread">{{dialogInfo.publishTime}}</span>
-          </span>
-        </el-dialog>
-      </el-tab-pane>
-      <el-tab-pane label="我的证书" name="third"></el-tab-pane>
-    </el-tabs>
+        <el-pagination
+          style="margin: 20px 0"
+          background
+          layout="prev, pager, next"
+          :current-page="currentPage"
+          @current-change="handleCurrentChange"
+          :total="totalPage">
+        </el-pagination>
+      </div>
+    </div>
+    <!--查看消息对话框-->
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisible"
+      width="50%">
+      <div>
+        <span style="margin-right: 20px">
+          <!--<el-tag type="success" size="small">{{messageData[currentMessage].type}}</el-tag>-->
+          <el-tag type="success" size="small" v-if="dialogInfo.messageType  == 10">系统通知</el-tag>
+          <el-tag type="success" size="small" v-else-if="dialogInfo.messageType  == 20 ">学校通知</el-tag>
+          <el-tag type="success" size="small" v-else-if="dialogInfo.messageType  == 30">课程通知</el-tag>
+        </span>
+        {{dialogInfo.title}}
+      </div>
+      <div style="margin-top: 20px">
+        {{dialogInfo.content}}
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <span class="markread">{{dialogInfo.publishTime}}</span>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import {getMsg, readMsg, delMsg} from '@/api/user'
+  import userHeader from './userHeader'
 export default {
     name: "message",
+    components:{
+      userHeader
+    },
     data() {
       return {
         activeName: 'second',
@@ -208,7 +208,7 @@ export default {
       align-items center
       padding-bottom 10px;
       padding-top 10px;
-      border-bottom 2px solid $c-gray
+      border-bottom 1px solid $c-gray
     .red-c
       display inline-block
       width: 10px

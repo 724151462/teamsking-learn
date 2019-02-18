@@ -1,6 +1,10 @@
 const devUrl = '/api/v1/study/' // 开发环境
 const prodUrl = 'http://120.36.137.90:9008/api/v1/study/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
+
+const courseDev = '/api/v1/course/' // 开发环境
+const courseProd = 'http://120.36.137.90:9008/api/v1/course/' // 生产环境
+const courseUrl = process.env.NODE_ENV === 'production' ? courseProd : courseDev
 import {
   commonsAjax
 } from '../utils/requery'
@@ -31,9 +35,15 @@ export function timeBucketOther(data) {
 }
 
 /**
- * 学情质量列表
+ * 课堂行为
  */
-// export function timeBucketOther(data) {
-//   return commonsAjax(`${baseUrl}classafter`, data, 'post')
-// }
-//
+export function classBehavior(data) {
+  return commonsAjax(`${baseUrl}classbehavior/page`, data, 'post')
+}
+/**
+ * 学情质量
+ */
+export function studyAnalysis(data) {
+  return commonsAjax(`${courseUrl}classquality/page`, data, 'post')
+}
+

@@ -10,7 +10,7 @@
           <span style="font-size: 16px">本地上传</span>
         </i>
       </div>
-      <div v-for="src in imgSrc" :key="src.assetId" class="cover-img-warp" style="margin-bottom: 20px;margin-right: 10px;position: relative">
+      <div v-for="src in imgSrc" :key="src.id" class="cover-img-warp" style="margin-bottom: 20px;margin-right: 10px;position: relative">
         <img :src="src.assetUrl" alt="" style="width: 280px;height: 160px;cursor: pointer;">
         <div class="img-mark" @click="cover(src.assetUrl)">设为封面</div>
       </div>
@@ -63,27 +63,26 @@
   import { VueCropper }  from 'vue-cropper'
   import {coverList} from '@/api/course'
   export default {
-    created(){
-      coverList().then(res=>{
-        console.log(res)
-        if(Number(res.code) === 200) {
-          this.imgSrc = res.data
-        }else if(Number(res.code) === 440){
-          let msgs = JSON.parse(res.msg)
-          this.$message({
-            message:msgs[0].message,
-            type:'error'
-          })
-        }
-      })
-    },
     components:{
       VueCropper
     },
     data () {
       return {
         visible: this.show,
-        imgSrc:[{assetId: 0, assetUrl: ''}],
+        imgSrc:[
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/1.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/2.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/3.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/4.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/5.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/6.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/7.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/8.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/9.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/10.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/11.jpg'},
+          { assetUrl: 'https://tskedu-course.oss-cn-beijing.aliyuncs.com/teskedu/img/courseCover/12.jpg'},
+        ],
         innerVisible:false, // 图片裁剪框
         dialogImageUrl: '',
         dialogVisible: false,
@@ -211,7 +210,6 @@
         let curType = event.type.split('/')
         let name = `${new Date().getTime()}${file.name}.${curType[1]}`
         // let name = new Date().getTime() + file.name + curType[1]
-        console.log(name)
         if (file.size > this.size) {
           this.$message({
             message: '上传文件超出可上传范围，请重新选择文件上传',
@@ -221,6 +219,7 @@
           return false
         }
         let client = new oss(this.ossData)
+        name = 'teskedu/img/courseCover/' + name
         //多文件上传请修改这里
         this.forInputs(client,name,file)
       },
@@ -242,8 +241,7 @@
           })
           Number(self.isError) !== 2 ? (self.isError = 2) : ''
           let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
-          console.log('图片地址' + url)
-          this.imgSrc.unshift({assetId: '', assetUrl: url})
+          this.imgSrc.unshift({assetUrl: url})
           this.innerVisible = false
         }).catch(error=>{
           console.log(error)

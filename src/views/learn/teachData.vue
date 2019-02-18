@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
-      <el-tab-pane label="关键指标3" name="first">
+      <el-tab-pane label="关键指标" name="first">
         <!--为echarts准备一个具备大小的容器dom-->
         <div id="chart1" style="width: 1000px;height: 400px;"></div>
         <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
@@ -20,7 +20,6 @@
       </el-tab-pane>
       <el-tab-pane label="学情质量" name="third">学情质量</el-tab-pane>
     </el-tabs>
-    
   </div>
 </template>
 <script>
