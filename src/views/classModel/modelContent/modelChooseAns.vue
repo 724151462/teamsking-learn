@@ -45,6 +45,7 @@
 <script>
 import Cookie from "js-cookie";
 import { getTestFileFold } from "@/api/library";
+import { matchReg } from "@/utils/utils";
 
 import Tree from "@/components/fileTree";
 export default {
@@ -93,7 +94,7 @@ export default {
           // 文件处理
           if (item.quizList.length !== 0) {
             item.quizList.forEach(list => {
-              list.quizTitle = this.matchReg(list.quizTitle);
+              list.quizTitle = matchReg(list.quizTitle);
               item.catalogList.push({
                 catalogName: list.quizTitle,
                 quizId: list.quizId
@@ -125,11 +126,6 @@ export default {
       } else {
         this.subject.title = checkedList[0].catalogName;
       }
-    },
-    // 去富文本HTML标签
-    matchReg(str) {
-      let reg = /<\/?.+?\/?>/g;
-      return str.replace(reg, "");
     },
     // 确认添加试题
     addEnsure() {

@@ -45,16 +45,19 @@
                 :key="index"
                 :body-style="{ padding: '10px' }"
               >
-              {{item}}
-                <!-- <div style="display: flex; align-items: center">
-                  <img :src="require('@/assets/images/vote.png')" class="stu-image">
-                  <span style="margin-left: 20px">{{item.userId}}</span>
-                </div> -->
+              <!-- {{item}} -->
+                <div style="display: flex; align-items: center">
+                  <img :src="item.avatar" height="100" class="stu-image">
+                  <span style="margin-left: 20px">{{item.userName}}</span>
+                </div>
                 <div>
                   <div
                     style="padding: 20px 0;min-height: 30px; border-bottom: 1px solid rgb(222,222,222)"
                   >
-                    <span>{{item.stormContent}}</span>
+                    <div>
+                      <img :src="item.asset[0]" alt="">
+                    </div>
+                    <span>{{item.entity.stormContent}}</span>
                   </div>
 
                   <div class="bottom clearfix">
@@ -130,6 +133,7 @@
 import Cookie from "js-cookie";
 import modelAside from "@/components/modelAside";
 import { getTestFileFold } from "@/api/library";
+import { matchReg } from "@/utils/utils";
 import { classStromeGet, classStromeSave, storm, stormAddScore } from "@/api/course";
 import Tree from "@/components/fileTree";
 export default {
@@ -179,7 +183,7 @@ export default {
     activeStorme(value) {
       console.log(value);
       storm({ stormId: value.stormId }).then(response => {
-        response.data.stormTitle = this.matchReg(response.data.stormTitle);
+        response.data.stormTitle = matchReg(response.data.stormTitle);
         response.data.answerList = []
         this.stormObj = response.data;
       });
@@ -238,8 +242,9 @@ export default {
           let socketData = JSON.parse(result.body)
           let socketObj = {}
           socketObj.entity = socketData.data.socketData.entity
-          socketObj.userName = socketData.data.socketData.name
-          socketObj.assets = socketData.data.socketData.assets || []
+          socketObj.userName = socketData.data.socketData.userName
+          socketObj.asset = socketData.data.socketData.asset
+          socketObj.avatar = socketData.data.socketData.avatar
           console.log(socketObj)
           that.stormObj.answerList.push(socketObj)
           console.log('storm========',that.stormObj.answerList)
@@ -258,8 +263,8 @@ export default {
       });
     },
     addScore(answer) {
-      console.log(answer.id);
-      stormAddScore({ recordId: answer.id }).then(response => {
+      console.log(answer);
+      stormAddScore({ recordId: answer.entity.id }).then(response => {
         if (response.code === 200) {
           this.$message({
             message: "加分成功",
@@ -267,11 +272,6 @@ export default {
           });p
         }
       });
-    },
-    // 去富文本HTML标签
-    matchReg(str) {
-      let reg = /<\/?.+?\/?>/g;
-      return str.replace(reg, "");
     },
     // 选中的文件
     checkedFiles(checkedList) {
@@ -298,7 +298,7 @@ export default {
     getStormList() {
       classStromeGet(this.addStormParams).then(response => {
         response.data.forEach(element => {
-          element.stormTitle = this.matchReg(element.stormTitle);
+          element.stormTitle = matchReg(element.stormTitle);
         });
         this.stormList = response.data;
       });

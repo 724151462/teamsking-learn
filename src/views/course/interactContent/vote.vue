@@ -4,7 +4,7 @@
       <router-link :to="{name: '互动', query:{id: this.$route.query.id}}">互动</router-link>> 发起投票
     </span>
     <div>
-      <el-button size="small" @click="addTab(voteQuizzesValue)">添加题目</el-button>
+      <el-button size="small" @click="addTab(voteQuizzesValue)" type="primary">添加题目</el-button>
       <div class="margin-sides">
         <el-tabs
           v-model="voteQuizzesValue"
@@ -35,35 +35,31 @@
               <el-input v-model="answer.optionTitle" style="width:300px"></el-input>
               <span class="delBtn" @click="delAnswer(item,index)">删除</span>
             </div>
-            <el-button @click="addAnswer(item)">添加选项</el-button>
+            <el-button @click="addAnswer(item)" type="primary">添加选项</el-button>
           </el-tab-pane>
         </el-tabs>
       </div>
-      <div class="margin-sides">
-        <span>标题</span>
-      </div>
-      <div class="margin-sides">
-        <el-input v-model="voteObj.voteTitle"></el-input>
-      </div>
-      <div class="margin-sides">
-        <span>所属章</span>
-      </div>
-      <div>
-        <el-select v-model="voteObj.chapterId" class="margin-sides">
-          <!-- <el-option value="1">第一章</el-option> -->
-          <el-option
-            v-for="item in chapterList"
-            :key="item.chapterId"
-            :label="item.chapterName"
-            :value="item.chapterId"
-          ></el-option>
-        </el-select>
-      </div>
+      <el-form :model="voteObj" :rules="rules" ref="voteForm">
+        <el-form-item label="标题" prop="voteTitle">
+          <el-input v-model="voteObj.voteTitle"/>
+        </el-form-item>
+        <el-form-item label="所属章" prop="chapterId">
+          <el-select v-model="voteObj.chapterId">
+            <!-- <el-option value="1">第一章</el-option> -->
+            <el-option
+              v-for="item in chapterList"
+              :key="item.chapterId"
+              :label="item.chapterName"
+              :value="item.chapterId"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
       <div>
         <el-checkbox v-model="voteObj.showResult" true-label="1" false-label="2">投票后立即显示结果</el-checkbox>
       </div>
     </div>
-    <el-button @click="saveVoteArr">保存</el-button>
+    <el-button @click="saveVoteArr" type="primary">保存</el-button>
     <el-button @click="cancel">取消</el-button>
   </div>
 </template>
@@ -82,6 +78,14 @@ export default {
   data() {
     return {
       voteQuizzesValue: "1",
+      rules: {
+        voteTitle: [
+          { required: true, message: '请填写投票标题', trigger: 'blur' }
+        ],
+        chapterId: [
+          { required: true, message: '请选择一个章节', trigger: 'change' }
+        ]
+      },
       voteObj: {
         courseId: this.$route.query.id,
         voteTitle: "",
@@ -95,12 +99,6 @@ export default {
             quizTitle: "",
             quizType: "",
             voteQuizOptions: [
-              {
-                optionTitle: ""
-              },
-              {
-                optionTitle: ""
-              },
               {
                 optionTitle: ""
               },
@@ -152,14 +150,6 @@ export default {
         name: newTabName,
         content: "New Tab content",
         voteQuizOptions: [
-          {
-            optionTitle: "",
-            id: ""
-          },
-          {
-            optionTitle: "",
-            id: ""
-          },
           {
             optionTitle: "",
             id: ""
@@ -222,16 +212,25 @@ export default {
           }
         });
       }else{
-        voteSave(this.voteObj).then(response => {
-          if (response.code === 200) {
-            this.$message({
-              message: "发起投票成功",
-              type: "success"
+        this.$refs['voteForm'].validate((valid) => {
+          if (valid) {
+            voteSave(this.voteObj).then(response => {
+              if (response.code === 200) {
+                this.$message({
+                  message: "发起投票成功",
+                  type: "success"
+                });
+                this.handleSuccess()
+              }else{
+                this.$message({
+                  message: "请检查 投票题干/选项/题目类型 是否填写正确",
+                  type: "warning"
+                });
+              }
             });
-            this.handleSuccess()
           }
-        });
-      }
+        }
+      )}
     },
     handleClick(tab, event) {},
     // 添加答案

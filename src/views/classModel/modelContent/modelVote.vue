@@ -144,7 +144,6 @@ export default {
         itemId: "voteId",
         itemTitle: "voteTitle"
       },
-      dialogVisible: false,
       fileList: [],
       defaultProps: {
         children: "catalogList",
@@ -300,11 +299,6 @@ export default {
       });
       this.addVoteParams.quizIds = quizArr;
       this.addVoteParams.interactionId = null;
-    },
-    // 去富文本HTML标签
-    matchReg(str) {
-      let reg = /<\/?.+?\/?>/g;
-      return str.replace(reg, "");
     },
     // 确认添加试题
     addEnsure() {

@@ -1,6 +1,6 @@
 import store from '@/store/index';
 
-export function formatDate (time) {
+export function formatDate(time) {
   let date
   if (time) {
     if (typeof time === 'object') {
@@ -42,15 +42,15 @@ export function formatDate (time) {
 
 //获取当前日期,及前n天
 export function getBeforeDate(n) {
-    let nowTime = formatDate(new Date())
-    let nowMs = new Date().getTime()
-    let beforeMs =  nowMs -  1000 * 60 * 60 * 24 * parseInt(n)
-    let beforeTime = formatDate(beforeMs)
+  let nowTime = formatDate(new Date())
+  let nowMs = new Date().getTime()
+  let beforeMs = nowMs - 1000 * 60 * 60 * 24 * parseInt(n)
+  let beforeTime = formatDate(beforeMs)
 
-    return {
-        nowTime,
-        beforeTime
-    }
+  return {
+    nowTime,
+    beforeTime
+  }
 }
 
 /*
@@ -61,18 +61,20 @@ function PadZero(str) {
   return new RegExp(/^\d$/g).test(str) ? `0${str}` : str;
 }
 export function formatTime(_seconds) {
-    _seconds = parseInt(_seconds);
-    let hours, mins, seconds;
-    let result = '';
-    seconds = parseInt(_seconds % 60);
-    mins = parseInt(_seconds % 3600 / 60)
-    hours = parseInt(_seconds / 3600);
+  _seconds = parseInt(_seconds);
+  let hours, mins, seconds;
+  let result = '';
+  seconds = parseInt(_seconds % 60);
+  mins = parseInt(_seconds % 3600 / 60)
+  hours = parseInt(_seconds / 3600);
+  if (hours)
+    result = `${PadZero(hours)}:${PadZero(mins)}:${PadZero(seconds)}`
+  else
+    result = `${PadZero(mins)}:${PadZero(seconds)}`
+  return result;
+}
 
-    if (hours)
-      result = `${PadZero(hours)}:${PadZero(mins)}:${PadZero(seconds)}`
-    else
-      result = `${PadZero(mins)}:${PadZero(seconds)}`
-    return result;
-  }
-
-
+export function matchReg(str) {
+  let reg = /<\/?.+?\/?>/g;
+  return str.replace(reg, "");
+}

@@ -132,7 +132,8 @@
         searchForm: {
           pageIndex: 1,
           searchString: '',
-          pageSize: 2
+          pageSize: 2,
+          orderValue: 0
         },
         // 详情数据
         detialData: [],
