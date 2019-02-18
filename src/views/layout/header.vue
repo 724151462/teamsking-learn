@@ -3,7 +3,7 @@
     <div class="header">
       <div style="display: flex">
         <router-link to="/course" class="login">
-          <span>天擎智教</span>
+          <span>天擎智课</span>
           <span class="sizes">后台管理</span>
         </router-link>
         <el-menu
