@@ -294,10 +294,10 @@ import { setTimeout } from 'timers';
               // this.$set( this.$data, 'resourceData', curdata )
                 console.log(this.resourceData)
             } else {
-                this.$message({
-                    message: "资源获取失败",
-                    type: "error"
-                });
+              this.$message({
+                  message: "资源获取失败",
+                  type: "error"
+              });
             }
         })
     },
@@ -467,27 +467,27 @@ import { setTimeout } from 'timers';
       filterData(data){
         let getFilter = (data)=>{
             data.forEach((item)=>{
-                if(!item.childCatalogList.length!==0){
-                    getFilter(item.childCatalogList)
-                }
-                if(item.resourceList.length !==0){
-                  let parentId = item.catalogId
-                  item.resourceList.forEach((list)=>{
-                    // list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
-                    if(list.resourceSize){
-                      list.resourceSize = this.sizeTrans(list.resourceSize)
-                    }
-                      item.childCatalogList.push({
-                        catalogName: list.resourceTitle,
-                        resourceId: list.resourceId,
-                        createTime:list.createTime,
-                        parentId:parentId,
-                        srtUrl: list.srtUrl,
-                        resourceType:list.resourceType,
-                        resourceSize:list.resourceSize,
-                      })
+              if(!item.childCatalogList.length!==0){
+                  getFilter(item.childCatalogList)
+              }
+              if(item.resourceList.length !==0){
+                let parentId = item.catalogId
+                item.resourceList.forEach((list)=>{
+                  // list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
+                  if(list.resourceSize){
+                    list.resourceSize = this.sizeTrans(list.resourceSize)
+                  }
+                    item.childCatalogList.push({
+                      catalogName: list.resourceTitle,
+                      resourceId: list.resourceId,
+                      createTime:list.createTime,
+                      parentId:parentId,
+                      srtUrl: list.srtUrl,
+                      resourceType:list.resourceType,
+                      resourceSize:list.resourceSize,
                     })
-                }
+                  })
+              }
             })
             return data
         }
