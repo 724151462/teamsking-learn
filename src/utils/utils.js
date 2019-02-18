@@ -73,8 +73,12 @@ export function formatTime(_seconds) {
     result = `${PadZero(mins)}:${PadZero(seconds)}`
   return result;
 }
-
+//去除文本里的HTML标签
 export function matchReg(str) {
   let reg = /<\/?.+?\/?>/g;
   return str.replace(reg, "");
+}
+//错误信息处理
+export function  getErrorMsg(res) {
+  return res.split('|')[res.split('|').length-1]
 }
