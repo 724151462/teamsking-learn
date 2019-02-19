@@ -169,7 +169,8 @@ export default {
           sessionStorage.setItem("realName", res.data.realName);
           sessionStorage.setItem("tenantId", res.data.gender);
         } else {
-          this.$message.error(getErrorMsg(res.msg));
+          // this.$message.error('请登录')
+          // this.$message.error(getErrorMsg(res.msg));
         }
       });
     },
@@ -181,7 +182,9 @@ export default {
             this.msgNumber = res.data
             this.$store.commit('SET_MSG', res.data)
           } else {
-            this.$message.error(getErrorMsg(res.msg));
+            this.$message.error('请登录')
+
+            // this.$message.error(getErrorMsg(res.msg));
           }
         })
         .catch((err)=>{

@@ -927,7 +927,7 @@ export const constantRouterMap = [{
   },
   {
     path: '/*',
-    redirect: '/login'
+    redirect: '/404'
   },
 ]
 

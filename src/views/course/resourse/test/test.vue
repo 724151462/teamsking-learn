@@ -18,7 +18,7 @@
       </div>
       <div style="" class="btn-warp" >
         <div>
-          <el-button type="success">下载模板</el-button>
+          <el-button type="success" @click="downTemp">下载模板</el-button>
         </div>
         <div>
           <!--<el-button @click="uploadDialog = true">导入模板</el-button>-->
@@ -210,6 +210,11 @@
       }
     },
     methods: {
+      //下载模板
+      downTemp(){
+        var FileSaver = require("file-saver");
+        FileSaver.saveAs('https://tskedu-course.oss-cn-beijing.aliyuncs.com/ExcelTemplate/QuizTemplate.xls','试题模板')
+      },
       //点击弹出新建目录的弹窗
       goCreateCatalog(data,id) {
         this.newCatalog.catalogId = id

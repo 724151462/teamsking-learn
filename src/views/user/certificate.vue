@@ -200,6 +200,8 @@
         //证书图片下载
         downImg(url,filename){
           var FileSaver = require("file-saver");
+          url = 'https' + url.substring(4)
+          console.log(url)
           FileSaver.saveAs(url);
         },
         //修改证书

@@ -11,7 +11,12 @@
         </el-form-item>
 
         <el-form-item label="课程分类" required>
-          <el-select v-model="Course.courseCategoryParent" placeholder="课程一级分类" filterable @change="yesCategories">
+          <el-select
+            style="width: 220px;"
+            v-model="Course.courseCategoryParent"
+            placeholder="课程一级分类"
+            filterable
+            @change="yesCategories">
             <el-option
               v-for="(item , index) in categoriesList"
               :key="index"
@@ -19,7 +24,11 @@
               :value="item.categoryId">
             </el-option>
           </el-select>
-          <el-select v-model="Course.courseCategory" placeholder="课程二级分类" style="margin-left: 30px" filterable v-show="isCourseChild">
+          <el-select
+            v-model="Course.courseCategory"
+            placeholder="课程二级分类"
+            style="margin-left: 30px;width: 220px;"
+            filterable v-show="isCourseChild">
             <el-option
               v-for="item in categoriesChildList"
               :key="item.categoryId"
@@ -86,7 +95,7 @@
 
           <el-row>
             <el-autocomplete
-              style="width: 305px;"
+              style="width: 300px;"
               v-model="tag"
               suffix-icon="el-icon-search"
               :fetch-suggestions="tagSearch"
@@ -495,11 +504,11 @@
       yesCategories(e){
         let course = e
         this.categoriesList.forEach( (item, index) =>{
-          if(item.categoryId === course && item.children !== null){
-            console.info(item)
+          if(item.categoryId === course){
+            // console.info(item)
             this.categoriesChildList = item.children
             this.Course.courseCategory = ''
-            this.isCourseChild = true
+            item.children ? this.isCourseChild = true : this.isCourseChild = false
           }
         })
       },
@@ -510,7 +519,6 @@
           this.$message.warning('请选择课程分类')
           return false;
         }
-
         let data = this.goDataFilter()
         console.log(data)
         this.$refs['Course'].validate((valid) => {
