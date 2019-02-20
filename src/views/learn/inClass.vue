@@ -37,7 +37,13 @@
       <el-tab-pane label="关键指标" disabled name="first"></el-tab-pane>
       <el-tab-pane label="课堂行为" name="second">
         <!--为echarts准备一个具备大小的容器dom-->
-        <div id="chart1" style="width: 1000px;height: 400px;"></div>
+        <div id="chart1" style="height: 400px;" v-if="isChart1"></div>
+        <div v-else style="height: 400px;">
+          <div style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃课堂行为参与率</div>
+          <div style="height: 200px;width: 200px;margin: 0 auto;margin-top:50px;">
+            <img :src="require('@/assets/images/noData.png')" style="height: inherit;" alt="">
+          </div>
+        </div>
         <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
         <el-table
           :data="tableData"
@@ -78,7 +84,6 @@
             </template>
           </el-table-column>
         </el-table>
-
         <el-pagination
           background
           style="margin-top: 20px;text-align: center"
@@ -91,7 +96,13 @@
       </el-tab-pane>
       <el-tab-pane label="学情质量" name="third">
         <!--为echarts准备一个具备大小的容器dom-->
-        <div id="chart2" style="width: 1000px;height: 400px;"></div>
+        <div id="chart2" style="width: 1000px;height: 400px;" v-if="isChart2"></div>
+        <div v-else style="height: 400px;">
+          <div style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃学情质量</div>
+          <div style="height: 200px;width: 200px;margin: 0 auto;margin-top:50px;">
+            <img :src="require('@/assets/images/noData.png')" style="height: inherit;" alt="">
+          </div>
+        </div>
         <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
         <el-table
           :data="tableData1"
@@ -136,8 +147,8 @@
         <el-pagination
           background
           style="margin-top: 20px;text-align: center"
-          @size-change="getAnalysisData"
-          @current-change="getAnalysisData"
+          @size-change="analysisChange"
+          @current-change="analysisChange"
           :current-page.sync="Analysis.pageIndex"
           layout="prev, pager, next, jumper"
           :total="Analysis.totalPage">
@@ -198,6 +209,8 @@ export default {
           title: "数据待填充",
         }
       ],
+      isChart1:true,
+      isChart2:true,
       behPage:{
         currentPage:1,
         totalPage:1,
@@ -214,7 +227,7 @@ export default {
   mounted() {
     //获取前七天的数据
     this.changeDate(7)
-    this.getBehaviorData()
+    this.getBehaviorData(7)
   },
   created () {
     this.myCourseData()
@@ -284,12 +297,13 @@ export default {
       }
       classBehavior(data)
         .then(res=>{
-        // console.log('获取数据',res)
+        // console.log('课堂行为数据',res)
         this.tableData = res.data.pageData
         this.behPage.totalPage = res.data.totalPage * 10
         return res.data.pageData
       })
-        .then(data=>{
+      .then(data=>{
+        if(data.length>0){
           let XData = [],
             YData = {
               sign:[],
@@ -305,57 +319,56 @@ export default {
             YData.vote.push(item.voteRate)
           })
           this.drawBehavior(XData,YData)
-      })
-        .catch(err=>{
-          console.log(err)
-        })
-    },
-    getAnalysisData(pageIndex){
-      // let data = {
-      //   "courseId" : this.course,
-      //   "startTime" : this.date[0],
-      //   "endTime": this.date[1],
-      //   "pageParam": {
-      //     "pageIndex": pageIndex || 1,
-      //     "pageSize": 5,
-      //   },
-      // }
-      let data =
-        {
-          "courseId" : "0608367675f54267aa6960fd0557cc1b",
-          "endTime": "2019-01-26 07:23:51",
-          "pageParam": {
-            "pageIndex": pageIndex || 1,
-            "pageSize": 5,
-          },
-          "startTime" : "2019-01-23 07:23:51"
+        }else{
+          this.isChart1 = false
         }
+    })
+    .catch(err=>{
+      console.log(err)
+    })
+    },
+    //教学质量数据
+    getAnalysisData(pageIndex){
+      let data = {
+        "courseId" : this.course,
+        "startTime" : this.date[0],
+        "endTime": this.date[1],
+        "pageParam": {
+          "pageIndex": pageIndex || 1,
+          "pageSize": 5,
+        },
+      }
       studyAnalysis(data)
-        .then(res=>{
-        console.log('学情质量',res)
-        this.tableData1 = res.data.pageData
-        this.Analysis.totalPage = res.data.totalPage * 10
-        return res.data.pageData
-      })
-        .then(data=>{
-        let XData = [],
-          YData = {
-            classroom:[],
-            vote:[],
-            exam:[],
-            storm:[]
-          };
-        data.forEach(item=>{
-          XData.push(item.staticsDate.slice(0,10))
-          YData.classroom.push(item.classroomAverage)
-          YData.storm.push(item.stormAverage)
-          YData.exam.push(item.examAverage)
-          YData.vote.push(item.voteAverage)
-        })
-        this.drawAnalysis(XData,YData)
-      }).catch(err=>{
-        console.log(err)
-      })
+      .then(res=>{
+      console.log('学情质量',res)
+      this.tableData1 = res.data.pageData
+      this.Analysis.totalPage = res.data.totalPage * 10
+      return res.data.pageData
+    })
+      .then(data=>{
+        if(data.length>0){
+          let XData = [],
+            YData = {
+              classroom:[],
+              vote:[],
+              exam:[],
+              storm:[]
+            };
+          data.forEach(item=>{
+            XData.push(item.staticsDate.slice(0,10))
+            YData.classroom.push(item.classroomAverage)
+            YData.storm.push(item.stormAverage)
+            YData.exam.push(item.examAverage)
+            YData.vote.push(item.voteAverage)
+          })
+          this.drawAnalysis(XData,YData)
+        }else{
+          this.isChart2 = false
+        }
+    })
+      .catch(err=>{
+      console.log(err)
+    })
     },
     behPageChange(page){
       this.getBehaviorData(page)

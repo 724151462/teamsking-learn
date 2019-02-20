@@ -116,18 +116,14 @@ export function getEmailBindCode (data) {
  * 邮箱换绑时检查密码
  * */
 export function checkMailPass (data) {
-
   return commonsAjax(`${baseUrl}user/mail/captcha`, data, 'post')
 }
-
 /**
  * 邮箱换绑时检查密码
  * */
 export function checkMobilePass (data) {
-
   return commonsAjax(`${baseUrl}user/mobile/captcha/replace/form`, data, 'post')
 }
-
 /**
  * 获取换邮箱绑口令
  * */
@@ -139,6 +135,30 @@ export function getResetEmailCode (data) {
  * */
 export function checkEmailResetCode (data) {
   return commonsAjax(`${baseUrl}user/mail/captcha`, data, 'post')
+}
+//================
+// ====忘记密码
+// ===============
+
+//忘记密码发送验证码（手机号）
+export function mobileForgot(data) {
+  return commonsAjax(`${baseUrl}login/reset/passwd/captcha/${data.mobile}`, data, 'get')
+}
+//忘记密码发送验证码（邮箱）
+export function emailForgot (data) {
+  return commonsAjax(`${baseUrl}login/reset/passwd/mailcaptcha`, data, 'get')
+}
+//手机重置密码
+export function mobileFotgotCheck (data) {
+  return commonsAjax(`${baseUrl}login/reset/captcha`, data, 'post')
+}
+//验证码，验证（邮箱）
+export function emailFotgotCheck (data) {
+  return commonsAjax(`${baseUrl}login/reset/passwd/mailcaptcha`, data, 'post')
+}
+//重置密码（邮箱）
+export function resetPass (data) {
+  return commonsAjax(`${baseUrl}login/reset/passwd/mailcaptcha`, data, 'put')
 }
 
 //============================证书相关==================================
@@ -193,3 +213,4 @@ export function teacherInfo (data) {
 export function saveTeacherInfo (data) {
   return commonsAjax(`${baseUrl}user/teacher/me`, data, 'put')
 }
+
