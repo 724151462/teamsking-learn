@@ -60,7 +60,7 @@
         <el-checkbox v-model="homeWork.markType" :true-label="20" :false-label="10"></el-checkbox>
       </el-form-item>
       <el-form-item label="添加附件">
-        <upOss @ossUp="getUrl" :btnText="'添加附件'"></upOss>
+        <upOss @ossUp="getUrl" :btnText="'添加附件'" :fileKind="'resource'"></upOss>
       </el-form-item>
       <div>
         <div>

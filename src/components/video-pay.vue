@@ -23,10 +23,14 @@
       },
       cover:{
         default:'poster.jpg'
+      },
+      state:{
+        default:false
       }
     },
     data(){
       return{
+        videoStatus: this.state,
         playerOptions: {
           playbackRates: [0.5, 1.0, 1.2, 1.5, 1.8, 2.0],
           autoplay: false,
@@ -57,7 +61,7 @@
         this.playerOptions.sources[0].src = url
       },
       onPlayerPlay(player) {
-        this.playerOptions.sources[0].src = this.isMp4
+        // this.playerOptions.sources[0].src = this.isMp4
         console.log('play', this.isMp4)
         // alert("play");
       },
@@ -72,6 +76,22 @@
     computed: {
       player() {
         return this.$refs.videoPlayer.player
+      },
+    },
+    watch: {
+      isMp4: function (val) {
+        // const myPlayer = this.$refs.videoPlayer.player
+        if (val !== '') {
+          this.$refs.videoPlayer.player.src(val)
+        }
+      },
+      state: function (val) {
+        console.log(val)
+        // this.myResult = val
+        if (val) {
+          this.$refs.videoPlayer.player.pause()
+          this.$emit('resetStatus', false)
+        }
       }
     }
   }

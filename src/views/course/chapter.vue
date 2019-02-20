@@ -165,18 +165,18 @@
           type="primary"
           @click="localVideoDialog = true"
         >本地上传视频</el-button>
-        <upOss v-else style="margin: 0px 10px 10px 0px" :btnText="'本地上传文档'" @ossUp="getDocUrl"></upOss>
+        <upOss v-else style="margin: 0px 10px 10px 0px" :btnText="'本地上传文档'" @ossUp="getDocUrl" :fileKind="'resource'"></upOss>
         <el-button type="primary" @click="addItem">确 认</el-button>
         <el-button @click="dialogVisible = false">取 消</el-button>
       </span>
     </el-dialog>
 
     <!-- 添加题目对话框 -->
-    <el-dialog title="添加题目" top="30vh" :visible.sync="subjectVisible" width="65%">
+    <el-dialog title="添加题目" top="30vh" :visible.sync="subjectVisible" width="65%" :before-close="handleVideoClose">
       <div class="subject-container">
         <div class="subject-left">
           <!-- <video :src="videoUrl"></video> -->
-          <videoPlayer :isMp4="videoUrl" :poster="coverUrl"></videoPlayer>
+          <videoPlayer :isMp4="videoUrl" :poster="coverUrl" :state="videoState" @resetStatus="resetStatus"></videoPlayer>
         </div>
         <div class="subject-right">
           <div class="row-container">
@@ -253,7 +253,7 @@
           style="display: flex;flex-direction: column;justify-content: space-around;height: 300px"
         >
           <div style="display: flex;flex-direction: column;">
-            <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频'" @ossUp="getVideoUrl"></upOss>
+            <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频'" @ossUp="getVideoUrl" :fileKind="'resource'"></upOss>
             <span>请上传格式为mp4或flv格式，且小于2GB的视频</span>
           </div>
           <div style="display: flex;flex-direction: column;">
@@ -353,6 +353,7 @@ export default {
         courseId: this.$route.query.id,
         itemResource: {}
       },
+      videoState: false,
       radio: "1.2",
       // 添加内容类型tab
       contentType: "视频",
@@ -436,6 +437,12 @@ export default {
       chaptersList(this.courseId).then(response => {
         this.sourceData = response.data;
       });
+    },
+    // 弹窗关闭前视频停止
+    handleVideoClose() {
+      this.videoState = true
+      // this.videoState = false
+      this.subjectVisible = false
     },
     // 发布课程
     coursePublish() {
@@ -852,6 +859,10 @@ export default {
       this.editSubjectVisible = true;
       this.checkedQuizFiles(this.temCheckedList);
     },
+    // 重置视频播放状态
+    resetStatus(value) {
+      this.videoState = value
+    },
     // 选完题确认按钮
     editEnsure() {
       this.subjectList[this.sourceSubListIndex].courseId = this.courseId
@@ -931,7 +942,8 @@ export default {
     },
     // 本地上传视频
     getVideoUrl(...params) {
-      this.videoForm.itemResource.resourceTitle = params[1].substring(13); // 名称
+      // this.videoForm.itemResource.resourceTitle = params[1].substring(13); // 名称
+      this.videoForm.itemResource.resourceTitle = params[1]
       this.videoForm.itemResource.resourceUrl = params[0]; // 路径
       this.videoForm.itemResource.resourceType = 10; // 资源类型
       let start = params[0].lastIndexOf(".");
@@ -940,18 +952,23 @@ export default {
       this.videoForm.chapterId = this.tempSection.chapterId;
       this.videoForm.sectionId = this.tempSection.sectionId;
       this.videoForm.catalogId = null;
-      this.videoForm.itemName = params[1].substring(13);
+      // this.videoForm.itemName = params[1].substring(13);
+      this.videoForm.itemName = params[1]
       this.videoUrl = params[0];
     },
     getDocUrl(...params) {
-      this.docForm.itemResource.resourceTitle = params[1].substring(13); // 名称
+      console.log(params[0])
+      let fileName = params[1].replace(/[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g, '')
+      this.docForm.itemResource.resourceTitle = fileName; // 名称
       this.docForm.itemResource.resourceUrl = params[0]; // 路径
       this.docForm.itemResource.resourceType = 20; // 资源类型
       let start = params[0].lastIndexOf(".");
       let end = params[0].length;
       this.docForm.contentType = 20;
       this.docForm.catalogId = null;
-      this.docForm.itemName = params[1].substring(13);
+      // this.docForm.itemName = params[1].substring(13);
+      
+      this.docForm.itemName = fileName
       this.contentAdd(this.docForm);
     },
     localVideoUpload() {

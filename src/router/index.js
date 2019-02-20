@@ -21,7 +21,8 @@ export const constantRouterMap = [{
   {
     path: '/course',
     component: Header,
-    name: 'course',
+    name: '课程中心',
+    level: 1,
     menuShow: true,
     type: 'courseCenter',
     redirect: '/course/list',
@@ -119,42 +120,42 @@ export const constantRouterMap = [{
                     name: '成绩管理',
                   },
                   {
-                    path: 'notes',
+                    path: '/course/list/teach/notes',
                     component: _import('course/teachContent/notes'),
                     name: '笔记管理',
                   },
                   {
-                    path: 'homework',
+                    path: '/course/list/teach/homework',
                     component: _import('course/teachContent/homeworkList'),
                     name: '作业管理',
                   },
                   {
-                    path: 'homeworkdetail',
+                    path: '/course/list/teach/homeworkdetail',
                     component: _import('course/teachContent/homeworkDetail'),
                     name: '学生作业详情',
                   },
                   {
-                    path: 'storm',
+                    path: '/course/list/teach/storm',
                     component: _import('course/teachContent/storm'),
                     name: '头脑风暴',
                   },
                   {
-                    path: 'questionnaire',
+                    path: '/course/list/teach/questionnaire',
                     component: _import('course/teachContent/questionnaire'),
                     name: '投票问卷',
                   },
                   {
-                    path: 'test',
+                    path: '/course/list/teach/test',
                     component: _import('course/teachContent/test'),
                     name: '测试管理',
                   },
                   {
-                    path: 'testmark',
+                    path: '/course/list/teach/testmark',
                     component: _import('course/teachContent/testMark'),
                     name: '测试成绩',
                   },
                   {
-                    path: 'video',
+                    path: '/course/list/teach/video',
                     component: _import('course/teachContent/videos'),
                     name: '视频',
                   },
@@ -272,9 +273,10 @@ export const constantRouterMap = [{
   {
     path: '/school',
     component: Header,
-    name: 'school',
+    name: '校管中心',
     type: 'schoolManageCenter',
     menuShow: true,
+    level: 1,
     redirect: '/school/student',
     children: [{
         path: '/school/student',
@@ -449,6 +451,7 @@ export const constantRouterMap = [{
     path: '/learn',
     component: Header,
     name: 'learn',
+    level: 1,
     type: 'studyManage',
     menuShow: true,
     redirect: '/learn/inclass',
@@ -530,71 +533,12 @@ export const constantRouterMap = [{
       }
     ]
   },
-   {
-    path: '/school',
-    component: Layout,
-    name: '个人中心',
-    redirect: '/school/student',
-    meta: {
-      address: 'school'
-    },
-    children: [{
-        path: 'student',
-        component: _import('school/student'),
-        name: 'user学生管理'
-      },
-      {
-        path: 'teacher',
-        component: _import('school/teacher'),
-        name: 'user教师管理'
-      },
-      {
-        path: 'controller',
-        component: _import('school/controller'),
-        name: 'user管理员'
-      },
-      {
-        path: 'portal',
-        component: _import('school/portal'),
-        name: 'user门户配置'
-      },
-      {
-        path: 'course',
-        component: _import('school/course'),
-        name: 'user课程管理'
-      },
-      {
-        path: 'certificate',
-        component: _import('school/certificate'),
-        name: 'user证书审核'
-      },
-      {
-        path: 'academy',
-        component: _import('school/academy'),
-        name: 'user院管理'
-      },
-      {
-        path: 'department',
-        component: _import('school/department'),
-        name: 'user系管理'
-      },
-      {
-        path: 'speciality',
-        component: _import('school/speciality'),
-        name: 'user专业管理'
-      },
-      {
-        path: 'class',
-        component: _import('school/class'),
-        name: 'user班级管理'
-      },
-    ]
-  },
   {
     path: '/system',
     component: Header,
     name: 'system',
     menuShow: true,
+    level: 1,
     type: 'systemManage',
     redirect: '/system/tenantManager',
     meta: {

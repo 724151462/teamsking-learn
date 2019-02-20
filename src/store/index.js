@@ -11,7 +11,7 @@ const state = {
   allMenu: [],
   filterMenu: [],
   topNavState: 'course',
-  leftNavState: 'course' ,
+  leftNavState: '课程中心' ,
   modelActive: Cookie.get('modelActive') || "1",
   beginDrag:{
     type: '',
