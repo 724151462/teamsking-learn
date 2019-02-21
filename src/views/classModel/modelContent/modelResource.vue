@@ -29,7 +29,6 @@
       <div >暂无数据</div>
     </div>
     <div style="width: 100%" v-if="showContent === true">
-      {{resourceObj}}
       <div style="margin: 0 auto; width: 80%" v-if="resourceObj.resourceType === 40">
         <img :src="resourceObj.resourceUrl" style="height: 600px;width: 100%"/>
       </div>

@@ -17,7 +17,7 @@
             border-right:1px solid #fff;">
               <el-menu router @select="handleSelect">
         <template v-for="(issue,index) in $router.options.routes">
-          <!-- issue.name:{{issue.name}}<br>leftNavState:{{$store.state.leftNavState}} -->
+          issue.name:{{issue.name}}<br>leftNavState:{{$store.state.leftNavState}}
           <template v-if="issue.name === $store.state.leftNavState"><!-- 注意：这里就是leftNavState状态作用之处，当该值与router的根路由的name相等时加载相应菜单组 -->
             <template v-for="(item,index) in issue.children">
               <el-submenu v-if="!item.leaf" :index="index+''">

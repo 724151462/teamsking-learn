@@ -14,7 +14,7 @@
     <el-dialog title="添加轮播图" :visible.sync="dialogVisible" width="30%">
       <el-form ref="form" :model="form" label-width="80px">
         <el-form-item label="图片路径">
-          <upOss :btnText="'上传轮播图'" @ossUp="getBannerUrl"></upOss>
+          <upOss :btnText="'上传轮播图'" @ossUp="getBannerUrl" :fileKind="'img'"></upOss>
         </el-form-item>
         <el-form-item label="链接web">
           <el-input v-model="form.linkWebUrl"></el-input>
