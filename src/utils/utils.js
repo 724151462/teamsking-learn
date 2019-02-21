@@ -83,13 +83,10 @@ export function matchReg(str) {
   let reg = /<\/?.+?\/?>/g;
   return str.replace(reg, "");
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
 //错误信息处理
 export function  getErrorMsg(res) {
   return res.split('|')[res.split('|').length-1]
 }
-=======
 
 // 下载
 export function downLoadFile(url, fileName) {

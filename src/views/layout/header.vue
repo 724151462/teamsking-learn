@@ -20,16 +20,10 @@
           <el-menu-item :index="item.path" v-for="item in nav">{{item.name}}</el-menu-item>
           <!-- <el-menu-item index="/learn">学习管理</el-menu-item>
           <el-menu-item index="/school">校管中心</el-menu-item>
-<<<<<<< HEAD
-          <el-menu-item index="/system">系统管理</el-menu-item>
-          <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" >
-              <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
-=======
           <el-menu-item index="/system">系统管理</el-menu-item> -->
           <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" 
                                 >
                     <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
->>>>>>> jia
           </el-menu-item>-->
         </el-menu>
       </div>
