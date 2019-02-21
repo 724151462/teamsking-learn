@@ -13,10 +13,7 @@ const state = {
   topNavState: 'course',
   leftNavState: '课程中心' ,
   modelActive: Cookie.get('modelActive') || "1",
-  beginDrag:{
-    type: '',
-    id:''
-  }, //当前被拖拽对象的信息
+  msgNum:0
 }
 
 const mutations = {
@@ -29,9 +26,11 @@ const mutations = {
       state.allMenu.push(element)
     });
   },
-  SAVE_DRAG:(state, data)=>{
-    state.beginDrag.type = data.type
-    state.beginDrag.id = data.id
+  MSG_READY:(state, data)=>{
+    state.msgNum = state.msgNum - Number(data)
+  },
+  SET_MSG:(state, data)=>{
+    state.msgNum = Number(data)
   }
 }
 

@@ -41,7 +41,9 @@ export function formatDate(time) {
   return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + seconds
 }
 
-//获取当前日期,及前n天
+/*
+* 获取当前日期,及前n天
+* */
 export function getBeforeDate(n) {
   let nowTime = formatDate(new Date())
   let nowMs = new Date().getTime()
@@ -74,11 +76,14 @@ export function formatTime(_seconds) {
     result = `${PadZero(mins)}:${PadZero(seconds)}`
   return result;
 }
-//去除文本里的HTML标签
+/*
+* 去除文本里的HTML标签
+* */
 export function matchReg(str) {
   let reg = /<\/?.+?\/?>/g;
   return str.replace(reg, "");
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 //错误信息处理
 export function  getErrorMsg(res) {
@@ -147,3 +152,18 @@ export function fileType(name){
   return fileType
 }
 >>>>>>> jia
+=======
+/***
+*错误信息处理
+ * 参数：后台返回的错误消息
+* */
+export function  getErrorMsg(res) {
+  return res.split('|')[res.split('|').length-1]
+}
+/***
+ *  解决下载图片报跨域问题,将图片地址: http,换为https
+* ***/
+function insert_url(url){
+  return 'https' + url.substring(4)
+}
+>>>>>>> caf8dcb255ae339ce70eda3d987ff484c70b3b24

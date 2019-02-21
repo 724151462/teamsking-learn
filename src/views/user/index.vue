@@ -255,16 +255,9 @@
       userHeader
     },
     mounted (){
-      Promise.all([this.initUserInfo(), this.initTeaInfo(), this.initCollege()])
-        .then((res)=>{
-            console.log(res)
-        })
-        .catch((err)=>{
-          console.log(err)
-        });
-      // this.initUserInfo()
-      // this.initTeaInfo()
-      // this.initCollege()
+      this.initUserInfo()
+      this.initTeaInfo()
+      this.initCollege()
     },
     data() {
       return {

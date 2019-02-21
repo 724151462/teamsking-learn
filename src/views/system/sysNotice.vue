@@ -8,8 +8,7 @@
       :tableData="tableData"
       :tables="tables"
       :buttonStylus="tableStylus"
-      v-on:showComponentInfo="typeFun"
-    ></itemTable>
+      v-on:showComponentInfo="typeFun"></itemTable>
     <el-dialog :visible.sync="isDialog" width="60%">
       <el-form>
         <el-form-item label="标 题：">

@@ -19,6 +19,12 @@ import {
 } from '../utils/requery'
 
 /**
+ * 获取用户未读消息
+ */
+export function unReadyMsg(data) {
+  return commonsAjax(`${studyUrl}user/message/notread/count`, '', 'get')
+}
+/**
  * 课堂模式下获取签到用户信息列表
  */
 export function checkUser(data) {

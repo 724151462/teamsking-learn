@@ -1,33 +1,105 @@
 <template>
-  <div class="login">
-    <div class="login-center">
-      <el-form :model="data" :rules="rules" ref="data" label-width="100px">
-        <el-form-item label="所属学校：" prop="tenantId">
-          <el-select
-            filterable
-            v-model="data.tenantId"
-            :filter-method="searchTenant"
-            placeholder="请选择">
-            <el-option
-              v-for="item in schoolList"
-              :key="item.tenantId"
-              :label="item.tenantName"
-              :value="item.tenantId">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="账号：" prop="userName">
-          <el-input placeholder="请输入/用户名/工号/邮箱" v-model="data.userName" style="width: 300px;"></el-input>
-        </el-form-item>
-        <el-form-item label="密码：" prop="password">
-          <el-input placeholder="请输入密码" v-model="data.password" style="width:300px;"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" style="margin-left: 100px" @click="goLogin">登陆</el-button>
-          <el-button type="primary" style="margin-left: 100px" @click="goLoginDebug">测试登陆</el-button>
-        </el-form-item>
-      </el-form>
+  <div class="login-warp">
+    <div class="login" :style="bgImg">
+      <div class="login-center">
+        <div class="left">
+          <img :src="require('@/assets/images/login_left.png')" class="left-img" alt="">
+        </div>
+        <div class="right">
+          <div>
+            <img :src="require('@/assets/images/logo.png')" class="logo-img" alt="">
+          </div>
+          <div style="position: relative;height: calc(100% - 85px)">
+            <el-form :model="data" ref="data" class="login-box">
+              <el-form-item label="" prop="tenantId">
+                <el-select
+                  filterable
+                  class="input-item"
+                  v-model="data.tenantId"
+                  :filter-method="searchTenant"
+                  placeholder="请选择学校">
+                  <el-option
+                    v-for="item in schoolList"
+                    :key="item.tenantId"
+                    :label="item.tenantName"
+                    :value="item.tenantId">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="" prop="userName">
+                <el-input placeholder="工号/邮箱/电话号码" v-model="data.userName" class="input-item"></el-input>
+              </el-form-item>
+              <el-form-item label="" prop="password" style="margin-bottom: 10px">
+                <el-input placeholder="密码" v-model="data.password" class="input-item"></el-input>
+              </el-form-item>
+              <el-form-item style="margin-bottom: 0">
+                <div class="input-item" style="text-align: left">
+                  <span class="login-text" @click="forgotPass.dialogVisible = true">忘记密码?</span>
+                </div>
+              </el-form-item>
+              <el-form-item style="">
+                <el-button type="primary" @click="goLogin" class="input-item">马上登录</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+        </div>
+      </div>
     </div>
+    <el-button type="danger" style="position: fixed;left:50%;top: 20px;" @click="goLoginDebug">测试登陆</el-button>
+    <el-dialog
+      title="找回密码"
+      :visible.sync="forgotPass.dialogVisible"
+      :before-close="noRest"
+      width="500px">
+      <!--通过手机号修改密码-->
+        <div class="forgot-box" v-show="!forgotPass.isMail">
+          <el-input type="text" placeholder="手机号" class="forgot-item" v-model="forgotPass.forgotForm.mobile" style="width: 300px"></el-input>
+          <div>
+            <el-input type="password" placeholder="验证码" v-model="forgotPass.forgotForm.code" class="forgot-item" style="width: 210px;margin-right: 20px"></el-input>
+            <el-button
+              type="primary"
+              :disabled="forgotPass.codeBtn"
+              @click="getMobileCode"
+              plain>{{forgotPass.codeBtn ? `${forgotPass.codeBtnTime}s` : '获取'}}</el-button>
+          </div>
+          <el-input type="password" placeholder="设置新密码" class="forgot-item" v-model="forgotPass.forgotForm.password" style="width: 300px"></el-input>
+          <el-input type="password" placeholder="确认新密码" class="forgot-item" v-model="forgotPass.forgotForm.rePassWord" style="width: 300px"></el-input>
+          <div style="color: #b5b5b5;user-select: none">
+            使用账号绑定的
+            <el-button type="text" @click="changeMobile">手机号</el-button>或
+            <el-button type="text" style="margin-left:0" @click="changeMail">邮箱</el-button>找回密码
+          </div>
+          <el-button style="" size="small" type="primary" @click="mobileRest">重置密码</el-button>
+        </div>
+      <!--通过邮箱找回密码-->
+        <div class="forgot-box" v-show="forgotPass.isMail">
+          <el-input type="text" placeholder="邮箱" class="forgot-item" v-model="forgotPass.forgotForm.email" style="width: 300px"></el-input>
+          <div v-if="!forgotPass.isEmailRest">
+            <el-input type="text" placeholder="验证码" v-model="forgotPass.forgotForm.code" class="forgot-item" style="width: 210px;margin-right: 20px"></el-input>
+            <el-button
+              type="primary"
+              :disabled="forgotPass.codeBtn"
+              @click="getMailCode"
+              plain>{{forgotPass.codeBtn ? `${forgotPass.codeBtnTime}s` : '获取'}}</el-button>
+          </div>
+          <div v-else>
+            <el-input type="password" placeholder="设置新密码" class="forgot-item" v-model="forgotPass.forgotForm.password" style="width: 300px"></el-input>
+            <el-input type="password" placeholder="确认新密码" class="forgot-item" v-model="forgotPass.forgotForm.rePassWord" style="width: 300px"></el-input>
+          </div>
+          <div style="color: #b5b5b5;user-select: none">
+            使用账号绑定的
+            <el-button type="text" @click="()=>{forgotPass.isMail = false;forgotPass.forgotForm.mail = ''}">手机号</el-button>或
+            <el-button type="text" style="margin-left:0" @click="()=>{forgotPass.isMail = true;forgotPass.forgotForm.mobile = ''}">邮箱</el-button>找回密码
+          </div>
+          <el-button
+            size="small"
+            type="primary"
+            @click="forgotPass.isEmailRest ? emailRest() : emailRestCheck()">{{this.forgotPass.isEmailRest ? '重置密码' : '下一步'}}</el-button>
+        </div >
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="noRest">取 消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -35,10 +107,31 @@
   import { logins, loginDebug, getTenant} from '@/api/login'
   import { setToken, getToken, twoWeeksExchange, twoWeeksGetExchange, saveUserInfo} from '@/utils/auth'
   import {getErrorMsg} from "@/utils/utils";
+  import {mobileForgot,emailForgot,resetPass,emailFotgotCheck,mobileFotgotCheck} from "../../api/user";
 
   export default {
     data () {
       return {
+        bgImg: {
+          backgroundImage: "url(" + require("@/assets/images/login_bg.jpg") + ")",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "100% 100%",
+        },
+        forgotPass:{
+          dialogVisible: false,
+          isMail:false,
+          codeBtn:false,
+          codeBtnTime:0,
+          isEmailRest: false,
+          forgotForm:{
+            email:'',
+            password:'',
+            rePassWord:'',
+            mobile:'',
+            code:''
+          }
+        },
+        leftImg: require("@/assets/images/login_left.png"),
         schoolList: [],   //租户列表
         searchKey:'', //搜索
         data: {
@@ -48,12 +141,8 @@
         },
         rules: {
           tenantId:[{required: true, message: '请选择所属学校', trigger: 'blur'}],
-          userName: [
-            { required: true, message: '请输入账号', trigger: 'blur' }
-          ],
-          password: [
-            { required: true, message: '请输入密码', trigger: 'blur' },
-          ]
+          userName: [{ required: true, message: '请输入账号', trigger: 'blur' }],
+          password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
         }
       }
     },
@@ -126,21 +215,203 @@
         }).catch(error => {
           console.log(error)
         })
+      },
+      //切换为手机号方式
+      changeMobile(){
+        this.forgotPass.isMail = false;
+        this.forgotPass.codeBtn = false,
+        this.forgotPass.codeBtnTime = 0,
+        this.forgotPass.forgotForm.email=''
+        this.forgotPass.forgotForm.password=''
+        this.forgotPass.forgotForm.rePassWord=''
+        this.forgotPass.forgotForm.mobile=''
+        this.forgotPass.forgotForm.code=''
+      },
+      //切换为邮箱方式
+      changeMail(){
+        this.forgotPass.isMail = false;
+        this.forgotPass.codeBtn = false,
+        this.forgotPass.codeBtnTime = 0,
+        this.forgotPass.forgotForm.email=''
+        this.forgotPass.forgotForm.password=''
+        this.forgotPass.forgotForm.rePassWord=''
+        this.forgotPass.forgotForm.mobile=''
+        this.forgotPass.forgotForm.code=''
+      },
+      //手机号重置密码,获取验证码
+      getMobileCode(){
+        mobileForgot({mobile:this.forgotPass.forgotForm.mobile})
+          .then(res=>{
+            if (res.code === 200) {
+              this.$message.success('验证码发送成功')
+              //限时
+              this.forgotPass.codeBtn = true
+              this.forgotPass.codeBtnTime = 60
+              let time = setInterval(() =>{
+                if(this.forgotPass.codeBtnTime>0){
+                  this.forgotPass.codeBtnTime -=1
+                }else{
+                  this.forgotPass.codeBtn = false
+                  clearInterval(time)
+                  this.forgotPass.codeBtnTime = 0
+                }
+              }, 1000)
+            } else {
+              this.$message.error(getErrorMsg(res.msg))
+            }
+          })
+          .catch(err=>{console.log(err)})
+      },
+      getMailCode(){
+        emailForgot({mail:this.forgotPass.forgotForm.email})
+          .then(res=>{
+            if (res.code === 200) {
+              this.$message.success('验证码成功发送至邮箱')
+              //限时
+              this.forgotPass.codeBtn = true
+              this.forgotPass.codeBtnTime = 60
+              let time = setInterval(() =>{
+                if(this.forgotPass.codeBtnTime>0){
+                  this.forgotPass.codeBtnTime -=1
+                  console.log(this.forgotPass.codeBtnTime)
+                }else{
+                  this.forgotPass.codeBtn = false
+                  clearInterval(time)
+                  this.forgotPass.codeBtnTime = 0
+                }
+              }, 1000)
+            } else {
+              this.$message.error(getErrorMsg(res.msg))
+            }
+          })
+          .catch(err=>{console.log(err)})
+      },
+      //手机号重置密码
+      mobileRest(){
+        let data = {
+          captcha : this.forgotPass.forgotForm.code ,
+          newPasswd : this.forgotPass.forgotForm.password ,
+          passwdCheck : this.forgotPass.forgotForm.rePassWord
+        }
+        mobileFotgotCheck(data)
+          .then(res=>{
+            if (res.code === 200) {
+              console.log(res)
+            } else {
+              this.$message.error(getErrorMsg(res.msg))
+            }
+          })
+          .catch(err=>{console.log(err)})
+      },
+      //邮箱验证码验证
+      emailRestCheck(){
+        let data = {
+          mail : this.forgotPass.forgotForm.email ,
+          captcha : this.forgotPass.forgotForm.code ,
+        }
+        emailFotgotCheck(data)
+          .then(res=>{
+            console.log(res)
+            if (res.code === 200) {
+              this.forgotPass.isEmailRest = true
+            } else {
+              this.$message.error(getErrorMsg(res.msg))
+            }
+          })
+          .catch(err=>{console.log(err)})
+      },
+      //邮箱重置密码
+      emailRest(){
+        let data = {
+          mail : this.forgotPass.forgotForm.mail ,
+          newPasswd : this.forgotPass.forgotForm.password ,
+          passwdCheck : this.forgotPass.forgotForm.rePassWord
+        }
+        resetPass(data)
+          .then(res=>{
+            console.log(res)
+            if (res.code === 200) {
+              this.$message.success('密码重置成功')
+            } else {
+              this.$message.error(getErrorMsg(res.msg))
+            }
+          })
+          .catch(err=>{console.log(err)})
+      },
+      //取消重置密码
+      noRest(){
+        this.forgotPass.dialogVisible = false
+        this.forgotPass.forgotForm.email = ''
+        this.forgotPass.forgotForm.password = ''
+        this.forgotPass.forgotForm.rePassWord = ''
+        this.forgotPass.forgotForm.code = ''
+        this.forgotPass.forgotForm.mobile = ''
+        this.forgotPass.codeBtnTime = 0
       }
     }
   }
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
-  .login
-    position: relative
-    height:100%
-    background:#000000
-    .login-center
-      width:500px
-      position: absolute
-      top: 50%
-      left: 50%
-      transform:translate(-50%,-50%)
-      color:#ffffff
+  .login-warp
+    width inherit
+    height inherit
+    .login
+      width 100%
+      position: relative
+      height:100%
+      .login-center
+        min-width:600px
+        min-height 350px
+        position: absolute
+        top: 50%
+        left: 50%
+        transform:translate(-50%,-50%)
+        overflow hidden
+        box-shadow: #a1a1a1 0 0 10px;
+        color:#ffffff
+        border-radius 20px;
+        display flex
+        .left
+          background-color #3a8ee6
+          width 50%
+          float left
+          .left-img
+            width 100%;
+            height 100%
+        .right
+          width 50%
+          /*float right*/
+          background-color white
+          display inline-block
+          text-align center
+          .login-box
+            position: absolute;
+            width 80%
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            .input-item
+              margin 0 auto
+              width 100%
+              max-width 300px
+            .login-text
+              color: #909399
+              text-align: left
+              cursor pointer
+              margin 10px 0
+              user-select none
+              font-size 13px
+            .login-btn
+              cursor: pointer
+              background: linear-gradient(to right , #6fb2ff, #095fff);
+              user-select none
+          .logo-img
+            height 45px
+            margin 20px 0
+    .forgot-box
+      width 320px
+      margin 0 auto
+      .forgot-item
+        margin-bottom 20px
 </style>
