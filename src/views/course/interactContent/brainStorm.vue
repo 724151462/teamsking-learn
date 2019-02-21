@@ -15,12 +15,12 @@
           />
         </el-form-item>
         <el-form-item label="添加图片">
-          <upOss @ossUp="getUrl" :fileType="'image/jpeg,image/png'"></upOss>
+          <upOss @ossUp="getUrl" :fileType="'image/jpeg,image/png'" :fileKind="'img'"></upOss>
           <div class="all-img-list">
             <template v-for="(item,i) in brainStorm.assetList">
               <div :key="i" style="display: flex; flex-direction: column; align-items: center">
                 <div class="img-list">
-                  <img style="width:50px" :src="item.assetUrl" class="img">
+                  <img @click="download(item)" style="width:50px;cursor: pointer" :src="item.assetUrl" class="img">
                 </div>
               </div>
               <span :key="item.userId" class="delAsset" @click="delAsset(item)">×</span>
@@ -142,6 +142,10 @@ export default {
         console.log(this.addImgList)
         console.log(this.brainStorm);
       });
+    },
+    download(url) {
+      var FileSaver = require("file-saver");
+      FileSaver.saveAs(url.assetUrl);
     },
     resType(name) {
       let index = name.lastIndexOf("."),

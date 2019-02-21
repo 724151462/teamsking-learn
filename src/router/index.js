@@ -23,7 +23,8 @@ export const constantRouterMap = [{
   {
     path: '/course',
     component: Header,
-    name: 'course',
+    name: '课程中心',
+    level: 1,
     menuShow: true,
     type: 'courseCenter',
     redirect: '/course/list',
@@ -121,42 +122,42 @@ export const constantRouterMap = [{
                     name: '成绩管理',
                   },
                   {
-                    path: 'notes',
+                    path: '/course/list/teach/notes',
                     component: _import('course/teachContent/notes'),
                     name: '笔记管理',
                   },
                   {
-                    path: 'homework',
+                    path: '/course/list/teach/homework',
                     component: _import('course/teachContent/homeworkList'),
                     name: '作业管理',
                   },
                   {
-                    path: 'homeworkdetail',
+                    path: '/course/list/teach/homeworkdetail',
                     component: _import('course/teachContent/homeworkDetail'),
                     name: '学生作业详情',
                   },
                   {
-                    path: 'storm',
+                    path: '/course/list/teach/storm',
                     component: _import('course/teachContent/storm'),
                     name: '头脑风暴',
                   },
                   {
-                    path: 'questionnaire',
+                    path: '/course/list/teach/questionnaire',
                     component: _import('course/teachContent/questionnaire'),
                     name: '投票问卷',
                   },
                   {
-                    path: 'test',
+                    path: '/course/list/teach/test',
                     component: _import('course/teachContent/test'),
                     name: '测试管理',
                   },
                   {
-                    path: 'testmark',
+                    path: '/course/list/teach/testmark',
                     component: _import('course/teachContent/testMark'),
                     name: '测试成绩',
                   },
                   {
-                    path: 'video',
+                    path: '/course/list/teach/video',
                     component: _import('course/teachContent/videos'),
                     name: '视频',
                   },
@@ -274,9 +275,10 @@ export const constantRouterMap = [{
   {
     path: '/school',
     component: Header,
-    name: 'school',
+    name: '校管中心',
     type: 'schoolManageCenter',
     menuShow: true,
+    level: 1,
     redirect: '/school/student',
     children: [{
         path: '/school/student',
@@ -453,6 +455,7 @@ export const constantRouterMap = [{
     path: '/learn',
     component: Header,
     name: 'learn',
+    level: 1,
     type: 'studyManage',
     menuShow: true,
     redirect: '/learn/inclass',
@@ -534,6 +537,7 @@ export const constantRouterMap = [{
       }
     ]
   },
+<<<<<<< HEAD
    {
     path: '/school',
     component: Layout,
@@ -594,11 +598,14 @@ export const constantRouterMap = [{
       },
     ]
   },
+=======
+>>>>>>> 33f8e159e86fc3414a75c53b77a21bb9f9943482
   {
     path: '/system',
     component: Header,
     name: 'system',
     menuShow: true,
+    level: 1,
     type: 'systemManage',
     redirect: '/system/tenantManager',
     meta: {

@@ -44,10 +44,10 @@
           <el-input v-model="form.shortName"></el-input>
         </el-form-item>
         <el-form-item label="logo">
-          <upOss :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo"></upOss>
+          <upOss :fileKind="'img'" :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo"></upOss>
         </el-form-item>
         <el-form-item label="平台图片">
-          <upOss :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic"></upOss>
+          <upOss :fileKind="'img'" :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic"></upOss>
         </el-form-item>
         <el-form-item label="学校域名" required>
           <el-input v-model="form.tenantDomain"></el-input>

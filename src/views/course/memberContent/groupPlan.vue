@@ -1,7 +1,7 @@
 <template>
   <div class="groupPlan">
     <span style="display:inline-block;margin: 10px 0">
-      <router-link :to="{name: '成员'}">成员</router-link>> 成员小组方案
+      <router-link :to="{path: '/course/list/member', query: {id: $route.query.id}}">成员</router-link>> 成员小组方案
     </span>
     <div class="nav">
       <el-button type="primary" @click="setGroupName(10)">+ 手动分组</el-button>
@@ -11,7 +11,11 @@
       <div class="list" v-for="item in schemeList" :key="item.schemeId">
         <div class="title">{{item.schemeName}}</div>
         <div class="bottom">
+          <span v-if="item.teamCount === null">
+            尚未划分小组
+          </span>
           <span
+            v-else
             class="left"
           >{{item.userCount | coutFilter}}人已被划分为小组，划分为{{item.teamCount | coutFilter}}个小组</span>
           <span class="right">
@@ -227,12 +231,15 @@ export default {
     }
   },
   created() {
-    schemeList(this.courseId)
-    .then((response)=> {
-      this.schemeList = response.data
-    })
+    this.getSchemeList()
   },
   methods: {
+    getSchemeList() {
+      schemeList(this.courseId)
+      .then((response)=> {
+        this.schemeList = response.data
+      })
+    },
     check(e){
       this.matchedList = this.showData.filter(element=> {
         return element.isCheck === true && element.teamName === null
@@ -368,6 +375,7 @@ export default {
             message: '添加成员成功',
             type: 'success'
           })
+          this.getSchemeList()
         }
       })
       // {

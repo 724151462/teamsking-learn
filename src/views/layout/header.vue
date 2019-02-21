@@ -17,12 +17,19 @@
           @select="handleSelect"
           :router="true"
         >
-          <el-menu-item index="/course">课程中心</el-menu-item>
-          <el-menu-item index="/learn">学习管理</el-menu-item>
+          <el-menu-item :index="item.path" v-for="item in nav">{{item.name}}</el-menu-item>
+          <!-- <el-menu-item index="/learn">学习管理</el-menu-item>
           <el-menu-item index="/school">校管中心</el-menu-item>
+<<<<<<< HEAD
           <el-menu-item index="/system">系统管理</el-menu-item>
           <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" >
               <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
+=======
+          <el-menu-item index="/system">系统管理</el-menu-item> -->
+          <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" 
+                                >
+                    <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
+>>>>>>> jia
           </el-menu-item>-->
         </el-menu>
       </div>
@@ -94,6 +101,12 @@ export default {
   created() {
     // menuList().then((response)=>{
     // console.log(this.storeNav, '``````', response.data)
+    this.nav = this.$router.options.routes.filter(item=> {
+        if(item.level ===1) {
+          return item
+        }
+      }
+    )
     this.$store.commit("setAllMenu", this.menuList);
     this.fetchNavData();
     this.getUserInfo();
@@ -133,16 +146,21 @@ export default {
 
             if (grand_children) {
               for (var k = 0; k < grand_children.length; k++) {
-                // console.log('grand_children',grand_children[k].path)
+                console.log('grand_children',grand_children[k].path, '===curpath' + cur_path)
                 if (grand_children[k].path === cur_path) {
                   console.log("topNavState", routers[i]);
-                  nav_type = routers[i].type;
+                  // nav_type = routers[i].type;
                   nav_name = routers[i].name;
                   break;
                 }
               }
             }
           }
+          // var foo1 = function(list){
+          //     if(list.children){
+          //         foo1(list.children)
+          //     }else{}
+          // }
         }
       }
       this.$store.state.topNavState = nav_type; // 改变topNavState状态的值

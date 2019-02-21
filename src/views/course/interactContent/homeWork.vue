@@ -60,11 +60,64 @@
         <el-checkbox v-model="homeWork.markType" :true-label="20" :false-label="10"></el-checkbox>
       </el-form-item>
       <el-form-item label="添加附件">
-        <upOss @ossUp="getUrl" :btnText="'添加附件'"></upOss>
+        <upOss @ossUp="getUrl" :btnText="'添加附件'" :fileKind="'resource'"></upOss>
       </el-form-item>
       <div>
-        <div>
-          <img v-for="item in homeWork.assets" width="50" :src="item.assetUrl">
+        <div v-for="(item,i) in homeWork.assets" :key="i" style="with:100%">
+          <div v-if="getFileType(item.assetUrl) === 'image'" class="box">
+            <div class="pic_title">
+              <img height="50" width="50" :src="item.assetUrl">
+              <span>{{item.assetTitle}}</span>
+            </div>
+            <div class="operate">
+              <span @click="download(item)"><i class="el-icon-download"></i>下载</span>
+              <span @click="delAsset(i)"><i class="el-icon-delete"></i>删除</span>
+            </div>
+          </div>
+          <div v-else-if="fileTail(item) === 'xls' || fileTail(item) === 'xlsx'" class="box">
+            <!-- <span @click="download(item)">{{item.assetTitle}}</span> -->
+            <div class="pic_title">
+              <img  width="50" :src="require('@/assets/images/asset_excel.png')">
+              <span>{{item.assetTitle}}</span>
+            </div>
+            <div class="operate">
+              <span @click="download(item)"><i class="el-icon-download"></i>下载</span>
+              <span @click="delAsset(item)"><i class="el-icon-delete"></i>删除</span>
+            </div>
+          </div>
+          <div v-else-if="fileTail(item) === 'doc' || fileTail(item) === 'docx' || fileTail(item) === 'txt'" class="box">
+            <!-- <span @click="download(item)">{{item.assetTitle}}</span> -->
+            <div class="pic_title">
+              <img  width="50" :src="require('@/assets/images/asset_word.png')">
+              <span>{{item.assetTitle}}</span>
+            </div>
+            <div class="operate">
+              <span @click="download(item)"><i class="el-icon-download"></i>下载</span>
+              <span @click="delAsset(item)"><i class="el-icon-delete"></i>删除</span>
+            </div>
+          </div>
+          <div v-else-if="fileTail(item) === 'ppt' || fileTail(item) === 'pptx'" class="box">
+            <!-- <span @click="download(item)">{{item.assetTitle}}</span> -->
+            <div class="pic_title">
+              <img  width="50" :src="require('@/assets/images/asset_ppt.png')">
+              <span>{{item.assetTitle}}</span>
+            </div>
+            <div class="operate">
+              <span @click="download(item)"><i class="el-icon-download"></i>下载</span>
+              <span @click="delAsset(item)"><i class="el-icon-delete"></i>删除</span>
+            </div>
+          </div>
+          <div v-else-if="fileTail(item) === 'pdf'" class="box">
+            <!-- <span @click="download(item)">{{item.assetTitle}}</span> -->
+            <div class="pic_title">
+              <img  width="50" :src="require('@/assets/images/asset_pdf.png')">
+              <span>{{item.assetTitle}}</span>
+            </div>
+            <div class="operate">
+              <span @click="download(item)"><i class="el-icon-download"></i>下载</span>
+              <span @click="delAsset(item)"><i class="el-icon-delete"></i>删除</span>
+            </div>
+          </div>
         </div>
       </div>
       <el-form-item label="参考答案" prop="answer">
@@ -80,6 +133,7 @@
 <script>
 import upOss from "@/components/up-oss";
 import Cookie from "js-cookie";
+import { fileType, downLoadFile } from "@/utils/utils"
 import {
   assetCreate,
   homeWorkDetail,
@@ -202,30 +256,39 @@ export default {
       console.log(this.homeWork);
     },
     getUrl(url, fileName) {
+      console.log(fileName)
       console.log("资源链接：" + url);
       this.addImgList.push(url);
       this.asset.assetTitle = fileName;
       this.asset.assetUrl = url;
+      this.asset.contentType = this.fileTail(this.asset)
       assetCreate(this.asset).then(response => {
         this.homeWork.assets.push(response.data);
         console.log("asset", this.homeWork);
       });
     },
+    // 判断文件后缀
+    fileTail(file) {
+      let url = file.assetUrl, 
+          index= url.lastIndexOf('.')
+      return url.substring(index+1,url.length).toLowerCase()
+    },
+    // 判断文件类型
+    getFileType(name) {
+      return fileType(name)
+    },
     // 下载
-    // funDownload(content, filename) {
-    //     // 创建隐藏的可下载链接
-    //     var eleLink = document.createElement('a');
-    //     eleLink.download = filename;
-    //     eleLink.style.display = 'none';
-    //     // 字符内容转变成blob地址
-    //     var blob = new Blob([content]);
-    //     eleLink.href = URL.createObjectURL(blob);
-    //     // 触发点击
-    //     document.body.appendChild(eleLink);
-    //     eleLink.click();
-    //     // 然后移除
-    //     document.body.removeChild(eleLink);
-    // },
+    download(file) {
+      // let fileType = fileType(url.assetUrl)
+      // var FileSaver = require("file-saver");
+      // FileSaver.saveAs(url.assetUrl);
+      let url = file.assetUrl, 
+          index= url.lastIndexOf('.')
+      downLoadFile(url, file.assetTitle)
+    },
+    delAsset(index) {
+      this.homeWork.assets.splice(index,1)
+    },
     handleSuccess() {
       this.routerType = "success";
       let chapterArr = JSON.parse(localStorage.getItem("localInteractId"));
@@ -333,5 +396,27 @@ export default {
 };
 </script>
 
-<style>
+<style <style lang="stylus" scoped>
+.box
+  display flex
+  align-items center
+  justify-content space-between
+  width 80%
+  height 70px
+  background rgb(248, 248, 248)
+  border 1px solid rgb(220, 220, 220)
+  margin 10px 0
+  margin-right 10px  
+  .pic_title
+    display flex
+    justify-content center 
+    align-items center
+    margin-left 10px
+    & span
+      margin-left 10px     
+  .operate
+    font-size:13px
+    & span
+      margin-right 10px
+      cursor pointer
 </style>

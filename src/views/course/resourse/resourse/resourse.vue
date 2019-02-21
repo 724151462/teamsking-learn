@@ -125,7 +125,7 @@
     <el-dialog
         title="资源预览"
         :visible.sync="resourceViewDialog"
-        width="60%">
+        width="60%" :before-close="handleVideoClose">
       <div style="width: 100%">
         <div style="margin: 0 auto; width: 80%" v-if="resourceObj.resourceType === 40">
           <img :src="resourceObj.resourceUrl" style="height: 600px;width: 100%"/>
@@ -134,7 +134,7 @@
           <iframe :src="resourceObj.docUrl" frameborder="0" style="height: 600px;width: 100%"></iframe>
         </div>
         <div style="margin: 0 auto; width: 80%" v-else-if="resourceObj.resourceType === 10">
-          <videoPlayer ref="video" :isMp4="resourceObj.resourceUrl"></videoPlayer>
+          <videoPlayer ref="video" :isMp4="resourceObj.resourceUrl" :state="videoState" @resetStatus="resetStatus"></videoPlayer>
         </div>
       </div>
     </el-dialog>
@@ -162,6 +162,7 @@ import { setTimeout } from 'timers';
     data() {
       return {
         resourceViewDialog: false,
+        videoState: false,
         fileKind:'resource',
         imgSrc: {
           folder: require("../../../../assets/images/folder.png"),
@@ -235,6 +236,16 @@ import { setTimeout } from 'timers';
       //     this.$refs.video.onPlayerPause()
       //   }
       // },
+      // 弹窗关闭前视频停止
+      handleVideoClose() {
+        this.videoState = true
+        // this.videoState = false
+        this.resourceViewDialog = false
+      },
+      // 重置视频播放状态
+      resetStatus(value) {
+        this.videoState = value
+      },
       // 预览
       preView(resource) {
         console.log(resource)

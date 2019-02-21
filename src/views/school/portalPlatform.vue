@@ -15,10 +15,10 @@
       </div>
     </el-form-item>
     <el-form-item label="logo" required>
-      <upOss :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo"></upOss>
+      <upOss :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo" :fileKind="'img'"></upOss>
     </el-form-item>
     <el-form-item label="平台图片" required>
-      <upOss :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic"></upOss>
+      <upOss :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic" :fileKind="'img'"></upOss>
     </el-form-item>
     <el-button type="primary" @click="saveInfo" style="margin-left: 200px;margin-top: 20px">保存</el-button>
   </el-form>

@@ -96,13 +96,7 @@ export default {
       data: [],
       selectValue: '',
       sellTime: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }],
+      options: [],
       isDialog: false,
       isActice:true,
       listQuery: {
@@ -125,6 +119,7 @@ export default {
     courseType(type = '') {
       type ? this.isActice = false : this.isActice = true
       this.listQuery.courseStatus = type
+      this.listQuery.pageIndex = 1
       coursePage(this.listQuery).then(res => {
         if (res.code === 200) {
           this.data = res.data.pageData
