@@ -83,10 +83,6 @@ export function matchReg(str) {
   let reg = /<\/?.+?\/?>/g;
   return str.replace(reg, "");
 }
-//错误信息处理
-export function  getErrorMsg(res) {
-  return res.split('|')[res.split('|').length-1]
-}
 
 // 下载
 export function downLoadFile(url, fileName) {
@@ -148,8 +144,6 @@ export function fileType(name){
 
   return fileType
 }
->>>>>>> jia
-=======
 /***
 *错误信息处理
  * 参数：后台返回的错误消息
@@ -163,4 +157,3 @@ export function  getErrorMsg(res) {
 function insert_url(url){
   return 'https' + url.substring(4)
 }
->>>>>>> caf8dcb255ae339ce70eda3d987ff484c70b3b24
