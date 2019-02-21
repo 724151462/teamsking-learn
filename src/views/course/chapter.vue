@@ -82,10 +82,10 @@
                         >
                       </el-tooltip>
                       <img
-                          :src="require('../../assets/images/txt.png')"
-                          style="margin-left: 5px"
-                          height="18px"
-                        >
+                        :src="require('../../assets/images/txt.png')"
+                        style="margin-left: 5px"
+                        height="18px"
+                      >
                     </div>
                   </div>
                   <div class="operate">
@@ -193,7 +193,10 @@
                 placeholder="输入00:00:00格式"
                 @blur="saveAddTime(subject)"
               >
-              <span v-if="subject.timeFormatTip === true" style="color:red;margin-left:2px">输入00:00:00格式</span>
+              <span
+                v-if="subject.timeFormatTip === true"
+                style="color:red;margin-left:2px"
+              >输入00:00:00格式</span>
             </div>
             <div class="subject-operate">
               <span>预览</span>
@@ -368,8 +371,7 @@ export default {
       // 添加题目对话框
       quizList: [],
       subjectVisible: false,
-      subjectList: [
-      ],
+      subjectList: [],
       // 题目弹窗的视频地址
       videoUrl: "",
       // 课程资源
@@ -427,9 +429,9 @@ export default {
     getTestFileFold({
       quizType: 0,
       searchKey: ""
-    }).then(response=> {
+    }).then(response => {
       this.quizList = this.filterQuizData(response.data);
-    })
+    });
   },
   methods: {
     getChapterList() {
@@ -592,7 +594,7 @@ export default {
           this.delChapterEnsure();
         case "delItem":
           this.delItemEnsure();
-        case 'delSubject':
+        case "delSubject":
           this.delSubjectEnsure();
         default:
           break;
@@ -732,23 +734,27 @@ export default {
       console.log("题目所在的内容", subject);
       this.videoUrl = subject.resourceUrl;
       this.coverUrl = subject.coverUrl;
-      this.tempItems = subject
+      this.tempItems = subject;
       this.subjectList = [];
-      subjectGet({itemId: subject.itemId})
-      .then(response=> {
-          response.data.forEach((element, i) => {  
-            console.log(Math.floor(element.timePoint / 3600))
-            let hour = Math.floor(element.timePoint / 3600);
-            let minute = element.timePoint > 60 ? Math.floor((element.timePoint - (hour * 3600)) / 60) : 0;
-            let second = element.timePoint % 60;
-            hour = String(hour).length === 1 ? '0' + String(hour) : String(hour)
-            minute = String(minute).length === 1 ? '0' + String(minute) : String(minute)
-            second = String(second).length === 1 ? '0' + String(second) : String(second)
-            element.time = `${hour}:${minute}:${second}`
-            element.timeFormatTip = false
-          });
-          this.subjectList = response.data
-      })
+      subjectGet({ itemId: subject.itemId }).then(response => {
+        response.data.forEach((element, i) => {
+          console.log(Math.floor(element.timePoint / 3600));
+          let hour = Math.floor(element.timePoint / 3600);
+          let minute =
+            element.timePoint > 60
+              ? Math.floor((element.timePoint - hour * 3600) / 60)
+              : 0;
+          let second = element.timePoint % 60;
+          hour = String(hour).length === 1 ? "0" + String(hour) : String(hour);
+          minute =
+            String(minute).length === 1 ? "0" + String(minute) : String(minute);
+          second =
+            String(second).length === 1 ? "0" + String(second) : String(second);
+          element.time = `${hour}:${minute}:${second}`;
+          element.timeFormatTip = false;
+        });
+        this.subjectList = response.data;
+      });
       this.subjectVisible = true;
     },
     filterData(data) {
@@ -801,12 +807,12 @@ export default {
       //   alert("亲，3题差不多了哦");
       //   return;
       // } else {
-        this.subjectList.push({ timePoint: "", timeFormatTip: false });
+      this.subjectList.push({ timePoint: "", timeFormatTip: false });
       // }
     },
     // 保存时间点
     saveAddTime(subject) {
-      console.log(subject)
+      console.log(subject);
       if (
         subject.time.split(":").length - 1 !== 2 ||
         subject.time.length !== 8
@@ -816,10 +822,12 @@ export default {
         subject.timeFormatTip = false;
       }
       let timeSplit = subject.time.split(":");
-      let second = 
-          Number(timeSplit[0]) * 3600 + Number(timeSplit[1]) * 60 + Number(timeSplit[2]);
-      console.log(timeSplit[0],timeSplit[1],timeSplit[2],second)
-      subject.timePoint = second
+      let second =
+        Number(timeSplit[0]) * 3600 +
+        Number(timeSplit[1]) * 60 +
+        Number(timeSplit[2]);
+      console.log(timeSplit[0], timeSplit[1], timeSplit[2], second);
+      subject.timePoint = second;
     },
     // 删除时间点
     delSubject(index) {
@@ -833,17 +841,16 @@ export default {
       this.delDialog = true;
     },
     delSubjectEnsure() {
-      subjectDel(this.delDialogParm.ids)
-      .then(response=> {
-        if(response.code === 200) {
+      subjectDel(this.delDialogParm.ids).then(response => {
+        if (response.code === 200) {
           this.subjectList.splice(this.delDialogParm.subjectIndex, 1);
           this.$message({
-            message: '删除内嵌题成功',
-            type: 'success'
-          })
-          this.delDialog = false
+            message: "删除内嵌题成功",
+            type: "success"
+          });
+          this.delDialog = false;
         }
-      })
+      });
     },
     // 编辑题目弹窗
     editSubject(index) {
@@ -854,9 +861,11 @@ export default {
     },
     // 选完题确认按钮
     editEnsure() {
-      this.subjectList[this.sourceSubListIndex].courseId = this.courseId
-      this.subjectList[this.sourceSubListIndex].itemId = this.tempItems.itemId
-      this.subjectList[this.sourceSubListIndex].videoId = this.tempItems.contentId
+      this.subjectList[this.sourceSubListIndex].courseId = this.courseId;
+      this.subjectList[this.sourceSubListIndex].itemId = this.tempItems.itemId;
+      this.subjectList[
+        this.sourceSubListIndex
+      ].videoId = this.tempItems.contentId;
       this.subjectList[this.sourceSubListIndex].title = this.subjPick;
       this.editSubjectVisible = false;
       console.log("题目列表对象", this.subjectList);
@@ -865,32 +874,29 @@ export default {
     saveAllSubj() {
       console.log(this.subjectList);
       this.subjectList.forEach(element => {
-        if(element.timeFormatTip === true){
+        if (element.timeFormatTip === true) {
           this.$message({
-            message: '时间点格式有误',
-            type: 'warning'
-          })
-          return
-        }else{
-          subjectAdd(element)
-        .then(response=> {
-          if(response.code === 200) {
-            this.$message({
-              message: '添加内嵌题成功',
-              type: 'success'
-            })
-            this.subjectVisible = false;
-          }else{
-            this.$message({
-              message: '添加失败,请选择题目',
-              type: 'warning'
-            })
-          }
-        })
+            message: "时间点格式有误",
+            type: "warning"
+          });
+          return;
+        } else {
+          subjectAdd(element).then(response => {
+            if (response.code === 200) {
+              this.$message({
+                message: "添加内嵌题成功",
+                type: "success"
+              });
+              this.subjectVisible = false;
+            } else {
+              this.$message({
+                message: "添加失败,请选择题目",
+                type: "warning"
+              });
+            }
+          });
         }
       });
-      
-      
     },
     // 选中的文件
     checkedFiles(checkedList) {
@@ -927,7 +933,8 @@ export default {
         });
         return false;
       }
-      this.subjectList[this.sourceSubListIndex].quizId = checkedList[0].resourceId
+      this.subjectList[this.sourceSubListIndex].quizId =
+        checkedList[0].resourceId;
     },
     // 本地上传视频
     getVideoUrl(...params) {
