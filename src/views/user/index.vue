@@ -246,7 +246,7 @@
   import * as userApi from '@/api/user'
   import UpOss from "../../components/up-oss";
   import userHeader from './userHeader'
-  import {teacherInfo} from "../../api/user";
+  import {getErrorMsg} from "../../utils/utils";
 
   export default {
     name: "index",
@@ -454,10 +454,20 @@
           }
         })
       },
-      //更换头像
-      changeAvatar(url , name){
-          this.infoForm.avatar = url
-          this.changeInfo()
+      //修改头像
+      changeAvatar(url){
+        let data = {avatar : this.infoForm.avatar = url}
+        userApi.changeUserAvatar(data).then(res=>{
+          if(Number(res.code) === 200) {
+            // this.$message.success('修改成功')
+            this.initUserInfo()
+          }else {
+            this.$message.error(getErrorMsg(res.msg))
+          }
+        }).catch(err=>{
+          console.log(err)
+        })
+        this.changeInfo()
       },
       //修改本人信息
       changeInfo(){
@@ -467,12 +477,8 @@
             if(Number(res.code) === 200) {
                 this.$message.success('修改成功')
                 this.initUserInfo()
-            }else if(Number(res.code) === 440){
-                let msgs = JSON.parse(res.msg)
-                this.$message({
-                    message:msgs[0].message,
-                    type:'error'
-                })
+            }else {
+               this.$message.error(getErrorMsg(res.msg))
             }
         })
       },

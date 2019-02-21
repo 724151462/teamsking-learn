@@ -15,22 +15,22 @@
                 <el-select
                   filterable
                   class="input-item"
-                  v-model="data.tenantId"
-                  :filter-method="searchTenant"
+                  v-model="searchKey"
+                  :filter-method="schoolInit"
                   placeholder="请选择学校">
                   <el-option
                     v-for="item in schoolList"
                     :key="item.tenantId"
                     :label="item.tenantName"
-                    :value="item.tenantId">
+                    :value="item.tenantName">
                   </el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="" prop="userName">
-                <el-input placeholder="工号/邮箱/电话号码" v-model="data.userName" class="input-item"></el-input>
+                <el-input placeholder="工号/电话号码" v-model="data.userName" class="input-item"></el-input>
               </el-form-item>
               <el-form-item label="" prop="password" style="margin-bottom: 10px">
-                <el-input placeholder="密码" v-model="data.password" class="input-item"></el-input>
+                <el-input type="password" placeholder="密码" v-model="data.password" class="input-item"></el-input>
               </el-form-item>
               <el-form-item style="margin-bottom: 0">
                 <div class="input-item" style="text-align: left">
@@ -55,7 +55,7 @@
         <div class="forgot-box" v-show="!forgotPass.isMail">
           <el-input type="text" placeholder="手机号" class="forgot-item" v-model="forgotPass.forgotForm.mobile" style="width: 300px"></el-input>
           <div>
-            <el-input type="password" placeholder="验证码" v-model="forgotPass.forgotForm.code" class="forgot-item" style="width: 210px;margin-right: 20px"></el-input>
+            <el-input type="text" placeholder="验证码" v-model="forgotPass.forgotForm.code" class="forgot-item" style="width: 210px;margin-right: 20px"></el-input>
             <el-button
               type="primary"
               :disabled="forgotPass.codeBtn"
@@ -63,7 +63,8 @@
               plain>{{forgotPass.codeBtn ? `${forgotPass.codeBtnTime}s` : '获取'}}</el-button>
           </div>
           <el-input type="password" placeholder="设置新密码" class="forgot-item" v-model="forgotPass.forgotForm.password" style="width: 300px"></el-input>
-          <el-input type="password" placeholder="确认新密码" class="forgot-item" v-model="forgotPass.forgotForm.rePassWord" style="width: 300px"></el-input>
+          <el-input type="password" placeholder="确认新密码" class="forgot-item" v-model="forgotPass.forgotForm.rePassWord" style="width: 300px;margin-bottom: 10px"></el-input>
+          <p style="color: red">新密码请使用字母+数字的组合</p>
           <div style="color: #b5b5b5;user-select: none">
             使用账号绑定的
             <el-button type="text" @click="changeMobile">手机号</el-button>或
@@ -84,8 +85,9 @@
           </div>
           <div v-else>
             <el-input type="password" placeholder="设置新密码" class="forgot-item" v-model="forgotPass.forgotForm.password" style="width: 300px"></el-input>
-            <el-input type="password" placeholder="确认新密码" class="forgot-item" v-model="forgotPass.forgotForm.rePassWord" style="width: 300px"></el-input>
+            <el-input type="password" placeholder="确认新密码" class="forgot-item" v-model="forgotPass.forgotForm.rePassWord" style="width: 300px;margin-bottom: 10px"></el-input>
           </div>
+          <p style="color: red">新密码请使用字母+数字的组合</p>
           <div style="color: #b5b5b5;user-select: none">
             使用账号绑定的
             <el-button type="text" @click="()=>{forgotPass.isMail = false;forgotPass.forgotForm.mail = ''}">手机号</el-button>或
@@ -147,24 +149,32 @@
       }
     },
     created () {
-      getTenant().then(res => {
-        // console.log(res)
-        if (res.code === 200) {
-          this.schoolList = res.data
-        }else{
-          this.$message.error('获取学校信息失败，请重试')
-        }
-      }).catch(error => {
-        console.log(error)
-      })
+      this.schoolInit()
     },
     methods: {
+      schoolInit(key = ''){
+        let data = {searchKey:key}
+        getTenant(data).then(res => {
+          // console.log(res)
+          if (res.code === 200) {
+            this.schoolList = res.data
+          }else{
+            this.$message.error('获取学校信息失败，请重试')
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      },
       goLogin () {
-        let data = {
-          tenantId: this.data.tenantId,
-          loginAccount: this.data.userName,
-          passwd: this.data.password
-        }
+        let tenant = this.schoolList.find((value)=>{
+          return value.tenantName == this.searchKey
+        })
+        let tenantId = tenant ? tenant.tenantId : '',
+             data = {
+              tenantId: tenantId,
+              loginAccount: this.data.userName,
+              passwd: this.data.password
+            };
         logins(data).then(res => {
           // console.log(res)
           if (res.code === 200) {
@@ -203,19 +213,6 @@
           console.log(error)
         })
       },
-      searchTenant(query){
-        let data = {searchKey: query}
-        getTenant(data).then(res => {
-          // console.log(res)
-          if (res.code === 200) {
-            this.schoolList = res.data
-          }else{
-            this.$message.error(getErrorMsg(res.msg))
-          }
-        }).catch(error => {
-          console.log(error)
-        })
-      },
       //切换为手机号方式
       changeMobile(){
         this.forgotPass.isMail = false;
@@ -229,7 +226,7 @@
       },
       //切换为邮箱方式
       changeMail(){
-        this.forgotPass.isMail = false;
+        this.forgotPass.isMail = true;
         this.forgotPass.codeBtn = false,
         this.forgotPass.codeBtnTime = 0,
         this.forgotPass.forgotForm.email=''
@@ -263,8 +260,15 @@
           .catch(err=>{console.log(err)})
       },
       getMailCode(){
+        let loading = this.$loading({
+          lock: true,
+          text: '正在发送验证码，请稍候',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         emailForgot({mail:this.forgotPass.forgotForm.email})
           .then(res=>{
+            loading.close()
             if (res.code === 200) {
               this.$message.success('验证码成功发送至邮箱')
               //限时
@@ -284,11 +288,15 @@
               this.$message.error(getErrorMsg(res.msg))
             }
           })
-          .catch(err=>{console.log(err)})
+          .catch(err=>{
+            loading.close()
+            console.log(err)
+          })
       },
       //手机号重置密码
       mobileRest(){
         let data = {
+          mobile:this.forgotPass.forgotForm.mobile,
           captcha : this.forgotPass.forgotForm.code ,
           newPasswd : this.forgotPass.forgotForm.password ,
           passwdCheck : this.forgotPass.forgotForm.rePassWord
@@ -296,7 +304,9 @@
         mobileFotgotCheck(data)
           .then(res=>{
             if (res.code === 200) {
-              console.log(res)
+              this.$message.success('密码重置成功')
+              this.data.userName = this.forgotPass.forgotForm.mobile
+              this.noRest()
             } else {
               this.$message.error(getErrorMsg(res.msg))
             }
@@ -323,15 +333,16 @@
       //邮箱重置密码
       emailRest(){
         let data = {
-          mail : this.forgotPass.forgotForm.mail ,
+          mail : this.forgotPass.forgotForm.email ,
           newPasswd : this.forgotPass.forgotForm.password ,
           passwdCheck : this.forgotPass.forgotForm.rePassWord
         }
         resetPass(data)
           .then(res=>{
-            console.log(res)
             if (res.code === 200) {
               this.$message.success('密码重置成功')
+              this.data.userName = this.forgotPass.forgotForm.email
+              this.noRest()
             } else {
               this.$message.error(getErrorMsg(res.msg))
             }
