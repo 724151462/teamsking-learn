@@ -90,12 +90,12 @@
         studyVideoRate:[]
       },
       other:{
-        docWatchCount: 2,//文档资源观看
-        loginCount: 3,
+        docWatchCount: 0,//文档资源观看
+        loginCount: 0,
         noteRate: 0,
-        studyBehaviorthRate: null,
-        studyLengthRate: "13",
-        videoCount: 2,
+        studyBehaviorthRate: 0,
+        studyLengthRate: 0,
+        videoCount: 0,
         //docWatchCount: 2,//教案观看
         // libraryCount: 2,  //人均参加活动
         // loginCount: 3,  //登录次数
@@ -527,11 +527,11 @@
     //课后平均学习数据
     learnRateData(data){
       leanRate(data).then(res=>{
-        console.log('课后平均学习度',res.data)
+        // console.log('课后平均学习度',res.data)
         this.learn = res.data
         // console.log(res)
-        this.learnChartInit()
-        this.numChartInit()
+          this.learnChartInit()
+          this.numChartInit()
       }).catch((err)=>{
         console.log(err)
       })
@@ -539,7 +539,7 @@
     //学习时段
     timeBucketData(data){
       timeBucketOther(data).then(res=>{
-        // console.log('学习时段',res.data)
+        console.log('学习时段',res.data)
         delete res.data.cmpTime
         delete res.data.courseId
         delete res.data.courseUserCount

@@ -17,9 +17,7 @@
         <p style="text-align: center">{{student.usreName}}</p>
       </div>
     </div>
-    <div class="fullScreen" @click="fullScreen">
-      <img :src="isFullScreen ? imgSrc.unfull : imgSrc.full" alt="">
-    </div>
+    <full-screen></full-screen>
   </div>
 </template>
 
@@ -29,6 +27,7 @@
     saveSign, signList, changeSign, checkUser
   } from "@/api/course";
   import {getUserInfo} from '@/api/user'
+  import fullScreen from './fullScreen'
   export default {
     name: "check",
     data(){
@@ -43,13 +42,17 @@
         studenlist:[]
       }
     },
+    components:{
+      fullScreen
+    },
     methods: {
-      timeAdd(){
+      timeAdd(miaoNum){
         let _this_ = this
         clearInterval(timer)
         let miao = 0,
-            fen = 0,
-            miaoNum = 0;
+            fen = 0
+
+        miaoNum = 0 || miaoNum;
 
         let timer = setInterval(function() {
           miao +=1
@@ -60,19 +63,11 @@
           }
           fen=parseInt(miaoNum/60);
           miao=parseInt(miaoNum%60);
+
           miao = miao >= 10 ? String(miao) : '0'+miao
           fen = fen >= 10 ? String (fen) : '0'+fen
           _this_.time = (`${fen}:${miao}`)
         }, 1000)
-      },
-      fullScreen(){
-        if (document.fullscreenElement) {
-          document.exitFullscreen()
-          this.isFullScreen = false
-        } else {
-          document.documentElement.requestFullscreen()
-          this.isFullScreen = true
-        }
       },
       //长连接开始签到
       startSign(){
@@ -172,10 +167,6 @@
           })
         );
       }
-    },
-    mounted(){
-      // this.startSign()
-      // this.getClass()
     },
     created(){
       this.courseName = sessionStorage.getItem('courseName')

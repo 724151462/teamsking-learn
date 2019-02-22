@@ -7,10 +7,10 @@
         </div>
         <div class="right">
           <div>
-            <img :src="require('@/assets/images/logo.png')" class="logo-img" alt="">
           </div>
-          <div style="position: relative;height: calc(100% - 85px)">
+          <div style="position: relative;height: 100%">
             <el-form :model="data" ref="data" class="login-box">
+              <img :src="require('@/assets/images/logo.png')" class="logo-img" alt="">
               <el-form-item label="" prop="tenantId">
                 <el-select
                   filterable

@@ -61,14 +61,21 @@
           node-key="catalogId"
           ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
-              <span class="test-info">
-                <img :src="imgSrc.folder" alt="" class="folder-img" v-show="!data.quizId">
+              <div class="test-info">
+                <img
+                  :width="20"
+                  v-if="data.catalogId"
+                  style="margin-right: 3px"
+                  :src="require('@/assets/images/folder.png')"
+                  alt
+                >
+                <!--<img :src="require('@/assets/images/folder.png')" alt="" class="folder-img" style="width: 20px" v-show="!data.quizId">-->
                 <span class="quiz-tag" v-show="data.quizType == 10">单选题</span>
                 <span class="quiz-tag" v-show="data.quizType == 20">多选题</span>
                 <span class="quiz-tag" v-show="data.quizType == 30">主观题</span>
                 <span>{{ node.label }}</span>
-              </span>
-              <span class="hide-button">
+              </div>
+              <div class="hide-button">
                 <span v-if="data.catalogLevel">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
                   <el-button size="mini" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
@@ -79,7 +86,7 @@
                   <el-button size="mini" type="primary" @click.stop="goEditTest(data.quizId)"> 编辑 </el-button>
                   <el-button size="mini" type="primary" @click.stop="delQuiz(data.quizId,data.parentId)">删除</el-button>
                 </span>
-              </span>
+              </div>
 
               <span style="margin-right: 10px" v-show="data.updateTime">{{data.updateTime}}</span>
             </span>
@@ -616,6 +623,8 @@
         text-overflow: ellipsis;
         padding-right: 8px;
         .test-info
+          width 100%;
+          max-width 600px;
           flex: 1;
           overflow: hidden;
           padding-right: 30px;

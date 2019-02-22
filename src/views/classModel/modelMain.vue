@@ -41,22 +41,27 @@
                 <router-view @showCurrentInfo="getCNanme"></router-view>
             </el-main>
         </el-container>
+      <full-screen></full-screen>
     </div>
 </template>
 
 <script>
   import { classOver } from "@/api/course";
+  import fullScreen from './fullScreen'
   export default {
     data(){
-        return{
-            courseName: sessionStorage.getItem('courseName'),
-            active: this.$store.state.modelActive,
-            currentInfo: {
-                chapterName: '',
-                sectionName: ''
-            },
-            isBack:false
-        }
+      return{
+        courseName: sessionStorage.getItem('courseName'),
+        active: this.$store.state.modelActive,
+        currentInfo: {
+          chapterName: '',
+          sectionName: ''
+        },
+        isBack:false
+      }
+    },
+    components:{
+      fullScreen
     },
     created() {
     //   this.handleSelect(this.$store.state.modelActive)
@@ -71,12 +76,12 @@
     },
     methods: {
        getCNanme(value) {
-           this.currentInfo = value
+         this.currentInfo = value
       },
       handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-          console.log('当前链接状态',this.$store.state.socket.isConnect)
-          switch(key) {
+        // console.log(key, keyPath);
+        // console.log('当前链接状态',this.$store.state.socket.isConnect)
+        switch(key) {
             case '1':
             this.$router.push({
               path: '/course/modelChapter',

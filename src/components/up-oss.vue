@@ -111,10 +111,10 @@
           loading.close()
           // console.log('then返回',results)
           //http://tskedu-course.oss-cn-beijing.aliyuncs.com/ + name = 完整的url
-          self.$message({
-            message:'上传成功',
-            type:'success'
-          })
+          // self.$message({
+          //   message:'上传成功',
+          //   type:'success'
+          // })
           Number(self.isError) !== 2 ? (self.isError = 2) : ''
           let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + dir
           this.inputNull()

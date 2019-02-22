@@ -38,7 +38,7 @@
       </div>
       <el-dropdown class="avator">
         <span class="el-dropdown-link userinfo-inner">
-            <img :src="require('../../assets/images/user.png')" alt>
+            <img :src="$store.state.userAvatar" alt style="width: 35px;height: 35px">
             <span>{{this.realName}}</span>
             <i class="el-icon-caret-bottom"></i>
           </span>
@@ -91,6 +91,7 @@ export default {
         }
       ],
       realName: "",
+      userAvatar: require('../../assets/images/user.png'),
       menuList: constantRouterMap,
       nameInit: "",
       msgNumber:1,
@@ -98,8 +99,6 @@ export default {
     };
   },
   created() {
-    // menuList().then((response)=>{
-    // console.log(this.storeNav, '``````', response.data)
     this.$store.commit("setAllMenu", this.menuList);
     this.fetchNavData();
     this.getUserInfo();
@@ -163,9 +162,10 @@ export default {
     getUserInfo() {
       let data = getUserId();
       getMeInfo().then(res => {
-        // console.log(res);
+        console.log(res);
         if (Number(res.code) === 200) {
           this.realName = res.data.realName;
+          Boolean(res.data.avatar) ? this.$store.commit('CHANGE_AVATAR', res.data.avatar): '';
           sessionStorage.setItem("realName", res.data.realName);
           sessionStorage.setItem("tenantId", res.data.gender);
         } else {

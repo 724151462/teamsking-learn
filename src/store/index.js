@@ -13,7 +13,9 @@ const state = {
   topNavState: 'course',
   leftNavState: 'course' ,
   modelActive: Cookie.get('modelActive') || "1",
-  msgNum:0
+  msgNum:0,
+  isFullScreen:false,
+  userAvatar:require('@/assets/images/user.png')
 }
 
 const mutations = {
@@ -26,11 +28,46 @@ const mutations = {
       state.allMenu.push(element)
     });
   },
+  //修改未读消息
   MSG_READY:(state, data)=>{
     state.msgNum = state.msgNum - Number(data)
   },
   SET_MSG:(state, data)=>{
     state.msgNum = Number(data)
+  },
+  //修改用户头像
+  CHANGE_AVATAR:(state, data)=>{
+    state.userAvatar = data
+  },
+  //全屏
+  SET_FULLSCREEN(state, data){
+    if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) {
+        document.documentElement.msRequestFullscreen();
+
+      } else if (document.documentElement.mozRequestFullScreen) {
+        document.documentElement.mozRequestFullScreen();
+
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+      }
+      state.isFullScreen = true
+      // console.log('全屏')
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+      state.isFullScreen = false
+      // console.log('退出全屏')
+    }
   }
 }
 

@@ -310,7 +310,7 @@ export default {
 
     .button
       float: right
-      text-align:center
+      text-align:right
 
       .top
         margin-top:30px;
