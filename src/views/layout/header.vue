@@ -100,7 +100,6 @@ export default {
     };
   },
   created() {
-<<<<<<< HEAD
     // menuList().then((response)=>{
     // console.log(this.storeNav, '``````', response.data)
     this.nav = this.$router.options.routes.filter(item=> {
@@ -109,8 +108,6 @@ export default {
         }
       }
     )
-=======
->>>>>>> zone98f
     this.$store.commit("setAllMenu", this.menuList);
     this.fetchNavData();
     this.getUserInfo();
