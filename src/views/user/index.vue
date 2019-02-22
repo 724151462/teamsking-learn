@@ -371,6 +371,7 @@
           loading.close()
           if(Number(res.code) === 200) {
             console.log(res.data)
+            // res.data.
             this.userInfo = JSON.parse(JSON.stringify(res.data))
             this.infoForm = JSON.parse(JSON.stringify(res.data))
           }else{
@@ -453,12 +454,24 @@
         let data = {avatar : this.infoForm.avatar = url}
         userApi.changeUserAvatar(data).then(res=>{
           if(Number(res.code) === 200) {
-            this.$message.success('修改成功')
-            this.initUserInfo()
+            this.$message.success('头像更换成功')
+            this.$store.commit('CHANGE_AVATAR', res.data)
+            // this.initUserInfo()
           }else {
             this.$message.error(getErrorMsg(res.msg))
           }
-        }).catch(err=>{
+        }).then(()=>{
+          userApi.getMeInfo().then(res=>{
+            if(Number(res.code) === 200) {
+              console.log(res.data)
+              this.userInfo = JSON.parse(JSON.stringify(res.data))
+              this.infoForm = JSON.parse(JSON.stringify(res.data))
+            }else{
+              this.$message.error(getErrorMsg(res.msg))
+            }
+          })
+        })
+          .catch(err=>{
           console.log(err)
         })
         // this.changeInfo()
@@ -468,6 +481,7 @@
         let data = this.infoForm
         console.log(data)
         userApi.changeUserInfo(data).then(res=>{
+          console.log(res)
             if(Number(res.code) === 200) {
                 this.$message.success('修改成功')
                 // this.initUserInfo()

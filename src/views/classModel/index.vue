@@ -6,9 +6,10 @@
             <div style="font-size: 2em">{{this.teacherName}}</div>
             <div style="font-size: 2.5em;cursor: pointer" @click="enterClass">进入课堂</div>
             <div style="display:flex; align-items: flex-start; width: 100%; font-size: 2em"><span style="margin-left:1em">课程号:{{this.courseCode}}</span></div>
-            <div class="fullScreen" @click="toggleFullScreen">
-              <img :src="isFullScreen ? imgSrc.unfull : imgSrc.full" alt="">
-            </div>
+            <!--<div  style="position : fixed;bottom :20px;right: 20px;" class="fullScreen" @click="full()">-->
+              <!--<img :src="$store.state.isFullScreen ? require('@/assets/images/unfull.png') : require('@/assets/images/full.png') " alt="">-->
+            <!--</div>-->
+            <full-screen></full-screen>
         </div>
         <el-dialog title="提示"
                   :visible.sync="dialogVisible"
@@ -27,7 +28,8 @@
 
 <script>
 import { classingInfo, classOver, classSave ,courseBaseInfo } from "@/api/course";
-import {connect} from "@/utils/utils"
+import {toggleFullScreen} from "@/utils/utils"
+import fullScreen from './fullScreen'
 import Cookie from "js-cookie";
 export default {
     data(){
@@ -35,15 +37,16 @@ export default {
         courseName:'',
         courseCode:'',
         teacherName:'',
-        isFullScreen: false,//是否全屏
-        imgSrc :{
-          full: require("@/assets/images/full.png"),
-          unfull: require("@/assets/images/unfull.png"),
-          },
         dialogVisible:false
       }
     },
+    components:{
+      fullScreen
+    },
     methods: {
+      full(){
+        this.$store.commit('SET_FULLSCREEN')
+      },
       //获取课程信息
       initCourse(){
         courseBaseInfo(this.$route.query.id).then((res)=>{
@@ -52,16 +55,6 @@ export default {
           this.$store.commit('SAVE_NAME',res.data.courseName)
           sessionStorage.setItem('courseName',res.data.courseName)
         })
-      },
-      //获取教师
-      fullScreen() {
-        if (document.fullscreenElement) {
-          document.exitFullscreen()
-          this.isFullScreen = false
-        } else {
-          document.documentElement.requestFullscreen()
-          this.isFullScreen = true
-        }
       },
       enterClass() {
         let loading = this.$loading({
@@ -177,35 +170,6 @@ export default {
           }
         });
       },
-      toggleFullScreen() {
-        if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
-          if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen();
-          } else if (document.documentElement.msRequestFullscreen) {
-            document.documentElement.msRequestFullscreen();
-
-          } else if (document.documentElement.mozRequestFullScreen) {
-            document.documentElement.mozRequestFullScreen();
-
-          } else if (document.documentElement.webkitRequestFullscreen) {
-            document.documentElement.webkitRequestFullscreen();
-          }
-            this.isFullScreen = true
-          // console.log('全屏')
-        } else {
-          if (document.exitFullscreen) {
-            document.exitFullscreen();
-          } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-          } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-          } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-          }
-          this.isFullScreen = false
-          // console.log('退出全屏')
-        }
-      },
     },
     created(){
       this.teacherName = sessionStorage.getItem('realName')
@@ -218,6 +182,7 @@ export default {
           this.toggleFullScreen()
         }
       }
+      sessionStorage.setItem('isFullScreen','')
     },
     mounted() {
       this.initCourse()
@@ -257,9 +222,5 @@ export default {
             width 90%
             height 90%
             border 10px solid #fff
-            .fullScreen
-              position fixed
-              bottom 20px;
-              right 20px;
 </style>
 

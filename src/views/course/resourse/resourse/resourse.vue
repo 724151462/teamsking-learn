@@ -3,7 +3,7 @@
     <div class="title">
       <div>资源管理</div>
     </div>
-    <div class="radio-group">
+    <div class="radio-group" style="overflow: hidden">
       <div style="flex:1">
         <el-radio v-model="radio" :label="0" @change="radioChange(radio)">全部文件</el-radio>
         <el-radio v-model="radio" :label="40" @change="radioChange(radio)">图片</el-radio>
@@ -49,17 +49,17 @@
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
-              <span class="test-info">
-                <img :src="imgSrc.folder" alt="" class="folder-img" v-show="!data.resourceId">
-                <img :src="imgSrc.mp4" alt="" class="folder-img" v-if="data.resourceType == 10">
-                <img :src="imgSrc.word" alt="" class="folder-img" v-else-if="data.resourceType == 20">
-                <img :src="imgSrc.pdf" alt="" class="folder-img" v-else-if="data.resourceType == 30">
-                <img :src="imgSrc.img" alt="" class="folder-img" v-else-if="data.resourceType == 40">
+              <div class="test-info">
+                <img :width="20" v-if="!data.resourceId" style="margin-right: 3px" :src="require('@/assets/images/folder.png')" alt="">
+                <img :src="imgSrc.mp4" alt="" :width="25" :height="25" v-else-if="data.resourceType == 10">
+                <img :src="imgSrc.word" alt="" :width="25" :height="25" v-else-if="data.resourceType == 20">
+                <img :src="imgSrc.pdf" alt="" :width="25" :height="25" v-else-if="data.resourceType == 30">
+                <img :src="imgSrc.img" alt="" :width="25" :height="25" v-else-if="data.resourceType == 40">
                 <span class="tree-title">{{ node.label }}</span>
                 <!--<span v-if="data.srtUrl != undefined"> <el-tag type="success">字幕</el-tag></span>-->
                 <span class="str-tag" v-if="data.srtUrl != undefined">字幕</span>
-              </span>
-              <span>
+              </div>
+              <div>
                 <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
                   <el-button size="mini" type="primary" v-show="data.catalogLevel" @click.stop="goUp(data.catalogId)"><label for="male">上传</label></el-button>
@@ -77,7 +77,7 @@
                   <span>{{data.createTime}}</span>
                   <!--<span>预览</span>-->
                 </span>
-              </span>
+              </div>
               <span style="margin-right: 10px" v-show="data.updateTime">{{data.updateTime}}</span>
             </span>
         </el-tree>
@@ -744,8 +744,6 @@ import { setTimeout } from 'timers';
         align-items center
         background-color #f4f4f4
       .test-body
-        .folder-img
-          width: 20px;margin: -5px 10px;
         .test-tree-node
           flex: 1;
           display: flex;

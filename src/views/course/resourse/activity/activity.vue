@@ -47,8 +47,9 @@
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
-              <span class="test-info">
-                <img :src="imgSrc.folder" alt="" class="folder-img" v-show="!data.interactionId">
+              <div class="test-info">
+              <img :width="20" v-if="!data.interactionId" style="margin-right: 3px" :src="require('@/assets/images/folder.png')" alt="">
+                <!--<img :src="imgSrc.folder" alt="" :width="20" v-show="!data.interactionId">-->
                 <span class="quiz-tag" v-if="data.interactionType == 30">测试</span>
                 <span class="quiz-tag" v-else-if="data.interactionType == 40">作业</span>
                 <span class="quiz-tag" v-else-if="data.interactionType == 50">头脑风暴</span>
@@ -56,8 +57,8 @@
                 <span class="quiz-tag" v-else-if="data.interactionType == 70">讨论</span>
                 <span>{{ node.label }}</span>
                 <!--<span v-if="data.interactionId" class="golook" style="margin-left: 20px" @click="showAc(data.interactionId,data.interactionType)">查看</span>-->
-              </span>
-              <span>
+              </div>
+              <div>
                 <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>
                   <el-button size="mini" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
@@ -67,8 +68,7 @@
                   <!--<el-button size="mini" type="primary" @click.stop="goEditTest(data.interactionId)"> 编辑 </el-button>-->
                   <!--<el-button size="mini" type="primary" @click.stop="delAc(data.interactionId)">删除</el-button>-->
                 </span>
-              </span>
-
+              </div>
               <span style="margin-right: 10px" v-show="data.updateTime">{{data.createTime}}</span>
             </span>
         </el-tree>
@@ -586,8 +586,6 @@
         align-items center
         background-color #f4f4f4
       .test-body
-        .folder-img
-          width: 20px;margin: -5px 10px;
         .test-tree-node
           flex: 1;
           display: flex;

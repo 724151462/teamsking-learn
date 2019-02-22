@@ -14,9 +14,7 @@
     <div class="outBtn">
       <el-button  type="primary" @click="closeSign">结束签退</el-button>
     </div>
-    <div class="fullScreen" @click="toggleFullScreen">
-      <img :src="isFullScreen ? imgSrc.unfull : imgSrc.full" alt="">
-    </div>
+    <full-screen></full-screen>
   </div>
 </template>
 
@@ -25,6 +23,7 @@
     classingInfo, classOver, classSave ,
     saveSign, signList, changeSign, checkUser
   } from "@/api/course";
+  import fullScreen from './fullScreen'
   import {getUserInfo} from '@/api/user'
   export default {
     name: "checked",
@@ -33,43 +32,13 @@
         courseName:'',
         isFullScreen: false,//是否全屏
         time:'00:00',
-        imgSrc :{
-          full: require("@/assets/images/full.png"),
-          unfull: require("@/assets/images/unfull.png"),
-        },
         studenlist:[]
       }
     },
+    components:{
+      fullScreen
+    },
     methods:{
-      toggleFullScreen() {
-        if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
-          if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen();
-          } else if (document.documentElement.msRequestFullscreen) {
-            document.documentElement.msRequestFullscreen();
-
-          } else if (document.documentElement.mozRequestFullScreen) {
-            document.documentElement.mozRequestFullScreen();
-
-          } else if (document.documentElement.webkitRequestFullscreen) {
-            document.documentElement.webkitRequestFullscreen();
-          }
-          this.isFullScreen = true
-          // console.log('全屏')
-        } else {
-          if (document.exitFullscreen) {
-            document.exitFullscreen();
-          } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-          } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-          } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-          }
-          this.isFullScreen = false
-          // console.log('退出全屏')
-        }
-      },
       //长连接开始签到
       startSign(){
         let tagClient = window.STOMP_CLIENT,

@@ -66,7 +66,7 @@ export function readMsg (data) {
  * 修改头像
  * */
 export function changeUserAvatar (data) {
-  return commonsAjax(`${studyUrl}avatar`, data, 'get')
+  return commonsAjax(`${studyUrl}avatar/`, data, 'post')
 }
 
 /**
