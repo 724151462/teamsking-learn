@@ -3,7 +3,7 @@
     <div class="title">
       <div>资源管理</div>
     </div>
-    <div class="radio-group">
+    <div class="radio-group" style="overflow: hidden">
       <div style="flex:1">
         <el-radio v-model="radio" :label="0" @change="radioChange(radio)">全部文件</el-radio>
         <el-radio v-model="radio" :label="40" @change="radioChange(radio)">图片</el-radio>
@@ -50,9 +50,8 @@
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
               <div class="test-info">
-              <img :width="20" v-if="!data.resourceId" style="margin-right: 3px" :src="require('@/assets/images/folder.png')" alt="">
-                <!--<img :src="imgSrc.folder" alt="" :width="20" v-show="!data.resourceId">-->
-                <img :src="imgSrc.mp4" alt="" :width="25" :height="25" v-if="data.resourceType == 10">
+                <img :width="20" v-if="!data.resourceId" style="margin-right: 3px" :src="require('@/assets/images/folder.png')" alt="">
+                <img :src="imgSrc.mp4" alt="" :width="25" :height="25" v-else-if="data.resourceType == 10">
                 <img :src="imgSrc.word" alt="" :width="25" :height="25" v-else-if="data.resourceType == 20">
                 <img :src="imgSrc.pdf" alt="" :width="25" :height="25" v-else-if="data.resourceType == 30">
                 <img :src="imgSrc.img" alt="" :width="25" :height="25" v-else-if="data.resourceType == 40">

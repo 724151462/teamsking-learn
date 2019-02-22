@@ -36,7 +36,7 @@
           </el-badge>
         </router-link>
       </div>
-      <el-dropdown class="avator">
+      <el-dropdown class="avator" trigger="click">
         <span class="el-dropdown-link userinfo-inner">
             <img :src="$store.state.userAvatar" alt style="width: 35px;height: 35px">
             <span>{{this.realName}}</span>
