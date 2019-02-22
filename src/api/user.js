@@ -8,6 +8,10 @@ const infoDev = 'http://192.168.10.48:9008/api/v1/sys/user/info/' // 开发环�
 const infoProd = 'http://120.36.137.90:9008/api/v1/sys/user/info/' // 生产环境
 const infoUrl = process.env.NODE_ENV === 'production' ? infoProd : infoDev
 
+const studyDev = '/api/v1/study/user/' // 开发环境
+const studyProd = 'http://120.36.137.90:9008/api/v1/api/v1/study/user/' // 生产环境
+const studyUrl = process.env.NODE_ENV === 'production' ? studyProd : studyDev
+
 import { commonsAjax } from '@/utils/requery'
 
 /**
@@ -57,6 +61,12 @@ export function delMsg (data) {
 export function readMsg (data) {
   let url = `${baseUrl}/user/message`
   return commonsAjax(url, data, 'post')
+}
+/**
+ * 修改头像
+ * */
+export function changeUserAvatar (data) {
+  return commonsAjax(`${studyUrl}avatar`, data, 'get')
 }
 
 /**
@@ -150,7 +160,7 @@ export function emailForgot (data) {
 }
 //手机重置密码
 export function mobileFotgotCheck (data) {
-  return commonsAjax(`${baseUrl}login/reset/captcha`, data, 'post')
+  return commonsAjax(`${baseUrl}login/reset/captcha/mobile`, data, 'post')
 }
 //验证码，验证（邮箱）
 export function emailFotgotCheck (data) {

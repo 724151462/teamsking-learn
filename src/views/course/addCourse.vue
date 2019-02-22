@@ -42,6 +42,7 @@
         <el-form-item label="起止时间" required prop="beginTime">
           <div class="block">
             <el-date-picker
+                    :disabled="begTimeDis"
                     v-model="Course.beginTime"
                     type="datetime"
                     prefix-icon="el-icon-date"
@@ -161,13 +162,13 @@
 
         <el-form-item label="成绩考核" required>
           <div style="display: inline-block">
-            <span class="courseExplanation" v-show="CourseSetEntity.videoPercent !=0" style="margin-right: 10px">视频{{CourseSetEntity.videoPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.docPercent !=0" style="margin-right: 10px">文档{{CourseSetEntity.docPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.quizPercent !=0" style="margin-right: 10px">测试{{CourseSetEntity.quizPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.homeworkPercent !=0" style="margin-right: 10px">作业{{CourseSetEntity.homeworkPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.offlinePercent !=0" style="margin-right: 10px">线下{{CourseSetEntity.offlinePercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.votePercent !=0" style="margin-right: 10px">投票{{CourseSetEntity.votePercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.stormPercent !=0" style="margin-right: 10px">头脑风暴{{CourseSetEntity.stormPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.videoPercent" style="margin-right: 10px">视频{{CourseSetEntity.videoPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.docPercent" style="margin-right: 10px">文档{{CourseSetEntity.docPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.quizPercent" style="margin-right: 10px">测试{{CourseSetEntity.quizPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.homeworkPercent" style="margin-right: 10px">作业{{CourseSetEntity.homeworkPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.offlinePercent" style="margin-right: 10px">线下{{CourseSetEntity.offlinePercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.votePercent" style="margin-right: 10px">投票{{CourseSetEntity.votePercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.stormPercent" style="margin-right: 10px">头脑风暴{{CourseSetEntity.stormPercent}}%</span>
           </div>
           <a class="sysTem" @click="isSys">设置</a>
         </el-form-item>
@@ -422,7 +423,8 @@
           courseName: [{ required: true, message: '请输入课程名称', trigger: 'blur' }],
           beginTime: [{ required: true, message: '请选择开始时间', trigger: 'blur' }],
           endTime: [{ required: true, message: '请选择结束时间', trigger: 'blur' }],
-        }
+        },
+        begTimeDis:false
       }
     },
     watch:{
@@ -449,6 +451,12 @@
           //后台请求到的数据不完全适合展示，需要清洗
           let data = this.upDataFilter(res.data)
           console.log(data)
+          //已发布并且已经开始的课程不能修改开始时间
+          if(data.course.courseStatus == 30){
+            let begin = new Date(data.course.beginTime).getTime(),
+                now = new Date().getTime()
+            now > begin ? this.begTimeDis = true : this.begTimeDis = false
+          }
           this.Course = data.course
           //教师相关信息
           this.CourseForm.instructor = data.instructor
