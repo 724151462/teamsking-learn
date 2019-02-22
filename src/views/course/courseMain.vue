@@ -1,6 +1,6 @@
 <template>
   <div>
-    
+    <h3>{{currentCourse}}</h3>
     <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
       <el-menu-item index="1">章节内容</el-menu-item>
       <el-menu-item index="2">互动</el-menu-item>
@@ -9,7 +9,7 @@
       <el-menu-item index="5">通知管理</el-menu-item>
       <el-menu-item index="6">讨论中心</el-menu-item>
     </el-menu>
-    <router-view></router-view>
+    <router-view @courseName="courseName"></router-view>
   </div>
 </template>
 
@@ -18,6 +18,7 @@
     data() {
       return {
         activeIndex: '1',
+        currentCourse: ''
       };
     },
     mounted() {
@@ -85,6 +86,10 @@
             })
             break;
         }
+      },
+      courseName(val) {
+        console.log
+        this.currentCourse = val
       }
     }
   }

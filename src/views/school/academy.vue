@@ -180,7 +180,6 @@
             headerTheAgain
         },
       created:function(){
-        this.$emit('floorStatus','school');
         this.queryAcademy();
         let academyList = [];
         sysCollegeList().then(

@@ -435,7 +435,6 @@
       }
     },
     created(){
-      this.$emit('floorStatus','course')
       this.selectList()
       //课程编辑
       if(this.$route.query.courseId && this.$route.query.courseId !== ''){
