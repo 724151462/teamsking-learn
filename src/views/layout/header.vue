@@ -63,6 +63,7 @@ import { removeToken, getUserId, removeUserId } from "@/utils/auth";
 import { getUserInfo, getMeInfo, userInit } from "../../api/user";
 import {unReadyMsg} from '@/api/course'
 import {getErrorMsg} from "../../utils/utils";
+import { log } from 'util';
 
 export default {
   props: ["navs"],
@@ -113,9 +114,6 @@ export default {
     this.getMsg();
   },
   methods: {
-    navChange() {
-      this.storeNav = this.$store.state.navHeader;
-    },
     jumpTo(url) {
       console.log(url);
       this.$router.push(url);
@@ -128,48 +126,17 @@ export default {
     },
     handleSelect(index) {
       this.defaultActiveIndex = index;
+      sessionStorage.setItem('defaultOpens', 0)
     },
     fetchNavData() {
       // 初始化菜单激活项
-      var n = this.$route.path.split("/").length - 1;
-      var cur_path = n > 3 ? this.$store.state.leftNavState : this.$route.path; //获取当前路由
-      console.log("curpath", cur_path);
-      console.log("cookiepath", this.$store.state.leftNavState);
-      var routers = this.$router.options.routes; // 获取路由对象
-      var nav_type = "courseCenter",
-        nav_name = "course";
-      // console.log('routers', routers)
-      for (var i = 0; i < routers.length; i++) {
-        var children = routers[i].children;
-        if (children) {
-          for (var j = 0; j < children.length; j++) {
-            var grand_children = children[j].children;
-
-            if (grand_children) {
-              for (var k = 0; k < grand_children.length; k++) {
-                console.log('grand_children',grand_children[k].path, '===curpath' + cur_path)
-                if (grand_children[k].path === cur_path) {
-                  console.log("topNavState", routers[i]);
-                  // nav_type = routers[i].type;
-                  nav_name = routers[i].name;
-                  break;
-                }
-              }
-            }
-          }
-          // var foo1 = function(list){
-          //     if(list.children){
-          //         foo1(list.children)
-          //     }else{}
-          // }
-        }
-      }
+      var nav_type = "courseCenter"
+      let nav_name = this.$route.matched[0].name
+      let nav_path = this.$route.matched[0].path
       this.$store.state.topNavState = nav_type; // 改变topNavState状态的值
-      if (n <= 3) {
-        this.$store.state.leftNavState = nav_name; // 改变leftNavState状态的值
-      }
-      console.log("nav_type", nav_type, "nav_name", nav_name);
-      this.defaultActiveIndex = "/" + nav_name;
+      this.$store.state.leftNavState = nav_name; // 改变leftNavState状态的值
+      this.defaultActiveIndex = nav_path;
+      console.log(this.$route.matched[0].path)
     },
     //根据Cookie获取用户信息
     getUserInfo() {

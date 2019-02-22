@@ -258,7 +258,6 @@
       headerTheAgain
     },
     created:function(){
-      this.$emit('floorStatus','school');
       this.querySpecialityList();
       this.queryClass();
     },

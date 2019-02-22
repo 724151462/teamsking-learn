@@ -1010,3 +1010,13 @@ export function discussPost(data) {
   let url = `${studyUrl}discussion/save/reply`
   return commonsAjax(url, data, 'post')
 }
+
+
+// =====评价=====
+/** 
+* 评价列表
+*/
+export function evaluatePage(data) {
+  let url = `http://120.36.137.90:9008/api/v1/tenant/evaluate/page`
+  return commonsAjax(url, data, 'get')
+}

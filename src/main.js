@@ -31,7 +31,6 @@ router.beforeEach((to, from, next) => {
     routeList.push(to.name)
   }
   to.meta.routeList = routeList
-  store.commit('setNav', to.path)
   var n = (to.path.split('/')).length - 1;
   console.log('timess', n)
   if (n <= 3) {

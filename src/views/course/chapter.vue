@@ -165,7 +165,7 @@
           type="primary"
           @click="localVideoDialog = true"
         >本地上传视频</el-button>
-        <upOss v-else style="margin: 0px 10px 10px 0px" :btnText="'本地上传文档'" @ossUp="getDocUrl" :fileKind="'resource'"></upOss>
+        <upOss v-else style="margin: 0px 10px 10px 0px" :btnText="'本地上传文档'" @ossUp="getDocUrl"></upOss>
         <el-button type="primary" @click="addItem">确 认</el-button>
         <el-button @click="dialogVisible = false">取 消</el-button>
       </span>
@@ -417,6 +417,7 @@ export default {
     };
   },
   created() {
+    this.$emit('courseName', sessionStorage.getItem('courseName'))
     this.getChapterList();
     courseBaseInfo(this.courseId).then(response => {
       this.patternId = String(response.data.studyMode);
@@ -953,8 +954,9 @@ export default {
       this.videoForm.itemResource.resourceTitle = params[1]
       this.videoForm.itemResource.resourceUrl = params[0]; // 路径
       this.videoForm.itemResource.resourceType = 10; // 资源类型
-      let start = params[0].lastIndexOf(".");
-      let end = params[0].length;
+      this.videoForm.itemResource.contentType = this.fileTail({assetUrl:params[0]});
+      // let start = params[0].lastIndexOf(".");
+      // let end = params[0].length;
       this.videoForm.contentType = 10;
       this.videoForm.chapterId = this.tempSection.chapterId;
       this.videoForm.sectionId = this.tempSection.sectionId;
@@ -969,14 +971,22 @@ export default {
       this.docForm.itemResource.resourceTitle = fileName; // 名称
       this.docForm.itemResource.resourceUrl = params[0]; // 路径
       this.docForm.itemResource.resourceType = 20; // 资源类型
-      let start = params[0].lastIndexOf(".");
-      let end = params[0].length;
-      this.docForm.contentType = 20;
+      this.docForm.itemResource.contentType = this.fileTail({assetUrl: params[0]})
+      // let start = params[0].lastIndexOf(".");
+      // let end = params[0].length;
+      this.docForm.contentType = 20
       this.docForm.catalogId = null;
       // this.docForm.itemName = params[1].substring(13);
       
       this.docForm.itemName = fileName
       this.contentAdd(this.docForm);
+    },
+     // 判断文件后缀
+    fileTail(file) {
+      console.log(file)
+      let url = file.assetUrl, 
+          index= url.lastIndexOf('.')
+      return url.substring(index+1,url.length).toLowerCase()
     },
     localVideoUpload() {
       console.log(this.videoForm);

@@ -64,6 +64,7 @@
       </el-form-item>
       <div>
         <div v-for="(item,i) in homeWork.assets" :key="i" style="with:100%">
+          {{item.assetUrl}}
           <div v-if="getFileType(item.assetUrl) === 'image'" class="box">
             <div class="pic_title">
               <img height="50" width="50" :src="item.assetUrl">
@@ -269,12 +270,14 @@ export default {
     },
     // 判断文件后缀
     fileTail(file) {
+      console.log(file)
       let url = file.assetUrl, 
           index= url.lastIndexOf('.')
       return url.substring(index+1,url.length).toLowerCase()
     },
     // 判断文件类型
     getFileType(name) {
+      console.log(name)
       return fileType(name)
     },
     // 下载
@@ -282,6 +285,7 @@ export default {
       // let fileType = fileType(url.assetUrl)
       // var FileSaver = require("file-saver");
       // FileSaver.saveAs(url.assetUrl);
+      console.log(file)
       let url = file.assetUrl, 
           index= url.lastIndexOf('.')
       downLoadFile(url, file.assetTitle)
@@ -310,15 +314,17 @@ export default {
       });
     },
     hwSave() {
-      let newAssets = JSON.parse(JSON.stringify(this.homeWork.assets));
+      // 取出assetId，作为请求的assets的值，newObject.assign,与this.homeWork互不影响
       let imgList = [];
-      newAssets.forEach(element => {
+      this.homeWork.assets.forEach(element => {
         console.log(element);
         imgList.push(element.assetId);
       });
-      this.homeWork.assets = imgList;
+      let newObj = {}
+      Object.assign(newObj, this.homeWork, {assets: imgList})
+      console.log(this.homeWork, newObj)
       if (this.$route.query.operation === "edit") {
-        homeworkPut(this.homeWork).then(response => {
+        homeworkPut(newObj).then(response => {
           if (response.code === 200) {
             this.$message({
               message: "修改作业成功",

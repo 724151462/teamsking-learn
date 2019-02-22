@@ -48,7 +48,7 @@
         <el-table-column prop="tenantName" label="租户名称"></el-table-column>
         <el-table-column prop="errorData" label="错误信息"></el-table-column>
       </el-table>
-      <el-button @click="ensureImport">确认导入</el-button>
+      <!-- <el-button @click="ensureImport">确认导入</el-button> -->
     </el-dialog>
   </div>
 </template>

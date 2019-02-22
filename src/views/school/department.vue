@@ -205,7 +205,6 @@
       headerTheAgain
     },
     created:function(){
-      this.$emit('floorStatus','school');
       this.getCollegeList();
       this.queryDepartment()
     },

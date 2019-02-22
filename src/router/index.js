@@ -37,7 +37,10 @@ export const constantRouterMap = [{
         children: [{
             path: '/course/list',
             component: _import('course/list'),
-            name: '课程列表'
+            name: '课程列表',
+            meta:{
+              father: '课程中心'
+            }
           },
           {
             path: '/course/addCourse',
@@ -218,14 +221,18 @@ export const constantRouterMap = [{
           },
         ]
       },
-      // {
-      //   path: 'appraisal',
-      //   component: _import('course/appraisal'),
-      //   name: '课程评价',
-      //   children: [
-
-      //   ]
-      // },
+      {
+        path: 'appraisal',
+        component: Layout,
+        name: '课程评价',
+        leaf: true,
+        menuShow: true,
+        children: [{
+          path: '/appraisal/list',
+          component: _import('course/appraisal'),
+          name: '课程评价',
+        }]
+      },
       {
         path: 'test',
         component: Layout,
@@ -454,7 +461,7 @@ export const constantRouterMap = [{
   {
     path: '/learn',
     component: Header,
-    name: 'learn',
+    name: '学习中心',
     level: 1,
     type: 'studyManage',
     menuShow: true,
@@ -540,7 +547,7 @@ export const constantRouterMap = [{
   {
     path: '/system',
     component: Header,
-    name: 'system',
+    name: '系统管理',
     menuShow: true,
     level: 1,
     type: 'systemManage',

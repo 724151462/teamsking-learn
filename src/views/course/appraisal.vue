@@ -32,6 +32,13 @@
           :label="list.name">
         </el-table-column>
         <el-table-column
+          label="授课教师"
+          width="180">
+          <template slot-scope="scope">
+            <span style="margin-left: 10px">{{ allTeacher(scope.row.instructor) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
           label="操作"
           width="120">
           <template slot-scope="scope">
@@ -76,7 +83,7 @@
 </template>
 
 <script>
-  import { coursePage } from '../../api/course'
+  import { evaluatePage } from '@/api/course'
   export default {
     data() {
       return {
@@ -87,11 +94,7 @@
           },
           {
             name:'所属分类',
-            prop:'classify'
-          },
-          {
-            name:'分数',
-            prop:'score'
+            prop:'categoryName'
           },
           {
             name:'评价条数',
@@ -154,11 +157,18 @@
       //this.getCatagoryList();
     },
     methods: {
+      // 教师显示
+      allTeacher(teachers=[]) {
+        console.log(teachers)
+        let str = ''
+        teachers.forEach( item => str += (item + ','))
+        return str.substr(0,str.length-1)
+      },
       getList(){
-        coursePage(this.listQuery).then(res=>{
+        evaluatePage(this.listQuery).then(res=>{
           console.log(res)
           if (res.code === 200){
-              //this.tableData3 = res.data.xxx
+              this.tableData3 = res.data
               // /api/v1/sys/category/page
               console.log(res.data);
           }

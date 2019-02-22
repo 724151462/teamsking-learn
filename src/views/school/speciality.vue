@@ -248,7 +248,6 @@
       headerTheAgain
     },
     created:function(){
-      this.$emit('floorStatus','school');
       this.getCollegeList();  //获取院列表
       this.sysDepartmentList();  //获取系列表
       this.querySpeciality();  //查询专业
