@@ -177,7 +177,7 @@ export default {
     getMsg(){
       unReadyMsg()
         .then((res)=>{
-          console.log(res)
+          // console.log(res)
           if (Number(res.code) === 200) {
             this.msgNumber = res.data
             this.$store.commit('SET_MSG', res.data)

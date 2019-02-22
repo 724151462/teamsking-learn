@@ -162,13 +162,13 @@
 
         <el-form-item label="成绩考核" required>
           <div style="display: inline-block">
-            <span class="courseExplanation" v-show="CourseSetEntity.videoPercent !=0" style="margin-right: 10px">视频{{CourseSetEntity.videoPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.docPercent !=0" style="margin-right: 10px">文档{{CourseSetEntity.docPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.quizPercent !=0" style="margin-right: 10px">测试{{CourseSetEntity.quizPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.homeworkPercent !=0" style="margin-right: 10px">作业{{CourseSetEntity.homeworkPercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.offlinePercent !=0" style="margin-right: 10px">线下{{CourseSetEntity.offlinePercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.votePercent !=0" style="margin-right: 10px">投票{{CourseSetEntity.votePercent}}%</span>
-            <span class="courseExplanation" v-show="CourseSetEntity.stormPercent !=0" style="margin-right: 10px">头脑风暴{{CourseSetEntity.stormPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.videoPercent" style="margin-right: 10px">视频{{CourseSetEntity.videoPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.docPercent" style="margin-right: 10px">文档{{CourseSetEntity.docPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.quizPercent" style="margin-right: 10px">测试{{CourseSetEntity.quizPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.homeworkPercent" style="margin-right: 10px">作业{{CourseSetEntity.homeworkPercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.offlinePercent" style="margin-right: 10px">线下{{CourseSetEntity.offlinePercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.votePercent" style="margin-right: 10px">投票{{CourseSetEntity.votePercent}}%</span>
+            <span class="courseExplanation" v-show="CourseSetEntity.stormPercent" style="margin-right: 10px">头脑风暴{{CourseSetEntity.stormPercent}}%</span>
           </div>
           <a class="sysTem" @click="isSys">设置</a>
         </el-form-item>

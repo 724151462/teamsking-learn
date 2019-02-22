@@ -371,17 +371,11 @@
           loading.close()
           if(Number(res.code) === 200) {
             console.log(res.data)
-
             this.userInfo = JSON.parse(JSON.stringify(res.data))
             this.infoForm = JSON.parse(JSON.stringify(res.data))
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
-            this.$message({
-              message:msgs[0].message,
-              type:'error'
-            })
+          }else{
+            this.$message.error(getErrorMsg(res.msg))
           }
-          return 123
         })
       },
       //获取教师信息
@@ -459,7 +453,7 @@
         let data = {avatar : this.infoForm.avatar = url}
         userApi.changeUserAvatar(data).then(res=>{
           if(Number(res.code) === 200) {
-            // this.$message.success('修改成功')
+            this.$message.success('修改成功')
             this.initUserInfo()
           }else {
             this.$message.error(getErrorMsg(res.msg))
@@ -467,7 +461,7 @@
         }).catch(err=>{
           console.log(err)
         })
-        this.changeInfo()
+        // this.changeInfo()
       },
       //修改本人信息
       changeInfo(){
@@ -476,7 +470,7 @@
         userApi.changeUserInfo(data).then(res=>{
             if(Number(res.code) === 200) {
                 this.$message.success('修改成功')
-                this.initUserInfo()
+                // this.initUserInfo()
             }else {
                this.$message.error(getErrorMsg(res.msg))
             }
