@@ -272,7 +272,7 @@ export default {
       .tib
         background: #3EABA8
         padding:2px 5px
-        z-index 1000
+        z-index 10
         color:#ffffff;
         font-size: 16px
         -webkit-border-radius: 2px

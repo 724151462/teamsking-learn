@@ -90,7 +90,6 @@
             }
           }
           }
-          this.$store.state.topNavState = nav_type;  // 改变topNavState状态的值	
           this.$store.state.leftNavState = nav_name;  // 改变leftNavState状态的值
           console.log('nav_type',nav_type,'nav_name', nav_name)
           if(nav_type == "courseCenter"){

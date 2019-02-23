@@ -8,7 +8,6 @@ Vue.use(Vuex)
 const state = {
   allMenu: [],
   filterMenu: [],
-  topNavState: 'course',
   leftNavState: 'è¯¾ç¨‹ä¸­å¿ƒ' ,
   modelActive: Cookie.get('modelActive') || "1",
   msgNum:0,
@@ -23,18 +22,18 @@ const mutations = {
       state.allMenu.push(element)
     });
   },
-  //ÐÞ¸ÄÎ´¶ÁÏûÏ¢
+  //ï¿½Þ¸ï¿½Î´ï¿½ï¿½ï¿½ï¿½Ï¢
   MSG_READY:(state, data)=>{
     state.msgNum = state.msgNum - Number(data)
   },
   SET_MSG:(state, data)=>{
     state.msgNum = Number(data)
   },
-  //ÐÞ¸ÄÓÃ»§Í·Ïñ
+  //ï¿½Þ¸ï¿½ï¿½Ã»ï¿½Í·ï¿½ï¿½
   CHANGE_AVATAR:(state, data)=>{
     state.userAvatar = data
   },
-  //È«ÆÁ
+  //È«ï¿½ï¿½
   SET_FULLSCREEN(state, data){
     if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
       if (document.documentElement.requestFullscreen) {
@@ -49,7 +48,7 @@ const mutations = {
         document.documentElement.webkitRequestFullscreen();
       }
       state.isFullScreen = true
-      // console.log('È«ÆÁ')
+      // console.log('È«ï¿½ï¿½')
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen();
@@ -61,7 +60,7 @@ const mutations = {
         document.webkitExitFullscreen();
       }
       state.isFullScreen = false
-      // console.log('ÍË³öÈ«ÆÁ')
+      // console.log('ï¿½Ë³ï¿½È«ï¿½ï¿½')
     }
   }
 }

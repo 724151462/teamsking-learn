@@ -52,7 +52,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-    <router-view></router-view>
+    <router-view style="margin-top: 60px;"></router-view>
   </div>
 </template>
 
@@ -127,14 +127,14 @@ export default {
     },
     handleSelect(index) {
       this.defaultActiveIndex = index;
-      sessionStorage.setItem('defaultOpens', 0)
     },
-    fetchNavData() {
+    fetchNavData(to,from) {
+      console.log(to,from)
       // 初始化菜单激活项
-      var nav_type = "courseCenter"
+      // var nav_type = "courseCenter"
       let nav_name = this.$route.matched[0].name
       let nav_path = this.$route.matched[0].path
-      this.$store.state.topNavState = nav_type; // 改变topNavState状态的值
+      // this.$store.state.topNavState = nav_type; // 改变topNavState状态的值
       this.$store.state.leftNavState = nav_name; // 改变leftNavState状态的值
       this.defaultActiveIndex = nav_path;
       console.log(this.$route.matched[0].path)
@@ -177,7 +177,7 @@ export default {
     $route: function(to, from) {
       // 路由改变时执行
       //console.info("to.path:" + to.path);
-      this.fetchNavData();
+      this.fetchNavData(to, from);
       this.getUserInfo();
     }
   }
@@ -196,6 +196,9 @@ export default {
 }
 
 .header {
+  position fixed
+  top 0
+  z-index 100
   width: 100%;
   height: 60px;
   background: #464C5C;

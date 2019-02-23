@@ -55,35 +55,31 @@
       :before-close="handleClose">
 
       <div class="appraisal-warp">
-        <div class="appraisal-left">
-          <div class="appraisal-img">
-            <img src="" alt="" class="">
+        <div class="appraisal-body" v-for="(item, index) in detailEvaluateList">
+          <div class="appraisal-left">
+            <div class="appraisal-img">
+              <img :src="item.avatar" height="50px" alt="" class="">
+            </div>
+          </div>
+          <div class="appraisal-right">
+            <div>
+              <span>{{item.nickName}}</span>
+              <el-rate v-model="rateValue" disabled style="display: inline-block"></el-rate>
+              <span>{{item.createTime}}</span>
+            </div>
+            <p>{{item.content}}</p>
+            <el-button type="text" style="color: #999999; float: right" @click="deleteEvealuate(item)">删除</el-button>
           </div>
         </div>
-        <div class="appraisal-body">
-          <div>
-            <div>张三</div>
-            <div><el-rate v-model="rateValue" disabled></el-rate></div>
-            <div>-2018-12-25 10:46:30</div>
-          </div>
-          <p>很有帮助的课程，谢谢老师</p>
-        </div>
-        <div class="appraisal-right">
-          <el-button type="text" style="color: #999999;">删除</el-button>
-        </div>
+        
       </div>
-
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">保 存</el-button>
-      </span>
     </el-dialog>
 
   </div>
 </template>
 
 <script>
-  import { evaluatePage,evaluateDetail } from '@/api/course'
+  import { evaluatePage,evaluateDetail,evaluateDelete } from '@/api/course'
   export default {
     data() {
       return {
@@ -149,6 +145,8 @@
           }
         ],
         multipleSelection: [],
+        // 某课程下的评价列表
+        detailEvaluateList: [],
         rateValue: 5 //评分
       }
     },
@@ -164,8 +162,28 @@
         teachers.forEach( item => str += (item + ','))
         return str.substr(0,str.length-1)
       },
+      // 课程下评论列表
       appraisalDetail(item) {
         evaluateDetail({courseId: item.courseId})
+        .then(response=> {
+          if(response.data.pageData.length === 0) {
+            this.$message({
+              message: '暂无数据',
+              type: 'warning'
+            })
+          }else{
+            this.detailEvaluateList = response.data.pageData
+            console.log(this.detailEvaluateList)
+            this.dialogVisible = true
+          }
+        })
+      },
+      // 删除评论
+      deleteEvealuate(item) {
+        evaluateDelete([item.evaluateId])
+        .then(response=> {
+          this.getList()
+        })
       },
       getList(){
         evaluatePage(this.listQuery).then(res=>{
@@ -230,19 +248,17 @@
       border 1px soild blue
       padding-right 10px
       .appraisal-img
-        background-color yellow
-        height 100%
-        width 100%
+        height 50px
+        width 50px
     .appraisal-body
-      height 100%
-      background-color #FAFAFA
-      flex 1
-      & div
-        display flex
+      width 100%
+      display flex
+      align-items flex-start
+      justify-content flex-start
     .appraisal-right
-      height 100%
-      line-height 60px
       background-color: #FAFAFA
+      padding 5px
+      width 100%
     .grid-content
       box-sizing: border-box
       padding: 10px 0 10px 10px
