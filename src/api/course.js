@@ -1020,3 +1020,11 @@ export function evaluatePage(data) {
   let url = `http://120.36.137.90:9008/api/v1/tenant/evaluate/page`
   return commonsAjax(url, data, 'get')
 }
+
+/** 
+* 具体课程下的评价
+*/
+export function evaluateDetail(data) {
+  let url = `http://120.36.137.90:9008/api/v1/tenant/evaluate/${data.courseId}/page`
+  return commonsAjax(url, '', 'get')
+}

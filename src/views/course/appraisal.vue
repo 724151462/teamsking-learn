@@ -42,7 +42,7 @@
           label="操作"
           width="120">
           <template slot-scope="scope">
-            <el-button type="text" @click="dialogVisible = true">查看</el-button>
+            <el-button type="text" @click="appraisalDetail(scope.row)">查看</el-button>
           </template>
         </el-table-column>
       </el-table-column>
@@ -83,7 +83,7 @@
 </template>
 
 <script>
-  import { evaluatePage } from '@/api/course'
+  import { evaluatePage,evaluateDetail } from '@/api/course'
   export default {
     data() {
       return {
@@ -163,6 +163,9 @@
         let str = ''
         teachers.forEach( item => str += (item + ','))
         return str.substr(0,str.length-1)
+      },
+      appraisalDetail(item) {
+        evaluateDetail({courseId: item.courseId})
       },
       getList(){
         evaluatePage(this.listQuery).then(res=>{
