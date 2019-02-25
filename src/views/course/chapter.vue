@@ -966,11 +966,12 @@ export default {
       this.videoUrl = params[0];
     },
     getDocUrl(...params) {
-      console.log(params[0])
+      console.log(params)
       let fileName = params[1].replace(/[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g, '')
       this.docForm.itemResource.resourceTitle = fileName; // 名称
       this.docForm.itemResource.resourceUrl = params[0]; // 路径
       this.docForm.itemResource.resourceType = 20; // 资源类型
+      this.docForm.itemResource.resourceSize = params[2] // 资源大小
       this.docForm.itemResource.contentType = this.fileTail({assetUrl: params[0]})
       // let start = params[0].lastIndexOf(".");
       // let end = params[0].length;
