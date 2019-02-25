@@ -17,12 +17,12 @@
           @select="handleSelect"
           :router="true"
         >
-          <el-menu-item :index="item.path" v-for="item in nav">{{item.name}}</el-menu-item>
+          <el-menu-item :index="item.path" v-for="item in nav" :key="item.id">{{item.name}}</el-menu-item>
           <!-- <el-menu-item index="/learn">学习管理</el-menu-item>
           <el-menu-item index="/school">校管中心</el-menu-item>
           <el-menu-item index="/system">系统管理</el-menu-item> -->
-          <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path" 
-                                >
+          <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path"
+>
                     <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
           </el-menu-item>-->
         </el-menu>
@@ -39,7 +39,7 @@
       </div>
       <el-dropdown class="avator" trigger="click">
         <span class="el-dropdown-link userinfo-inner">
-            <img :src="$store.state.userAvatar" alt style="width: 35px;height: 35px">
+            <img :src="$store.state.userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
             <span>{{this.realName}}</span>
             <i class="el-icon-caret-bottom"></i>
           </span>
@@ -53,6 +53,21 @@
       </el-dropdown>
     </div>
     <router-view></router-view>
+    <el-dialog
+      title="提示"
+      :visible.sync="nameDialog"
+      :close-on-click-modal = "false"
+      :close-on-press-escape = "false"
+      :show-close = "false"
+      width="30%">
+      <p>初次登录，请重置您的用户名。</p>
+      <br>
+      <el-input v-model="nameInit" placeholder="用户名"></el-input>
+      <p style="color:#f95f5f;margin-top: 5px;">用户名为字母和数字的组合，可用于登录。</p>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="userNameInit">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -63,7 +78,6 @@ import { removeToken, getUserId, removeUserId } from "@/utils/auth";
 import { getUserInfo, getMeInfo, userInit } from "../../api/user";
 import {unReadyMsg} from '@/api/course'
 import {getErrorMsg} from "../../utils/utils";
-import { log } from 'util';
 
 export default {
   props: ["navs"],
@@ -97,7 +111,7 @@ export default {
       menuList: constantRouterMap,
       nameInit: "",
       msgNumber:1,
-      nameDialog: true
+      nameDialog: false
     };
   },
   created() {
@@ -137,23 +151,47 @@ export default {
       this.$store.state.topNavState = nav_type; // 改变topNavState状态的值
       this.$store.state.leftNavState = nav_name; // 改变leftNavState状态的值
       this.defaultActiveIndex = nav_path;
-      console.log(this.$route.matched[0].path)
+      //console.log(this.$route.matched[0].path)
     },
     //根据Cookie获取用户信息
     getUserInfo() {
       let data = getUserId();
-      getMeInfo().then(res => {
-        console.log(res);
-        if (Number(res.code) === 200) {
-          this.realName = res.data.realName;
-          Boolean(res.data.avatar) ? this.$store.commit('CHANGE_AVATAR', res.data.avatar): '';
-          sessionStorage.setItem("realName", res.data.realName);
-          sessionStorage.setItem("tenantId", res.data.gender);
-        } else {
-          // this.$message.error('请登录')
-          // this.$message.error(getErrorMsg(res.msg));
+      getMeInfo()
+        .then(res => {
+          let status
+          if (Number(res.code) === 200) {
+            this.realName = res.data.realName;
+            status = res.data.initStatus
+            Boolean(res.data.avatar) ? this.$store.commit('CHANGE_AVATAR', res.data.avatar): '';
+            sessionStorage.setItem("realName", res.data.realName);
+            sessionStorage.setItem("tenantId", res.data.gender);
+          } else {
+            // this.$message.error('请登录')
+            // this.$message.error(getErrorMsg(res.msg));
+          }
+          return status
+      })
+      .then(status=>{
+        if(status === 2){
+          this.nameDialog = true
         }
-      });
+      })
+      .catch(err=>{console.log(err)})
+    },
+    //status为3 时修改用户名
+    userNameInit(){
+      let data = {userName : this.nameInit}
+      userInit(data)
+        .then(res=>{
+          if (Number(res.code) === 200) {
+            console.log(res.data)
+            this.$message.success('修改成功');
+            this.nameDialog = false
+          } else {
+            this.$message.error(getErrorMsg(res.msg));
+          }
+        })
+        .catch(err=>{console.log(err)})
     },
     getMsg(){
       unReadyMsg()
@@ -164,7 +202,6 @@ export default {
             this.$store.commit('SET_MSG', res.data)
           } else {
             this.$message.error('请登录')
-
             // this.$message.error(getErrorMsg(res.msg));
           }
         })
