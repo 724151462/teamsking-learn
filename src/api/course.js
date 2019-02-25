@@ -30,6 +30,10 @@ export function unReadyMsg(data) {
 export function checkUser(data) {
   return commonsAjax(`${commonBaseUrl}user/${data}/classroom/userinfo`, '', 'get')
 }
+//课堂模式下检查是否有未结束的签到
+export function hasCheck(data) {
+  return commonsAjax(`${baseUrl}classroom/${data.classroomId}/sign/unfinish`, data, 'get')
+}
 
 /**
  * 获取课程列表

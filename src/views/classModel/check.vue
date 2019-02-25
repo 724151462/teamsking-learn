@@ -46,13 +46,12 @@
       fullScreen
     },
     methods: {
-      timeAdd(miaoNum){
+      timeAdd(){
         let _this_ = this
         clearInterval(timer)
         let miao = 0,
-            fen = 0
-
-        miaoNum = 0 || miaoNum;
+            fen = 0,
+            miaoNum = 0
 
         let timer = setInterval(function() {
           miao +=1

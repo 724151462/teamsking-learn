@@ -22,7 +22,7 @@
       };
     },
     mounted() {
-      console.log(this.$route.path)
+      //console.log(this.$route.path)
       switch(this.$route.path) {
         case '/course/list/chapter':
           this.activeIndex = '1'
@@ -43,7 +43,6 @@
           this.activeIndex = '6'
           break;
       }
-        
     },
     methods: {
       handleSelect(key, keyPath) {

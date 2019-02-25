@@ -46,7 +46,7 @@
 </template>
 
 <script>
-  import { classOver } from "@/api/course";
+  import { classOver, hasCheck, saveSign} from "@/api/course";
   import fullScreen from './fullScreen'
   export default {
     data(){
@@ -64,10 +64,9 @@
       fullScreen
     },
     created() {
-    //   this.handleSelect(this.$store.state.modelActive)
-      // if(sessionStorage.getItem('isSign') === 'NO'){
-      //   this.goCheck()
-      // }
+    },
+    mounted () {
+      this.isCheck()
     },
     watch: {
       $route (to, from) {
@@ -75,7 +74,7 @@
       }
     },
     methods: {
-       getCNanme(value) {
+      getCNanme(value) {
          this.currentInfo = value
       },
       handleSelect(key, keyPath) {
@@ -146,9 +145,7 @@
           cancelButtonText: '开启签退',
           type: 'warning'
         }).then(() => {
-            this.$router.push({
-              path: "/course/classend",
-            });
+            this.$router.push({path: "/course/classend",});
         }).catch((action => {
           if(action === 'cancel'){
             this.$router.push({
@@ -158,13 +155,51 @@
         }))
       },
       goCheck(){
-        this.$router.push({
-          path: "/course/check",
-          query: {
-            id: this.$route.query.id,
-            classroomId: this.$store.state.socket.classroomId
-          }
-        });
+        if(sessionStorage.getItem('isSign') === 'NO'){
+          this.$router.push({
+            path: "/course/check",
+            query: {
+              id: this.$route.query.id,
+              classroomId: this.$store.state.socket.classroomId
+            }
+          });
+        }else{
+          this.$message.warning('已经开启过签到了')
+        }
+      },
+      //保存签到
+      newSign(){
+        let signData = {classroomId , courseId ,signType:10,usedType:20};
+
+        //开始签到前保存签到
+        saveSign(signData)
+          .then(res=>{
+            console.log('保存签到成功')
+            if(Number(res.code) === 200){
+              this.subClassroom()
+              sessionStorage.setItem('signOutId',res.data.signId)
+              tagClient.send('/teamsking/course/sign/start',{'token': token},
+                JSON.stringify({
+                  "bean":res.data.signId,
+                  "classroomId":classroomId,
+                  "courseId":courseId,
+                  "userId":userId
+                })
+              );
+            }else{
+              this.$message.error('保存签到失败')
+            }
+          })
+      },
+      //检查是否有未完成的签到
+      isCheck(){
+        console.log('检查')
+        let data = {classroomId:Number(sessionStorage.getItem('classroom'))}
+        hasCheck(data)
+          .then(res=>{
+            console.log(res)
+          })
+          .catch(err=>{console.log(err)})
       },
       goUser(){
         this.$router.push({path: "/course/modelChecked"});

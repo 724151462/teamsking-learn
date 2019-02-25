@@ -195,12 +195,13 @@
           </el-row>
           <div id="editor1" v-show="iseditor1"></div>
         </el-form-item>
-
+        {{this.CourseInfoEntity.courseDescription}}
         <el-form-item label="教学目标" required>
           <el-row>
             <el-button type="text" v-show="!iseditor2" @click="iseditor2 = true">设置</el-button>
           </el-row>
           <div id="editor2" v-show="iseditor2"></div>
+          {{this.CourseInfoEntity.teachingTarget}}
         </el-form-item>
 
         <el-form-item label="教学安排" required>
@@ -208,6 +209,7 @@
             <el-button type="text" v-show="!iseditor3" @click="iseditor3 = true">设置</el-button>
           </el-row>
           <div id="editor3" v-show="iseditor3"></div>
+          {{this.CourseInfoEntity.teachingArrangement}}
         </el-form-item>
       </el-form>
       <el-row style="text-align: center" v-if="!isUpdata">
