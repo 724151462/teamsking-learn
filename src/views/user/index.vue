@@ -5,7 +5,7 @@
       <div>
         <p>头像</p>
         <div  style="padding-left: 100px;width: 100px;margin: 25px 0;">
-          <img :src="infoForm.avatar" alt="" class="user-avatar">
+          <img :src="infoForm.avatar ? infoForm.avatar : defAvatar" alt="" class="user-avatar">
           <div style="text-align: center;font-size: 14px;">
             <el-button type="text" @ossUp="changeAvatar"><label for="male" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
             <up-oss style="display: none" :file-kind="fileKind" @ossUp="changeAvatar"></up-oss>
@@ -25,9 +25,9 @@
                 <el-radio :label="2">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="用户名">
-              <el-input v-model="infoForm.nickName" class="input-width"></el-input>
-            </el-form-item>
+            <!--<el-form-item label="用户名">-->
+              <!--<el-input v-model="infoForm.userName" class="input-width"></el-input>-->
+            <!--</el-form-item>-->
           </el-form>
         </div>
         <div style="text-align: right"><el-button type="primary" @click="changeInfo">保存</el-button></div>
@@ -119,7 +119,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div style="text-align: right"><el-button type="primary" @click="changePassword()">保存</el-button></div>
+        <div style="text-align: right"><el-button type="primary" @click="changePassword">保存</el-button></div>
       </div>
     </div>
     <!--绑定手机弹窗-->
@@ -163,11 +163,11 @@
         </el-form-item>
       </el-form>
 
-        <el-button
-          style="margin-left: 40px"
-          :disabled="emailBtn"
-          size="small"
-          type="primary" @click="getMailCode">获取验证码</el-button>
+      <el-button
+        style="margin-left: 40px"
+        :disabled="emailBtn"
+        size="small"
+        type="primary" @click="getMailCode">获取验证码</el-button>
       <span v-show="emailBtnTime != 0" style="margin-left: 10px"><span style="color:red">{{this.emailBtnTime}}</span>秒后可重新获取验证码</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="()=>{changeEmailDialog = false;newForm.email=''}">取 消</el-button>
@@ -212,9 +212,10 @@
         <el-form-item label="名称">
           <el-input type="text" class="input-width" v-model="cerForm.certificateName" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="发证时间" required>
+        <el-form-item label="发证时间">
           <el-date-picker
             v-model="cerForm.issuingDate"
+            class="input-width"
             type="datetime"
             prefix-icon="el-icon-date"
             placeholder="选择发证时间"
@@ -225,7 +226,7 @@
         <el-form-item label="发证件单位">
           <el-input type="text" class="input-width" v-model="cerForm.issuingAuthority" placeholder="请输入"></el-input>
         </el-form-item>
-        <span>证书图片</span>
+        <span style="margin: 20px;">证书图片</span>
         <span v-for="img in cerForm.imgUrls" :key="img.id">
           <img :src="img.imgUrl" alt="" class="cre-img">
         </span>
@@ -246,6 +247,7 @@
   import * as userApi from '@/api/user'
   import UpOss from "../../components/up-oss";
   import userHeader from './userHeader'
+  import { removeToken, removeUserId } from "@/utils/auth";
   import {getErrorMsg} from "../../utils/utils";
 
   export default {
@@ -262,6 +264,7 @@
     data() {
       return {
         fileKind: 'avatar',
+        defAvatar: require('@/assets/images/default.png'),
         infoForm:{
           avatar: null,
           email: null,
@@ -370,8 +373,6 @@
         userApi.getMeInfo().then(res=>{
           loading.close()
           if(Number(res.code) === 200) {
-            console.log(res.data)
-            // res.data.
             this.userInfo = JSON.parse(JSON.stringify(res.data))
             this.infoForm = JSON.parse(JSON.stringify(res.data))
           }else{
@@ -384,50 +385,34 @@
         let data = Cookie.get('userId')
         userApi.teacherInfo(data).then(res=>{
           if(Number(res.code) === 200) {
-            console.log(res.data)
             this.initDepartment(res.data.collegeId)
             if(res.data){
               // this.teacherInfo = JSON.parse(JSON.stringify(res.data))
               this.jobForm = JSON.parse(JSON.stringify(res.data))
             }
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
-            this.$message({
-              message:msgs[0].message,
-              type:'error'
-            })
+          }else{
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       },
       //获取院列表
       initCollege(){
         sysCollegeList().then(res=>{
-          console.log('获取到的院列表')
           if(Number(res.code) === 200) {
             this.collegeList = JSON.parse(JSON.stringify(res.data))
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
-            this.$message({
-              message:msgs[0].message,
-              type:'error'
-            })
+          }else {
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       },
       //获取系 列表
       initDepartment(id){
         let data = {collegeId:id}
-        console.log(data)
         DepartmentList(data).then(res=>{
           if(Number(res.code) === 200) {
-            console.log(res.data)
             this.departmentList = JSON.parse(JSON.stringify(res.data))
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
-            this.$message({
-              message:msgs[0].message,
-              type:'error'
-            })
+          }else{
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       },
@@ -440,12 +425,8 @@
           if(Number(res.code) === 200) {
             console.log(res.data)
             this.departmentList = JSON.parse(JSON.stringify(res.data))
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
-            this.$message({
-              message:msgs[0].message,
-              type:'error'
-            })
+          }else {
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       },
@@ -478,57 +459,25 @@
       },
       //修改本人信息
       changeInfo(){
-        let data = this.infoForm
-        console.log(data)
-        userApi.changeUserInfo(data).then(res=>{
-          console.log(res)
-            if(Number(res.code) === 200) {
-                this.$message.success('修改成功')
-                // this.initUserInfo()
-            }else {
-               this.$message.error(getErrorMsg(res.msg))
-            }
-        })
-      },
-      //修改本人的用户信息
-      changeUserInfo(){
         let data = {
-          avatar: this.info.avatar,
           gender: this.infoForm.gender,
-          nickName: this.infoForm.nickName,
           userId: this.infoForm.userId
         }
-        console.log(data)
         userApi.changeUserInfo(data).then(res=>{
-          console.log(res)
-          if(Number(res.code) === 200) {
-            this.$notify.success({
-              title: '成功',
-              message:'用户信息修改成功'
-            });
-
-          }else if(Number(res.code) === 440){
-            let msgs = JSON.parse(res.msg)
-            this.$notify.error({
-              title: '错误',
-              message:msgs[0].message
-            });
-          }
+          this.$message.success('修改用户信息成功')
         })
       },
       //修改本人的教师信息
       changeTeaInfo(){
         let data = this.jobForm
-        console.log(data)
         userApi.saveTeacherInfo(data).then(res=>{
         console.log(res)
         if(Number(res.code) === 200) {
           this.$message.success('修改成功')
           this.jobForm = {}
           this.initTeaInfo()
-        }else if(Number(res.code) === 440){
-          let msgs = JSON.parse(res.msg)
-          this.$message.error(msgs[0]);
+        }else {
+          this.$message.error(getErrorMsg(res.msg))
         }
       })
       },
@@ -546,12 +495,13 @@
           oldPasswd: String(this.passForm.oldPasswd)
         }
         userApi.changeUserPassword(data).then(res=>{
-          loading.close()
-          console.log(res)
           if(Number(res.code) === 200) {
             this.$message.success('密码修改成功')
-          }else{
-            this.$message.error(res.msg)
+            removeToken();
+            removeUserId();
+            this.$router.push("/login");
+          }else {
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       },
@@ -572,7 +522,7 @@
             this.checkMobileDialog = false
             this.changeMobileDialog = true
           }else {
-            this.$message.error(res.msg);
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       },
@@ -593,7 +543,7 @@
             this.checkEmailDialog = false
             this.changeEmailDialog = true
           }else {
-            this.$message.error(res.msg);
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       },
@@ -642,8 +592,8 @@
             this.newForm.email = ''
             this.initUserInfo()
             this.changeEmailDialog = false
-          }else if(Number(res.code) === 1000){
-            this.$message.error('绑定号码失败')
+          }else {
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       },
@@ -675,13 +625,8 @@
             this.newForm.mobile = ''
             this.initUserInfo()
             this.changeMobileDialog = false
-          }else if(Number(res.code) === 1000){
-            // let msgs = JSON.parse(res.msg)
-            // this.$message({
-            //   message:msgs[0].message,
-            //   type:'error'
-            // })
-            this.$message.error('绑定号码失败')
+          }else {
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       },

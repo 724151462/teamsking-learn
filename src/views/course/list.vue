@@ -5,15 +5,15 @@
         <el-button round size="small" @click="courseType(30)">已发布</el-button>
         <el-button round size="small" @click="courseType(10)">未发布</el-button>
         <el-button round size="small" @click="courseType(40)">已关闭</el-button>
-        <div class="list-search">
+        <el-button type="primary" style="float: right" @click="goAddCourse">创建课程</el-button>
+        <div class="list-search" style="float:right">
           <el-input v-model="listQuery.courseName" type="text" placeholder="请输入课程名称" style="width:180px;margin-left: 100px;"></el-input>
           <el-button type="primary" @click="getList">搜索</el-button>
         </div>
-        <el-button type="primary" round style="float: right" @click="goAddCourse">创建课程</el-button>
       </el-row>
 
       <el-row>
-        <el-row style="background:#F3F3F3;padding:10px 0 10px 10px;margin-top: 20px;">课程列表</el-row>
+        <!--<el-row style="background:#F3F3F3;padding:10px 0 10px 10px;margin-top: 20px;">课程列表</el-row>-->
         <el-row class="course-table" v-for="list in data" :key="list.id">
           <div class="img">
             <span class="tib">{{courseStatus(list.courseStatus)}}</span>
@@ -38,7 +38,7 @@
             <el-button type="primary" @click="goCourseChapter(list.courseId, list.courseName)">教学管理</el-button>
           </div>
         </el-row>
-        <div style="text-align:right;">
+        <div style="text-align:right;" v-show="data.length!=0">
           <el-pagination
               background
               layout="prev, pager, next"

@@ -32,7 +32,7 @@
     .test,.resource,.activity
       .el-tree-node__content
         height 50px!important
-        border-bottom 1px solid #ccc
+        border-bottom 1px solid #e3e8ee
         &:hover .hide-button
           opacity 1
     .teacher-dialog

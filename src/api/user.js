@@ -29,7 +29,7 @@ export function getUserInfo (id) {
  * */
 export function userInit (data) {
 
-  let url = `${infoUrl}user/init`
+  let url = `${baseUrl}user/init`
   return commonsAjax(url, data, 'post')
 }
 /**
