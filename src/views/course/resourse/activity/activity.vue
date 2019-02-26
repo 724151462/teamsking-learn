@@ -41,8 +41,8 @@
             @check-change = "nodeCheck"
             accordion
             draggable
-            :allow-drop="allowDrop"
             @node-drop="handleDrop"
+            :allow-drop="allowDrop"
             :default-expanded-keys="expan"
             node-key="catalogId"
             ref="tree">
@@ -441,60 +441,104 @@
         })
       },
       //拖拽相关
-      handleDrop(draggingNode, dropNode, dropType, ev) {
-        let beforeType= draggingNode.data.resourceId ? 2 :1,
-          beforeId = beforeType ==1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
-          afterType = dropNode.data.resourceId ? 2 :1,
-          afterId = afterType ==1 ? dropNode.data.catalogId: dropNode.data.resourceId;
+      handleDrop(draggingNode, dropNode, dropType) {
+        //console.log(dropType)
+        //console.log('拖拽的',dropNode.label,dropNode)
 
-        let expanId = draggingNode.data.catalogId || draggingNode.data.parentId
-        this.expan=[expanId]
+        let type= draggingNode.data.catalogId ? 1 :2,
+          beforeId = type == 1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
+          afterType = dropNode.data.catalogId ? 1 : 2,
+          afterId = type == 1 ? dropNode.data.catalogId: dropNode.data.resourceId;
 
-        if(dropType == 'after'){
-          let data = {
-            id:beforeId,
-            type:beforeType,
-            previous: {
-              id: afterId,
-              type:afterType
+        let data = {}
+
+        switch (dropType) {
+          case 'inner':
+            data = {id:beforeId, type:type, inCatalogId:afterId}
+            this.move(data)
+            break
+          case 'after':
+            data = {
+              id:beforeId,
+              type:type,
+              previous: {
+                id: afterId,
+                type:afterType
+              }
             }
-          }
-          console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的后面')
-          console.log(data)
-          this.move(data)
-        }else if(dropType == 'before'){
-          let data = {
-            id:beforeId,
-            type:beforeType,
-            previous: {
-              id: afterId,
-              type:afterType
+            console.log(data)
+            console.log('将被移到id:',dropNode.data.catalogId,'名字：',dropNode.label,'后面')
+            this.move(data)
+            break
+          case 'before':
+            if(dropNode.previousSibling.previousSibling){
+              data = {
+                id:beforeId,
+                type:type,
+                previous: {
+                  id: dropNode.previousSibling.previousSibling.data.catalogId,
+                  type:afterType
+                }
+              }
+              console.log(data)
+              console.log('将被移到id',dropNode.previousSibling.previousSibling.data.catalogId,
+                '名字:',dropNode.previousSibling.previousSibling.label,'后面')
+            }else{
+              data = {
+                id:beforeId,
+                type:type,
+                next: {
+                  id: afterId,
+                  type:afterType
+                }
+              }
+              console.log(data)
+              console.log('将被移到最顶部')
             }
-          }
-          console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的前面')
-          console.log(data)
-          // this.move(data)
-        }else if(dropType == 'inner'){
-          let data = {
-            id:beforeId,
-            type:beforeType,
-            inCatalogId:afterId
-          }
-          console.log(data)
-          console.log('移入操作')
-          this.move(data)
+            this.move(data)
+            break
         }
       },
-      allowDrop(draggingNode, dropNode, dropType) {
-        // console.log(draggingNode,dropNode,dropType)
-        let type = draggingNode.data.resourceId ? 2 :1
-        if(type ==2 && dropNode.data.catalogLevel == 1){
-          return false
-        }else if (dropType == 'prev' || dropType == 'next'){
-          return false
-        }else{
+      allowDrop(draggingNode, dropNode, type) {
+        if(!draggingNode.data.catalogId){
+          return type === 'inner' && dropNode.data.catalogId
+        }else if(draggingNode.data.catalogId){
+          return dropNode.data.catalogId
+        } else{
           return true
         }
+      },
+      handleDragEnd(draggingNode, dropNode, dropType, ev) {
+        // console.log(dropType)
+        // console.log('被拖拽的',draggingNode.label,draggingNode.data)
+       // console.log('end拖拽的',dropNode.label,dropNode)
+        //
+        // let type= draggingNode.data.catalogId ? 1 :2,
+        //   beforeId = type == 1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
+        //   afterType = dropNode.data.catalogId ? 1 : 2,
+        //   afterId = type == 1 ? dropNode.data.catalogId: dropNode.data.resourceId;
+        //
+        // let data = {}
+        //
+        // switch (dropType) {
+        //   case 'inner':
+        //     data = {id:beforeId, type:type, inCatalogId:afterId}
+        //     console.log(data)
+        //     console.log('移入操作')
+        //     this.move(data)
+        //     break
+        //   case 'after':
+        //     data = {
+        //       id:beforeId,
+        //       type:type,
+        //       previous: {
+        //         id: afterId,
+        //         type:afterType
+        //       }
+        //     }
+        //     this.move(data)
+        //     break
+        // }
       },
       //文件夹/文件 移动操作
       move(data){
@@ -515,7 +559,7 @@
 
 <style scoped lang="stylus" type="text/stylus">
   .golook
-    color #ccc
+    color #e3e8ee
     &:hover
       color :#409EFF
   .active
@@ -524,7 +568,7 @@
     border-color: #409EFF;
   .activity
     .title
-      border-bottom 2px solid gray
+      border-bottom 2px solid #e3e8ee
       padding-bottom 20px
     .search-box
       width: 350px
@@ -560,7 +604,7 @@
       width 100%
       display flex
       align-items center
-      border-bottom 2px solid gray
+      border-bottom 2px solid #e3e8ee
       padding-bottom 10px
       & div:first-chilf
         height 45px;

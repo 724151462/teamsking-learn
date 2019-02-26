@@ -195,13 +195,11 @@
           </el-row>
           <div id="editor1" v-show="iseditor1"></div>
         </el-form-item>
-        {{this.CourseInfoEntity.courseDescription}}
         <el-form-item label="教学目标" required>
           <el-row>
             <el-button type="text" v-show="!iseditor2" @click="iseditor2 = true">设置</el-button>
           </el-row>
           <div id="editor2" v-show="iseditor2"></div>
-          {{this.CourseInfoEntity.teachingTarget}}
         </el-form-item>
 
         <el-form-item label="教学安排" required>
@@ -209,7 +207,6 @@
             <el-button type="text" v-show="!iseditor3" @click="iseditor3 = true">设置</el-button>
           </el-row>
           <div id="editor3" v-show="iseditor3"></div>
-          {{this.CourseInfoEntity.teachingArrangement}}
         </el-form-item>
       </el-form>
       <el-row style="text-align: center" v-if="!isUpdata">
@@ -471,7 +468,6 @@
           this.editor2.txt.html(data.info.teachingTarget)
           //教学安排
           this.editor3.txt.html(data.info.teachingArrangement)
-          console.log(this.CourseInfoEntity)
         }).catch(error=>{
           console.log(error)
         })
@@ -486,17 +482,16 @@
       //教师
       yesTeacher (e) {
         this.CourseForm.teacher.push(e.teacherName)
-        console.log(this.CourseForm.teacher)
+
       },
       //讲师
       yesInstructor (e) {
-          console.log(e)
         delete e.value
         let flag = this.CourseForm.instructor.find((item)=>{
             return item.instructorId == e.instructorId
         })
 
-        flag ? this.$message.warning('已选择该讲师'):this.CourseForm.instructor.push(e)
+        flag ? this.$message.warning('已选择该讲师'):this.CourseForm.instructor.push(e);this.instructor = ''
       },
       //标签数据赋值
       yesTages(e){
@@ -506,7 +501,7 @@
               return item.tagId == e.tagId
           })
 
-          flag ? this.$message.warning('已选择此标签'):this.Course.courseTagIds.push(e)
+          flag ? this.$message.warning('已选择此标签'):this.Course.courseTagIds.push(e);this.tag = ''
 
       },
       //一级分类被选择，赋值二级课程
@@ -529,7 +524,7 @@
           return false;
         }
         let data = this.goDataFilter()
-        console.log(data)
+        // console.log(data)
         this.$refs['Course'].validate((valid) => {
           if (valid) {
             let loading = this.$loading({
@@ -719,7 +714,8 @@
           console.log(error)
         })
         //获取教师列表的数据
-        teachersList(sessionStorage.getItem('tenantId')).then(res=>{
+        teachersList(sessionStorage.getItem('tenantId'))
+          .then(res=>{
           // console.log('教师列表:')
           // console.log(res)
           if(Number(res.code) === 200){
@@ -730,7 +726,8 @@
               type:'error'
             })
           }
-        }).catch(error=>{
+        })
+          .catch(error=>{
           console.log(error)
         })
       },
@@ -878,6 +875,8 @@
       let self = this
       this.editor1 = new wangEditor('#editor1')
       this.editor1.customConfig.onblur = function (html) {
+        console.log('课程编辑')
+        console.log(html)
         self.CourseInfoEntity.courseDescription = html
       }
       this.editor1.customConfig.zIndex = 100
@@ -891,8 +890,10 @@
         self.CourseInfoEntity.teachingTarget = html
       }
       this.editor2.customConfig.zIndex = 100
-      this.addEditor2 = this.editor1.customConfig.onchange = function (html) {
-        self.CourseInfoEntity.teachingArrangement = html
+      this.addEditor2 = this.editor2.customConfig.onchange = function (html) {
+        console.log('教学安排')
+        console.log(html)
+        self.CourseInfoEntity.teachingTarget = html
       }
       this.editor2.create()
       //教学安排
@@ -901,8 +902,8 @@
         self.CourseInfoEntity.teachingArrangement  = html
       }
       this.editor3.customConfig.zIndex = 100
-      this.addEditor3 = this.editor1.customConfig.onchange = function (html) {
-        self.CourseInfoEntity.teachingTarget = html
+      this.addEditor3 = this.editor3.customConfig.onchange = function (html) {
+        self.CourseInfoEntity.teachingArrangement = html
       }
       this.editor3.create()
     }

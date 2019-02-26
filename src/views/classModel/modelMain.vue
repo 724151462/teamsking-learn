@@ -12,14 +12,14 @@
                     <img :src="require('@/assets/images/user1.png')" height="35px" alt="">
                     <span>签到</span>
                   </div>
-                    <div class="icon-inner" style="cursor: pointer;" @click="goUser">
-                        <img :src="require('@/assets/images/user1.png')" height="35px" alt="">
-                        <span>成员</span>
-                    </div>
-                    <div class="icon-inner" @click="closeClass" style="cursor: pointer;">
-                        <img :src="require('@/assets/images/over.png')" height="35px" alt="">
-                        <span >结束课堂</span>
-                    </div>
+                  <div class="icon-inner" style="cursor: pointer;" @click="goUser">
+                      <img :src="require('@/assets/images/user1.png')" height="35px" alt="">
+                      <span>成员</span>
+                  </div>
+                  <div class="icon-inner" @click="closeClass" style="cursor: pointer;">
+                      <img :src="require('@/assets/images/over.png')" height="35px" alt="">
+                      <span >结束课堂</span>
+                  </div>
                 </div>
             </el-header>
             <el-main>
@@ -60,9 +60,7 @@
         isBack:false
       }
     },
-    components:{
-      fullScreen
-    },
+    components:{fullScreen},
     created() {
     },
     mounted () {
@@ -202,7 +200,11 @@
           .catch(err=>{console.log(err)})
       },
       goUser(){
-        this.$router.push({path: "/course/modelChecked"});
+        if(sessionStorage.getItem('isSign') === 'NO'){
+          this.$message.warning('未开启签到，无法查看课堂成员')
+        }else{
+          this.$router.push({path: "/course/modelChecked"});
+        }
       },
     }
 }

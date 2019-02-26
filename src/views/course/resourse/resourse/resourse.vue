@@ -72,7 +72,6 @@
                     <el-button size="mini" type="primary" @click.stop="" v-if="!data.srtUrl && data.resourceType == 10">添加字幕 </el-button>
                     <el-button size="mini" type="primary" @click.stop="delRes(data.resourceId,data.parentId)">删除</el-button>
                   </span>
-
                   <span style="margin-right: 10px;">{{data.resourceSize}}</span>
                   <span>{{data.createTime}}</span>
                   <!--<span>预览</span>-->
@@ -588,61 +587,72 @@ import { setTimeout } from 'timers';
       //拖拽相关
       handleDrop(draggingNode, dropNode, dropType, ev) {
 
-        console.log(draggingNode)
-        console.log(dropNode)
-        console.log(dropType)
+        //console.log(dropType)
+        //console.log('拖拽的',dropNode.label,dropNode)
 
-        let beforeType= draggingNode.data.resourceId ? 2 :1,
-            beforeId = beforeType ==1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
-            afterType = dropNode.data.resourceId ? 2 :1,
-            afterId = afterType ==1 ? dropNode.data.catalogId: dropNode.data.resourceId;
+        let type= draggingNode.data.catalogId ? 1 :2,
+          beforeId = type == 1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
+          afterType = dropNode.data.catalogId ? 1 : 2,
+          afterId = type == 1 ? dropNode.data.catalogId: dropNode.data.resourceId;
 
-        let expanId = draggingNode.data.catalogId || draggingNode.data.parentId
-        this.expan=[expanId]
+        let data = {}
 
-        if(dropType == 'after'){
-          let data = {
-            id:beforeId,
-            type:beforeType,
-            previous: {
-              id: afterId,
-              type:afterType
+        switch (dropType) {
+          case 'inner':
+            data = {id:beforeId, type:type, inCatalogId:afterId}
+            this.move(data)
+            break
+          case 'after':
+            data = {
+              id:beforeId,
+              type:type,
+              previous: {
+                id: afterId,
+                type:afterType
+              }
             }
-          }
-          console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的后面')
-          console.log(data)
-          this.move(data)
-        }else if(dropType == 'before'){
-          let data = {
-            id:beforeId,
-            type:beforeType,
-            previous: {
-              id: afterId,
-              type:afterType
+            console.log(data)
+
+            console.log('将被移到id:',dropNode.data.catalogId,'名字：',dropNode.label,'后面')
+            this.move(data)
+            break
+          case 'before':
+            if(dropNode.previousSibling.previousSibling){
+              data = {
+                id:beforeId,
+                type:type,
+                previous: {
+                  id: dropNode.previousSibling.previousSibling.data.catalogId,
+                  type:afterType
+                }
+              }
+              console.log(data)
+
+              console.log('将被移到id',dropNode.previousSibling.previousSibling.data.catalogId,
+                '名字:',dropNode.previousSibling.previousSibling.label,'后面')
+            }else{
+              data = {
+                id:beforeId,
+                type:type,
+                next: {
+                  id: afterId,
+                  type:afterType
+                }
+              }
+              console.log(data)
+
+              console.log('将被移到最顶部')
             }
-          }
-          console.log(draggingNode.data.catalogName, '---文件夹移动到---', dropNode.data.catalogName ,'--的前面')
-          console.log(data)
-          // this.move(data)
-        }else if(dropType == 'inner'){
-          let data = {
-            id:beforeId,
-            type:beforeType,
-            inCatalogId:afterId
-          }
-          console.log(data)
-          console.log('移入操作')
-          this.move(data)
+            this.move(data)
+            break
         }
       },
       allowDrop(draggingNode, dropNode, dropType) {
-        // console.log(draggingNode,dropNode,dropType)
-        let type = draggingNode.data.resourceId ? 2 :1
-        if(type ==2 && dropNode.data.catalogLevel == 1){
-          return false
-        }else if (dropType == 'prev' || dropType == 'next'){
-          return false
-        }else{
+        if(!draggingNode.data.catalogId){
+          return type === 'inner' && dropNode.data.catalogId
+        }else if(draggingNode.data.catalogId){
+          return dropNode.data.catalogId
+        } else{
           return true
         }
       },
@@ -682,7 +692,7 @@ import { setTimeout } from 'timers';
       opacity  1
   .resource
     .title
-      border-bottom 2px solid gray
+      border-bottom 2px solid #e3e8ee
       padding-bottom 20px
     .radio-group
       display flex
