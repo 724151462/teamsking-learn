@@ -53,7 +53,6 @@
       </el-dropdown>
     </div>
     <router-view style="margin-top: 60px;"></router-view>
-    <router-view></router-view>
     <el-dialog
       title="提示"
       :visible.sync="nameDialog"
