@@ -460,18 +460,23 @@
       //修改本人信息
       changeInfo(){
         let data = {
+          avatar: this.infoForm.avatra,
           gender: this.infoForm.gender,
           userId: this.infoForm.userId
         }
         userApi.changeUserInfo(data).then(res=>{
-          this.$message.success('修改用户信息成功')
+          if(Number(res.code) === 200) {
+            console.log(res)
+            this.$message.success('修改用户信息成功')
+          }else {
+            this.$message.error(getErrorMsg(res.msg))
+          }
         })
       },
       //修改本人的教师信息
       changeTeaInfo(){
         let data = this.jobForm
         userApi.saveTeacherInfo(data).then(res=>{
-        console.log(res)
         if(Number(res.code) === 200) {
           this.$message.success('修改成功')
           this.jobForm = {}

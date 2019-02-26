@@ -110,14 +110,7 @@ export default {
         let userId = sessionStorage.getItem('userId');
         window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
           let data = result.body
-          JSON.parse(data)
           console.log(JSON.parse(data))
-          if(data.socketType == 803){
-            this.$message.info('有学生签到')
-          }
-          if(data.socketType == 804){
-            this.$message.error('签到错误')
-          }
         });
       },
       getClass(){
