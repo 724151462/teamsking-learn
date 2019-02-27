@@ -27,7 +27,7 @@
           :default-openeds="defaultOpens"
           ref="menu"
         >
-          <template v-for="issue in $router.options.routes">
+          <template v-for="issue in node">
             <!-- issue.name:{{issue.name}}<br>leftNavState:{{$store.state.leftNavState}} -->
             <template v-if="issue.name === $store.state.leftNavState">
               <!-- 注意：这里就是leftNavState状态作用之处，当该值与router的根路由的name相等时加载相应菜单组 -->
@@ -78,11 +78,24 @@ export default {
   },
   data() {
     return {
+      node: this.$router.options.routes,
       defaultOpens: [String(sessionStorage.getItem("defaultOpens"))] || []
     };
   },
   computed: {
     ...mapGetters(["currentMenu"])
+  },
+  created() {
+    //这里没有直接使用this.$router.options.routes，是因为addRoute的路由规则，在这里this.$router.options.routes获取不到
+		//有兴趣的可以看一下源码，是为什么获取不到，但是却又有规则了 
+		//另外在开发的时候，可能由于是热部署，也会不断重复的给nodes添加元素，造成导航条有重复的，简单解决，可以设置一个开关
+		let isLoadNodes = sessionStorage.getItem('isLoadNodes')
+		if (!isLoadNodes) {
+			let data = JSON.parse(window.sessionStorage.getItem('menuList'))
+			// this.nodes.push(...data)
+			console.log(this.nodes)
+			sessionStorage.setItem('isLoadNodes', 'true')
+		}
   },
   methods: {
     handleOpen(...params) {
