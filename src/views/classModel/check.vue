@@ -46,13 +46,11 @@
       fullScreen
     },
     methods: {
-      timeAdd(){
+      timeAdd(miaoNum = 0){
         let _this_ = this
         clearInterval(timer)
         let miao = 0,
-            fen = 0,
-            miaoNum = 0
-
+            fen = 0;
         let timer = setInterval(function() {
           miao +=1
           miaoNum +=1
@@ -102,33 +100,34 @@
         })
       },
       subClassroom(){
-        let userId = sessionStorage.getItem('userId');
-        console.log('订阅成功')
+        let userId = sessionStorage.getItem('userId'),
+            courseId = sessionStorage.getItem('courseId');
+        //console.log('订阅成功')
         let _this_ = this;
 
         window.STOMP_CLIENT.subscribe('/user/' + userId + '/teamsking/classroom',function(result){
           let data = result.body
           data = JSON.parse(data)
-
-          if(data.data.socketType == 801){
+          console.log(data)
+          if(data.data.socketType == 801 && data.data.socketData.courseId == courseId){
             console.log('--开始签到--')
             _this_.timeAdd()
             console.log(data.data)
           }
-          if(data.data.socketType == 803){
+          if(data.data.socketType == 803 && data.data.socketData.courseId == courseId){
             console.log('学生签到')
             console.log(data.data)
             _this_.studentSign(data.data.socketData.userId)
           }
-          if(data.data.socketType == 804){
+          if(data.data.socketType == 804 && data.data.socketData.courseId == courseId){
             console.log('错误签到')
             console.log(data.data)
             _this_.$message.error('签到错误')
           }
-          if(data.data.socketType == 802){
+          if(data.data.socketType == 802 && data.data.socketData.courseId == courseId){
             console.log('结束签到')
+            _this_.$message.success('签到结束')
             sessionStorage.setItem('isSign','YES')
-            console.log(data.data)
             window.STOMP_CLIENT.unsubscribe();
             _this_.$router.push({path: "/course/classchapter"});
           }
@@ -169,7 +168,13 @@
     },
     created(){
       this.courseName = sessionStorage.getItem('courseName')
-      this.startSign()
+      if(this.$route.query.recover){
+        let data = JSON.parse(sessionStorage.getItem('signInfo'))
+        this.timeAdd(data.duringTime)
+        this.studenlist = data.userList
+      }else{
+        this.subClassroom()
+      }
     },
   }
 </script>

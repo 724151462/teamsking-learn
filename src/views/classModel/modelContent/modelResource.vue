@@ -2,9 +2,9 @@
   <div class="model-resource">
     <div class="nav">
       <div class="nav-go">
-        <span><i class="el-icon-arrow-left"></i></span>
-        <span><i class="el-icon-arrow-right"></i></span>
-        <span style="user-select: none">|</span>
+        <!--<span><i class="el-icon-arrow-left"></i></span>-->
+        <!--<span><i class="el-icon-arrow-right"></i></span>-->
+        <!--<span style="user-select: none">|</span>-->
       </div>
       <div class="nav-list">
         <!--<div class="path">资源库<i class="el-breadcrumb__separator el-icon-arrow-right"></i></div>-->
@@ -87,6 +87,7 @@ export default {
       },
       showContent: false,
       routerList:[],
+      hisRouter:[],
       search:'',
       data : {
         catalogList:[],
@@ -147,12 +148,13 @@ export default {
     },
     resourceView(resource) {
       console.log(resource)
+      this.routerList.push({id:resource.resourceId,name:resource.resourceTitle})
       if(resource.resourceType === 20) {
         getResourceViewByUrl({url: resource.resourceUrl})
         .then(response=> {
           this.resourceObj = resource
           this.resourceObj.docUrl = response.data
-          console.log(response.data)
+          //console.log(response.data)
           this.showContent = true
         })
       }else {

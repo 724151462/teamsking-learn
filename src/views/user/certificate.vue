@@ -78,7 +78,7 @@
             <el-form-item label="名称">
                 <el-input type="text" class="input-width" v-model="cerForm.certificateName" placeholder="请输入"></el-input>
             </el-form-item>
-            <el-form-item label="发证时间" required>
+            <el-form-item label="发证时间">
                 <el-date-picker
                   v-model="cerForm.issuingDate"
                   type="datetime"
@@ -91,8 +91,8 @@
             <el-form-item label="发证件单位">
                 <el-input type="text" class="input-width" v-model="cerForm.issuingAuthority" placeholder="请输入"></el-input>
             </el-form-item>
-            <span>证书图片</span>
-            <span v-for="(img,index) in cerForm.imgUrls" :key="img.id" class="" style="display: inline-block;position: relative">
+            <span style="margin-left: 30px;">证书图片</span>
+            <span v-for="(img,index) in cerForm.imgUrls" :key="img.id" class="" style="display: inline-block;position: relative;margin-left: 10px">
                 <span class="close" @click="delImg(index)"><i class="el-icon-error"></i></span>
                 <img :src="img.imgUrl" alt="" class="cre-img has-close" style="position: relative">
             </span>
