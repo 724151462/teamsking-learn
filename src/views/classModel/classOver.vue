@@ -15,7 +15,7 @@
           <img :src="require('@/assets/images/classModel/play.png')" height="40px" alt="">
         </div>
         <div class="box-text">
-          <p>5</p>
+          <p>暂无数据</p>
           <p>播放课堂资源个数</p>
         </div>
       </div>

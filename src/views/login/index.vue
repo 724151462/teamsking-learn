@@ -45,7 +45,7 @@
         </div>
       </div>
     </div>
-    <!--<el-button type="danger" style="position: fixed;left:50%;top: 20px;" @click="goLoginDebug">测试登陆</el-button>-->
+    <el-button type="danger" style="position: fixed;left:50%;top: 20px;" @click="goLoginDebug">测试登陆</el-button>
     <el-dialog
       title="找回密码"
       :visible.sync="forgotPass.dialogVisible"
@@ -194,18 +194,20 @@
       },
       goLoginDebug(){
         let data = {
-          userName: 'admin',
-          password: 'admin'
+          tenantId: 1,
+          loginAccount: 'admin',
+          passwd: 'abc123'
         }
-        loginDebug(data).then(res => {
+        logins(data).then(res => {
           // console.log(res)
           if (res.code === 200) {
+            console.log('登录成功')
             twoWeeksExchange(res.data.token)
             saveUserInfo(res.data.userId)
             this.$router.replace('/course')
           } else {
             this.$message({
-              message: '用户名密码错误，请重新输入',
+              message:getErrorMsg(res.msg),
               type: 'error'
             })
           }

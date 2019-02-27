@@ -62,6 +62,15 @@
     },
     components:{fullScreen},
     created() {
+      // this.$confirm('检测到您还未开启过签到，是否前往签到?', '签到检测', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // }).then(() => {
+      //   alert('前往签到')
+      // }).catch(() => {
+      //   console.log('取消签到')
+      // });
     },
     mounted () {
       this.isCheck()
@@ -154,28 +163,36 @@
       },
       goCheck(){
         if(sessionStorage.getItem('isSign') === 'NO'){
-          this.$router.push({
-            path: "/course/check",
-            query: {
-              id: this.$route.query.id,
-              classroomId: this.$store.state.socket.classroomId
-            }
-          });
+          this.newSign()
+          // this.$router.push({
+          //   path: "/course/check",
+          //   query: {
+          //     id: this.$route.query.id,
+          //     classroomId: this.$store.state.socket.classroomId
+          //   }
+          // });
         }else{
           this.$message.warning('已经开启过签到了')
         }
       },
       //保存签到
       newSign(){
+        let tagClient = window.STOMP_CLIENT,
+          token = sessionStorage.getItem('token'),
+          userId = sessionStorage.getItem('userId'),
+          courseId = sessionStorage.getItem('courseId'),
+          beanId = sessionStorage.getItem('signId'),
+          classroomId = sessionStorage.getItem('classroom');
         let signData = {classroomId , courseId ,signType:10,usedType:20};
 
         //开始签到前保存签到
         saveSign(signData)
           .then(res=>{
-            console.log('保存签到成功')
+            //console.log('保存签到成功')
             if(Number(res.code) === 200){
-              this.subClassroom()
-              sessionStorage.setItem('signOutId',res.data.signId)
+              // this.subClassroom()
+              sessionStorage.setItem('signId',res.data.signId)
+              beanId = sessionStorage.getItem('signId')
               tagClient.send('/teamsking/course/sign/start',{'token': token},
                 JSON.stringify({
                   "bean":res.data.signId,
@@ -184,6 +201,7 @@
                   "userId":userId
                 })
               );
+              this.$router.push({path: "/course/check"});
             }else{
               this.$message.error('保存签到失败')
             }
@@ -191,11 +209,40 @@
       },
       //检查是否有未完成的签到
       isCheck(){
-        console.log('检查')
         let data = {classroomId:Number(sessionStorage.getItem('classroom'))}
         hasCheck(data)
           .then(res=>{
-            console.log(res)
+            if(res.data){
+              sessionStorage.setItem('signInfo',JSON.stringify(res.data))
+              console.log(res.data)
+              this.$confirm('检测到您有一个未结束的签到，是否继续签到?', '签到检测', {
+                confirmButtonText: '继续签到',
+                cancelButtonText: '直接结束',
+                type: 'warning'
+              }).then(() => {
+                this.$router.push({
+                  path: "/course/check",
+                  query: {recover: res.data.signId}
+                });
+                alert('前往签到')
+              }).catch(() => {
+                let tagClient = window.STOMP_CLIENT,
+                  token = sessionStorage.getItem('token'),
+                  userId = sessionStorage.getItem('userId'),
+                  courseId = sessionStorage.getItem('courseId'),
+                  signId = sessionStorage.getItem('signId'),
+                  classroomId = sessionStorage.getItem('classroom');
+
+                tagClient.send('/teamsking/course/sign/close',{'token': token},
+                  JSON.stringify({
+                    "bean":signId,
+                    "classroomId":classroomId,
+                    "courseId":courseId,
+                    "userId":userId
+                  })
+                );
+              });
+            }else{}
           })
           .catch(err=>{console.log(err)})
       },

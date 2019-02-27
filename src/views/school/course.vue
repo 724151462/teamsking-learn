@@ -1,7 +1,5 @@
 <template>
     <div class="course">
-        课程管理
-
         <el-form ref="form" :model="searchForm" :inline="true" label-width="100px" class="form-query">
             <el-form-item label="输入搜索：">
                 <el-input v-model="searchForm.searchString" placeholder="课程名称/课程ID"></el-input>
@@ -28,7 +26,7 @@
                 background
                 layout="prev, pager, next"
                 :total="totalCount"
-                :page-size="2"
+                :page-size="5"
                 @current-change="pageChange">
         </el-pagination>
 
@@ -72,7 +70,7 @@ export default {
             searchForm: {
                 pageIndex: 1,
                 searchString: '',
-                pageSize: 2
+                pageSize: 5
             },
             dialogVisible: false,
             // 对话框
@@ -117,7 +115,7 @@ export default {
             {
                 key: '课程人数：',
                 inputType: 'string',
-                value: 'userCount'
+                value: 'userCount',
             },
             {
                 key: '所属学校:',

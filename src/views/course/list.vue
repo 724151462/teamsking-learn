@@ -15,12 +15,12 @@
       <el-row>
         <!--<el-row style="background:#F3F3F3;padding:10px 0 10px 10px;margin-top: 20px;">课程列表</el-row>-->
         <el-row class="course-table" v-for="list in data" :key="list.id">
-          <div class="img">
+          <div class="img-warp">
             <span class="tib">{{courseStatus(list.courseStatus)}}</span>
-            <img :src="list.courseCover">
+            <img class="course-img" :src="list.courseCover">
           </div>
           <div class="center">
-            <div class="title" style="margin:20px 0;font-weight:bold">{{list.courseName }}</div>
+            <div class="title" style="margin-bottom:10px;font-weight:bold">{{list.courseName }}</div>
             <div class="list">学生数：{{list.userCount}}人</div>
             <div class="list">课程时间：{{list.beginTime}} ~ {{list.endTime}}</div>
             <div class="list">所属学校：{{list.tenantName}}</div>
@@ -34,8 +34,10 @@
               <a class="list" v-else-if="list.courseStatus === 10" @click="release(list.courseId)">发布</a>
               <a class="list" @click="deleteCourse(list.courseId)" v-if="list.courseStatus === 40 || list.courseStatus === 10">删除</a>
             </div>
-            <el-button type="primary" @click="goCourseModel(list.courseId)" v-if="list.courseStatus === 30">课堂模式</el-button>
-            <el-button type="primary" @click="goCourseChapter(list.courseId, list.courseName)">教学管理</el-button>
+            <div>
+              <el-button type="primary" @click="goCourseModel(list.courseId)" v-if="list.courseStatus === 30">课堂模式</el-button>
+              <el-button type="primary" @click="goCourseChapter(list.courseId, list.courseName)">教学管理</el-button>
+            </div>
           </div>
         </el-row>
         <div style="text-align:right;" v-show="data.length!=0">
@@ -258,61 +260,54 @@ export default {
   .course-table
     overflow hidden
     margin-bottom:10px
+    height 167px
+    font-family: serif
     border-bottom:1px solid #CCCCCC
-
-    .img
+    .img-warp
       position: relative
       width:280px
       height:160px
       border:1px solid #CCCCCC
       display:inline-block
       vertical-align:top
-      position: relative
-
       .tib
         background: #3EABA8
         padding:2px 5px
         z-index 1000
         color:#ffffff;
         font-size: 16px
-        -webkit-border-radius: 2px
-        -moz-border-radius: 2px
-        border-radius: 2px
-
-      span
         position: absolute
         left: 0
         top: 0
-
-      img
-        width:100%
-        height:auto
-        position: absolute
-        top: 50%
-        transform:translateY(-50%)
-
+        -webkit-border-radius: 2px
+        -moz-border-radius: 2px
+        border-radius: 2px
+      .course-img
+        width:280px
+        height:160px
     .center
       display:inline-block
       padding-left:30px
-
       .title
         font-size:20px
         margin-top:5px
         color: rgb(61, 61, 70)
-
       .list
-        margin-top:5px
-
+        margin-bottom:10px
     .button
+      height 100%
       float: right
       text-align:right
-
+      vertical-align top
+      display inline-block
       .top
         margin-top:30px;
         margin-bottom:20px
-
-        .list
-          margin-right:20px
-          color: rgb(116, 120,129)
-          cursor: pointer
+        height calc(100% - 100px)
+      .list
+        margin-right:20px
+        color: #909399
+        cursor: pointer
+        &:hover
+          color #3399ff
 </style>
