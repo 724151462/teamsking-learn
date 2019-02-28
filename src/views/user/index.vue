@@ -7,8 +7,8 @@
         <div  style="padding-left: 100px;width: 100px;margin: 25px 0;">
           <img :src="infoForm.avatar ? infoForm.avatar : defAvatar" alt="" class="user-avatar">
           <div style="text-align: center;font-size: 14px;">
-            <el-button type="text" @ossUp="changeAvatar"><label for="male" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
-            <up-oss style="display: none" :file-kind="fileKind" @ossUp="changeAvatar"></up-oss>
+            <el-button type="text" @ossUp="changeAvatar"><label for="main" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
+            <up-oss  style="display: none" :file-kind="fileKind" @ossUp="changeAvatar"></up-oss>
           </div>
         </div>
       </div>
@@ -193,7 +193,7 @@
       title="确认密码"
       :visible.sync="checkEmailDialog"
       width="30%">
-      <span>身份认证</span>
+      <span style="margin-right:20px;">身份认证</span>
       <el-input class="input-width" type="password" placeholder="请输入登录密码" v-model="mailPass"></el-input>
       <span slot="footer" class="dialog-footer">
         <el-button @click="()=>{checkEmailDialog = false;this.password=''}">取 消</el-button>
@@ -215,13 +215,20 @@
         <el-form-item label="发证时间">
           <el-date-picker
             v-model="cerForm.issuingDate"
+            type="date"
+            value-format="yyyy-MM-dd 12:00:00"
             class="input-width"
-            type="datetime"
-            prefix-icon="el-icon-date"
-            placeholder="选择发证时间"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            default-time="12:00:00">
+            placeholder="选择日期">
           </el-date-picker>
+          <!--<el-date-picker-->
+            <!--v-model="cerForm.issuingDate"-->
+            <!--class="input-width"-->
+            <!--type="datetime"-->
+            <!--prefix-icon="el-icon-date"-->
+            <!--placeholder="选择发证时间"-->
+            <!--value-format="yyyy-MM-dd HH:mm:ss"-->
+            <!--default-time="12:00:00">-->
+          <!--</el-date-picker>-->
         </el-form-item>
         <el-form-item label="发证件单位">
           <el-input type="text" class="input-width" v-model="cerForm.issuingAuthority" placeholder="请输入"></el-input>
@@ -678,8 +685,8 @@
       },
       //证书图片上传
       upCre (url) {
-        console.log('证书上传')
-        let data = {imgUrl : url,order: this.order}
+        //console.log('证书上传')
+        let data = {imgUrl : url,orderValue: this.order}
         this.order+=1
         this.cerForm.imgUrls.push(data)
       },
@@ -707,7 +714,7 @@
             this.order = 1
             this.uploadDialog = false
           }else {
-            this.$message.error('证书保存失败');
+            this.$message.error(getErrorMsg(res.msg))
           }
         })
       }

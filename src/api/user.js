@@ -198,7 +198,7 @@ export function certificateList (data) {
 }
 
 /**
- * 获取审核中的证书信息
+ * 证书审核详情
  * */
 export function statusCre (data) {
   return commonsAjax(`${baseUrl}certificate/${data}/audit`, data, 'get')

@@ -1,20 +1,19 @@
 <template>
   <div style="display: inline-block;margin: 0 10px">
-    <el-button type="primary" @click="goUp" id="male">{{btnText}}</el-button>
+    <el-button type="primary" @click="goUp" id="main">{{btnText}}</el-button>
     <!-- <div>{{schedule}}</div> -->
     <input type="file" :id="inputs" @change="upInput"/>
   </div>
 </template>
 
 <script>
-  /**
-   * 这里只能传单文件，多文件需要修改逻辑，需for调用 forInputs 方法
-   * */
   import oss from 'ali-oss'
-  import { ossAliSts } from '../api/oss'
+  import axios from 'axios'
+  import { webUpload} from '../api/oss'
+
   export default {
+    name: "up-oss",
     props:{
-      //可上传大小
       size:{
         default:2 * 1024 * 1024 * 1024
       },
@@ -31,131 +30,109 @@
         default: 'default'
       }
     },
-    data(){
-      return{
+    data () {
+      return {
         schedule:0, //上传进度
         ossData:null,
         fileData:null,
+        imageData:{
+          accessid: "",
+          dir: "",
+          expire: "",
+          host: "",
+          policy: "",
+          signature: "",
+        },
         isError:3,
         //需要返回的文件信息
         fileName:'',
         fileSize:'',
+        dir:'',
         // fileName:'',
       }
     },
     methods:{
+      //触发上传按钮
       goUp () {
         document.getElementById(this.inputs).click()
       },
-      upInput (event) {
-        console.log('1',event)
-        if(event){
-          this.fileData = event
-          this.fileName =event.target.files[0].name
-          this.fileSize =event.target.files[0].size
-        }
-        //这里加一个获取验签信息的错误处理
-        if (Number(this.isError) === 0) {
-          this.errors()
-          return false
-        }
-        if (this.ossData === null && Number(this.isError) !== 0) {
-          this.ossCheck()
-          return false
-        }
-        let file = this.fileData.target.files[0]
-        let name = new Date().getTime() + file.name.replace(/[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g, '')
-        if(this.fileType !== '') {
-          let chekcType = this.fileType.split(',').some(element=> {
-            return file.type === element
-          })
-          if(!chekcType) {
-              this.$message({
-                message: '文件格式错误',
-                type: 'error'
-              })
-              this.inputNull()
-              return false
-            }
-        }
-        if (file.size > this.size) {
-          this.$message({
-            message: '上传文件超出可上传范围，请重新选择文件上传',
-            type: 'error'
-          })
-          this.inputNull()
-          return false
-        }
-        let client = new oss(this.ossData)
-        //多文件上传请修改这里
-        this.forInputs(client,name,file)
-      },
-      forInputs (client,name,file) {
-        let loading = this.$loading({
-          lock: true,
-          text: '正在努力上传中',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
-        let self = this
-        // 判断上传文件的分类
-        let dir = this.resType(name)
-        // 'base-dir/' +'object-name' ， 如果要指定上传目录，第一个参数就这样传
-        client.multipartUpload(dir, file, {
-          progress(p, checkpoint){
-            //反回的 p 是当前进度，大概1s会返回一个进度的样子，下面处理了下百分比，checkpoint 是具体的数据流上传，不做暂停效果可以不考虑用它
-            console.log('进度返回', p, checkpoint)
-            self.schedule = (p.toFixed(2) * 100) + '%'
-          }
-        }).then((results) => {
-          loading.close()
-          // console.log('then返回',results)
-          //http://tskedu-course.oss-cn-beijing.aliyuncs.com/ + name = 完整的url
-          // self.$message({
-          //   message:'上传成功',
-          //   type:'success'
-          // })
-          Number(self.isError) !== 2 ? (self.isError = 2) : ''
-          let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + dir
-          this.inputNull()
-          self.$emit('ossUp', url, this.fileName, this.fileSize)
-        }).catch(error=>{
-          console.log(error)
-          //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
-          self.ossCheck('error')
-        })
-      },
-      inputNull () {
+      //清空输入框
+      inputNull (event) {
         let dom = document.getElementById(this.inputs)
         dom.value = '';
         // dom.outerHTML = dom.outerHTML;
         this.fileData = null
       },
-      ossCheck (e) {
-        // console.log('e的监控数据',e , this.isError)
-        if (Number(this.isError) === 0) {
-          this.errors()
-          return false
+      //捕获到文件
+      upInput(event){
+        if(event){
+          this.fileData = event
+          this.fileName = new Date().getTime() + event.target.files[0].name
+          this.fileSize =event.target.files[0].size
         }
-        this.isError -= 1
-        ossAliSts().then(res => {
-          if (Number(res.code) === 200) {
-            this.ossData = JSON.parse(res.data)
-            // console.log('给到', this.ossData)
-            this.upInput()
-          } else {
-            this.ossCheck()
-          }
-        }).catch(error => {
-          //验签数据错误 / 过期，执行重试，3次后直接返回错误
-          this.ossCheck()
-        })
+        this.ossCheck()
       },
-      //判断文件类型,返回上传目录
+      //获取签证
+      ossCheck(name){
+        let dir = this.resType(this.fileName)
+        this.dir = dir
+        let loading = this.$loading({
+          lock: true,
+          text: '正在努力上传文件',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        webUpload({ossPath:dir})
+          .then(res=>{
+            console.log(res)
+            if(Number(res.code) === 200) {
+              let request = new FormData()
+              this.imageData = res.data
+
+              request.append('key', res.data.dir + this.fileName)
+              request.append('policy', res.data.policy)
+              request.append('OSSAccessKeyId', res.data.accessid)
+              request.append('success_action_status', '200')
+              request.append('Signature', res.data.signature)
+              request.append('file', this.fileData.target.files[0])
+
+              return request
+            }else {
+              this.$message.error('获取验签失败，请重试')
+            }
+          })
+          .then(request=>{
+            this.startUp(request)
+          })
+          .then((res)=>{
+            loading.close()
+            let url = this.imageData.host + '/' + this.imageData.dir + this.fileName
+            this.inputNull()
+            this.$emit('ossUp', url, this.fileName, this.fileSize)
+          })
+          .catch(err=>{
+            console.log(err)
+            this.$message.error('获取验签失败，请重试')
+          })
+      },
+      //上传文件到OSS
+      startUp(request){
+        axios({
+          method: 'post',
+          url: this.imageData.host,
+          data: request,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        }).then((err)=>{
+          //console.log('上传成功')
+        }).catch(function (error) {
+          //console.log(error);
+        });
+      },
+      //检验文件类型，生成dir
       resType(name){
         let dir = ''
         if(this.fileKind==='avatar'){
-          dir = 'teskedu/avatar/'+name
+          dir = 'teskedu/avatar/'
         }else if(this.fileKind==='resource'){
           let index= name.lastIndexOf('.'),
             imgArr = ['jpeg','jpg','png'],
@@ -165,43 +142,28 @@
           let curType = name.substring(index+1,name.length).toLowerCase()
 
           if(imgArr.find((item)=>{return curType == item})){
-            dir = 'teskedu/resource/img/'+name
+            dir = 'teskedu/resource/img/'
           }else if(videoArr.find((item)=>{return curType == item})){
-            dir = 'teskedu/resource/video/'+name
+            dir = 'teskedu/resource/video/'
           }else if(docArr.find((item)=>{return curType == item})){
-            dir = 'teskedu/resource/doc/'+name
+            dir = 'teskedu/resource/doc/'
           }else if(audioArr.find((item)=>{return curType == item})){
-            dir = 'teskedu/resource/audio/'+name
+            dir = 'teskedu/resource/audio/'
           }else{
-            this.$message.error('请上传受支持的资源文件')
+            this.$message.error('请上传受支持的文件类型')
             return false
           }
         } else if (this.fileKind ==='certificate'){
-          dir = 'teskedu/img/certificate/'+name
+          dir = 'teskedu/img/certificate/'
         } else{
           dir = name
         }
-
         return dir
       },
-      errors () {
-        this.$message({
-          message: '验签获取错误，请联系管理员',
-          type: 'error'
-        })
-        this.inputNull()
-      }
     }
   }
 </script>
 
-<style scoped lang="stylus" type="text/stylus">
-  #logo
-    display:none
-  #pic
-    display:none
-  #inputs
-    display:none
-  #creImg
-    display:none
+<style scoped>
+
 </style>
