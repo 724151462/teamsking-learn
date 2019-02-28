@@ -293,8 +293,8 @@
             this.resetPassword(info)
             break;
           case 'resetAll':
-            break;
             this.resetPassword(info)
+            break;
           case 'edit':
             this.$router.push({path: '/school/teacher/modifyteacher', query: {teacherId: info.teacherId} })
             break;

@@ -55,7 +55,7 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <div>
+      <div style="margin-bottom: 10px">
         <el-checkbox v-model="voteObj.showResult" true-label="1" false-label="2">投票后立即显示结果</el-checkbox>
       </div>
     </div>

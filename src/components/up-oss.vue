@@ -65,6 +65,7 @@
         }
         let file = this.fileData.target.files[0]
         let name = new Date().getTime() + file.name.replace(/[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g, '')
+        console.log(file.type)
         if(this.fileType !== '') {
           let chekcType = this.fileType.split(',').some(element=> {
             return file.type === element

@@ -100,6 +100,6 @@
 <style scoped lang="stylus" type="text/stylus">
   .container
     background-color: #efefef
-    min-height: 100%
+    min-height: 80%
 
 </style>

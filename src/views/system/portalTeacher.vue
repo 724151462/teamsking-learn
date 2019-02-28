@@ -1,6 +1,7 @@
 <template>
   <div class="portalTeacher">
-    <div style="height: 70px">
+    <div style="height: 50px; line-height: 50px">
+      <span>提示：最多添加8位推荐教师</span>
       <el-button style="float: right;margin-right: 50px" type="primary" @click="addTeacher">添加</el-button>
     </div>
 
@@ -114,6 +115,14 @@ export default {
     },
     ensureBtn() {
       if (this.btnType === "add") {
+        if(this.tableData3.length >= 8) {
+          this.$message({
+            message: '最多添加8位教师，您可以尝试替换教师',
+            type: 'warning'
+          })
+          this.dialogVisible = false
+          return
+        }
         console.log(this.form)
         this.form.sourceIds = [this.form.sourceIds]
         recAdd(this.form)

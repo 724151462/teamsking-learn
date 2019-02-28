@@ -15,8 +15,13 @@
       </div>
     </div>
     <div class="main-container">
-      <el-collapse>
-        <el-collapse-item v-for="(chapter, chapterIndex) in sourceData" :key="chapterIndex">
+      <span v-if="sourceData.length === 0">这是一门啥都没有的课程</span>
+      <el-collapse accordion v-model="activeChapter" @change="chapterChange" v-else>
+        <el-collapse-item
+          v-for="(chapter, chapterIndex) in sourceData"
+          :key="chapterIndex"
+          :name="String(chapter.chapterId)"
+        >
           <template slot="title">
             <div class="chapter-index">
               <div class="chapter-index chapter-inner">{{chapterIndex+1}}</div>
@@ -30,72 +35,75 @@
               </div>
             </div>
           </template>
-          <el-collapse-item
-            style="margin-left: 30px"
-            v-for="(jie, jieIndex) in chapter.catalogSection"
-            :key="jieIndex"
-          >
-            <template slot="title">
-              <div class="title-container" style="margin-left: 40px;">
-                <span>{{jie.sectionName}}</span>
-                <div class="operate">
-                  <span @click.stop="addContentBtn(jie)">+添加内容</span>
-                  <span @click.stop="delSection(jie)">删除</span>
-                  <!-- <span  class="spread" @click="spread(chapter)">展开</span> -->
-                </div>
-              </div>
-            </template>
-            <div
-              style="margin: 0 auto; width:90%;"
-              v-for="(content, contentIndex) in jie.catalogItem"
-              :key="contentIndex"
+          <el-collapse accordion v-model="activeSection" @change="sectionChange">
+            <el-collapse-item
+              style="margin-left: 30px"
+              v-for="(jie, jieIndex) in chapter.catalogSection"
+              :key="jieIndex"
+              :name="String(jie.sectionId)"
             >
-              <div style="padding: 5px 10px;">
-                <div class="itemTitleContainer">
-                  <div style="display: flex;align-items: center;margin-right: 10px">
-                    <img :src="typeIcon(content)" width="40" alt style="margin-right: 10px">
-                    <span>{{content.itemName}}</span>
-                    <div class="video-info" v-if="content.contentType === 10">
-                      <span style="margin-left: 15px">时长：{{content.resourceLength | timeTransfer}}</span>
-                      <el-tooltip
-                        class="item"
-                        effect="dark"
-                        :content="strUrl(content)"
-                        placement="top-start"
-                      >
-                        <img
-                          :src="require('../../assets/images/cc.png')"
+              <template slot="title">
+                <div class="title-container" style="margin-left: 40px;">
+                  <span>{{jie.sectionName}}</span>
+                  <div class="operate">
+                    <span @click.stop="addContentBtn(jie)">+添加内容</span>
+                    <span @click.stop="delSection(jie)">删除</span>
+                    <!-- <span  class="spread" @click="spread(chapter)">展开</span> -->
+                  </div>
+                </div>
+              </template>
+              <div
+                style="margin: 0 auto; width:90%;"
+                v-for="(content, contentIndex) in jie.catalogItem"
+                :key="contentIndex"
+              >
+                <div style="padding: 5px 10px;">
+                  <div class="itemTitleContainer">
+                    <div style="display: flex;align-items: center;margin-right: 10px">
+                      <img :src="typeIcon(content)" width="40" alt style="margin-right: 10px">
+                      <span>{{content.itemName}}</span>
+                      <div class="video-info" v-if="content.contentType === 10">
+                        <span style="margin-left: 15px">时长：{{content.resourceLength | timeTransfer}}</span>
+                        <el-tooltip
+                          class="item"
+                          effect="dark"
+                          :content="strUrl(content)"
+                          placement="top-start"
+                        >
+                          <img
+                            :src="require('../../assets/images/cc.png')"
+                            style="margin-left: 5px"
+                            height="18px"
+                          >
+                        </el-tooltip>
+                        <el-tooltip
+                          class="item"
+                          effect="dark"
+                          :content="transProgress(content)"
+                          placement="top-start"
+                        >
+                          <img
+                            :src="require('../../assets/images/tcode.png')"
+                            style="margin-left: 5px"
+                            height="18px"
+                          >
+                        </el-tooltip>
+                        <!-- <img
+                          :src="require('../../assets/images/txt.png')"
                           style="margin-left: 5px"
                           height="18px"
-                        >
-                      </el-tooltip>
-                      <el-tooltip
-                        class="item"
-                        effect="dark"
-                        :content="transProgress(content)"
-                        placement="top-start"
-                      >
-                        <img
-                          :src="require('../../assets/images/tcode.png')"
-                          style="margin-left: 5px"
-                          height="18px"
-                        >
-                      </el-tooltip>
-                      <img
-                        :src="require('../../assets/images/txt.png')"
-                        style="margin-left: 5px"
-                        height="18px"
-                      >
+                        > -->
+                      </div>
+                    </div>
+                    <div class="operate">
+                      <span v-if="content.contentType===10" @click="addSubjectBtn(content)">+内嵌题</span>
+                      <span @click="delItem(content, jie.catalogItem, contentIndex)">删除</span>
                     </div>
                   </div>
-                  <div class="operate">
-                    <span v-if="content.contentType===10" @click="addSubjectBtn(content)">+内嵌题</span>
-                    <span @click="delItem(content, jie.catalogItem, contentIndex)">删除</span>
-                  </div>
                 </div>
               </div>
-            </div>
-          </el-collapse-item>
+            </el-collapse-item>
+          </el-collapse>
         </el-collapse-item>
       </el-collapse>
       <div class="addChapter" @click="addChapterBtn">添加章</div>
@@ -172,11 +180,22 @@
     </el-dialog>
 
     <!-- 添加题目对话框 -->
-    <el-dialog title="添加题目" top="30vh" :visible.sync="subjectVisible" width="65%" :before-close="handleVideoClose">
+    <el-dialog
+      title="添加题目"
+      top="30vh"
+      :visible.sync="subjectVisible"
+      width="65%"
+      :before-close="handleVideoClose"
+    >
       <div class="subject-container">
         <div class="subject-left">
           <!-- <video :src="videoUrl"></video> -->
-          <videoPlayer :isMp4="videoUrl" :poster="coverUrl" :state="videoState" @resetStatus="resetStatus"></videoPlayer>
+          <videoPlayer
+            :isMp4="videoUrl"
+            :poster="coverUrl"
+            :state="videoState"
+            @resetStatus="resetStatus"
+          ></videoPlayer>
         </div>
         <div class="subject-right">
           <div class="row-container">
@@ -256,13 +275,19 @@
           style="display: flex;flex-direction: column;justify-content: space-around;height: 300px"
         >
           <div style="display: flex;flex-direction: column;">
-            <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频'" @ossUp="getVideoUrl" :fileKind="'resource'"></upOss>
+            <upOss
+              style="margin: 0px 10px 10px 0px"
+              :btnText="'上传视频'"
+              @ossUp="getVideoUrl"
+              :fileKind="'resource'"
+              :fileType="'video/mp4'"
+            ></upOss>
             <span>请上传格式为mp4或flv格式，且小于2GB的视频</span>
           </div>
-          <div style="display: flex;flex-direction: column;">
+          <!-- <div style="display: flex;flex-direction: column;">
             <upOss style="margin: 0px 10px 10px 0px" :btnText="'上传视频字幕'"></upOss>
             <span>请上传srt格式的字幕</span>
-          </div>
+          </div> -->
         </div>
         <videoPlayer
           style="width:500px; margin-left:50px"
@@ -310,6 +335,8 @@ export default {
       // courseId: '0608367675f54267aa6960fd0557cc1b',
       // 删除确认弹窗
       delDialog: false,
+      activeChapter: sessionStorage.getItem('activeChapter') || '',
+      activeSection: sessionStorage.getItem('activeSection') || '',
       // 删除参数
       delDialogParm: {},
       courseId: this.$route.query.id,
@@ -417,7 +444,7 @@ export default {
     };
   },
   created() {
-    this.$emit('courseName', sessionStorage.getItem('courseName'))
+    this.$emit("courseName", sessionStorage.getItem("courseName"));
     this.getChapterList();
     courseBaseInfo(this.courseId).then(response => {
       this.patternId = String(response.data.studyMode);
@@ -436,6 +463,16 @@ export default {
     });
   },
   methods: {
+    // 章折叠事件
+    chapterChange(val) {
+      sessionStorage.setItem('activeSection', '')
+      this.activeSection = ''
+      sessionStorage.setItem('activeChapter', val)
+    },
+    // 节折叠事件
+    sectionChange(val) {
+      sessionStorage.setItem('activeSection', val)
+    },
     getChapterList() {
       chaptersList(this.courseId).then(response => {
         this.sourceData = response.data;
@@ -443,9 +480,9 @@ export default {
     },
     // 弹窗关闭前视频停止
     handleVideoClose() {
-      this.videoState = true
+      this.videoState = true;
       // this.videoState = false
-      this.subjectVisible = false
+      this.subjectVisible = false;
     },
     // 发布课程
     coursePublish() {
@@ -650,15 +687,17 @@ export default {
       this.dialogVisible = false;
       console.log("ft", formType);
       itemAdd(formType).then(response => {
-        console.log(response.data);
         if (response.code === 200) {
-          this.tempSection.catalogItem.push(formType);
+          this.tempSection.catalogItem.push(response.data);
           this.$message({
             message: "添加内容成功",
             type: "success"
           });
           this.dialogVisible = false;
-          this.getChapterList();
+          console.log(response.data)
+          this.activeSection = String(response.data.sectionId)
+          sessionStorage.setItem('activeSection', response.data.sectionId)
+          // this.getChapterList();
         }
       });
     },
@@ -869,7 +908,7 @@ export default {
     },
     // 重置视频播放状态
     resetStatus(value) {
-      this.videoState = value
+      this.videoState = value;
     },
     // 选完题确认按钮
     editEnsure() {
@@ -951,10 +990,12 @@ export default {
     // 本地上传视频
     getVideoUrl(...params) {
       // this.videoForm.itemResource.resourceTitle = params[1].substring(13); // 名称
-      this.videoForm.itemResource.resourceTitle = params[1]
+      this.videoForm.itemResource.resourceTitle = params[1];
       this.videoForm.itemResource.resourceUrl = params[0]; // 路径
       this.videoForm.itemResource.resourceType = 10; // 资源类型
-      this.videoForm.itemResource.contentType = this.fileTail({assetUrl:params[0]});
+      this.videoForm.itemResource.contentType = this.fileTail({
+        assetUrl: params[0]
+      });
       // let start = params[0].lastIndexOf(".");
       // let end = params[0].length;
       this.videoForm.contentType = 10;
@@ -962,37 +1003,42 @@ export default {
       this.videoForm.sectionId = this.tempSection.sectionId;
       this.videoForm.catalogId = null;
       // this.videoForm.itemName = params[1].substring(13);
-      this.videoForm.itemName = params[1]
+      this.videoForm.itemName = params[1];
       this.videoUrl = params[0];
     },
     getDocUrl(...params) {
-      console.log(params)
-      let fileName = params[1].replace(/[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g, '')
+      console.log(params);
+      let fileName = params[1].replace(
+        /[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g,
+        ""
+      );
       this.docForm.itemResource.resourceTitle = fileName; // 名称
       this.docForm.itemResource.resourceUrl = params[0]; // 路径
       this.docForm.itemResource.resourceType = 20; // 资源类型
-      this.docForm.itemResource.resourceSize = params[2] // 资源大小
-      this.docForm.itemResource.contentType = this.fileTail({assetUrl: params[0]})
+      this.docForm.itemResource.resourceSize = params[2]; // 资源大小
+      this.docForm.itemResource.contentType = this.fileTail({
+        assetUrl: params[0]
+      });
       // let start = params[0].lastIndexOf(".");
       // let end = params[0].length;
-      this.docForm.contentType = 20
+      this.docForm.contentType = 20;
       this.docForm.catalogId = null;
       // this.docForm.itemName = params[1].substring(13);
-      
-      this.docForm.itemName = fileName
+
+      this.docForm.itemName = fileName;
       this.contentAdd(this.docForm);
     },
-     // 判断文件后缀
+    // 判断文件后缀
     fileTail(file) {
-      console.log(file)
-      let url = file.assetUrl, 
-          index= url.lastIndexOf('.')
-      return url.substring(index+1,url.length).toLowerCase()
+      console.log(file);
+      let url = file.assetUrl,
+        index = url.lastIndexOf(".");
+      return url.substring(index + 1, url.length).toLowerCase();
     },
     localVideoUpload() {
       console.log(this.videoForm);
       this.contentAdd(this.videoForm);
-      this.getChapterList();
+      // this.getChapterList();
     },
     contentAdd(formName) {
       itemAdd(formName).then(response => {
@@ -1000,6 +1046,9 @@ export default {
         if (response.code === 200) {
           this.localVideoDialog = false;
           this.dialogVisible = false;
+          this.tempSection.catalogItem.push(response.data);
+          this.activeSection = String(response.data.sectionId)
+          sessionStorage.setItem('activeSection', response.data.sectionId)
           this.$message({
             message: "添加内容成功",
             type: "success"
@@ -1183,7 +1232,6 @@ export default {
   justify-content: space-between;
 
   .subject-left {
-    background: pink;
     width: 720px;
   }
 

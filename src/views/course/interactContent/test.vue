@@ -194,7 +194,7 @@ export default {
       });
     },
     addTab(params) {
-      let activeName = this.testContentArrValue;
+      // let activeName = this.testContentArrValue;
       params.forEach((element, i) => {
         element.title = `第${i + 1}题`;
         element.quizTitle = element.catalogName;
@@ -209,7 +209,7 @@ export default {
       //   content: "New Tab content"
       // });
       this.testObj.quizList = params;
-      this.testContentArrValue = activeName;
+      // this.testContentArrValue = activeName;
     },
     removeTab(targetName) {
       let tabs = this.testObj.quizList;
@@ -380,6 +380,7 @@ export default {
         }
       });
       this.addTab(checkedList);
+      this.dialogVisible = false
     }
   },
   beforeRouteLeave (to, from, next) {

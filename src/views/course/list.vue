@@ -14,7 +14,31 @@
 
       <el-row>
         <!--<el-row style="background:#F3F3F3;padding:10px 0 10px 10px;margin-top: 20px;">课程列表</el-row>-->
-        <el-row class="course-table" v-for="list in data" :key="list.id">
+        <el-card class="box-card course-table" v-for="list in data" :key="list.id" shadow="hover">
+          <div class="img">
+            <span class="tib">{{courseStatus(list.courseStatus)}}</span>
+            <img :src="list.courseCover" height="">
+          </div>
+          <div class="center">
+            <div class="title" style="margin:15px 0;font-weight:bold">{{list.courseName }}</div>
+            <div class="list">学生数：{{list.userCount}}人</div>
+            <div class="list">课程时间：{{list.beginTime}} ~ {{list.endTime}}</div>
+            <div class="list">所属学校：{{list.tenantName}}</div>
+            <div class="list">开放范围：{{Number(list.courseMode) === 10 ? '教师指定学员' : Number(list.courseMode) === 20 ? '本校学生' : Number(list.courseMode) === 30 ? '全部学员' : '' }}</div>
+          </div>
+          <div class="button">
+            <div class="top">
+              <a class="list" @click="upData(list.courseId)" v-if="list.courseStatus !== 40">编辑</a>
+              <a class="list" @click="copyCourse(list.courseId)" >复制</a>
+              <a class="list" @click="closeCourse(list.courseId)" v-if="list.courseStatus === 30">关闭</a>
+              <a class="list" v-else-if="list.courseStatus === 10" @click="release(list.courseId)">发布</a>
+              <a class="list" @click="deleteCourse(list.courseId)" v-if="list.courseStatus === 40 || list.courseStatus === 10">删除</a>
+            </div>
+            <el-button type="success" @click="goCourseModel(list.courseId)" v-if="list.courseStatus === 30">课堂模式</el-button>
+            <el-button type="primary" @click="goCourseChapter(list.courseId, list.courseName)">教学管理</el-button>
+          </div>
+        </el-card>
+        <!-- <el-row class="course-table" v-for="list in data" :key="list.id">
           <div class="img">
             <span class="tib">{{courseStatus(list.courseStatus)}}</span>
             <img :src="list.courseCover">
@@ -37,7 +61,7 @@
             <el-button type="primary" @click="goCourseModel(list.courseId)" v-if="list.courseStatus === 30">课堂模式</el-button>
             <el-button type="primary" @click="goCourseChapter(list.courseId, list.courseName)">教学管理</el-button>
           </div>
-        </el-row>
+        </el-row> -->
         <div style="text-align:right;" v-show="data.length!=0">
           <el-pagination
               background
@@ -258,13 +282,13 @@ export default {
   .course-table
     overflow hidden
     margin-bottom:10px
-    border-bottom:1px solid #CCCCCC
+    // border-bottom:1px solid #CCCCCC
 
     .img
       position: relative
       width:280px
       height:160px
-      border:1px solid #CCCCCC
+      // border:1px solid #CCCCCC
       display:inline-block
       vertical-align:top
       position: relative
@@ -286,7 +310,7 @@ export default {
 
       img
         width:100%
-        height:auto
+        height:100%
         position: absolute
         top: 50%
         transform:translateY(-50%)

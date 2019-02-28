@@ -7,8 +7,8 @@
         <span>共1道题 | 7人作答</span>
       </div>
       <div>
-        <el-button>导出结果</el-button>
-        <el-button>返回</el-button>
+        <!-- <el-button>导出结果</el-button> -->
+        <router-link :to="{path: '/course/list/interact', query: {id: $route.query.id}}"><el-button>返回</el-button></router-link>
       </div>
     </div>
 
