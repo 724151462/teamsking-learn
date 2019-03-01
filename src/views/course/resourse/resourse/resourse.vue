@@ -52,8 +52,7 @@
               <div class="test-info">
                 <img :width="20" v-if="!data.resourceId" style="margin-right: 3px" :src="require('@/assets/images/folder.png')" alt="">
                 <img :src="imgSrc.mp4" alt="" :width="25" :height="25" v-else-if="data.resourceType == 10">
-                <img :src="imgSrc.word" alt="" :width="25" :height="25" v-else-if="data.resourceType == 20">
-                <img :src="imgSrc.pdf" alt="" :width="25" :height="25" v-else-if="data.resourceType == 30">
+                <img :src="getIcon(data.catalogName)" alt="" :width="25" :height="25" v-else-if="data.resourceType == 20">
                 <img :src="imgSrc.img" alt="" :width="25" :height="25" v-else-if="data.resourceType == 40">
                 <span class="tree-title">{{ node.label }}</span>
                 <!--<span class="str-tag" v-if="data.srtUrl != undefined">字幕</span>-->
@@ -143,6 +142,7 @@
   import { ossAliSts } from '@/api/oss'
   import {getResList, newResFileFold, reResFileFold,
           delResFileFold, deleteRes ,localUpload, moveRes, getFileDetail} from "@/api/library";
+  import {fileKind} from '@/utils/utils'
   import {getResourceViewByUrl} from '@/api/sourceView'
   import videoPlayer from '@/components/video-pay'
   import UpOss from "@/components/up-oss";
@@ -164,9 +164,12 @@ import { setTimeout } from 'timers';
         fileKind:'resource',
         imgSrc: {
           folder: require("../../../../assets/images/folder.png"),
-          pdf: require("../../../../assets/images/pdf.png"),
+          pdf: require("@/assets/images/resource/pdf.png"),
+          ppt: require("@/assets/images/resource/ppt.png"),
           mp4: require("../../../../assets/images/mp4.png"),
-          word: require("../../../../assets/images/word.png"),
+          word: require("@/assets/images/resource/word.png"),
+          unknow: require("@/assets/images/resource/unknow.png"),
+          excel: require("@/assets/images/resource/excel.png"),
           txt: require("../../../../assets/images/txt.png"),
           img: require("../../../../assets/images/img.png")
         },
@@ -310,6 +313,12 @@ import { setTimeout } from 'timers';
             }
         })
     },
+      //判断文档类型
+      getIcon(name){
+        console.log(name)
+        let kind = fileKind(name)
+        return this.imgSrc[kind];
+      },
       //搜索资源
       searchResource(key) {
         let data = {
