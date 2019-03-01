@@ -65,7 +65,7 @@
                   <el-button size="mini" style="margin-left: 5px" type="primary" @click.stop="goRenameCatalog(data,data.catalogId)"> 重命名 </el-button>
                 </span>
                 <span v-else >
-                  <span class="hide-button">
+                  <span class="hide-button" style="margin-right: 10px">
                     <el-button size="mini" type="primary" @click.stop="preView(data)">预览</el-button>
                     <!--<el-button size="mini" type="primary" @click.stop="" v-if="!data.srtUrl && data.resourceType == 10">添加字幕 </el-button>-->
                     <el-button size="mini" type="primary" @click.stop="delRes(data.resourceId,data.parentId)">删除</el-button>
