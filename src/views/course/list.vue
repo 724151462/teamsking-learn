@@ -113,7 +113,10 @@
 </template>
 
 <script>
+var routers = []
 import { coursePage, publish, copy, close, courseDel } from '../../api/course'
+import { sysUserMenuList } from '@/api/system'
+import MenuUtils from '@/utils/MenuUtils'
 export default {
   data () {
     return {
@@ -133,6 +136,13 @@ export default {
   },
   created () {
     this.getList()
+    sysUserMenuList()
+      .then(response=> {
+        console.log(response.data)
+        // console.log(this.$router.options)
+        sessionStorage.setItem('menuList',JSON.stringify(response.data))
+        MenuUtils(routers,[response.data[0]])
+      })
   },
   methods: {
     goGetList (e) {

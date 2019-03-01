@@ -186,8 +186,10 @@
             saveUserInfo(res.data.userId)
             sysUserMenuList()
             .then(response=> {
+              console.log(response.data)
+              // console.log(this.$router.options)
               sessionStorage.setItem('menuList',JSON.stringify(response.data))
-              MenuUtils(routers,response.data)
+              MenuUtils(routers,[response.data[0]])
             })
             this.$router.replace('/course')
           } else {

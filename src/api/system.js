@@ -54,6 +54,19 @@ export function sysRoleDelete (list) {
   return commonsAjax(`${baseUrl}role`,list,'delete')
 }
 
+/*
+*  添加权限菜单
+* */
+export function sysUserMenuAdd (data) {
+  return commonsAjax(`${baseUrl}/menu`,data,'post')
+}
+
+/*
+*  删除权限菜单 
+* */
+export function sysUserMenuDel (data) {
+  return commonsAjax(`${baseUrl}/menu/${data.menuId}`,'','delete')
+}
 
 /*
 *  查询用户权限菜单 
