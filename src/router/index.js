@@ -511,6 +511,11 @@ export const constantRouterMap = [{
         component: _import('user/message'),
         name: '消息管理'
       },
+      {
+        path: '/user/certificate',
+        component: _import('user/certificate'),
+        name: '我的证书'
+      },
     ]
   },
   {

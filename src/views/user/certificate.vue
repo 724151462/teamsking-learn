@@ -90,10 +90,10 @@
               <img :src="img.imgUrl" alt="" class="cre-img has-close" style="position: relative">
           </span>
           <!--<span><i class="el-icon-picture cre-uploader-icon"></i></span>-->
-          <up-oss @ossUp="upCre" :inputs="'creImg'"></up-oss>
+          <upOss @ossUp="upCre"></upOss>
         </el-form>
-        <div style="color: red">
-            <span>审核意见</span>
+        <div style="color: red;margin-left: 30px">
+            <span>审核意见：</span>
             {{this.cerComment}}
         </div>
       <span slot="footer" class="dialog-footer">
@@ -196,7 +196,7 @@
           url = 'https' + url.substring(4)
           FileSaver.saveAs(url);
         },
-        //修改证书
+        //修改证书时查看证书
         changeCre(id){
           let loading = this.$loading(this.loadingCss)
 
@@ -211,8 +211,8 @@
             }
           }).then(()=>{
             statusCre(id).then(res=>{
+              loading.close()
               if(Number(res.code) === 200) {
-                console.log(res)
                 this.cerComment = res.data[0].comment
               }else {
                 this.$message.error(getErrorMsg(res.msg))
@@ -223,20 +223,32 @@
         //修改证书
         goChangeCre(id){
           let loading = this.$loading(this.loadingCss)
-
           changeCer(this.cerForm).then(res=>{
             loading.close()
             if(Number(res.code) === 200) {
-              console.log(res.data)
+              this.uploadDialog = false;
             }else {
               this.$message.error(getErrorMsg(res.msg))
             }
-          })
+          }).then(()=>{
+            certificateList().then(res=>{
+              if(Number(res.code) === 200) {
+                this.data = res.data.pageData
+                this.totalPage = res.data.totalPage * 10
+              }else {
+                this.$message.error(getErrorMsg(res.msg))
+              }
+            })
+          }).catch(err=>{
+              console.log(err)
+            })
         },
         //证书图片上传
         upCre (url) {
-          let data = {imgUrl : url,orderValue : 1}
-          this.cerForm.imgUrls.push(data)
+          setTimeout(()=>{
+            let data = {imgUrl : url,orderValue : 1}
+            this.cerForm.imgUrls.push(data)
+          },500)
         },
         //撤销证书
         delCre(id){
@@ -253,8 +265,7 @@
                 this.$message.error(getErrorMsg(res.msg))
               }
             })
-            // delCertificate()
-          },
+        },
         delImg(index){
           console.log(index)
           this.cerForm.imgUrls.splice(index, 1)

@@ -167,6 +167,13 @@
   }
 </script>
 
-<style scoped>
-
+<style scoped lang="stylus" type="text/stylus">
+  #logo
+    display:none
+  #pic
+    display:none
+  #inputs
+    display:none
+  #creImg
+    display:none
 </style>
