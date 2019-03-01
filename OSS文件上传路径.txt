@@ -1,17 +1,17 @@
 OSS目录上传结构：
 
-资源库图片资源的路径：/tskedu/resource/img
-资源库音频资源的路径：/teskedu/resource/audio
-资源库视频资源的路径：/tskedu/resource/video
-资源库文档资源的路径：/teskedu/resource/doc 
+资源库图片资源的路径：tskedu/resource/img
+资源库音频资源的路径：teskedu/resource/audio
+资源库视频资源的路径：tskedu/resource/video
+资源库文档资源的路径：teskedu/resource/doc
 
 
-头像存储路径：      /teskedu/avatar
+头像存储路径：      teskedu/avatar
 
-其他附件路径:       /tskedu/enclosure
+其他附件路径:       tskedu/enclosure
 
 
-其它图片路径: /teskedu/img
-课程封面：/teskedu/img/courseCover
-证书：/teskedu/img/certificate
+其它图片路径: teskedu/img
+课程封面：teskedu/img/courseCover
+证书：teskedu/img/certificate
 

@@ -7,7 +7,7 @@
 </template>
 
 <script>
-  import upossg from '../../../../components/up-oss.vue'
+  import upossg from '../../../../components/up-oss-old.vue'
   export default {
     components: {
       upossg

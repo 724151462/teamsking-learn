@@ -1,7 +1,6 @@
 <template>
   <div class="certificate">
-
-    <header-the-again headerTitle="证书管理"></header-the-again>
+    <!--<header-the-again headerTitle="证书管理"></header-the-again>-->
     <el-form ref="form" :model="searchForm" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
         <el-input v-model="searchForm.searchString" placeholder="证书名称"></el-input>
@@ -23,7 +22,7 @@
             background
             layout="prev, pager, next"
             :total="totalCount"
-            :page-size="2"
+            :page-size="5"
             @current-change="pageChange">
     </el-pagination>
 
@@ -132,7 +131,7 @@
         searchForm: {
           pageIndex: 1,
           searchString: '',
-          pageSize: 2,
+          pageSize: 5,
           orderValue: 0
         },
         // 详情数据
@@ -271,7 +270,7 @@
           if (response.code === 200) {
             this.$message({
                 type: 'success',
-                message: '提交成功!'
+                message: '审核完成'
             });
             this.innerVisible = false
           }else{

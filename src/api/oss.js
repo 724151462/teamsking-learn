@@ -14,3 +14,10 @@ export function ossAli (data) {
 export function ossAliSts (data) {
   return commonsAjax('http://120.36.137.90:9008/api/v1/policy', '', 'get')
 }
+
+/**
+ * 直传方式 获取验签
+ * */
+export function webUpload (data) {
+  return commonsAjax('http://120.36.137.90:9008/api/v1/policy/web', data, 'get')
+}

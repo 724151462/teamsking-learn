@@ -57,14 +57,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination
-        style="margin: 20px 0"
-        background
-        layout="prev, pager, next"
-        :current-page="currentPage"
-        @current-change="handleCurrentChange"
-        :total="totalPage">
-      </el-pagination>
+0
     </div>
     <!--修改证书-->
     <el-dialog
@@ -72,32 +65,32 @@
       :visible.sync="uploadDialog"
       width="30%">
         <el-form :model="cerForm" label-width="100px">
-            <el-form-item label="编号">
-                <el-input type="text" class="input-width" v-model="cerForm.certificateNo" placeholder="请输入"></el-input>
-            </el-form-item>
-            <el-form-item label="名称">
-                <el-input type="text" class="input-width" v-model="cerForm.certificateName" placeholder="请输入"></el-input>
-            </el-form-item>
-            <el-form-item label="发证时间">
-                <el-date-picker
-                  v-model="cerForm.issuingDate"
-                  type="datetime"
-                  prefix-icon="el-icon-date"
-                  placeholder="选择发证时间"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  default-time="12:00:00">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="发证件单位">
-                <el-input type="text" class="input-width" v-model="cerForm.issuingAuthority" placeholder="请输入"></el-input>
-            </el-form-item>
-            <span style="margin-left: 30px;">证书图片</span>
-            <span v-for="(img,index) in cerForm.imgUrls" :key="img.id" class="" style="display: inline-block;position: relative;margin-left: 10px">
-                <span class="close" @click="delImg(index)"><i class="el-icon-error"></i></span>
-                <img :src="img.imgUrl" alt="" class="cre-img has-close" style="position: relative">
-            </span>
-            <!--<span><i class="el-icon-picture cre-uploader-icon"></i></span>-->
-            <up-oss @ossUp="upCre" :inputs="'creImg'"></up-oss>
+          <el-form-item label="编号">
+              <el-input type="text" class="input-width" v-model="cerForm.certificateNo" placeholder="请输入"></el-input>
+          </el-form-item>
+          <el-form-item label="名称">
+              <el-input type="text" class="input-width" v-model="cerForm.certificateName" placeholder="请输入"></el-input>
+          </el-form-item>
+          <el-form-item label="发证时间">
+              <el-date-picker
+                v-model="cerForm.issuingDate"
+                type="datetime"
+                prefix-icon="el-icon-date"
+                placeholder="选择发证时间"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                default-time="12:00:00">
+              </el-date-picker>
+          </el-form-item>
+          <el-form-item label="发证件单位">
+              <el-input type="text" class="input-width" v-model="cerForm.issuingAuthority" placeholder="请输入"></el-input>
+          </el-form-item>
+          <span style="margin-left: 30px;">证书图片</span>
+          <span v-for="(img,index) in cerForm.imgUrls" :key="img.id" class="" style="display: inline-block;position: relative;margin-left: 10px">
+              <span class="close" @click="delImg(index)"><i class="el-icon-error"></i></span>
+              <img :src="img.imgUrl" alt="" class="cre-img has-close" style="position: relative">
+          </span>
+          <!--<span><i class="el-icon-picture cre-uploader-icon"></i></span>-->
+          <up-oss @ossUp="upCre" :inputs="'creImg'"></up-oss>
         </el-form>
         <div style="color: red">
             <span>审核意见</span>
@@ -105,7 +98,7 @@
         </div>
       <span slot="footer" class="dialog-footer">
       <el-button @click="()=>{uploadDialog = false}">取 消</el-button>
-      <el-button type="primary" @click="changeCre">提交</el-button>
+      <el-button type="primary" @click="goChangeCre">提交</el-button>
       </span>
     </el-dialog>
     <!--查看证书-->
@@ -126,7 +119,7 @@
   </div>
 </template>
 <script>
-  import UpOss from "../../components/up-oss";
+  import UpOss from "@/components/up-oss";
   import userHeader from './userHeader'
   import {certificateList, delCertificate, cerInfo, changeCer, statusCre} from '@/api/user'
   import {getErrorMsg} from "../../utils/utils";
@@ -201,11 +194,34 @@
         downImg(url,filename){
           var FileSaver = require("file-saver");
           url = 'https' + url.substring(4)
-          console.log(url)
           FileSaver.saveAs(url);
         },
         //修改证书
         changeCre(id){
+          let loading = this.$loading(this.loadingCss)
+
+          cerInfo(id)
+            .then(res=>{
+            console.log('证书信息',res)
+            if(Number(res.code) === 200) {
+              this.cerForm = res.data
+              this.uploadDialog = true
+            }else {
+              this.$message.error(getErrorMsg(res.msg))
+            }
+          }).then(()=>{
+            statusCre(id).then(res=>{
+              if(Number(res.code) === 200) {
+                console.log(res)
+                this.cerComment = res.data[0].comment
+              }else {
+                this.$message.error(getErrorMsg(res.msg))
+              }
+            })
+          })
+        },
+        //修改证书
+        goChangeCre(id){
           let loading = this.$loading(this.loadingCss)
 
           changeCer(this.cerForm).then(res=>{
@@ -216,21 +232,10 @@
               this.$message.error(getErrorMsg(res.msg))
             }
           })
-          cerInfo(id).then(res=>{
-            loading.close()
-            console.log('证书信息',res)
-            if(Number(res.code) === 200) {
-              this.cerForm = res.data
-              this.uploadDialog = true
-            }else {
-              this.$message.error(getErrorMsg(res.msg))
-            }
-          })
         },
         //证书图片上传
         upCre (url) {
-          console.log('证书上传')
-          let data = {imgUrl : url,order: 1}
+          let data = {imgUrl : url,orderValue : 1}
           this.cerForm.imgUrls.push(data)
         },
         //撤销证书
