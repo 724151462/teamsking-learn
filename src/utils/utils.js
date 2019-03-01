@@ -140,11 +140,19 @@ export function fileType(name){
       // this.$message.error('请上传受支持的资源文件')
       return false
     }
-  
 
   return fileType
 }
 /***
+ *获取文件后缀
+ * */
+export function fileKind(name){
+
+  let index= name.lastIndexOf(".");
+
+  return name.substr(index+1);
+}
+/*
 *错误信息处理
  * 参数：后台返回的错误消息
 * */

@@ -7,7 +7,7 @@
         <div  style="padding-left: 100px;width: 100px;margin: 25px 0;">
           <img :src="infoForm.avatar ? infoForm.avatar : defAvatar" alt="" class="user-avatar">
           <div style="text-align: center;font-size: 14px;">
-            <el-button type="text" @ossUp="changeAvatar"><label for="main" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
+            <el-button type="text" @ossUp="changeAvatar"><label for="male" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
             <up-oss  style="display: none" :file-kind="fileKind" @ossUp="changeAvatar"></up-oss>
           </div>
         </div>
@@ -439,12 +439,11 @@
       },
       //修改头像
       changeAvatar(url){
-        let data = {avatar : this.infoForm.avatar = url}
+        let data = {avatar : url}
         userApi.changeUserAvatar(data).then(res=>{
           if(Number(res.code) === 200) {
             this.$message.success('头像更换成功')
-            this.$store.commit('CHANGE_AVATAR', res.data)
-            // this.initUserInfo()
+            //this.initUserInfo()
           }else {
             this.$message.error(getErrorMsg(res.msg))
           }
@@ -453,13 +452,15 @@
             if(Number(res.code) === 200) {
               console.log(res.data)
               this.userInfo = JSON.parse(JSON.stringify(res.data))
+              this.$store.commit('CHANGE_AVATAR', res.data.avatar)
+
               this.infoForm = JSON.parse(JSON.stringify(res.data))
             }else{
               this.$message.error(getErrorMsg(res.msg))
             }
           })
         })
-          .catch(err=>{
+        .catch(err=>{
           console.log(err)
         })
         // this.changeInfo()

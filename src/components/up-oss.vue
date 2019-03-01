@@ -1,6 +1,6 @@
 <template>
   <div style="display: inline-block;margin: 0 10px">
-    <el-button type="primary" @click="goUp" id="main">{{btnText}}</el-button>
+    <el-button type="primary" @click="goUp" id="male">{{btnText}}</el-button>
     <!-- <div>{{schedule}}</div> -->
     <input type="file" :id="inputs" @change="upInput"/>
   </div>
@@ -84,12 +84,12 @@
         });
         webUpload({ossPath:dir})
           .then(res=>{
-            console.log(res)
+            //console.log(res)
             if(Number(res.code) === 200) {
               let request = new FormData()
               this.imageData = res.data
-
-              request.append('key', res.data.dir + this.fileName)
+              this.imageData.key = res.data.dir + '/' + this.fileName
+              request.append('key', res.data.dir + '/' + this.fileName)
               request.append('policy', res.data.policy)
               request.append('OSSAccessKeyId', res.data.accessid)
               request.append('success_action_status', '200')
@@ -98,6 +98,7 @@
 
               return request
             }else {
+              loading.close()
               this.$message.error('获取验签失败，请重试')
             }
           })
@@ -106,11 +107,13 @@
           })
           .then((res)=>{
             loading.close()
-            let url = this.imageData.host + '/' + this.imageData.dir + this.fileName
+
+            let url = this.imageData.host + '/' + this.imageData.key
             this.inputNull()
             this.$emit('ossUp', url, this.fileName, this.fileSize)
           })
           .catch(err=>{
+            loading.close()
             console.log(err)
             this.$message.error('获取验签失败，请重试')
           })
@@ -132,7 +135,7 @@
       resType(name){
         let dir = ''
         if(this.fileKind==='avatar'){
-          dir = 'teskedu/avatar/'
+          dir = 'teskedu/avatar'
         }else if(this.fileKind==='resource'){
           let index= name.lastIndexOf('.'),
             imgArr = ['jpeg','jpg','png'],
@@ -142,13 +145,13 @@
           let curType = name.substring(index+1,name.length).toLowerCase()
 
           if(imgArr.find((item)=>{return curType == item})){
-            dir = 'teskedu/resource/img/'
+            dir = 'teskedu/resource/img'
           }else if(videoArr.find((item)=>{return curType == item})){
-            dir = 'teskedu/resource/video/'
+            dir = 'teskedu/resource/video'
           }else if(docArr.find((item)=>{return curType == item})){
-            dir = 'teskedu/resource/doc/'
+            dir = 'teskedu/resource/doc'
           }else if(audioArr.find((item)=>{return curType == item})){
-            dir = 'teskedu/resource/audio/'
+            dir = 'teskedu/resource/audio'
           }else{
             this.$message.error('请上传受支持的文件类型')
             return false

@@ -9,7 +9,6 @@ const _import = require('./_import_' + process.env.NODE_ENV)
 Vue.use(Router)
 
 
-
 export const constantRouterMap = [{
     path: '/login',
     component: _import('login/index'),
@@ -512,36 +511,6 @@ export const constantRouterMap = [{
         component: _import('user/message'),
         name: '消息管理'
       },
-      {
-        path: '/user/operation',
-        component: _import('user/operation'),
-        name: '操作记录'
-      },
-      {
-        path: '/user/buy',
-        component: _import('user/buy'),
-        name: '购买记录'
-      },
-      {
-        path: '/user/income',
-        component: _import('user/income'),
-        name: '收入记录'
-      },
-      {
-        path: '/user/withdraw',
-        component: _import('user/withdraw'),
-        name: '申请提现'
-      },
-      {
-        path: '/user/feedback',
-        component: _import('user/feedback'),
-        name: '意见反馈'
-      },
-      {
-        path: '/user/certificate',
-        component: _import('user/certificate'),
-        name: '我的证书'
-      }
     ]
   },
   {

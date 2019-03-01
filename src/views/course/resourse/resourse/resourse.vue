@@ -56,8 +56,7 @@
                 <img :src="imgSrc.pdf" alt="" :width="25" :height="25" v-else-if="data.resourceType == 30">
                 <img :src="imgSrc.img" alt="" :width="25" :height="25" v-else-if="data.resourceType == 40">
                 <span class="tree-title">{{ node.label }}</span>
-                <!--<span v-if="data.srtUrl != undefined"> <el-tag type="success">字幕</el-tag></span>-->
-                <span class="str-tag" v-if="data.srtUrl != undefined">字幕</span>
+                <!--<span class="str-tag" v-if="data.srtUrl != undefined">字幕</span>-->
               </div>
               <div>
                 <span v-if="data.catalogLevel" class="hide-button">
@@ -69,7 +68,7 @@
                 <span v-else >
                   <span class="hide-button">
                     <el-button size="mini" type="primary" @click.stop="preView(data)">预览</el-button>
-                    <el-button size="mini" type="primary" @click.stop="" v-if="!data.srtUrl && data.resourceType == 10">添加字幕 </el-button>
+                    <!--<el-button size="mini" type="primary" @click.stop="" v-if="!data.srtUrl && data.resourceType == 10">添加字幕 </el-button>-->
                     <el-button size="mini" type="primary" @click.stop="delRes(data.resourceId,data.parentId)">删除</el-button>
                   </span>
                   <span style="margin-right: 10px;">{{data.resourceSize}}</span>

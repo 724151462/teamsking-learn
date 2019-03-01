@@ -19,6 +19,7 @@
     <el-dialog
       width="1020px"
       title="封面图上传"
+      :before-close="handleRemove"
       :visible.sync="innerVisible"
       append-to-body>
       <div class="cropper-content">
@@ -58,8 +59,8 @@
 </template>
 
 <script>
-  import oss from 'ali-oss'
-  import { ossAliSts } from '@/api/oss'
+  import axios from 'axios'
+  import { webUpload} from '@/api/oss'
   import { VueCropper }  from 'vue-cropper'
   import {coverList} from '@/api/course'
   export default {
@@ -94,10 +95,17 @@
           width:'',
           height:''
         },
-        ossData:null,
-        fileData:null,
-        isError:3,
+        imageData:{
+          accessid: "",
+          dir: "",
+          expire: "",
+          host: "",
+          policy: "",
+          signature: "",
+        },
+        fileName :'',
         imgData :'',
+        imgName : '',
         currImgSrc: ''
       };
     },
@@ -106,8 +114,14 @@
       handleAvatarSuccess(res, file) {
         this.imageUrl = URL.createObjectURL(file.raw);
       },
-      handleRemove(file, fileList) {
-        console.log(file, fileList);
+      handleRemove() {
+        console.log('关闭')
+        let dom = document.getElementById('uploads')
+        dom.value = '';
+        // dom.outerHTML = dom.outerHTML;
+        this.imgData = ''
+        this.option.img = ''
+        this.innerVisible = false;
       },
       handlePictureCardPreview(file) {
         this.dialogImageUrl = file.url;
@@ -136,9 +150,6 @@
         // 输出
         if (type === 'blob') {
           this.$refs.cropper.getCropBlob((data) => {
-            // this.downImg = window.URL.createObjectURL(data)
-            // aLink.href = window.URL.createObjectURL(data)
-            // aLink.click()
             this.imgData = data
             this.upInput(data)
           })
@@ -162,7 +173,7 @@
       },
       uploadImg(e, num) {
         //上传图片
-        // this.option.img
+        this.fileName = e.target.files[0].name
         var file = e.target.files[0]
         if (!/\.(jpg|jpeg|png|GIF|JPG|PNG)$/.test(e.target.value)) {
           alert('图片类型必须是jpeg,jpg,png中的一种')
@@ -191,90 +202,71 @@
       cover(url){
         this.$emit('chooseCover', url)
       },
-      upInput (event) {
-        console.log('1',event)
-        if(event){
-          this.fileData = event
-        }
-        //这里加一个获取验签信息的错误处理
-        if (Number(this.isError) === 0) {
-          this.errors()
-          return false
-        }
-        if (this.ossData === null && Number(this.isError) !== 0) {
-          this.ossCheck()
-          return false
-        }
-        let file = new File([event], event.size , {type: event.type})
-        console.log(file)
-        let curType = event.type.split('/')
-        let name = `${new Date().getTime()}${file.name}.${curType[1]}`
-        // let name = new Date().getTime() + file.name + curType[1]
-        if (file.size > this.size) {
-          this.$message({
-            message: '上传文件超出可上传范围，请重新选择文件上传',
-            type: 'error'
-          })
-          // this.inputNull()
-          return false
-        }
-        let client = new oss(this.ossData)
-        name = 'teskedu/img/courseCover/' + name
-        //多文件上传请修改这里
-        this.forInputs(client,name,file)
+      //捕获到文件
+      upInput(event){
+        this.imgName = new Date().getTime() + 'cover' + this.fileName
+        this.ossCheck()
       },
-      forInputs (client,name,file) {
+      //获取签证
+      ossCheck(name){
+        let dir = 'teskedu/img/courseCover'
+        this.dir = dir
+        let loading = this.$loading({
+          lock: true,
+          text: '正在努力上传文件',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        webUpload({ossPath:dir})
+          .then(res=>{
+            //console.log(res)
+            if(Number(res.code) === 200) {
+              let request = new FormData()
+              this.imageData = res.data
+              this.imageData.key = res.data.dir + '/' + this.imgName
+              request.append('key', res.data.dir + '/' + this.imgName)
+              request.append('policy', res.data.policy)
+              request.append('OSSAccessKeyId', res.data.accessid)
+              request.append('success_action_status', '200')
+              request.append('Signature', res.data.signature)
+              request.append('file', this.imgData)
 
-        let self = this
-        client.multipartUpload(name, file, {
-          progress(p, checkpoint){
-            //反回的 p 是当前进度，大概1s会返回一个进度的样子，下面处理了下百分比，checkpoint 是具体的数据流上传，不做暂停效果可以不考虑用它
-            console.log('进度返回', p, checkpoint)
-            self.schedule = (p.toFixed(2) * 100) + '%'
-          }
-        }).then((results) => {
-          console.log('then返回',results)
-          // http://tskedu-course.oss-cn-beijing.aliyuncs.com/ + name = 完整的url
-          self.$message({
-            message:'上传成功',
-            type:'success'
+              return request
+            }else {
+              loading.close()
+              this.$message.error('获取验签失败，请重试')
+            }
           })
-          Number(self.isError) !== 2 ? (self.isError = 2) : ''
-          let url = 'http://tskedu-course.oss-cn-beijing.aliyuncs.com/' + name
-          this.imgSrc.unshift({assetUrl: url})
-          this.innerVisible = false
-        }).catch(error=>{
-          console.log(error)
-          //返回错误之后如验签过期则直接进行请求，否则提示管理员来处理
-          self.ossCheck('error')
-        })
+          .then(request=>{
+            this.startUp(request)
+          })
+          .then((res)=>{
+            loading.close()
+            let url = this.imageData.host + '/' + this.imageData.key
+            setTimeout(()=>{
+              this.imgSrc.unshift({assetUrl: url})
+              this.innerVisible = false
+            },500)
+          })
+          .catch(err=>{
+            loading.close()
+            console.log(err)
+            this.$message.error('获取验签失败，请重试')
+          })
       },
-      ossCheck (e) {
-        console.log('e的监控数据',e , this.isError)
-        if (Number(this.isError) === 0) {
-          this.errors()
-          return false
-        }
-        this.isError -= 1
-        ossAliSts().then(res => {
-          if (Number(res.code) === 200) {
-            this.ossData = JSON.parse(res.data)
-            console.log('给到验签', this.ossData)
-            this.upInput(this.imgData)
-          } else {
-            this.ossCheck()
-          }
-        }).catch(error => {
-          //验签数据错误 / 过期，执行重试，3次后直接返回错误
-          this.ossCheck()
-        })
+      //上传文件到OSS
+      startUp(request){
+        axios({
+          method: 'post',
+          url: this.imageData.host,
+          data: request,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        }).then((err)=>{
+          console.log('上传成功')
+        }).catch(function (error) {
+          //console.log(error);
+        });
       },
-      errors () {
-        this.$message({
-          message: '验签获取错误，请联系管理员',
-          type: 'error'
-        })
-      }
     },
     watch: {
       show () {
