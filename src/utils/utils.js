@@ -147,10 +147,32 @@ export function fileType(name){
  *获取文件后缀
  * */
 export function fileKind(name){
+  let fileType = ''
+  let curType
+  let index= name.lastIndexOf('.'),
+    pptArr = ['ppt','pptx'],
+    pdfArr=['pdf'],
+    excelArr=['xls','xlsx'],
+    docArr=['txt','doc','docx'];
+  if(name.includes('.')) {
+    curType = name.substring(index+1,name.length).toLowerCase()
+  }else{
+    curType = name
+  }
+  if(pptArr.find((item)=>{return curType == item})){
+    fileType = "ppt"
+  }else if(pdfArr.find((item)=>{return curType == item})){
+    fileType = "pdf"
+  }else if(docArr.find((item)=>{return curType == item})){
+    fileType = "word"
+  }else if(excelArr.find((item)=>{return curType == item})){
+    fileType = "excel"
+  }else{
+    // this.$message.error('请上传受支持的资源文件')
+    return 'unknow'
+  }
 
-  let index= name.lastIndexOf(".");
-
-  return name.substr(index+1);
+  return fileType
 }
 /*
 *错误信息处理

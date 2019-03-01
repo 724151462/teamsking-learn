@@ -202,7 +202,7 @@
 
           cerInfo(id)
             .then(res=>{
-            console.log('证书信息',res)
+            // console.log('证书信息',res)
             if(Number(res.code) === 200) {
               this.cerForm = res.data
               this.uploadDialog = true
