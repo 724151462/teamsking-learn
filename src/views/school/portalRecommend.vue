@@ -1,6 +1,7 @@
 <template>
   <div class="portalTeacher">
-    <div style="height: 70px">
+    <div style="height: 50px; line-height: 50px">
+      <span>提示：最多添加4门推荐课程</span>
       <el-button style="float: right;margin-right: 50px" type="primary" @click="addCourse">添加</el-button>
     </div>
 
@@ -8,7 +9,7 @@
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
       :columnNameList="columnNameList"
-      :tableData="tableData3"
+      :tableData="recommendData"
       :operateList="operateList"
       @showComponentInfo="showComponentInfo"
     ></table-the-again>
@@ -48,7 +49,7 @@ export default {
       dialogVisible: false,
       activeIndex: "2",
       tableTitle: "课程列表",
-      tableData3: [],
+      recommendData: [],
       columnNameList: [
         {
           type: "index"
@@ -124,6 +125,14 @@ export default {
     },
     ensureBtn() {
       if (this.btnType === "add") {
+        if(this.recommendData.length >= 4) {
+          this.$message({
+            message: '最多添加4门课程，您可以尝试替换课程',
+            type: 'warning'
+          })
+          this.dialogVisible = false
+          return
+        }
         console.log(this.form);
         let form = {
           sourceIds: [this.form.sourceIds],
@@ -190,7 +199,7 @@ export default {
       courseRecList()
       .then(res => {
         console.log("res", res);
-        this.tableData3 = res.data.page.pageData;
+        this.recommendData = res.data.page.pageData;
       })
     }
   },

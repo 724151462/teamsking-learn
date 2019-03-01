@@ -64,7 +64,6 @@
       </el-form-item>
       <div>
         <div v-for="(item,i) in homeWork.assets" :key="i" style="with:100%">
-          {{item.assetUrl}}
           <div v-if="getFileType(item.assetUrl) === 'image'" class="box">
             <div class="pic_title">
               <img height="50" width="50" :src="item.assetUrl">
@@ -336,7 +335,13 @@ export default {
       } else {
         this.$refs["homeWorkForm"].validate(valid => {
           if (valid) {
-            homeWorkSave(this.homeWork).then(response => {
+            let addHomeworkObj = Object.assign({}, this.homeWork)
+            let assetList = []
+            this.homeWork.assets.forEach(element=> {
+              assetList.push(element.assetId)
+            })
+            addHomeworkObj.assets = assetList
+            homeWorkSave(addHomeworkObj).then(response => {
               if (response.code === 200) {
                 this.$message({
                   message: "添加作业成功",

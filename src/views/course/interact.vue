@@ -2,7 +2,7 @@
   <div class="interact">
     <div class="start-container">
       <div class="start-item">
-        <span style="margin-right:30px">发起：</span>
+        <span style="margin-right:10px">发起：</span>
         <div class="icon-group">
           <div>
             <img :src="require('../../assets/images/vote.png')">
@@ -22,9 +22,9 @@
           </div>
         </div>
       </div>
-      <div>
+      <!-- <div>
         <el-button>签到</el-button>
-      </div>
+      </div> -->
     </div>
     <div class="interact-radio">
       <el-radio-group v-model="interactParams.interactionStatus" @change="handleSelect">

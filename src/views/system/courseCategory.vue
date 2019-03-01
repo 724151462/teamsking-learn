@@ -61,9 +61,9 @@
         width="60%"
         style="min-width: 800px"
       >
-        <el-form ref="form1" :model="catalogObj2" label-width="120px">
+        <el-form :model="catalogObj2" label-width="120px">
           <el-form-item label="分类名称" required>
-            <el-input v-model="catalogObj2.name"></el-input>
+            <el-input v-model="catalogObj2.categoryName"></el-input>
           </el-form-item>
           <el-form-item label="分类描述" required>
             <el-input v-model="catalogObj2.description"></el-input>
@@ -157,25 +157,29 @@ export default {
       ],
       tableData: [],
       level2: [],
-      cataOptions: []
+      cataOptions: [],
+      parentId: ''
     };
   },
   created() {
-    courseCatalogList().then(response => {
-      response.data.forEach(element => {
-        element.level = "一级";
-        if(element.children)
-          {element.children.forEach(lv2=> {
-            lv2.level = "二级"
-          })
-        }
-      });
-      this.tableData = response.data;
-      this.cataOptions = response.data;
-      this.cataOptions.unshift({categoryId: null,categoryName: '一级分类'})
-    });
+    this.getCatalog()
   },
   methods: {
+    getCatalog() {
+      courseCatalogList().then(response => {
+        response.data.forEach(element => {
+          element.level = "一级";
+          if(element.children)
+            {element.children.forEach(lv2=> {
+              lv2.level = "二级"
+            })
+          }
+        });
+        this.tableData = response.data;
+        this.cataOptions = response.data;
+        this.cataOptions.unshift({categoryId: null,categoryName: '一级分类'})
+      });
+    },
     saveCatalog() {
       console.log(this.catalogObj)
       this.catalogObj.catalogId = ''
@@ -214,6 +218,7 @@ export default {
         case "detail":
           this.level2 = info.children;
           this.catalogObj2.parentId = info.categoryId
+          this.parentId = info.categoryId
           this.dialogVisible = true;
           break;
         case "delete":
@@ -224,6 +229,7 @@ export default {
                 message: "删除成功",
                 type: "success"
               });
+              this.dialogVisible = false
               courseCatalogList().then(response => {
                 response.data.forEach(element => {
                   element.level = "一级";
@@ -240,20 +246,23 @@ export default {
           break;
         case "edit":
           console.log(info);
-          this.form = info;
           // this.catalogObj2.showType = Number(this.catalogObj2.showType)
-          this.catalogObj2.categoryId = info.categoryId
-          this.catalogObj2.name = info.categoryName
-          this.catalogObj2.description = info.description
+          this.catalogObj2 = info
           this.addForm.title = "编辑分类";
+          // this.form = info;
           this.saveDialog = true;
           break;
       }
     },
     save() {
       console.log(this.catalogObj2)
+      let params = Object.assign({}, this.catalogObj2)
+      params.name = this.catalogObj2.categoryName
       if(this.addForm.title === "编辑分类") {
-        courseCatalogEdit(this.catalogObj2)
+        console.log(this.catalogObj2)
+        params.parentId = this.parentId
+        console.log(params)
+        courseCatalogEdit(params)
         .then(response => {
           if (response.code === 200) {
             this.$message({
@@ -287,19 +296,21 @@ export default {
           }
         });
       }else{
-        courseCatalogAdd(this.catalogObj2)
+        params.categoryId = null
+        courseCatalogAdd(params)
         .then(response => {
           if (response.code === 200) {
             this.$message({
               message: "添加成功",
               type: "success"
             });
-            this.tableData.forEach(element=> {
-              if(element.categoryId === this.catalogObj2.parentId) {
-                response.data.level = "二级"
-                element.children.push(response.data)
-              }
-            })
+            // this.tableData.forEach(element=> {
+            //   if(element.categoryId === this.catalogObj2.parentId) {
+            //     response.data.level = "二级"
+            //     element.children.push(response.data)
+            //   }
+            // })
+            this.getCatalog()
             this.saveDialog = false
           }
         });

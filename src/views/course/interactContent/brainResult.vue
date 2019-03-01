@@ -4,11 +4,11 @@
             <div>
                 <img :src="require('@/assets/images/vote.png')" alt="">
                 <span style="margin: 0 20px 0 10px">头脑风暴</span>
-                <span>5人参与</span>
+                <span>{{stormList.length}}人参与</span>
             </div>
             <div>
-                <el-button>导出结果</el-button>
-                <el-button>返回</el-button>
+                <!-- <el-button>导出结果</el-button> -->
+                <router-link :to="{path: '/course/list/interact', query: {id: $route.query.id}}"><el-button>返回</el-button></router-link>
             </div>
         </div>
         
@@ -17,11 +17,14 @@
                 <span>题目1：金属货币制度下是不是就不会出现通货膨胀，。。。。。。</span>
                 <span style="color:rgb(130,178,198)">(单选题)</span>
             </div> -->
-            <div class="answer-container">
+            <div v-if="stormList.length === 0">
+                <span>这道题还没有人回答</span>
+            </div>
+            <div class="answer-container" v-else>
                 <div class="answer-item" v-for="(item,index) in stormList" :key="index">
                     <div style="display:flex; justify-content: space-between">
                         <div>
-                            <img width="40" :src="require('@/assets/images/brainStorme.png')" alt="">
+                            <img width="40" :src="require('@/assets/images/user.png')" alt="">
                             <div style="display: inline-block;margin-left:10px">
                                 <span style="display: block;margin-bottom: 5px">{{item.realName}}</span>
                                 <span>{{item.createTime}}</span>

@@ -70,7 +70,42 @@
           this.fileName = new Date().getTime() + event.target.files[0].name
           this.fileSize =event.target.files[0].size
         }
-        this.ossCheck()
+        //这里加一个获取验签信息的错误处理
+        if (Number(this.isError) === 0) {
+          this.errors()
+          return false
+        }
+        if (this.ossData === null && Number(this.isError) !== 0) {
+          this.ossCheck()
+          return false
+        }
+        let file = this.fileData.target.files[0]
+        let name = new Date().getTime() + file.name.replace(/[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g, '')
+        console.log(file.type)
+        if(this.fileType !== '') {
+          let chekcType = this.fileType.split(',').some(element=> {
+            return file.type === element
+          })
+          if(!chekcType) {
+              this.$message({
+                message: '文件格式错误',
+                type: 'error'
+              })
+              this.inputNull()
+              return false
+            }
+        }
+        if (file.size > this.size) {
+          this.$message({
+            message: '上传文件超出可上传范围，请重新选择文件上传',
+            type: 'error'
+          })
+          this.inputNull()
+          return false
+        }
+        let client = new oss(this.ossData)
+        //多文件上传请修改这里
+        this.forInputs(client,name,file)
       },
       //获取签证
       ossCheck(name){

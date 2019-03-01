@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p class="route-guide">教师用户><span>{{currentRoute}}</span></p>
+        <p class="route-guide"><router-link :to="{path:'/system/teacher'}">教师用户</router-link>><span>{{currentRoute}}</span></p>
         <el-form ref="form1" :model="form" label-width="80px" class="teacherForm">
             <!-- {{testList}} -->
             <el-form-item label="用户名">

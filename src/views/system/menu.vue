@@ -4,10 +4,10 @@
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="菜单名称"></el-input>
+        <el-input v-model="form.name"  style="width: 200px;margin-left: 10px;" placeholder="菜单名称"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="queryRoleList">查询</el-button>
+        <el-button type="primary" @click="getMenuList">查询</el-button>
       </el-form-item>
     </el-form>
 
@@ -35,16 +35,40 @@
         width="60%"
         :before-close="handleClose"
         style="min-width: 800px">
-
-      <div class="pop-academy">
-        <div class="item-title">
-          <span class="color-red">*</span><span>请输入角色名：</span>
-        </div>
-        <div class="item-input">
-          <el-input class="input-pop"  v-model="addForm.data.roleName"  placeholder="角色名称" clearable></el-input>
-        </div>
-      </div>
-
+      <el-form :model="routeConfig" ref="menuForm" :rules="rules">
+        <el-form-item label="菜单名称" prop="name">
+          <el-input v-model="routeConfig.name"></el-input>
+        </el-form-item>
+        <el-form-item label="访问路径" prop="url">
+          <el-input v-model="routeConfig.url"></el-input>
+        </el-form-item>
+        <el-form-item label="组件加载路径" prop="component">
+          <el-input v-model="routeConfig.component"></el-input>
+        </el-form-item>
+        <el-form-item label="父级菜单，默认为0">
+          <el-input v-model="routeConfig.parentId"></el-input>
+        </el-form-item>
+        <el-form-item label="菜单类型">
+          <el-radio v-model="routeConfig.type" label="0">
+            目录
+          </el-radio>
+          <el-radio v-model="routeConfig.type" label="1">
+            菜单
+          </el-radio>
+          <el-radio v-model="routeConfig.type" label="2">
+            按钮
+          </el-radio>
+        </el-form-item>
+        <el-form-item label="菜单级别" prop="level">
+          <el-input v-model="routeConfig.level"></el-input>
+        </el-form-item>
+        <el-form-item label="权限" prop="perms">
+          <el-input v-model="routeConfig.perms"></el-input>
+        </el-form-item>
+        <el-form-item label="重定向">
+          <el-input v-model="routeConfig.redirect"></el-input>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="save">确 定</el-button>
@@ -64,8 +88,9 @@
   import { sysRolePage } from '../../api/system'
   import { sysRoleAdd } from '../../api/system'
   import { sysRoleEdit } from '../../api/system'
-  import { sysRoleDelete } from '../../api/system'
-  import { sysUserMenuList } from '../../api/system'
+  import { sysUserMenuDel } from '../../api/system'
+  import { sysUserMenuList, sysUserMenuAdd } from '../../api/system'
+import { get } from 'http';
 
   export default {
     name: "role",
@@ -75,8 +100,18 @@
     },
     data(){
       return {
+        routeConfig: {
+          type: '2'
+        },
+        rules: {
+          name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
+          url: [{ required: true, message: '请输入菜单访问路径', trigger: 'blur' }],
+          component: [{ required: true, message: '请输入组件加载路径', trigger: 'blur' }],
+          level: [{ required: true, message: '请输入菜单级别', trigger: 'blur' }],
+          perms: [{ required: true, message: '授权(多个用逗号分隔，如：user:list,user:create)', trigger: 'blur' }],
+        },
         addForm:{
-          title:'添加角色',
+          title:'',
           data:{
             roleName:'',
           }
@@ -84,7 +119,6 @@
         menuDialogVisible:false,
         dialogVisible:false,
         form:{
-          title:'添加角色',
         },
         tableTitle:'角色管理列表',
         tableOperate:[
@@ -92,10 +126,10 @@
             content:'创建菜单',
             type:'created'
           },
-          {
-            content:'批量删除',
-            type:'deleteList'
-          }
+          // {
+          //   content:'批量删除',
+          //   type:'deleteList'
+          // }
         ],
         columnNameList:[
           {
@@ -111,12 +145,12 @@
           },
           {
             name:'父级菜单',
-            prop:'parentName'
+            prop:'parentId'
           },
-          {
-            name:'创建时间',
-            prop:'createName'
-          },
+          // {
+          //   name:'创建时间',
+          //   prop:'createName'
+          // },
           {
             name:'创建人',
             prop:'createName'
@@ -132,7 +166,7 @@
             type:'edit'
           }
         ],
-        tableData:'',
+        tableData:[],
 
 
 
@@ -140,12 +174,8 @@
     },
     created:function(){
      // this.queryRoleList();
-      sysUserMenuList().then(
-        res => {
-          this.tableData = res;
-          console.log('this.tableData',this.tableData);
-        }
-      ).catch()
+     this.getMenuList(this.form)
+      
     },
     mounted:function(){
      /* sysUserMenuList().then(
@@ -176,10 +206,9 @@
     },
     methods:{
       showComponentInfo:function(type,info){
-       /* console.log('type',type,'info',info);
+        console.log('type',type,'info',info);
         switch(type){
           case 'created':
-            console.log('here is created');
             this.appendRole();
             break;
           case 'edit':
@@ -195,23 +224,20 @@
           case 'set':
             this.editMenu(info);
             break;
-        }*/
+        }
       },
-      queryRoleList:function () {
-       /* console.log('this.form',this.form);
-        sysRolePage(this.form).then(
+      getMenuList:function () {
+        sysUserMenuList().then(
           res => {
-            this.tableData=res.data;
-            console.log("tableData",this.tableData)
+            this.tableData = res;
+            console.log('this.tableData',this.tableData);
           }
-        ).catch(
-          error => console.log('error',error)
-        )*/
+        ).catch()
       },
       appendRole:function(){
-       /* this.dialogVisible = true;
-        this.addForm.title = '添加角色';
-        this.addForm.data={ roleName:'' }*/
+        this.dialogVisible = true;
+        this.addForm.title = '添加菜单';
+        this.addForm.data={ roleName:'' }
       },
       editRole:function(roleInfo){
         /*this.dialogVisible = true;
@@ -226,15 +252,28 @@
         console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );*/
       },
       save:function(){
-       /* if( this.addForm.title === '添加角色'){
-          console.log( '添加角色的信息:', this.addForm.data);
-          sysRoleAdd( this.addForm.data).then(
-            res => {
-              console.log('添加角色:',res);
+        if( this.addForm.title === '添加菜单'){
+          this.$refs['menuForm'].validate((valid) => {
+            if (valid) {
+              sysUserMenuAdd(this.routeConfig)
+              .then(response=> {
+                if(response.code === 200) {
+                  this.$message({
+                    message: '添加成功',
+                    type: 'success'
+                  })
+                }else{
+                  this.$message({
+                    message: response.msg,
+                    type: 'warning'
+                  })
+                }
+              })
+            } else {
+              console.log('error submit!!');
+              return false;
             }
-          ).catch(
-            error => console.log('添加角色出错',error)
-          )
+          });
         }else if( this.addForm.title === '编辑角色' ){
           console.log('编辑提交的信息:',this.addForm.data);
           sysRoleEdit( this.addForm.data ).then(
@@ -248,37 +287,27 @@
           );
         }
         this.dialogVisible = false;
-        setTimeout( ()=>{ this.queryRoleList() },300);*/
       },
       delete:function(type,list){
-       /* let roleIdList = [];
-        switch (type) {
-          case 'one':
-            roleIdList.push(list.roleId);
-            break;
-          case 'list':
-            list.filter(
-              element => {
-                roleIdList.push( element.roleId );
-                return true;
-              }
-            );
-            break;
-        }
-        sysRoleDelete(roleIdList).then(
+        sysUserMenuDel(list).then(
           res => {
             console.log('删除成功的信息:',res);
+            if(res.code === 200) {
+              this.$message({
+                message: '删除成功',
+                type: 'success'
+              })
+              this.getMenuList()
+            }
           }
         ).catch(
           error => {
             console.log("删除失败:",error);
           }
         )
-        setTimeout( () => { this.queryRoleList() },300 );*/
       },
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;
-        this.queryRoleList();
       },
       handleClose(done) {
         done();

@@ -19,14 +19,14 @@ export const constantRouterMap = [{
     hidden: true
   },
   {
-    path: '/course',
-    component: Header,
-    name: '课程中心',
-    level: 1,
-    menuShow: true,
-    type: 'courseCenter',
-    redirect: '/course/list',
-    children: [{
+    path: '/course',    // 访问路径
+    component: Header,  // 组件
+    name: '课程中心',    // 页面名称
+    level: 1,           // 路由等级，用来判断是否是头部（一级）导航
+    menuShow: true,     // 是否显示于侧边栏
+    // type: 'courseCenter',
+    redirect: '/course/list', // 重定向
+    children: [{        // 子路由
         path: '/course/list',
         component: Layout,
         name: '课程列表',
@@ -563,12 +563,12 @@ export const constantRouterMap = [{
             name: '帮助中心管理',
             menuShow: true
           },
-          {
-            path: '/system/templates',
-            component: _import('system/templates'),
-            name: '模板管理',
-            menuShow: true
-          },
+          // {
+          //   path: '/system/templates',
+          //   component: _import('system/templates'),
+          //   name: '模板管理',
+          //   menuShow: true
+          // },
           {
             path: '/system/notice',
             component: _import('system/sysNotice'),

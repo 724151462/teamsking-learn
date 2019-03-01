@@ -107,10 +107,13 @@
 
 <script>
   import { logins, loginDebug, getTenant} from '@/api/login'
+  import { sysUserMenuList } from '@/api/system'
   import { setToken, getToken, twoWeeksExchange, twoWeeksGetExchange, saveUserInfo} from '@/utils/auth'
   import {getErrorMsg} from "@/utils/utils";
+  import MenuUtils from '@/utils/MenuUtils'
   import {mobileForgot,emailForgot,resetPass,emailFotgotCheck,mobileFotgotCheck} from "../../api/user";
 
+  var routers = []
   export default {
     data () {
       return {
@@ -181,6 +184,13 @@
             console.log('登录成功')
             twoWeeksExchange(res.data.token)
             saveUserInfo(res.data.userId)
+            sysUserMenuList()
+            .then(response=> {
+              console.log(response.data)
+              // console.log(this.$router.options)
+              sessionStorage.setItem('menuList',JSON.stringify(response.data))
+              MenuUtils(routers,[response.data[0]])
+            })
             this.$router.replace('/course')
           } else {
             this.$message({
