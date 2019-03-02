@@ -328,6 +328,7 @@ import {
   subjectDel
 } from "@/api/course";
 import { getResList, localUpload, getTestFileFold } from "@/api/library";
+import { fileKind } from '@/utils/utils'
 
 export default {
   data() {
@@ -746,11 +747,28 @@ export default {
     },
     // 资源类型图标
     typeIcon(info) {
-      if (info.contentType === 10) {
-        return require("../../assets/images/vedio.png");
-      } else {
-        return require("../../assets/images/word.png");
+      console.log(info)
+      let type = fileKind(info.itemName)
+      switch (type) {
+        case 'ppt':
+          return require("@/assets/images/ppt.png");
+          break;
+        case 'pdf':
+          return require("@/assets/images/pdf.png");
+          break;
+        case 'excel':
+          return require("@/assets/images/excel.png");
+          break;
+        case 'word':
+          return require("@/assets/images/word.png");
+          break;
+
+        default:
+          break;
       }
+      if (info.contentType === 10) {
+        return require("@/assets/images/vedio.png");
+      } 
     },
     // 字幕信息
     strUrl(info) {
