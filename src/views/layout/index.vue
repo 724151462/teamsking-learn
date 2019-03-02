@@ -27,7 +27,7 @@
           :default-openeds="defaultOpens"
           ref="menu"
         >
-          <template v-for="issue in node">
+          <template v-for="issue in nodes">
             <!-- issue.name:{{issue.name}}<br>leftNavState:{{$store.state.leftNavState}} -->
             <template v-if="issue.name === $store.state.leftNavState">
               <!-- 注意：这里就是leftNavState状态作用之处，当该值与router的根路由的name相等时加载相应菜单组 -->
@@ -42,14 +42,14 @@
                     :key="term.path"
                     :index="term.path"
                     :class="$route.path===term.path?'is-active':''"
-                    v-if="term.menuShow"
+
                   >
                     <i :class="term.iconCls"></i>
                     <span slot="title">{{term.name}}</span>
                   </el-menu-item>
                 </el-submenu>
                 <el-menu-item
-                  v-else-if="item.leaf&&item.children&&item.children.length&&item.menuShow"
+                  v-else-if="item.leaf&&item.children&&item.children.length"
                   :index="item.children[0].path"
                   :class="$route.path===item.children[0].path?'is-active':''"
                 >
@@ -72,13 +72,14 @@
 import headers from "./header.vue";
 import { constantRouterMap } from "@/router/index";
 import { mapGetters } from "vuex";
+
 export default {
   components: {
     headers
   },
   data() {
     return {
-      node: this.$router.options.routes,
+      nodes: [],
       defaultOpens: [String(sessionStorage.getItem("defaultOpens"))] || []
     };
   },
@@ -89,13 +90,13 @@ export default {
     //这里没有直接使用this.$router.options.routes，是因为addRoute的路由规则，在这里this.$router.options.routes获取不到
 		//有兴趣的可以看一下源码，是为什么获取不到，但是却又有规则了 
 		//另外在开发的时候，可能由于是热部署，也会不断重复的给nodes添加元素，造成导航条有重复的，简单解决，可以设置一个开关
-		let isLoadNodes = sessionStorage.getItem('isLoadNodes')
-		if (!isLoadNodes) {
-			let data = JSON.parse(window.sessionStorage.getItem('menuList'))
-			// this.nodes.push(...data)
+		// let isLoadNodes = sessionStorage.getItem('isLoadNodes')
+		// if (!isLoadNodes) {
+			let data = this.$store.state.allMenu
+			this.nodes.push(...data)
 			console.log(this.nodes)
 			sessionStorage.setItem('isLoadNodes', 'true')
-		}
+		// }
   },
   methods: {
     handleOpen(...params) {

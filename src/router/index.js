@@ -278,44 +278,44 @@ export const constantRouterMap = [{
       }
     ],
   },
-  {
-    path: '/learn',
-    component: Header,
-    name: '学习中心',
-    level: 1,
-    type: 'studyManage',
-    menuShow: true,
-    redirect: '/learn/inclass',
-    children: [{
-      path: '/learn/inclass',
-      // leaf: true,
-      component: Layout,
-      name: '学习管理',
-      menuShow: true,
-      children: [{
-          path: '/learn/inclass',
-          leaf: true,
-          component: _import('learn/inClass'),
-          name: '课堂',
-          menuShow: true,
-        },
-        {
-          path: '/learn/afterclass',
-          leaf: true,
-          component: _import('learn/afterClass'),
-          name: '课后',
-          menuShow: true,
-        },
-        // {
-        //   path: '/learn/teachdata',
-        //   leaf: true,
-        //   component: _import('learn/teachData'),
-        //   name: '教学数据',
-        //   menuShow: true,
-        // }
-      ]
-    }]
-  },
+  // {
+  //   path: '/learn',
+  //   component: Header,
+  //   name: '学习中心',
+  //   level: 1,
+  //   type: 'studyManage',
+  //   menuShow: true,
+  //   redirect: '/learn/inclass',
+  //   children: [{
+  //     path: '/learn/inclass',
+  //     // leaf: true,
+  //     component: Layout,
+  //     name: '学习管理',
+  //     menuShow: true,
+  //     children: [{
+  //         path: '/learn/inclass',
+  //         leaf: true,
+  //         component: _import('learn/inClass'),
+  //         name: '课堂',
+  //         menuShow: true,
+  //       },
+  //       {
+  //         path: '/learn/afterclass',
+  //         leaf: true,
+  //         component: _import('learn/afterClass'),
+  //         name: '课后',
+  //         menuShow: true,
+  //       },
+  //       // {
+  //       //   path: '/learn/teachdata',
+  //       //   leaf: true,
+  //       //   component: _import('learn/teachData'),
+  //       //   name: '教学数据',
+  //       //   menuShow: true,
+  //       // }
+  //     ]
+  //   }]
+  // },
   {
     path: '/school',
     component: Header,
@@ -850,10 +850,10 @@ export const constantRouterMap = [{
       },
     ]
   },
-  {
-    path: '/*',
-    redirect: '/404'
-  },
+  // {
+  //   path: '/*',
+  //   redirect: '/404'
+  // },
 ]
 
 export default new Router({

@@ -187,11 +187,19 @@
             sysUserMenuList()
             .then(response=> {
               console.log(response.data)
+              sessionStorage.setItem('menuList',JSON.stringify(response.data.slice(0, 2)))
               // console.log(this.$router.options)
-              sessionStorage.setItem('menuList',JSON.stringify(response.data))
-              MenuUtils(routers,[response.data[0]])
+              let routes = MenuUtils(response.data.slice(0, 2))
+              this.$store.commit('setAllMenu', routes)
+              console.log(routes)
+              this.$router.addRoutes(routes)
+              // routers.forEach(element => {
+              //   this.$router.options.routes.push(element)
+              // });
+              console.log(this.$router.options.routes)
+              this.$router.replace('/learn')
             })
-            this.$router.replace('/course')
+            
           } else {
             this.$message({
               message:getErrorMsg(res.msg),

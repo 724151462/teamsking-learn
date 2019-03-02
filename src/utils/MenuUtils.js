@@ -15,6 +15,7 @@ function generaMenu(data){
     }
     item.component = _import(item.component)
     item.children = item.list
+    item.path = item.url
     delete item.list
     delete item.comment
     delete item.icon
