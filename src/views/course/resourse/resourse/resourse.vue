@@ -749,7 +749,7 @@ import { setTimeout } from 'timers';
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        padding-right: 8px;
+        padding-left: 10px;
       .img-span
         display inline-block
         .img-icon

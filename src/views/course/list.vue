@@ -1,6 +1,6 @@
 <template>
     <div>
-      <el-row style="margin-bottom: 10px">
+      <el-row style="margin-bottom: 30px">
         <el-button round size="small" :class="{'active':isActice}" @click="courseType()">全部课程</el-button>
         <el-button round size="small" @click="courseType(30)">已发布</el-button>
         <el-button round size="small" @click="courseType(10)">未发布</el-button>

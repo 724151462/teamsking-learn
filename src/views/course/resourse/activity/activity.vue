@@ -55,7 +55,7 @@
                 <span class="quiz-tag" v-else-if="data.interactionType == 50">头脑风暴</span>
                 <span class="quiz-tag" v-else-if="data.interactionType == 60">投票问卷</span>
                 <span class="quiz-tag" v-else-if="data.interactionType == 70">讨论</span>
-                <span>{{ node.label }}</span>
+                <span style="margin-left: 10px">{{ node.label }}</span>
                 <!--<span v-if="data.interactionId" class="golook" style="margin-left: 20px" @click="showAc(data.interactionId,data.interactionType)">查看</span>-->
               </div>
               <div>
