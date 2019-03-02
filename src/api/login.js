@@ -6,12 +6,20 @@ const tenantDev = '/api/v1/login/tenant' // 开发环境
 const tenantProd = 'http://120.36.137.90:9008/api/v1/login/tenant' // 生产环境
 const tenantUrl = process.env.NODE_ENV === 'production' ? tenantProd : tenantDev
 
-
-
-
-
+const tokenDev = '/api/v1/token/accessToken' // 开发环境
+const tokenProd = 'http://120.36.137.90:9008/api/v1/api/v1/token/accessToken' // 生产环境
+const tokenUrl = process.env.NODE_ENV === 'production' ? tokenProd : tokenDev
 
 import { commonsAjax } from '@/utils/requery'
+
+
+
+/**
+ * 刷新Token
+ * */
+export function reToken (data) {
+  return commonsAjax(`${baseUrl}user/login`, data, 'post')
+}
 
 /**
  * 获取租户列表用于登录

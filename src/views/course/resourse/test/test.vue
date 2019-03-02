@@ -73,7 +73,7 @@
                 <span class="quiz-tag" v-show="data.quizType == 10">单选题</span>
                 <span class="quiz-tag" v-show="data.quizType == 20">多选题</span>
                 <span class="quiz-tag" v-show="data.quizType == 30">主观题</span>
-                <span>{{ node.label }}</span>
+                <span style="margin-left: 10px">{{ node.label }}</span>
               </div>
               <div class="hide-button">
                 <span v-if="data.catalogLevel">

@@ -144,11 +144,11 @@
         <el-form-item label="选课名单" required>
           <el-row>
             <span>开放范围：</span>
-            <el-tooltip class="item" effect="dark" content="只对选课名单内的学生开放，需要导入选课学生名单" placement="bottom-start">
-              <el-radio v-model="Course.courseMode" :label="10">选课名单学员</el-radio>
-            </el-tooltip>
             <el-tooltip class="item" effect="dark" content="只对本校认证的学员开放，其他学员无法学习！" placement="bottom-start">
               <el-radio v-model="Course.courseMode" :label="20">本校学员</el-radio>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="只对选课名单内的学生开放，需要导入选课学生名单" placement="bottom-start">
+              <el-radio v-model="Course.courseMode" :label="10">选课名单学员</el-radio>
             </el-tooltip>
             <el-tooltip class="item" effect="dark" content="对所有学员开放！" placement="bottom-start">
               <el-radio v-model="Course.courseMode" :label="30">全部学员</el-radio>
@@ -237,16 +237,18 @@
             <el-button @click="isAccredit = false">取 消</el-button>
         </div>
       </el-dialog >
-    <!--弹出的设置说明-->
+    <!--成绩权重设定-->
     <el-dialog
         title="成绩权重设定"
         :visible.sync="isSysTem"
         style="z-index: 10002"
+        :before-close="sysTemCancel"
         class="isSystem"
         width="750px">
       <el-row>
         <div class="top">
           <span>满分：100分</span>
+          <!--<span style="margin-left: 10px;">当前已分配权重：<span style="color: red;">{{this.temTotle}}%</span></span>-->
           <span style="text-align: right;float: right">*单项考核权重为0则不计入成绩！</span>
         </div>
         <div class="center">
@@ -344,7 +346,7 @@
           courseCover:'', //课程封面
           payMode: 10,  //课程价格 10授课 20售卖
           coursePrice:0, //课程价格
-          courseMode: 10,  //10：教师导入 20 本校学生 30 全部学员 ,
+          courseMode: 20,  //10：教师导入 20 本校学生 30 全部学员 ,
           dropCourse:true, //1 允许退课 2 不允许
           courseCode:'',  //课程代码/课程编码
           // teacher:'', //教师id
@@ -423,6 +425,7 @@
           beginTime: [{ required: true, message: '请选择开始时间', trigger: 'blur' }],
           endTime: [{ required: true, message: '请选择结束时间', trigger: 'blur' }],
         },
+        temTotle:0,
         begTimeDis:false
       }
     },
@@ -824,8 +827,8 @@
       goPutCourse () {
         let data = this.goDataFilter()
         let loading = this.$loading(this.loadingCss)
-        // console.log('请求发送前的数据')
-        // console.log(data)
+        console.log('请求发送前的数据')
+        console.log(data)
         putCourse(data).then(res=>{
           // console.log(res)
           loading.close()
@@ -841,6 +844,12 @@
           }
         }).catch(error=>{
           console.log(error)
+        })
+      },
+      setTotle(){
+        let arr = Object.values(this.CourseSetEntity);
+        arr.forEach((item)=>{
+          this.temtotle += Number(item)
         })
       },
       //成绩权重设置完毕

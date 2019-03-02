@@ -39,7 +39,7 @@
       </div>
       <el-dropdown class="avator" trigger="click">
         <span class="el-dropdown-link userinfo-inner">
-            <img :src="$store.state.userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
+            <img :src="userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
             <span>{{this.realName}}</span>
             <i class="el-icon-caret-bottom"></i>
           </span>
@@ -78,6 +78,7 @@ import { removeToken, getUserId, removeUserId } from "@/utils/auth";
 import { getUserInfo, getMeInfo, userInit } from "../../api/user";
 import {unReadyMsg} from '@/api/course'
 import {getErrorMsg} from "../../utils/utils";
+import Cookie from 'js-cookie'
 
 export default {
   props: ["navs"],
@@ -125,7 +126,12 @@ export default {
     )
     this.$store.commit("setAllMenu", this.menuList);
     this.fetchNavData();
-    this.getUserInfo();
+    if(!Cookie.get("realName")){
+      this.getUserInfo();
+    }else{
+      this.userAvatar = Cookie.get('avatar')
+      this.realName = Cookie.get('realName')
+    }
     this.getMsg();
   },
   methods: {
@@ -160,11 +166,12 @@ export default {
         .then(res => {
           let status
           if (Number(res.code) === 200) {
-            this.realName = res.data.realName;
             status = res.data.initStatus
-            Boolean(res.data.avatar) ? this.$store.commit('CHANGE_AVATAR', res.data.avatar): '';
-            sessionStorage.setItem("realName", res.data.realName);
-            sessionStorage.setItem("tenantId", res.data.gender);
+            this.realName = res.data.realName;
+            this.userAvatar = res.data.avatar
+            Cookie.set('avatar',res.data.avatar)
+            Cookie.set("realName", res.data.realName);
+            Cookie.set("tenantId", res.data.gender);
           } else {
             // this.$message.error('请登录')
             // this.$message.error(getErrorMsg(res.msg));
@@ -215,7 +222,6 @@ export default {
       // 路由改变时执行
       //console.info("to.path:" + to.path);
       this.fetchNavData(to, from);
-      this.getUserInfo();
     }
   }
 };

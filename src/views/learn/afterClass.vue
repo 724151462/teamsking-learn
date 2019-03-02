@@ -511,10 +511,12 @@
         }
       }
       myCourseList(data).then(res=>{
-        console.log(res)
-        this.courseList = res.data.pageData
-        this.course = res.data.pageData[0].courseId
-        return res.data.pageData[0].courseId
+        this.courseList =[];
+        res.data.pageData.forEach((item)=>{
+          item.courseStatus == 30 ? this.courseList.push(item) : '';
+        })
+        this.course = this.courseList[0].courseId
+        return this.courseList[0].courseId
       }).then(courseId =>{
         //根据课程ID获取课程成员人数
         courseBaseInfo(courseId).then(res=>{
