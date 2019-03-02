@@ -1,7 +1,8 @@
 <template>
   <div class="portalTeacher">
     <div style="height: 70px">
-      <el-button style="float: right;margin-right: 50px" type="primary" @click="addBanner">添加</el-button>
+      <el-button style="float: right;margin-right: 50px" type="primary" @click="addBanner(1)">添加PC轮播图</el-button>
+      <el-button style="float: right;margin-right: 50px" type="primary" @click="addBanner(2)">添加小程序轮播图</el-button>
     </div>
     <table-wjx
       :tableTitle="tableTitle"
@@ -11,17 +12,19 @@
       :operateList="operateList"
       @showComponentInfo="showComponentInfo"
     ></table-wjx>
-    <el-dialog title="添加轮播图" :visible.sync="dialogVisible" width="30%">
-      <el-form ref="form" :model="form" label-width="80px">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%">
+      <el-form ref="form" :model="form" label-width="100px">
         <el-form-item label="图片路径">
           <upOss :btnText="'上传轮播图'" @ossUp="getBannerUrl" :fileKind="'img'"></upOss>
         </el-form-item>
-        <el-form-item label="链接web">
+        <el-form-item label="链接web" v-if="form.carouselType === 1">
           <el-input v-model="form.linkWebUrl"></el-input>
         </el-form-item>
-        <el-form-item label="链接小程序">
+        <el-form-item label="链接小程序" v-else>
           <el-input v-model="form.linkWxxUrl"></el-input>
         </el-form-item>
+        <span v-if="form.carouselType === 1" style="color: red">提示：网页轮播图建议1920*500px</span>
+        <span style="color: red" v-else>提示：小程序轮播图建议790*350px</span>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -47,6 +50,7 @@ export default {
   data() {
     return {
       form: {},
+      dialogTitle: '',
       dialogVisible: false,
       activeIndex: "2",
       tableTitle: "轮播图",
@@ -61,12 +65,16 @@ export default {
           imgList: {}
         },
         {
-          name: "链接web端",
-          prop: "linkWebUrl"
+          name: "链接路径",
+          prop: "linkUrl"
         },
         {
-          name: "链接微信小程序",
-          prop: "linkWxxUrl"
+          name: "轮播图类型",
+          prop: "carouselType",
+          formatter:(val)=>{
+              let carouselType = val === 1 ? 'PC端' : '小程序'
+              return carouselType
+            }
         },
         {
           name: "租户id",
@@ -95,10 +103,18 @@ export default {
       // console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
       switch (type) {
         case "edit":
+          console.log(info)
+          if(info.carouselType === 1) {
+            this.dialogTitle = '编辑PC端轮播图'
+            this.form.carouselType = 1
+            this.form.linkWebUrl = info.linkWebUrl;
+          }else{
+            this.dialogTitle = '编辑小程序轮播图'
+            this.form.carouselType = 2
+            this.form.linkWxxUrl = info.linkWxxUrl;
+          }
           this.form.carouselId = info.carouselId;
           this.form.imageUrl = info.imageUrl[0].imgUrl;
-          this.form.linkWebUrl = info.linkWebUrl;
-          this.form.linkWxxUrl = info.linkWxxUrl;
           this.btnType = "modify"
           this.dialogVisible = true;
           break;
@@ -107,8 +123,11 @@ export default {
           break;
       }
     },
-    addBanner() {
+    addBanner(type) {
+      this.form = {}
+      this.form.carouselType = type
       this.btnType = "add"
+      this.dialogTitle = type === 1 ? '添加PC端轮播图' : '添加小程序轮播图'
       this.dialogVisible = true;
     },
     deleteBanner(item) {
@@ -177,6 +196,13 @@ export default {
       bannerList()
       .then(res => {
         res.data.forEach(element => {
+          if(element.carouselType === 1) {
+            element.linkUrl = element.linkWebUrl
+            // element.carouselType = 'PC端'
+          }else{
+            element.linkUrl = element.linkWxxUrl
+            // element.carouselType = '微信'
+          }
           element.imageUrl = [{ imgUrl: element.imageUrl }];
         });
         this.tableData3 = res.data;
