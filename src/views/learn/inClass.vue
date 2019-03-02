@@ -28,6 +28,7 @@
         value-format="yyyy-MM-dd 00:00:00"
         type="daterange"
         range-separator="至"
+        :picker-options="pickerOptions"
         start-placeholder="开始日期"
         end-placeholder="结束日期">
       </el-date-picker>
@@ -171,6 +172,11 @@ export default {
     return {
       activeName: 'second',
       course:'',
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+      },
       userCount:0,
       courseList:'',
       date:'',
@@ -294,11 +300,10 @@ export default {
     },
     //课堂行为数据获取
     getBehaviorData(pageIndex){
-      let moren = getBeforeDate(7-1)
       let data = {
         "courseId" : this.course,
-        "startTime" : this.date[0] || moren.beforeTime,
-        "endTime": this.date[1] || moren.nowTime,
+        "startTime" : this.date[0],
+        "endTime": this.date[1],
         "pageParam": {
           "pageIndex": pageIndex || 1,
           "pageSize": 5,

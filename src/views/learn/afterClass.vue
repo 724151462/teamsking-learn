@@ -24,6 +24,7 @@
       <el-date-picker
           style="margin-left: 40px"
           v-model="date"
+          :picker-options="pickerOptions"
           format="yyyy 年 MM 月 dd 日"
           value-format="yyyy-MM-dd 00:00:00"
           type="daterange"
@@ -45,17 +46,23 @@
 
 <script>
   import echarts from "echarts";
-  import {getBeforeDate} from "../../utils/utils";
+  import {getBeforeDate, formatDate} from "../../utils/utils";
   import {afterOther, timeBucketOther, leanRate} from '@/api/study'
   import {myCourseList, courseBaseInfo} from '@/api/course'
   export default {
   data() {
     return {
       id: "",
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+      },
       course:'',
       userCount:0,
       courseList:'',
       date:'',
+      endTime:'',
       beforeDate:7,
       studyTime:{
         zeroPoint: 0,
@@ -107,7 +114,7 @@
   },
   mounted() {
     //获取前七天的数据
-    this.changeDate(7)
+    //this.changeDate(7)
   },
   created () {
     this.myCourseData()
@@ -131,10 +138,23 @@
       }
       courseBaseInfo(this.course).then(res=>{
         this.userCount = res.data.userCount
+        return res.data.endTime
       })
-      this.learnRateData(data)
-      this.otherData(data)
-      this.timeBucketData(data)
+        .then((endTime)=>{
+        let end = new Date(endTime).getTime();
+        if (end < Date.now()){
+          this.pickerOptions = {
+            disabledDate(time) {
+              return time.getTime() > end;
+            }
+          }
+          end = end - 1000 * 60 * 60 * 24 * 1
+          let beforeMs = end - 1000 * 60 * 60 * 24 * parseInt(6)
+          this.date = [formatDate(beforeMs),formatDate(end)]
+        }else{
+          this.changeDate(7)
+        }
+      })
     }
   },
   methods: {
