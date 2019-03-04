@@ -11,7 +11,7 @@ export default (data) => {
 function generaMenu(data){
   data.forEach((item)=>{
     if(item.list != null) {
-      generaMenu(item.list)
+      return generaMenu(item.children)
     }
     item.component = _import(item.component)
     item.children = item.list
@@ -26,7 +26,29 @@ function generaMenu(data){
     delete item.perms
     delete item.showCode
     delete item.type
-
   })
+  console.log(data)
   return data
 }
+// function generaMenu(data){
+//   data.forEach((item)=>{
+//     if(item.list != null) {
+//       item.component = _import(item.component)
+//       item.children = item.list
+//       delete item.list
+//       delete item.comment
+//       delete item.icon
+//       delete item.isLeaf
+//       delete item.menuCode
+//       delete item.open
+//       delete item.orderNo
+//       delete item.parentName
+//       delete item.perms
+//       delete item.showCode
+//       delete item.type
+//     }
+//     return generaMenu(item.children)
+//   })
+//   console.log(data)
+//   return data
+// }
