@@ -123,7 +123,7 @@ export default {
           break;
       }
     },
-    addBanner(type) {
+    addBanner() {
       this.form = {}
       this.form.carouselType = type
       this.btnType = "add"
