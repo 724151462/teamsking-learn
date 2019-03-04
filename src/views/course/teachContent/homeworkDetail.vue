@@ -216,7 +216,7 @@ export default {
     },
     // 打回作业
     repulse() {
-      console.log(this.homeworkSubmissionId)
+      //console.log(this.homeworkSubmissionId)
       homeWorkRepulse({homeworkSubmissionId: this.homeworkSubmissionId})
       .then(response=> {
         if(response.code === 200) {

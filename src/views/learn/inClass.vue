@@ -35,127 +35,127 @@
     </div>
     <br>
     <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
-      <el-tab-pane label="关键指标" disabled name="first"></el-tab-pane>
-      <el-tab-pane label="课堂行为" name="second">
-        <!--为echarts准备一个具备大小的容器dom-->
-        <div id="chart1" style="height: 400px;" v-show="isChart1"></div>
-        <div style="height: 400px;" v-show="isChart1Data">
-          <div style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃课堂行为参与率</div>
-          <div style="height: 200px;width: 200px;margin: 0 auto;margin-top:50px;">
-            <img :src="require('@/assets/images/noData.png')" style="height: inherit;" alt="">
+        <el-tab-pane label="关键指标" disabled name="first"></el-tab-pane>
+        <el-tab-pane label="课堂行为" name="second">
+          <!--为echarts准备一个具备大小的容器dom-->
+          <div id="chart1" style="height: 400px;" v-show="isChart1"></div>
+          <div style="height: 400px;" v-show="isChart1Data">
+            <div style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃课堂行为参与率</div>
+            <div style="height: 200px;width: 200px;margin: 0 auto;margin-top:50px;">
+              <img :src="require('@/assets/images/noData.png')" style="height: inherit;" alt="">
+            </div>
           </div>
-        </div>
-        <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
-        <el-table
-          :data="tableData"
-          border
-          style="width: 100%">
-          <el-table-column
-            label="授课时间"
-            width="120">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.staticsDate.slice(0,10)}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="签到比例">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.signRate}}%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="测验参与率">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.examRate}}%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="头脑风暴参与率">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.stormRate}}%</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="投票参与率">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.voteRate}}%</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="授课时长"
-            width="120">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{mTran(scope.row.classTime)}}</span>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          background
-          style="margin-top: 20px;text-align: center"
-          @size-change="behPageChange"
-          @current-change="behPageChange"
-          :current-page.sync="behPage.pageIndex"
-          layout="prev, pager, next, jumper"
-          :total="behPage.totalPage">
-        </el-pagination>
-      </el-tab-pane>
-      <el-tab-pane label="学情质量" name="third">
-        <!--为echarts准备一个具备大小的容器dom-->
-        <div id="chart2" style="width: 1000px;height: 400px;" v-if="isChart2"></div>
-        <div style="height: 400px;" v-show="isChart2Data">
-          <div style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃学情质量</div>
-          <div style="height: 200px;width: 200px;margin: 0 auto;margin-top:50px;">
-            <img :src="require('@/assets/images/noData.png')" style="height: inherit;" alt="">
+          <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
+          <el-table
+            :data="tableData"
+            border
+            style="width: 100%">
+            <el-table-column
+              label="授课时间"
+              width="120">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.staticsDate.slice(0,10)}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="签到比例">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.signRate}}%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="测验参与率">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.examRate}}%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="头脑风暴参与率">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.stormRate}}%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="投票参与率">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.voteRate}}%</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="授课时长"
+              width="120">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{mTran(scope.row.classTime)}}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            background
+            style="margin-top: 20px;text-align: center"
+            @size-change="behPageChange"
+            @current-change="behPageChange"
+            :current-page.sync="behPage.pageIndex"
+            layout="prev, pager, next, jumper"
+            :total="behPage.totalPage">
+          </el-pagination>
+        </el-tab-pane>
+        <el-tab-pane label="学情质量" name="third">
+          <!--为echarts准备一个具备大小的容器dom-->
+          <div id="chart2" style="width: 1000px;height: 400px;" v-if="isChart2"></div>
+          <div style="height: 400px;" v-show="isChart2Data">
+            <div style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃学情质量</div>
+            <div style="height: 200px;width: 200px;margin: 0 auto;margin-top:50px;">
+              <img :src="require('@/assets/images/noData.png')" style="height: inherit;" alt="">
+            </div>
           </div>
-        </div>
-        <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
-        <el-table
-          :data="tableData1"
-          border
-          style="width: 100%">
-          <el-table-column
-            label="授课时间"
-            width="120">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.staticsDate.slice(0,10)}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="课堂平均分">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.classroomAverage}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="测试平均分">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.examAverage}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="头脑风暴平均分">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.stormAverage}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="投票平均分">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{scope.row.voteAverage}}</span>
-            </template>
-          </el-table-column>
-          <!--<el-table-column-->
+          <span style="font-size:18px;font-weight: bold;display:inline-block; margin-bottom: 20px">┃详细数据</span>
+          <el-table
+            :data="tableData1"
+            border
+            style="width: 100%">
+            <el-table-column
+              label="授课时间"
+              width="120">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.staticsDate.slice(0,10)}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="课堂平均分">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.classroomAverage}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="测试平均分">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.examAverage}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="头脑风暴平均分">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.stormAverage}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="投票平均分">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{scope.row.voteAverage}}</span>
+              </template>
+            </el-table-column>
+            <!--<el-table-column-->
             <!--label="授课时长"-->
             <!--width="120">-->
             <!--<template slot-scope="scope">-->
-              <!--<span style="margin-left: 10px">{{mTran(scope.row.classTime)}}</span>-->
+            <!--<span style="margin-left: 10px">{{mTran(scope.row.classTime)}}</span>-->
             <!--</template>-->
-          <!--</el-table-column>-->
-        </el-table>
+            <!--</el-table-column>-->
+          </el-table>
 
-        <el-pagination
-          background
-          style="margin-top: 20px;text-align: center"
-          @size-change="analysisChange"
-          @current-change="analysisChange"
-          :current-page.sync="Analysis.pageIndex"
-          layout="prev, pager, next, jumper"
-          :total="Analysis.totalPage">
-        </el-pagination>
-      </el-tab-pane>
-    </el-tabs>
+          <el-pagination
+            background
+            style="margin-top: 20px;text-align: center"
+            @size-change="analysisChange"
+            @current-change="analysisChange"
+            :current-page.sync="Analysis.pageIndex"
+            layout="prev, pager, next, jumper"
+            :total="Analysis.totalPage">
+          </el-pagination>
+        </el-tab-pane>
+      </el-tabs>
     <br>
   </div>
 </template>
@@ -177,6 +177,7 @@ export default {
           return time.getTime() > Date.now();
         },
       },
+      endTime:'',//课程结束时间，用于判断当前课程是否已结束
       userCount:0,
       courseList:'',
       date:'',
@@ -234,7 +235,7 @@ export default {
   },
   mounted() {
     //获取前七天的数据
-    this.changeDate(7)
+    //this.changeDate(7)
     // this.getBehaviorData()
   },
   created () {
@@ -243,31 +244,43 @@ export default {
   watch: {
     date: function (newdata) {
       if(this.course){
-        let data = {
-          courseId:this.course,
-          startTime: this.date[0],
-          endTime: this.date[1]
-        }
         this.activeName === 'second' ? this.getBehaviorData() : this.getAnalysisData()
       }
     },
     course: function () {
-      let data = {
-        courseId:this.course,
-        startTime: this.date[0],
-        endTime: this.date[1]
-      }
       courseBaseInfo(this.course).then(res=>{
         this.userCount = res.data.userCount
+        return res.data.endTime
+      }).then((endTime)=>{
+        let end = new Date(endTime).getTime();
+        if (end < Date.now()){
+          this.endTime = endTime
+          //如果课程已结束,则数据只统计到课程截至日期
+          this.pickerOptions = {
+            disabledDate(time) {
+              return time.getTime() > end;
+            }
+          }
+          this.date = getBeforeDate(end)
+          this.beforeDate = 7
+        }else{
+          this.endTime = ''
+          this.beforeDate = 7
+          this.date = getBeforeDate(Date.now() - 1000 * 60 * 60 * 24)
+          this.pickerOptions = {
+            disabledDate(time) {
+              return time.getTime() > Date.now() - 1000 * 60 * 60 * 24;
+            }
+          }
+        }
       })
-      this.activeName === 'second' ? this.getBehaviorData() : this.getAnalysisData()
     }
   },
   methods: {
     //改变时间段
     changeDate(n){
-      let data = getBeforeDate(n-1)
-      this.date = [data.beforeTime,data.nowTime]
+      let time = this.endTime ? new Date(this.endTime).getTime() : Date.now() - 1000 * 60 * 60 * 24
+      this.date = getBeforeDate(time,n)
     },
     //授课时长秒速转换
     mTran(time){

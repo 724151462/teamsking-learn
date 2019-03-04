@@ -42,18 +42,11 @@ export function formatDate(time) {
 }
 
 /*
-* 获取当前日期,及前n天
+*传入某日时间戳，及前n天
+* 返回[前n天,某日] ‘2012-08-02 12：00' 格式化的日期范围
 * */
-export function getBeforeDate(n) {
-  let nowTime = formatDate(new Date())
-  let nowMs = new Date().getTime()
-  let beforeMs = nowMs - 1000 * 60 * 60 * 24 * parseInt(n)
-  let beforeTime = formatDate(beforeMs)
-
-  return {
-    nowTime,
-    beforeTime
-  }
+export function getBeforeDate(now = Date.now(),n = 7) {
+  return [formatDate(now - 1000 * 60 * 60 * 24 * parseInt(n-1)),formatDate(now)]
 }
 
 /*

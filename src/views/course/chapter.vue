@@ -15,7 +15,7 @@
       </div>
     </div>
     <div class="main-container">
-      <span v-if="sourceData.length === 0">这是一门啥都没有的课程</span>
+      <span v-if="sourceData.length === 0" style="color: red;">这是一门啥都没有的课程，需要UI切图</span>
       <el-collapse accordion v-model="activeChapter" @change="chapterChange" v-else>
         <el-collapse-item
           v-for="(chapter, chapterIndex) in sourceData"
@@ -36,7 +36,9 @@
             </div>
           </template>
           <el-collapse accordion v-model="activeSection" @change="sectionChange">
+            <span v-if="chapter.catalogSection.length ==0" style="color: red;">此章下面没有节，需UI切图</span>
             <el-collapse-item
+              v-else
               style="margin-left: 30px"
               v-for="(jie, jieIndex) in chapter.catalogSection"
               :key="jieIndex"
@@ -52,7 +54,9 @@
                   </div>
                 </div>
               </template>
+              <span v-if="jie.catalogItem.length ==0" style="color: red;">此节下面没有资源，需UI切图</span>
               <div
+                v-else
                 style="margin: 0 auto; width:90%;"
                 v-for="(content, contentIndex) in jie.catalogItem"
                 :key="contentIndex"

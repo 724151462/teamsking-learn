@@ -51,11 +51,10 @@
     <el-dialog
       title=""
       :visible.sync="dialogVisible"
-      width="70%"
-      :before-close="handleClose">
+      width="70%">
 
       <div class="appraisal-warp">
-        <div class="appraisal-body" v-for="(item, index) in detailEvaluateList">
+        <div class="appraisal-body" v-for="(item, index) in detailEvaluateList" :key="item.id">
           <div class="appraisal-left">
             <div class="appraisal-img">
               <img :src="item.avatar" height="50px" alt="" class="">

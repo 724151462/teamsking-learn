@@ -126,12 +126,7 @@ export default {
     )
     this.$store.commit("setAllMenu", this.menuList);
     this.fetchNavData();
-    if(!Cookie.get("realName")){
-      this.getUserInfo();
-    }else{
-      this.userAvatar = Cookie.get('avatar')
-      this.realName = Cookie.get('realName')
-    }
+    this.getUserInfo();
     this.getMsg();
   },
   methods: {
@@ -149,7 +144,7 @@ export default {
       this.defaultActiveIndex = index;
     },
     fetchNavData(to,from) {
-      console.log(to,from)
+      //console.log(to,from)
       // 初始化菜单激活项
       // var nav_type = "courseCenter"
       let nav_name = this.$route.matched[0].name
@@ -159,31 +154,30 @@ export default {
       this.defaultActiveIndex = nav_path;
       //console.log(this.$route.matched[0].path)
     },
-    //根据Cookie获取用户信息
+    //获取用户信息
     getUserInfo() {
       let data = getUserId();
       getMeInfo()
         .then(res => {
           let status
           if (Number(res.code) === 200) {
-            status = res.data.initStatus
             this.realName = res.data.realName;
-            this.userAvatar = res.data.avatar
-            Cookie.set('avatar',res.data.avatar)
-            Cookie.set("realName", res.data.realName);
-            Cookie.set("tenantId", res.data.gender);
+            status = res.data.initStatus
+            res.data.avatar ? this.userAvatar= res.data.avatar : this.userAvatar = require('../../assets/images/user.png')
+            sessionStorage.setItem("realName", res.data.realName);
+            sessionStorage.setItem("tenantId", res.data.gender);
           } else {
             // this.$message.error('请登录')
             // this.$message.error(getErrorMsg(res.msg));
           }
           return status
-      })
-      .then(status=>{
-        if(status === 2){
-          this.nameDialog = true
-        }
-      })
-      .catch(err=>{console.log(err)})
+        })
+        .then(status=>{
+          if(status === 2){
+            this.nameDialog = true
+          }
+        })
+        .catch(err=>{console.log(err)})
     },
     //status为3 时修改用户名
     userNameInit(){
