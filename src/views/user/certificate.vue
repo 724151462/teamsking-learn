@@ -57,7 +57,14 @@
           </template>
         </el-table-column>
       </el-table>
-0
+      <el-pagination
+        style="margin: 20px 0"
+        background
+        layout="prev, pager, next"
+        :current-page="currentPage"
+        @current-change="handleCurrentChange"
+        :total="totalPage">
+      </el-pagination>
     </div>
     <!--修改证书-->
     <el-dialog

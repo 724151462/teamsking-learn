@@ -49,14 +49,19 @@
             node-key="catalogId"
             ref="tree">
             <span class="test-tree-node" slot-scope="{ node, data }">
-              <div class="test-info">
-                <img :width="20" v-if="!data.resourceId" style="margin-right: 3px" :src="require('@/assets/images/folder.png')" alt="">
-                <img :src="imgSrc.mp4" alt="" :width="25" :height="25" v-else-if="data.resourceType == 10">
-                <img :src="getIcon(data.catalogName)" alt="" :width="25" :height="25" v-else-if="data.resourceType == 20">
-                <img :src="imgSrc.img" alt="" :width="25" :height="25" v-else-if="data.resourceType == 40">
-                <span class="tree-title">{{ node.label }}</span>
-                <!--<span class="str-tag" v-if="data.srtUrl != undefined">字幕</span>-->
-              </div>
+                <div class="test-info" v-if="!data.resourceId">
+                  <img :width="20" v-if="!data.resourceId" style="margin-right: 3px" :src="require('@/assets/images/folder.png')" alt="">
+                  <img :src="imgSrc.mp4" alt="" :width="25" :height="25" v-else-if="data.resourceType == 10">
+                  <img :src="getIcon(data.catalogName)" alt="" :width="25" :height="25" v-else-if="data.resourceType == 20">
+                  <img :src="imgSrc.img" alt="" :width="25" :height="25" v-else-if="data.resourceType == 40">
+                  <span class="tree-title">{{ node.label }}</span>
+                </div>
+                <div class="test-info" v-else>
+                  <img :src="imgSrc.mp4" alt="" :width="25" :height="25" v-if="data.resourceType == 10">
+                  <img :src="getIcon(data.catalogName)" alt="" :width="25" :height="25" v-else-if="data.resourceType == 20">
+                  <img :src="imgSrc.img" alt="" :width="25" :height="25" v-else-if="data.resourceType == 40">
+                  <span class="tree-title" style="margin-bottom: 3px">{{ node.label }}</span>
+                </div>
               <div>
                 <span v-if="data.catalogLevel" class="hide-button">
                   <el-button size="mini" type="primary" v-show="data.catalogLevel<3" @click.stop="goCreateCatalog(data,data.catalogId)"> 创建子目录 </el-button>

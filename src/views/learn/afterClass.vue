@@ -24,6 +24,7 @@
       <el-date-picker
           style="margin-left: 40px"
           v-model="date"
+          :picker-options="pickerOptions"
           format="yyyy 年 MM 月 dd 日"
           value-format="yyyy-MM-dd 00:00:00"
           type="daterange"
@@ -45,17 +46,23 @@
 
 <script>
   import echarts from "echarts";
-  import {getBeforeDate} from "../../utils/utils";
+  import {getBeforeDate, formatDate} from "../../utils/utils";
   import {afterOther, timeBucketOther, leanRate} from '@/api/study'
   import {myCourseList, courseBaseInfo} from '@/api/course'
   export default {
   data() {
     return {
       id: "",
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now() - 1000 * 60 * 60 * 24;
+        },
+      },
       course:'',
       userCount:0,
       courseList:'',
       date:'',
+      endTime:'',//课程结束时间，用于判断当前课程是否已结束
       beforeDate:7,
       studyTime:{
         zeroPoint: 0,
@@ -86,7 +93,7 @@
       learn:{
         studyDocCount:[],
         studyDocRate:[],
-        studyVideoDuration:[],
+        studyVideoCount:[],
         studyVideoRate:[]
       },
       other:{
@@ -104,10 +111,6 @@
         // studyLengthRate: 13,  //人均学习时长
       }
     };
-  },
-  mounted() {
-    //获取前七天的数据
-    this.changeDate(7)
   },
   created () {
     this.myCourseData()
@@ -131,17 +134,37 @@
       }
       courseBaseInfo(this.course).then(res=>{
         this.userCount = res.data.userCount
+        return res.data.endTime
+      }).then((endTime)=>{
+        let end = new Date(endTime).getTime();
+        if (end < Date.now()){
+          this.endTime = endTime
+          //如果课程已结束,则数据只统计到课程截至日期
+          this.pickerOptions = {
+            disabledDate(time) {
+              return time.getTime() > end;
+            }
+          }
+          this.date = getBeforeDate(end)
+          this.beforeDate = 7
+        }else{
+          this.endTime = ''
+          this.beforeDate = 7
+          this.date = getBeforeDate(Date.now() - 1000 * 60 * 60 * 24)
+          this.pickerOptions = {
+            disabledDate(time) {
+              return time.getTime() > Date.now() - 1000 * 60 * 60 * 24;
+            }
+          }
+        }
       })
-      this.learnRateData(data)
-      this.otherData(data)
-      this.timeBucketData(data)
     }
   },
   methods: {
-    //改变时间段
+    //单选改变时间段
     changeDate(n){
-      let data = getBeforeDate(n-1)
-      this.date = [data.beforeTime,data.nowTime]
+      let time = this.endTime ? new Date(this.endTime).getTime() : Date.now() - 1000 * 60 * 60 * 24
+      this.date = getBeforeDate(time,n)
     },
     learnChartInit(){
       let myChart = echarts.init(document.getElementById('afterLean'));
@@ -225,7 +248,7 @@
         minMAxArr.push(Number(Object.values(item)[0]))
         timeData.push(Object.keys(item)[0].substring(0,10))
       })
-      this.learn.studyVideoDuration.forEach(item=>{
+      this.learn.studyVideoCount.forEach(item=>{
         minMAxArr.push(Number(Object.values(item)[0]))
         studyVideoNum.push(Number(Object.values(item)[0]))
       })
@@ -516,12 +539,6 @@
           item.courseStatus == 30 ? this.courseList.push(item) : '';
         })
         this.course = this.courseList[0].courseId
-        return this.courseList[0].courseId
-      }).then(courseId =>{
-        //根据课程ID获取课程成员人数
-        courseBaseInfo(courseId).then(res=>{
-          this.userCount = res.data.userCount
-        })
       }).catch(err=>{
         console.log(err)
       })
@@ -541,7 +558,7 @@
     //学习时段
     timeBucketData(data){
       timeBucketOther(data).then(res=>{
-        console.log('学习时段',res.data)
+        // console.log('学习时段',res.data)
         delete res.data.cmpTime
         delete res.data.courseId
         delete res.data.courseUserCount
@@ -555,11 +572,6 @@
     },
     //获取其它行为的统计数据
     otherData(data){
-      // let data = {
-      //   "courseId": "0608367675f54267aa6960fd0557cc1b",
-      //   "endTime": "2019-01-26 07:23:51",
-      //   "startTime": "2019-01-23 07:23:51"
-      // }
       afterOther(data).then(res=>{
         // console.log('其它行为',res)
         this.other = res.data

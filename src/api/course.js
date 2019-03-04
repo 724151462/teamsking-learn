@@ -1021,7 +1021,7 @@ export function discussPost(data) {
 * 评价列表
 */
 export function evaluatePage(data) {
-  let url = `http://192.168.10.48:9008/api/v1/tenant/evaluate/page`
+  let url = `${commonBaseUrl}tenant/evaluate/page`
   return commonsAjax(url, data, 'get')
 }
 
@@ -1029,7 +1029,7 @@ export function evaluatePage(data) {
 * 具体课程下的评价
 */
 export function evaluateDetail(data) {
-  let url = `http://192.168.10.48:9008/api/v1/tenant/evaluate/${data.courseId}/page`
+  let url = `${commonBaseUrl}tenant/evaluate/${data.courseId}/page`
   return commonsAjax(url, '', 'get')
 }
 
@@ -1038,6 +1038,6 @@ export function evaluateDetail(data) {
 * 刪除评价
 */
 export function evaluateDelete(data) {
-  let url = `http://192.168.10.48:9008/api/v1/study/courseevaluate`
+  let url = `${commonBaseUrl}study/courseevaluate`
   return commonsAjax(url, data, 'delete')
 }

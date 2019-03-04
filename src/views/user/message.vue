@@ -134,9 +134,9 @@ export default {
       readAll() {
         let leng = this.checkedMessage.length
         readMsg(this.checkedMessage).then(res => {
-          console.log(res)
           if (Number(res.code) === 200) {
             this.$store.commit('MSG_READY',leng)
+            this.checkAll = false
             this.initList()
           } else {
             this.$message.error('读取消息失败');
@@ -179,6 +179,7 @@ export default {
           console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('删除成功');
+            this.checkAll = false
             this.initList()
           } else {
             this.$message.error('删除失败');

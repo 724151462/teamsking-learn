@@ -407,16 +407,15 @@ div {
 
     .start-item {
       display: flex;
-      width: 60%;
       align-items: center;
 
       .icon-group {
         display: flex;
-        width: 55%;
         justify-content: space-between;
 
         div {
           display: flex;
+          margin-right 20px;
           align-items: center;
           cursor: pointer;
 
