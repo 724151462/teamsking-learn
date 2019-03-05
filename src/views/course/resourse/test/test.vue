@@ -260,7 +260,6 @@
         this.deleteArr= idArr
 
         this.allDelete = flag
-        console.log(this.deleteArr)
         // this.$refs.tree.setCheckedKeys(idArr)
       },
       //节点复选框被选
@@ -306,9 +305,7 @@
               }
               this.newFileFold()
             }
-            let data = JSON.parse(JSON.stringify(res.data))
-            this.catalogData = this.filterData(data)
-            console.log(this.catalogData)
+            this.catalogData = this.filterData(res.data)
           } else {
             this.$message({
               message: "试题列表数据获取失败",
@@ -327,8 +324,7 @@
         }
         getTestFileFold(data).then(res => {
           if (Number(res.code) === 200) {
-            let data = JSON.parse(JSON.stringify(res.data))
-            this.catalogData = this.filterData(data)
+            this.catalogData = this.filterData(res.data)
           } else {
             this.$message({
               message: "试题列表数据获取失败",
@@ -452,11 +448,10 @@
       filterData(data){
         let getFilter = (data)=>{
          data.forEach((item)=>{
-            if(!item.catalogList.length!==0){
+            if(item.catalogList.length!==0){
               getFilter(item.catalogList)
             }
             if(item.quizList.length !==0){
-              let parentId = item.catalogId
               item.quizList.forEach((list)=>{
                 list.quizTitle = list.quizTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
                 item.catalogList.push({
@@ -464,15 +459,14 @@
                   quizId: list.quizId,
                   updateTime:list.updateTime,
                   quizType:list.quizType,
-                  parentId
+                  parentId:item.catalogId
                 })
               })
             }
           })
           return data
         }
-        let curData = getFilter(data)
-        return curData
+        return getFilter(data)
       },
       //拖拽相关
       handleDrop(draggingNode, dropNode, dropType, ev) {

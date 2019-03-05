@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { menuList, logout } from "@/api/login";
+import { menuList, logout ,reToken} from "@/api/login";
 import { constantRouterMap } from "@/router/index";
 import { removeToken, getUserId, removeUserId } from "@/utils/auth";
 import { getUserInfo, getMeInfo, userInit } from "../../api/user";
@@ -216,6 +216,9 @@ export default {
       // 路由改变时执行
       //console.info("to.path:" + to.path);
       this.fetchNavData(to, from);
+      if(!sessionStorage.get("realName")){
+        this.getUserInfo();
+      }
     }
   }
 };

@@ -1,12 +1,12 @@
 <template>
   <div class="appraisal">
-    <el-row>
-      <el-col :span="24">
-        <div class="grid-content bg-purple-dark">
-          课程评价
-        </div>
-      </el-col>
-    </el-row>
+    <!--<el-row>-->
+      <!--<el-col :span="24">-->
+        <!--<div class="grid-content bg-purple-dark">-->
+          <!--课程评价-->
+        <!--</div>-->
+      <!--</el-col>-->
+    <!--</el-row>-->
 
     <el-form ref="form" :model="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">

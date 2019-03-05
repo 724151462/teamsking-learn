@@ -246,8 +246,7 @@
                       }
                       this.newFileFold()
                   }
-                  let data = JSON.parse(JSON.stringify(res.data))
-                  this.activityData = this.filterData(data)
+                  this.activityData = this.filterData(res.data)
                   // console.log(this.activityData)
               } else {
                   this.$message({
@@ -269,8 +268,7 @@
         getAcList(data).then(res => {
           console.log(res)
           if (Number(res.code) === 200) {
-            let data = JSON.parse(JSON.stringify(res.data))
-            this.activityData = this.filterData(data)
+            this.activityData = this.filterData(res.data)
             // console.log(this.activityData)
           } else {
             this.$message({
@@ -363,8 +361,7 @@
                 })
                 return data
             }
-            let curData = getFilter(data)
-            return curData
+            return getFilter(data)
         },
         //查看资源
         showAc(id,type){

@@ -857,6 +857,7 @@
         let arr = Object.values(this.CourseSetEntity),
             totle = 0;
         arr.forEach((item)=>{
+          console.log(item)
           totle += Number(item)
         })
 

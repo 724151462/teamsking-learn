@@ -18,7 +18,7 @@ import { commonsAjax } from '@/utils/requery'
  * 刷新Token
  * */
 export function reToken (data) {
-  return commonsAjax(`${baseUrl}user/login`, data, 'post')
+  return commonsAjax(`${tokenUrl}`, data, 'get')
 }
 
 /**

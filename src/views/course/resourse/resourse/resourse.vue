@@ -306,10 +306,7 @@ import { setTimeout } from 'timers';
                     }
                     this.newFileFold()
                 }
-                let data = JSON.parse(JSON.stringify(res.data))
-                this.resourceData = this.filterData(data)
-              // this.$set( this.$data, 'resourceData', curdata )
-                console.log(this.resourceData)
+              this.resourceData = this.filterData(res.data)
             } else {
               this.$message({
                   message: "资源获取失败",
@@ -320,7 +317,6 @@ import { setTimeout } from 'timers';
     },
       //判断文档类型
       getIcon(name){
-        console.log(name)
         let kind = fileKind(name)
         return this.imgSrc[kind];
       },
@@ -334,10 +330,7 @@ import { setTimeout } from 'timers';
           // console.log(res)
           if (Number(res.code) === 200) {
             //如果试题库为空，则初始化新建一个默认的文件夹
-            let data = JSON.parse(JSON.stringify(res.data))
-            this.resourceData = this.filterData(data)
-            // this.$set( this.$data, 'resourceData', curdata )
-            console.log(this.resourceData)
+            this.resourceData = this.filterData(res.data)
           } else {
             this.$message({
               message: "资源获取失败",
@@ -489,33 +482,32 @@ import { setTimeout } from 'timers';
       //清洗数据
       filterData(data){
         let getFilter = (data)=>{
-            data.forEach((item)=>{
-              if(!item.childCatalogList.length!==0){
-                  getFilter(item.childCatalogList)
-              }
-              if(item.resourceList.length !==0){
+          data.forEach((item)=>{
+            if(item.childCatalogList.length!==0){
+              return getFilter(item.childCatalogList)
+            }else{
+              if(item.resourceList.length !== 0){
                 let parentId = item.catalogId
                 item.resourceList.forEach((list)=>{
-                  // list.resourceList = list.resourceTitle.replace(/<[^>]+>/g,"");//去掉所有的html标记
                   if(list.resourceSize){
                     list.resourceSize = this.sizeTrans(list.resourceSize)
                   }
-                    item.childCatalogList.push({
-                      catalogName: list.resourceTitle,
-                      resourceId: list.resourceId,
-                      createTime:list.createTime,
-                      parentId:parentId,
-                      srtUrl: list.srtUrl,
-                      resourceType:list.resourceType,
-                      resourceSize:list.resourceSize,
-                    })
+                  item.childCatalogList.push({
+                    catalogName: list.resourceTitle,
+                    resourceId: list.resourceId,
+                    createTime:list.createTime,
+                    parentId:parentId,
+                    srtUrl: list.srtUrl,
+                    resourceType:list.resourceType,
+                    resourceSize:list.resourceSize,
                   })
+                })
               }
-            })
-            return data
+            }
+          })
+          return data
         }
-        let curData = getFilter(data)
-        return curData
+        return getFilter(data)
       },
       goUp (id) {
         Cookie.set('catalogId',id)
