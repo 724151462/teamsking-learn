@@ -862,7 +862,7 @@
         })
         console.log(totle)
         if(totle>100){
-          this.$message.warning('权重不可超过100%')
+          this.$message.warning('权重不可超过或小于100%')
           return false
         }else{
           this.isSysTem = false
