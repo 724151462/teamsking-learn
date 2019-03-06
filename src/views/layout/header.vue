@@ -216,9 +216,9 @@ export default {
       // 路由改变时执行
       //console.info("to.path:" + to.path);
       this.fetchNavData(to, from);
-      if(!sessionStorage.get("realName")){
-        this.getUserInfo();
-      }
+      // if(!sessionStorage.get("realName")){
+      //   this.getUserInfo();
+      // }
     }
   }
 };

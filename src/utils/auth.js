@@ -19,14 +19,18 @@ export function removeToken () {
 
 // 一个一周有效的cookie
 export function twoWeeksExchange (token,reToken) {
-  let inFifteenMinutes = new Date(new Date().getTime() + 3 * 60 * 1000);
+  let inFifteenMinutes = new Date(new Date().getTime() + 10 * 60 * 1000);
 
-  Cookie.set('tokenLive',Date.now() + 1000 * 60 * 3, { expires: 7 })
+  Cookie.set('tokenLive',Date.now() + 10 * 1000 * 60 , { expires: 7 })
 
   Cookie.set(reTokenKey, reToken, { expires: 15 })
   // Cookie.set(TokenKey, token, { expires: inFifteenMinutes })
   Cookie.set(TokenKey, token, { expires: 7 })
 
+}
+//检查Token是否将要过期
+export function checkToken() {
+  return Date.now()>Number(Cookie.get('tokenLive'))
 }
 // 用户登录后保存用户信息
 export function saveUserInfo (data) {

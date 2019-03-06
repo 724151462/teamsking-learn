@@ -2,7 +2,7 @@
   <div>
     <div class="addCourse">
       <span>课程信息</span>
-      <el-button plain style="float:right" @click="$router.push('/course/list')">返回</el-button>
+      <el-button plain  type="primary" style="float:right" @click="$router.push('/course/list')">返回</el-button>
     </div>
     <div class="addCourse-center">
       <el-form :model="Course" :rules="courseRules" ref="Course" label-width="100px">
@@ -854,13 +854,13 @@
       },
       //成绩权重设置完毕
       sysTemOver () {
+        delete this.CourseSetEntity.courseId
         let arr = Object.values(this.CourseSetEntity),
             totle = 0;
-        arr.forEach((item)=>{
-          console.log(item)
+        Object.values(this.CourseSetEntity).forEach((item)=>{
           totle += Number(item)
         })
-
+        console.log(totle)
         if(totle>100){
           this.$message.warning('权重不可超过100%')
           return false
