@@ -1,23 +1,24 @@
 <template>
-  <div class="tip"><p>¿Î³ÌÖÐÐÄ</p></div>
+  <div class="tip"><p>{{ title }}</p></div>
 </template>
 
 <script>
   export default {
-    name: "tip"
+    name: "tip",
+    props:['title']
   }
 </script>
 
 <style scoped>
   .tip{
-    padding: 3px 16px;
+    padding: 0 16px;
     background-color: #ecf8ff;
-    /* border-radius: 4px; */
     border-left: 5px solid #50bfff;
-    margin: 20px 0;
+    margin: 10px 0;
   }
   .tip p {
-    font-size: 14px;
+    padding: 10px 0;
+    font-size: 15px;
     color: #5e6d82;
   }
 </style>

@@ -854,25 +854,27 @@
       },
       //成绩权重设置完毕
       sysTemOver () {
-        delete this.CourseSetEntity.courseId
-        let arr = Object.values(this.CourseSetEntity),
-            totle = 0;
+        this.isUpdata ? delete this.CourseSetEntity.courseId : '';
+        let totle = 0;
         Object.values(this.CourseSetEntity).forEach((item)=>{
           totle += Number(item)
         })
         if(totle !== 100){
           this.$message.warning('权重不可超过或小于100%')
-          return false
         }else{
           this.isSysTem = false
         }
       },
       //取消成绩权重设置
       sysTemCancel () {
-        for (let i in this.CourseSetEntity) {
-          this.CourseSetEntity[i] = 0
+        if(this.isUpdata){
+          this.isSysTem = false
+        }else{
+          for (let i in this.CourseSetEntity) {
+            this.CourseSetEntity[i] = 0
+          }
+          this.isSysTem = false
         }
-        this.isSysTem = false
       },
     },
     mounted(){

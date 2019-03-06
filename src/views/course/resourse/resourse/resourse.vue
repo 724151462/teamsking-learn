@@ -1,8 +1,6 @@
 <template>
   <div class="resource">
-    <div class="title">
-      <div>资源管理</div>
-    </div>
+    <tip title="资源管理"></tip>
     <div class="radio-group" style="overflow: hidden">
       <div style="flex:1">
         <el-radio v-model="radio" :label="0" @change="radioChange(radio)">全部文件</el-radio>
@@ -152,6 +150,7 @@
   import videoPlayer from '@/components/video-pay'
   import UpOss from "@/components/up-oss";
   import Cookie from 'js-cookie';
+  import tip from '@/components/tip'
 import { setTimeout } from 'timers';
   export default {
     name: "resource",
@@ -160,7 +159,8 @@ import { setTimeout } from 'timers';
     },
     components:{
       UpOss,
-      videoPlayer
+      videoPlayer,
+      tip
     },
     data() {
       return {
