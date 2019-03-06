@@ -11,7 +11,7 @@ export default (data) => {
 function generaMenu(data){
   data.forEach((item)=>{
     if(item.list != null) {
-      return generaMenu(item.list)
+      generaMenu(item.list)
     }
     item.component = _import(item.component)
     item.children = item.list
