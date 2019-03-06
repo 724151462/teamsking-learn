@@ -180,14 +180,14 @@
               passwd: this.data.password
             };
         logins(data).then(res => {
-          console.log(res)
+          // console.log(res)
           if (res.code === 200) {
             // console.log(res)
             twoWeeksExchange(res.data.token,res.data.refreshToken)
             saveUserInfo(res.data.userId)
             sysUserMenuList()
             .then(response=> {
-              console.log(response.data)
+              // console.log(response.data)
               sessionStorage.setItem('menuList',JSON.stringify(response.data))
               // console.log(this.$router.options)
               let routes = MenuUtils(response.data)
@@ -197,7 +197,7 @@
               // routers.forEach(element => {
               //   this.$router.options.routes.push(element)
               // });
-              console.log(this.$router.options.routes)
+              // console.log(this.$router.options.routes)
               this.$router.replace('/course')
             })
           } else {
