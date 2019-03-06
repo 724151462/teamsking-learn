@@ -68,7 +68,7 @@
             break;
             case '4':
             this.$router.push({
-              path: '/course/list/teach',
+              path: '/course/list/teach/grade',
               query: {id: this.$route.query.id}
             })
             break;

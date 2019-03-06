@@ -111,6 +111,7 @@
   import { setToken, getToken, twoWeeksExchange, twoWeeksGetExchange, saveUserInfo} from '@/utils/auth'
   import {getErrorMsg} from "@/utils/utils";
   import MenuUtils from '@/utils/MenuUtils'
+  // import {compare} from '@/utils/MenuUtils'
   import {mobileForgot,emailForgot,resetPass,emailFotgotCheck,mobileFotgotCheck} from "../../api/user";
 
   var routers = []
@@ -140,8 +141,8 @@
         schoolList: [],   //租户列表
         searchKey:'', //搜索
         data: {
-          userName: '',
-          password: '',
+          userName: 'admin',
+          password: 'abc123',
           tenantId: ''
         },
         rules: {
@@ -187,9 +188,9 @@
             sysUserMenuList()
             .then(response=> {
               console.log(response.data)
-              sessionStorage.setItem('menuList',JSON.stringify(response.data.slice(0, 2)))
+              sessionStorage.setItem('menuList',JSON.stringify(response.data))
               // console.log(this.$router.options)
-              let routes = MenuUtils(response.data.slice(0, 2))
+              let routes = MenuUtils(response.data)
               this.$store.commit('setAllMenu', routes)
               console.log(routes)
               this.$router.addRoutes(routes)
@@ -197,7 +198,7 @@
               //   this.$router.options.routes.push(element)
               // });
               console.log(this.$router.options.routes)
-              this.$router.replace('/learn')
+              this.$router.replace('/course')
             })
             
           } else {

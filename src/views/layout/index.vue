@@ -37,8 +37,9 @@
                     <i :class="item.iconCls"></i>
                     <span slot="title">{{item.name}}</span>
                   </template>
-                  <el-menu-item
-                    v-for="term in item.children"
+                  <template v-for="term in item.children">
+                    <el-menu-item
+                     v-if="term.showCode !== 2"
                     :key="term.path"
                     :index="term.path"
                     :class="$route.path===term.path?'is-active':''"
@@ -46,7 +47,8 @@
                   >
                     <i :class="term.iconCls"></i>
                     <span slot="title">{{term.name}}</span>
-                  </el-menu-item>
+                    </el-menu-item>
+                  </template>    
                 </el-submenu>
                 <el-menu-item
                   v-else-if="item.leaf&&item.children&&item.children.length"
