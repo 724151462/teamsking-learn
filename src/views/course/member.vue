@@ -4,7 +4,7 @@
       <el-input v-model="pageParmas.searchKey" placeholder="请输入内容" style="width: 200px;"></el-input>
       <el-button type="primary" @click="searchMember">搜索</el-button>
       <el-button type="primary">
-        <router-link :to="{name: '成员方案管理', query: {id: $route.query.id}}">成员小组方案管理</router-link>
+        <router-link :to="{path: '/course/list/member/manage', query: {id: $route.query.id}}">成员小组方案管理</router-link>
       </el-button>
       <el-button type="success" @click="deleteAll">批量移除成员</el-button>
       <div style="margin-top:10px">

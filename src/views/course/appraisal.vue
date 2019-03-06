@@ -238,9 +238,9 @@
   .appraisal
       -webkit-font-smoothing:antialiased
   .appraisal-warp
-    height 60px
     display flex
     align-items center
+    flex-direction column
     .appraisal-left
       height 100%
       width 50px

@@ -123,7 +123,11 @@ export default {
           break;
       }
     },
+<<<<<<< HEAD
     addBanner(type) {
+=======
+    addBanner() {
+>>>>>>> jia
       this.form = {}
       this.form.carouselType = type
       this.btnType = "add"

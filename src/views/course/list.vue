@@ -95,6 +95,7 @@ var routers = []
 import { coursePage, publish, copy, close, courseDel } from '../../api/course'
 import { sysUserMenuList } from '@/api/system'
 import MenuUtils from '@/utils/MenuUtils'
+import { setTimeout } from 'timers';
 export default {
   data () {
     return {
@@ -114,14 +115,19 @@ export default {
   },
   created () {
     this.getList()
-    sysUserMenuList()
-      .then(response=> {
-        console.log(response.data)
-        // console.log(this.$router.options)
-        sessionStorage.setItem('menuList',JSON.stringify(response.data))
-        let routers = MenuUtils([response.data[0]])
-        console.log(routers)
-      })
+    // sysUserMenuList()
+    //   .then(response=> {
+    //     console.log(response.data)
+    //     // console.log(this.$router.options)
+    //     sessionStorage.setItem('menuList',JSON.stringify(response.data))
+    //     let routers = MenuUtils([response.data[0]])
+    //     console.log(routers)
+    //     this.$router.addRoutes(routers)
+    //     setTimeout(()=>{
+    //       this.$router.push({ path: '/learn' });
+    //     }, 1000)
+        
+    //   })
   },
   methods: {
     goGetList (e) {

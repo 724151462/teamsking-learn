@@ -101,7 +101,7 @@
         console.log(type)
         switch (type) {
           case 'testMark':
-            this.$router.push({name: "测试成绩", query: {courseId:this.$route.query.id, examId:groupId}})
+            this.$router.push({path: "/course/list/teach/testmark", query: {courseId:this.$route.query.id, examId:groupId}})
             break;
         
           default:

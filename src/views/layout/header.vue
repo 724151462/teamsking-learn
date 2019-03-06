@@ -39,7 +39,7 @@
       </div>
       <el-dropdown class="avator" trigger="click">
         <span class="el-dropdown-link userinfo-inner">
-            <img :src="userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
+            <img :src="$store.state.userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
             <span>{{this.realName}}</span>
             <i class="el-icon-caret-bottom"></i>
           </span>
@@ -78,7 +78,7 @@ import { removeToken, getUserId, removeUserId } from "@/utils/auth";
 import { getUserInfo, getMeInfo, userInit } from "../../api/user";
 import {unReadyMsg} from '@/api/course'
 import {getErrorMsg} from "../../utils/utils";
-import Cookie from 'js-cookie'
+import MenuUtils from '@/utils/MenuUtils'
 
 export default {
   props: ["navs"],
@@ -86,26 +86,7 @@ export default {
     return {
       defaultActiveIndex: "/course",
       nav: [
-        {
-          name: "课程中心",
-          url: "/course",
-          isNav: "course"
-        },
-        {
-          name: "学习管理",
-          url: "/learn/index",
-          isNav: "learn"
-        },
-        {
-          name: "校管中心",
-          url: "/school",
-          isNav: "school"
-        },
-        {
-          name: "系统管理",
-          url: "/system",
-          isNav: "system"
-        }
+        
       ],
       realName: "",
       userAvatar: require('../../assets/images/user.png'),
@@ -116,15 +97,31 @@ export default {
     };
   },
   created() {
+    console.log(this.$store.state.allMenu)
     // menuList().then((response)=>{
     // console.log(this.storeNav, '``````', response.data)
-    this.nav = this.$router.options.routes.filter(item=> {
-        if(item.level ===1) {
-          return item
+    // console.log(this.$router)
+
+    // this.nav = this.$router.options.routes.filter(item=> {
+    //     console.log(item)
+    //     if(item.level ===1) {
+    //       return item
+    //     }
+    //   }
+    // )
+    // let isLoadNodes = sessionStorage.getItem('isLoadNodes')
+		// if (!isLoadNodes) {
+      let data = this.$store.state.allMenu
+      this.$store.state.allMenu.filter(item=> {
+          if(item.level ===1) {
+            return item
+          }
         }
-      }
-    )
-    this.$store.commit("setAllMenu", this.menuList);
+      )
+			this.nav.push(...this.$store.state.allMenu)
+			console.log(this.nodes)
+			sessionStorage.setItem('isLoadNodes', 'true')
+		// }
     this.fetchNavData();
     this.getUserInfo();
     this.getMsg();
@@ -138,6 +135,8 @@ export default {
     doLogout() {
       removeToken();
       removeUserId();
+      this.$store.state.allMenu = []
+      sessionStorage.removeItem('menuList')
       this.$router.push("/login");
     },
     handleSelect(index) {
@@ -163,7 +162,11 @@ export default {
           if (Number(res.code) === 200) {
             this.realName = res.data.realName;
             status = res.data.initStatus
+<<<<<<< HEAD
             res.data.avatar ? this.userAvatar= res.data.avatar : this.userAvatar = require('../../assets/images/user.png')
+=======
+            Boolean(res.data.avatar) ? this.$store.commit('CHANGE_AVATAR', res.data.avatar): '';
+>>>>>>> jia
             sessionStorage.setItem("realName", res.data.realName);
             sessionStorage.setItem("tenantId", res.data.gender);
           } else {
@@ -216,6 +219,7 @@ export default {
       // 路由改变时执行
       //console.info("to.path:" + to.path);
       this.fetchNavData(to, from);
+      this.getUserInfo();
     }
   }
 };

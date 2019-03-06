@@ -15,6 +15,7 @@ function generaMenu(data){
     }
     item.component = _import(item.component)
     item.children = item.list
+    item.path = item.url
     delete item.list
     delete item.comment
     delete item.icon
@@ -24,9 +25,16 @@ function generaMenu(data){
     delete item.orderNo
     delete item.parentName
     delete item.perms
-    delete item.showCode
     delete item.type
 
   })
   return data
+}
+
+export function compare(property){
+  return function(a,b){
+      var value1 = a[property];
+      var value2 = b[property];
+      return value1 - value2;
+  }
 }

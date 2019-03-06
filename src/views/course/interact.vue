@@ -6,19 +6,19 @@
         <div class="icon-group">
           <div>
             <img :src="require('../../assets/images/vote.png')">
-            <router-link :to="{name: '发布投票', query: {id: $route.query.id}}">投票</router-link>
+            <router-link :to="{path: '/course/list/interact/vote', query: {id: $route.query.id}}">投票</router-link>
           </div>
           <div>
             <img :src="require('../../assets/images/brainStorme.png')">
-            <router-link :to="{name: '发布头脑风暴', query: {id: $route.query.id}}">头脑风暴</router-link>
+            <router-link :to="{path: '/course/list/interact/brainstorm', query: {id: $route.query.id}}">头脑风暴</router-link>
           </div>
           <div>
             <img :src="require('../../assets/images/homeWork.png')">
-            <router-link :to="{name: '作业/小组任务', query: {id: $route.query.id}}">作业/小组任务</router-link>
+            <router-link :to="{path: '/course/list/interact/homework', query: {id: $route.query.id}}">作业/小组任务</router-link>
           </div>
           <div>
             <img :src="require('../../assets/images/test.png')">
-            <router-link :to="{name: '发布测试', query: {id: $route.query.id}}">测试</router-link>
+            <router-link :to="{path: '/course/list/interact/test', query: {id: $route.query.id}}">测试</router-link>
           </div>
         </div>
       </div>
@@ -286,16 +286,16 @@ export default {
       };
       switch (item.interactionType) {
         case 30:
-          this.$router.push({ name: "发布测试", query: routerParams });
+          this.$router.push({ path: "/course/list/interact/test", query: routerParams });
           break;
         case 40:
-          this.$router.push({ name: "作业/小组任务", query: routerParams });
+          this.$router.push({ path: "/course/list/interact/homework", query: routerParams });
           break;
         case 50:
-          this.$router.push({ name: "发布头脑风暴", query: routerParams });
+          this.$router.push({ path: "/course/list/interact/brainstorm", query: routerParams });
           break;
         case 60:
-          this.$router.push({ name: "发布投票", query: routerParams });
+          this.$router.push({ path: "/course/list/interact/vote", query: routerParams });
           break;
       }
     },
