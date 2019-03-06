@@ -123,15 +123,7 @@ export default {
           break;
       }
     },
-<<<<<<< HEAD
-<<<<<<< HEAD
     addBanner(type) {
-=======
-    addBanner() {
->>>>>>> jia
-=======
-    addBanner() {
->>>>>>> ee0f99bc02dbf4b1c02e41bd7da42edd7fc86c26
       this.form = {}
       this.form.carouselType = type
       this.btnType = "add"

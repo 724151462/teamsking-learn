@@ -185,7 +185,6 @@
             // console.log(res)
             twoWeeksExchange(res.data.token,res.data.refreshToken)
             saveUserInfo(res.data.userId)
-<<<<<<< HEAD
             sysUserMenuList()
             .then(response=> {
               console.log(response.data)
@@ -201,10 +200,6 @@
               console.log(this.$router.options.routes)
               this.$router.replace('/course')
             })
-            
-=======
-            this.$router.replace('/course')
->>>>>>> ee0f99bc02dbf4b1c02e41bd7da42edd7fc86c26
           } else {
             this.$message({
               message:getErrorMsg(res.msg),

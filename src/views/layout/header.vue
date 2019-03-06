@@ -162,11 +162,7 @@ export default {
           if (Number(res.code) === 200) {
             this.realName = res.data.realName;
             status = res.data.initStatus
-<<<<<<< HEAD
             res.data.avatar ? this.userAvatar= res.data.avatar : this.userAvatar = require('../../assets/images/user.png')
-=======
-            Boolean(res.data.avatar) ? this.$store.commit('CHANGE_AVATAR', res.data.avatar): '';
->>>>>>> jia
             sessionStorage.setItem("realName", res.data.realName);
             sessionStorage.setItem("tenantId", res.data.gender);
           } else {
@@ -219,13 +215,6 @@ export default {
       // 路由改变时执行
       //console.info("to.path:" + to.path);
       this.fetchNavData(to, from);
-<<<<<<< HEAD
-      this.getUserInfo();
-=======
-      // if(!sessionStorage.get("realName")){
-      //   this.getUserInfo();
-      // }
->>>>>>> ee0f99bc02dbf4b1c02e41bd7da42edd7fc86c26
     }
   }
 };
