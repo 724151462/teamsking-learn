@@ -11,7 +11,7 @@ export default (data) => {
 function generaMenu(data){
   data.forEach((item)=>{
     if(item.list != null) {
-      generaMenu(item.list)
+      return generaMenu(item.list)
     }
     item.component = _import(item.component)
     item.children = item.list
@@ -26,7 +26,6 @@ function generaMenu(data){
     delete item.parentName
     delete item.perms
     delete item.type
-
   })
   return data
 }

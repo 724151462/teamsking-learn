@@ -180,11 +180,12 @@
               passwd: this.data.password
             };
         logins(data).then(res => {
-          // console.log(res)
+          console.log(res)
           if (res.code === 200) {
-            console.log('登录成功')
-            twoWeeksExchange(res.data.token)
+            // console.log(res)
+            twoWeeksExchange(res.data.token,res.data.refreshToken)
             saveUserInfo(res.data.userId)
+<<<<<<< HEAD
             sysUserMenuList()
             .then(response=> {
               console.log(response.data)
@@ -201,6 +202,9 @@
               this.$router.replace('/course')
             })
             
+=======
+            this.$router.replace('/course')
+>>>>>>> ee0f99bc02dbf4b1c02e41bd7da42edd7fc86c26
           } else {
             this.$message({
               message:getErrorMsg(res.msg),
@@ -221,7 +225,7 @@
           // console.log(res)
           if (res.code === 200) {
             console.log('登录成功')
-            twoWeeksExchange(res.data.token)
+            twoWeeksExchange(res.data.token,res.data.refreshToken)
             saveUserInfo(res.data.userId)
             this.$router.replace('/course')
           } else {
