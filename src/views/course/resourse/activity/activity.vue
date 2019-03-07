@@ -511,38 +511,6 @@
           return true
         }
       },
-      handleDragEnd(draggingNode, dropNode, dropType, ev) {
-        // console.log(dropType)
-        // console.log('被拖拽的',draggingNode.label,draggingNode.data)
-       // console.log('end拖拽的',dropNode.label,dropNode)
-        //
-        // let type= draggingNode.data.catalogId ? 1 :2,
-        //   beforeId = type == 1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
-        //   afterType = dropNode.data.catalogId ? 1 : 2,
-        //   afterId = type == 1 ? dropNode.data.catalogId: dropNode.data.resourceId;
-        //
-        // let data = {}
-        //
-        // switch (dropType) {
-        //   case 'inner':
-        //     data = {id:beforeId, type:type, inCatalogId:afterId}
-        //     console.log(data)
-        //     console.log('移入操作')
-        //     this.move(data)
-        //     break
-        //   case 'after':
-        //     data = {
-        //       id:beforeId,
-        //       type:type,
-        //       previous: {
-        //         id: afterId,
-        //         type:afterType
-        //       }
-        //     }
-        //     this.move(data)
-        //     break
-        // }
-      },
       //文件夹/文件 移动操作
       move(data){
         removeAc(data).then(res => {
@@ -621,6 +589,7 @@
       & div:last-child
         margin-right 0
     .test-warp
+      pading-top 20px
       .img-span
         display inline-block
         .img-icon
