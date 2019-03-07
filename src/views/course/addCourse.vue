@@ -248,7 +248,7 @@
       <el-row>
         <div class="top">
           <span>满分：100分</span>
-          <!--<span style="margin-left: 10px;">当前已分配权重：<span style="color: red;">{{this.temTotle}}%</span></span>-->
+          <span style="margin-left: 10px;">当前已分配权重：<span style="color: red;">{{this.temTotle}}%</span></span>
           <span style="text-align: right;float: right">*单项考核权重为0则不计入成绩！</span>
         </div>
         <div class="center">
@@ -425,7 +425,7 @@
           beginTime: [{ required: true, message: '请选择开始时间', trigger: 'blur' }],
           endTime: [{ required: true, message: '请选择结束时间', trigger: 'blur' }],
         },
-        temTotle:0,
+        temTotle:0, //当前已设权重
         begTimeDis:false
       }
     },
@@ -434,6 +434,17 @@
       courseTime(a){
         this.Course.beginTime = formatDate(new Date(a[0]).getTime())
         this.Course.endTime = formatDate(new Date(a[1]).getTime())
+      },
+     'CourseSetEntity': {
+        deep: true,
+          handler: function(val, oldVal) {
+            this.isUpdata ? delete val.courseId : '';
+            let total = 0;
+          Object.values(val).forEach((item)=>{
+            total += Number(item)
+          })
+          this.temTotle = total
+        }
       }
     },
     created(){
@@ -448,10 +459,10 @@
       //课程编辑时获取该课程的数据
       getUpData(e){
         courseInfo(e).then(res=>{
-          console.log(res)
+          // console.log(res)
           //后台请求到的数据不完全适合展示，需要清洗
           let data = this.upDataFilter(res.data)
-          console.log(data)
+          // console.log(data)
           //已发布并且已经开始的课程不能修改开始时间
           if(data.course.courseStatus == 30){
             let begin = new Date(data.course.beginTime).getTime(),
@@ -827,8 +838,6 @@
       goPutCourse () {
         let data = this.goDataFilter()
         let loading = this.$loading(this.loadingCss)
-        console.log('请求发送前的数据')
-        console.log(data)
         putCourse(data).then(res=>{
           // console.log(res)
           loading.close()

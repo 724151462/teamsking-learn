@@ -14,7 +14,9 @@
     padding: 0 16px;
     background-color: #ecf8ff;
     border-left: 5px solid #50bfff;
-    margin: 10px 0;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    margin-left: 0;
   }
   .tip p {
     padding: 10px 0;

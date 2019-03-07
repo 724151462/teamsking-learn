@@ -1,8 +1,9 @@
 <template>
   <div class="test">
-    <div class="title">
-      <div>试题管理</div>
-    </div>
+    <!--<div class="title">-->
+      <!--<div>试题管理</div>-->
+    <!--</div>-->
+    <tip title="试题管理"></tip>
 
     <div style="display: flex;margin: 25px 0;">
       <div style="display: flex">
@@ -162,6 +163,7 @@
     upQuiz, testFileFoldRename,
     moveTest,
   } from "../../../../api/library";
+  import tip from '@/components/tip'
 
   export default {
     // components:{uposs},
@@ -169,7 +171,8 @@
       this.getTestList(0)
     },
     components:{
-      UpOss
+      UpOss,
+      tip
     },
     data() {
       return {

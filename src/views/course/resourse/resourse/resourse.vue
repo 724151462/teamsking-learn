@@ -9,25 +9,27 @@
         <el-radio v-model="radio" :label="20" @change="radioChange(radio)">文档</el-radio>
         <el-radio v-model="radio" :label="30" @change="radioChange(radio)">音频</el-radio>
       </div>
-      <div style="display: flex">
-        <el-input
-          placeholder="搜索资源"
-          v-model="input">
-        </el-input>
-        <div>
-          <el-button icon="el-icon-search" class="search-btn" @click="searchResource(input)"></el-button>
-        </div>
-      </div>
+
     </div>
     <div class="test-warp">
       <div class="test-title">
-        <div style="flex: 1"></div>
-        <div>
+        <div style="flex: 1">
           <el-button type="primary" size="small" @click="goCreateCatalog('',0)">创建目录</el-button>
           <el-button type="info" size="small"
                      v-bind:class="{ active: deleteArr.length>0}"
                      @click="deleteCatalog" >删除</el-button>
           <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
+        </div>
+        <div>
+          <div style="display: flex">
+            <el-input
+              placeholder="搜索资源"
+              v-model="input">
+            </el-input>
+            <div>
+              <el-button icon="el-icon-search" class="search-btn" @click="searchResource(input)"></el-button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="test-body">
@@ -151,7 +153,7 @@
   import UpOss from "@/components/up-oss";
   import Cookie from 'js-cookie';
   import tip from '@/components/tip'
-import { setTimeout } from 'timers';
+  import { setTimeout } from 'timers';
   export default {
     name: "resource",
     created() {
@@ -756,8 +758,8 @@ import { setTimeout } from 'timers';
       .test-title
         display flex
         height 50px
+        border-bottom: 1px solid #e3e8ee;
         align-items center
-        background-color #f4f4f4
       .test-body
         .test-tree-node
           flex: 1;
