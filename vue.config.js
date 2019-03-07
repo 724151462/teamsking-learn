@@ -29,8 +29,6 @@ module.exports = {
       '/api': {
          // target: 'http://192.168.10.48:9008',
         target: 'http://apidev.teamsking.com:9008',
-        // target: 'http://192.168.11.61:9008',
-        // target: 'https://wap.roobbc.com',
         secure: false,
         ws: true,
         changeOrigin: true
