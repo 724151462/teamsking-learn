@@ -1,9 +1,9 @@
 const devUrl = '/api/v1/library/' // 开发环境
-const prodUrl = 'http://120.36.137.90:9008/api/v1/library/' // 生产环境
+const prodUrl = 'http://apidev.teamsking.com:9008/api/v1/library/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
 const courseDevUrl = '/api/v1/course/' // 开发环境
-const courseprodUrl = 'http://120.36.137.90:9008/api/v1/course/' // 生产环境
+const courseprodUrl = 'http://apidev.teamsking.com:9008/api/v1/course/' // 生产环境
 const courseUrl = process.env.NODE_ENV === 'production' ? courseprodUrl : courseDevUrl
 
 import {
@@ -122,7 +122,7 @@ export function getFileDetail(data) {
  * 移动资源
  */
 export function moveRes(data) {
-  // let url = `http://120.36.137.90:9008/api/v1/library/catalog/resource`
+  // let url = `http://apidev.teamsking.com:9008/api/v1/library/catalog/resource`
   let url = `${baseUrl}/catalog/resource`
   return commonsAjax(url, data, 'patch')
 }

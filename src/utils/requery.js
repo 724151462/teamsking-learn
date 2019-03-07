@@ -45,6 +45,7 @@ axios.interceptors.request.use(
       }
       /*判断token是否将要过期*/
       if (checkToken() && config.url.indexOf('/api/v1/token/accessToken?refreshTokenString=') === -1 && config.headers.token) {
+        console.log('')
         /*判断是否正在刷新*/
         if (!window.isRefreshing) {
           /*将刷新token的标志置为true*/

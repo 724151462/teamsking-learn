@@ -13,7 +13,7 @@ export function setToken (token) {
 export function removeToken () {
   Cookie.remove('tokenLive')
   Cookie.remove(reTokenKey)
-   Cookie.remove('userId')
+  Cookie.remove('userId')
   return Cookie.remove(TokenKey)
 }
 

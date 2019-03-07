@@ -1,33 +1,34 @@
 <template>
   <div class="activity">
-    <div class="title">
-      <div>活动管理</div>
-    </div>
-    <div style="display: flex;margin: 25px 0;">
-      <div style="display: flex">
-        <div style="width: 300px">
-          <el-input
-              placeholder="查找活动"
-              v-model="input">
-          </el-input>
-        </div>
-        <div>
-          <el-button icon="el-icon-search" class="search-btn" @click="newList(0,input)"></el-button>
-        </div>
-      </div>
-    </div>
+    <!--<div class="title">-->
+      <!--<div>活动管理</div>-->
+    <!--</div>-->
+    <tip title="活动管理"></tip>
     <div class="test-warp">
       <div class="test-title">
-        <div style="flex: 1"></div>
-        <div>
+        <div style="flex: 1">
           <!--全选-->
-          <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
           <el-button type="primary" size="small" @click="goCreateCatalog('',0)">创建目录</el-button>
           <el-button type="info"
                      size="small"
                      v-bind:class="{ active: deleteArr.length>0}"
                      @click="deleteCatalog">删除</el-button>
           <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
+        </div>
+        <div>
+          <div style="display: flex;margin: 25px 0;">
+            <div style="display: flex">
+              <div style="width: 300px">
+                <el-input
+                  placeholder="查找活动"
+                  v-model="input">
+                </el-input>
+              </div>
+              <div>
+                <el-button icon="el-icon-search" class="search-btn" @click="newList(0,input)"></el-button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="test-body">
@@ -132,9 +133,14 @@
     renameAc, getAcList, getStormInfo,
     getHomeWorkInfo, getExamInfo, getVoteInfo
   } from '@/api/library'
+  import tip from '@/components/tip'
+
   export default {
     created () {
         this.getList(0)
+    },
+  components:{
+      tip
     },
     data () {
       return {
@@ -625,7 +631,7 @@
         display flex
         height 50px
         align-items center
-        background-color #f4f4f4
+        border-bottom: 1px solid #e3e8ee;
       .test-body
         .test-tree-node
           flex: 1;
