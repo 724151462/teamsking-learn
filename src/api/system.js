@@ -1,7 +1,7 @@
 import { commonsAjax } from '../utils/requery'
 
 const devUrl = 'api/v1/sys/' // 开发环境
-const prodUrl = 'http://apidev.teamsking.com:9008/api/v1/sys/' // 生产环境
+const prodUrl = 'http://apidev.tskedu.com:9008/api/v1/sys/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
 
@@ -102,7 +102,7 @@ export function sysTenantManagerPage (data) {
  * 修改租户
  **/
 export function tenantMod (data) {
-  return commonsAjax(`http://apidev.teamsking.com:9008/api/v1/tenant/${data.tenantId}`,data,'put')
+  return commonsAjax(`http://apidev.tskedu.com:9008/api/v1/tenant/${data.tenantId}`,data,'put')
 }
 
 /**
@@ -132,7 +132,7 @@ export function courseMsgAdd(data) {
  * 获取课程分类
  */
 export function courseCatalogList(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/common/categories`
+  let url = `http://apidev.tskedu.com:9008/api/v1/common/categories`
   return commonsAjax(url, data, 'get')
 }
 
@@ -292,7 +292,7 @@ export function recMod(data) {
  * 获取租户
  */
 export function tenantGet(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/tenant/page`
+  let url = `http://apidev.tskedu.com:9008/api/v1/tenant/page`
   return commonsAjax(url, data, 'post')
 }
 
@@ -300,7 +300,7 @@ export function tenantGet(data) {
  * 新增租户
  */
 export function tenantAdd(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/tenant`
+  let url = `http://apidev.tskedu.com:9008/api/v1/tenant`
   return commonsAjax(url, data, 'post')
 }
 
@@ -308,7 +308,7 @@ export function tenantAdd(data) {
  * 获取标签
  */
 export function getTag(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/sys/tag/page`
+  let url = `http://apidev.tskedu.com:9008/api/v1/sys/tag/page`
   return commonsAjax(url, data, 'post')
 }
 
@@ -316,7 +316,7 @@ export function getTag(data) {
  * 新增标签
  */
 export function setTag(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/sys/tag`
+  let url = `http://apidev.tskedu.com:9008/api/v1/sys/tag`
   return commonsAjax(url, data, 'post')
 }
 
@@ -324,7 +324,7 @@ export function setTag(data) {
  * 修改标签
  */
 export function modTag(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/sys/tag`
+  let url = `http://apidev.tskedu.com:9008/api/v1/sys/tag`
   return commonsAjax(url, data, 'put')
 }
 
@@ -332,6 +332,6 @@ export function modTag(data) {
  * 删除标签
  */
 export function delTag(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/sys/tag`
+  let url = `http://apidev.tskedu.com:9008/api/v1/sys/tag`
   return commonsAjax(url, data, 'delete')
 }

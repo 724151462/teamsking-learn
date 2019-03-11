@@ -1,9 +1,9 @@
 const devUrl = '/api/v1/study/' // 开发环境
-const prodUrl = 'http://apidev.teamsking.com:9008/api/v1/study/' // 生产环境
+const prodUrl = 'http://apidev.tskedu.com:9008/api/v1/study/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
 const courseDev = '/api/v1/course/' // 开发环境
-const courseProd = 'http://apidev.teamsking.com:9008/api/v1/course/' // 生产环境
+const courseProd = 'http://apidev.tskedu.com:9008/api/v1/course/' // 生产环境
 const courseUrl = process.env.NODE_ENV === 'production' ? courseProd : courseDev
 import {
   commonsAjax
