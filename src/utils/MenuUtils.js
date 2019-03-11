@@ -1,5 +1,4 @@
 
-import lazyLoading from './lazyLoading'
 const _import = require('@/router/_import_' + process.env.NODE_ENV)
 export default (data) => {
   //这里之所以要重新遍历一下，是因为，通常我们动态路由的时候，是获取服务端数据，这个component属性是一个字符串，或者可能连字段名都是其他的key
@@ -11,7 +10,7 @@ export default (data) => {
 function generaMenu(data){
   data.forEach((item)=>{
     if(item.list != null) {
-      return generaMenu(item.list)
+      generaMenu(item.list)
     }
     item.component = _import(item.component)
     item.children = item.list
@@ -26,14 +25,7 @@ function generaMenu(data){
     delete item.parentName
     delete item.perms
     delete item.type
+
   })
   return data
-}
-
-export function compare(property){
-  return function(a,b){
-      var value1 = a[property];
-      var value2 = b[property];
-      return value1 - value2;
-  }
 }

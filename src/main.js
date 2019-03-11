@@ -20,7 +20,6 @@ Vue.prototype.loadingCss = {
 Vue.config.productionTip = false
 window.STOMP_CLIENT = ''
 
-<<<<<<< HEAD
 var routeList = []
 let data = JSON.parse(window.sessionStorage.getItem('menuList'))
 if (data){
@@ -51,8 +50,6 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-=======
->>>>>>> ee0f99bc02dbf4b1c02e41bd7da42edd7fc86c26
 const Globe_VM = new Vue({
   router,
   store,

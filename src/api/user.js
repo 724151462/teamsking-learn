@@ -1,15 +1,15 @@
 const devUrl = '/api/v1/sys/' // 开发环境
-const prodUrl = 'http://120.36.137.90:9008/api/v1/sys/' // 生产环境
+const prodUrl = 'http://apidev.teamsking.com:9008/api/v1/sys/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
 
 const infoDev = 'http://192.168.10.48:9008/api/v1/sys/user/info/' // 开发环境
 // const infoDev = '/api/v1/sys/user/info/' // 开发环境
-const infoProd = 'http://120.36.137.90:9008/api/v1/sys/user/info/' // 生产环境
+const infoProd = 'http://apidev.teamsking.com:9008/api/v1/sys/user/info/' // 生产环境
 const infoUrl = process.env.NODE_ENV === 'production' ? infoProd : infoDev
 
 const studyDev = '/api/v1/study/user/' // 开发环境
-const studyProd = 'http://120.36.137.90:9008/api/v1/api/v1/study/user/' // 生产环境
+const studyProd = 'http://apidev.teamsking.com:9008/api/v1/api/v1/study/user/' // 生产环境
 const studyUrl = process.env.NODE_ENV === 'production' ? studyProd : studyDev
 
 import { commonsAjax } from '@/utils/requery'

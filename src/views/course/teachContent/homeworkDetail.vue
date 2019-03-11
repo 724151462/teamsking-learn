@@ -71,22 +71,22 @@ export default {
         }
       ],
       tableData: [
-        {
-          zyname: "资源名",
-          notesTitle: "笔记标题1",
-          notesContent: "<p>笔记内容</p>",
-          fbr: "发布人",
-          fbsj: "2018-1-1",
-          popover: "dsawf"
-        },
-        {
-          zyname: "资源名",
-          notesTitle: "笔记标题",
-          notesContent: "笔记内容",
-          fbr: "发布人",
-          fbsj: "2018-1-1",
-          popover: "twqfwq"
-        }
+        // {
+        //   zyname: "资源名",
+        //   notesTitle: "笔记标题1",
+        //   notesContent: "<p>笔记内容</p>",
+        //   fbr: "发布人",
+        //   fbsj: "2018-1-1",
+        //   popover: "dsawf"
+        // },
+        // {
+        //   zyname: "资源名",
+        //   notesTitle: "笔记标题",
+        //   notesContent: "笔记内容",
+        //   fbr: "发布人",
+        //   fbsj: "2018-1-1",
+        //   popover: "twqfwq"
+        // }
       ],
       sysButton: [
         {
@@ -149,8 +149,9 @@ export default {
         },
         {
           key: "老师评分",
-          inputType: "string",
-          value: "score",
+          inputType: "select",
+          value: 'score',
+          option: [{id:50}, {id:60}, {id:70}, {id:80}, {id:90}, {id:100}],
           remark: "总分：100分",
         },
         {
@@ -194,6 +195,15 @@ export default {
     adialog
   },
   methods: {
+    getHomeworkList() {
+      homeWorkAnswerList({ courseId: this.$route.query.id, homeworkId: this.$route.query.homeworkId }).then(response => {
+        response.data.forEach(element => {
+          element.reviewStatus= element.reviewStatus === 1 ? "未批阅" : (element.reviewStatus===2?"已批阅":"未提交")
+        });
+        this.tableData = response.data;
+        // console.log(this.tableData);
+      });
+    },
     showComponentInfo(...params) {
       let type = params[0];
       console.log(type);
@@ -208,7 +218,12 @@ export default {
           let tem = JSON.stringify(this.dataObj)
           commitObj = JSON.parse(tem)
           commitObj.reviewStatus = commitObj.reviewStatus === "未批阅" ? 1 : (commitObj.reviewStatus==="已批阅"? 2 : 3)
-          homeWorkScore(commitObj)
+          homeWorkScore(commitObj).then((response)=> {
+            if(response.code === 200) {
+              this.show = false
+              this.getHomeworkList()
+            }
+          })
           break;
         default:
           break;
@@ -238,6 +253,7 @@ export default {
   align-items: center;
   width: 95%;
   margin: 10px auto;
+  margin-top -10px
   padding: 10px;
   border-top: 1px solid rgb(233, 233, 233);
   border-bottom: 1px solid rgb(233, 233, 233);

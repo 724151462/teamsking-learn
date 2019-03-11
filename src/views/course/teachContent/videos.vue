@@ -7,6 +7,10 @@
       :tableData="tableData"
       :operateList="operateList"
       @showComponentInfo="showComponentInfo"
+      v-loading="loading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
     ></jiaTable>
     <el-dialog title="学生观看详情" :visible.sync="isDialog">
       <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
@@ -32,6 +36,7 @@ import {
   export default {
     data() {
       return {
+        loading: true,
         tableTitle:"视频列表",
         tableTitle1:"学生列表",
         tableData:[
@@ -69,11 +74,11 @@ import {
         tableOperate:[],
 
         tableDatas:[
-          {
-            vodeoName:'序号',
-            videoTime:'teacherName',
-            schedule:50
-          },
+          // {
+          //   vodeoName:'序号',
+          //   videoTime:'teacherName',
+          //   schedule:50
+          // },
         ],
         columnNameLists:[
           {
@@ -113,6 +118,7 @@ import {
           element.videoLength = this.timeTransfer(element.videoLength)
         });
         this.tableData = response.data.pageData
+        this.loading = false
       })
     },
     methods:{

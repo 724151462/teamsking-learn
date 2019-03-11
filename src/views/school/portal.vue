@@ -46,58 +46,24 @@
     methods: {
       handleSelect(key, keyPath) {
         console.log(123,key, keyPath);
-        this.fetchNavData()
         switch(key) {
           case '1':
-            this.$router.push('mould')
+            this.$router.push('/school/portal/mould')
             break;
           case '2':
-            this.$router.push('platform')
+            this.$router.push('/school/portal/platform')
             break;
           case '3':
-            this.$router.push('banner')
+            this.$router.push('/school/portal/banner')
             break;
           case '4':
-            this.$router.push('recommend')
+            this.$router.push('/school/portal/recommend')
             break;
           case '5':
-            this.$router.push('teacher')
+            this.$router.push('/school/portal/teacher')
             break;
         }
-      },
-      fetchNavData () { // 初始化菜单激活项
-          var cur_path = this.$route.path; //获取当前路由
-          console.log('curpath',cur_path)
-          var routers = this.$router.options.routes; // 获取路由对象
-          var nav_type = "courseCenter", nav_name = "课程列表";
-          console.log('routers', routers)
-          for (var i = 0; i < routers.length; i++) {
-          var children = routers[i].children;
-          if(children){
-            for (var j = 0; j < children.length; j++) {
-            var grand_children = children[j].children;
-            
-            if(grand_children){
-              for (var k = 0; k < grand_children.length; k++) {
-              console.log('grand_children',grand_children[k].path)
-              if (grand_children[k].path === cur_path) {
-                nav_type = routers[i].type;
-                nav_name = routers[i].name;
-                break;
-              }
-              }
-            }
-            }
-          }
-          }
-          this.$store.state.leftNavState = nav_name;  // 改变leftNavState状态的值
-          console.log('nav_type',nav_type,'nav_name', nav_name)
-          if(nav_type == "courseCenter"){
-          this.defaultActiveIndex = "/course/list";
-          } else {
-          this.defaultActiveIndex = "/" + nav_name;
-          }
-        },
       }
+    }
   }
 </script>
