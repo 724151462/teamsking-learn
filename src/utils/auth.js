@@ -19,7 +19,7 @@ export function removeToken () {
 
 // 一个一周有效的cookie
 export function twoWeeksExchange (token,reToken) {
-  let inFifteenMinutes = new Date(new Date().getTime() + 10 * 60 * 1000);
+  let inFifteenMinutes = new Date(new Date().getTime() + 6 * 24 * 60 * 60 * 1000);
 
   Cookie.set('tokenLive',Date.now() + 10 * 1000 * 60 , { expires: 7 })
 

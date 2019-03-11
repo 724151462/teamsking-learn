@@ -21,17 +21,17 @@ Vue.config.productionTip = false
 window.STOMP_CLIENT = ''
 
 var routeList = []
-let data = JSON.parse(window.sessionStorage.getItem('menuList'))
-if (data){
-  //这里是防止用户手动刷新页面，整个app要重新加载,动态新增的路由，会消失，所以我们重新add一次
-  let routes = MenuUtils(data)
-  console.log(routes)
-  router.addRoutes(routes)
-  if(sessionStorage.getItem('isLoadNodes')) {
-    store.commit('setAllMenu', routes)
-  }
-  window.sessionStorage.removeItem('isLoadNodes')
-}
+// let data = JSON.parse(window.sessionStorage.getItem('menuList'))
+// if (data){
+//   //这里是防止用户手动刷新页面，整个app要重新加载,动态新增的路由，会消失，所以我们重新add一次
+//   let routes = MenuUtils(data)
+//   console.log(routes)
+//   router.addRoutes(routes)
+//   if(sessionStorage.getItem('isLoadNodes')) {
+//     store.commit('setAllMenu', routes)
+//   }
+//   window.sessionStorage.removeItem('isLoadNodes')
+// }
 router.beforeEach((to, from, next) => {
 
   var index = routeList.indexOf(to.name)

@@ -1,17 +1,17 @@
 const devUrl = '/api/v1/course/' // 开发环境
-const prodUrl = 'http://apidev.teamsking.com:9008/api/v1/course/' // 生产环境
+const prodUrl = 'http://apidev.tskedu.com:9008/api/v1/course/' // 生产环境
 const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
 
 const commonDevUrl = '/api/v1/' // 开发环境
-const commonProdUrl = 'http://apidev.teamsking.com:9008/api/v1/' // 生产环境
+const commonProdUrl = 'http://apidev.tskedu.com:9008/api/v1/' // 生产环境
 const commonBaseUrl = process.env.NODE_ENV === 'production' ? commonProdUrl : commonDevUrl
 
 const courseDev = '/api/v1/course' // 开发环境
-const courseProd = 'http://apidev.teamsking.com:9008/api/v1/course' // 生产环境
+const courseProd = 'http://apidev.tskedu.com:9008/api/v1/course' // 生产环境
 const courseUrl = process.env.NODE_ENV === 'production' ? courseProd : courseDev
 
 const studyDev = '/api/v1/study/' // 开发环境
-const studyProd = 'http://apidev.teamsking.com:9008/api/v1/study/' // 生产环境
+const studyProd = 'http://apidev.tskedu.com:9008/api/v1/study/' // 生产环境
 const studyUrl = process.env.NODE_ENV === 'production' ? studyProd : studyDev
 
 import {
@@ -365,7 +365,7 @@ export function memberUpload(data) {
  */
 export function userModify(data) {
   // let url = `http://192.168.10.48:9008/api/v1/sys/course/0608367675f54267aa6960fd0557cc1b/score/excel`
-  let url = `http://apidev.teamsking.com:9008/api/v1/sys/course/${data.courseId}/user/excel`
+  let url = `http://apidev.tskedu.com:9008/api/v1/sys/course/${data.courseId}/user/excel`
   return commonsAjax(url, '', 'put')
 }
 
@@ -894,7 +894,7 @@ export function classSave(data) {
  * 课堂章节列表
  */
 export function classChapter(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/classroom/course/chapter/list/${data.courseId}`
+  let url = `http://apidev.tskedu.com:9008/api/v1/classroom/course/chapter/list/${data.courseId}`
   return commonsAjax(url, '', 'get')
 }
 
@@ -913,7 +913,7 @@ export function classItem(data) {
  * 课堂测试
  */
 export function classTest(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/classroom/course/chapter/exams`
+  let url = `http://apidev.tskedu.com:9008/api/v1/classroom/course/chapter/exams`
   return commonsAjax(url, data, 'post')
 }
 
@@ -921,7 +921,7 @@ export function classTest(data) {
  * 课堂保存测试
  */
 export function classTestSave(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/classroom/course/exam`
+  let url = `http://apidev.tskedu.com:9008/api/v1/classroom/course/exam`
   return commonsAjax(url, data, 'post')
 }
 
@@ -930,7 +930,7 @@ export function classTestSave(data) {
  * 课堂头脑风暴列表
  */
 export function classStromeGet(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/course/${data.courseId}/interaction/storm/${data.classroomId}`
+  let url = `http://apidev.tskedu.com:9008/api/v1/course/${data.courseId}/interaction/storm/${data.classroomId}`
   return commonsAjax(url, data, 'get')
 }
 
@@ -939,7 +939,7 @@ export function classStromeGet(data) {
  * 课堂保存头脑风暴
  */
 export function classStromeSave(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/course/interaction/storm/classroom`
+  let url = `http://apidev.tskedu.com:9008/api/v1/course/interaction/storm/classroom`
   return commonsAjax(url, data, 'post')
 }
 
@@ -947,7 +947,7 @@ export function classStromeSave(data) {
  * 课堂已结束测试结果
  */
 export function classTestRes(data) {
-  let url = `http://apidev.teamsking.com:9008/api/v1/classroom/course/exam/${data.examId}/statics`
+  let url = `http://apidev.tskedu.com:9008/api/v1/classroom/course/exam/${data.examId}/statics`
   return commonsAjax(url, data, 'post')
 }
 /**
@@ -955,7 +955,7 @@ export function classTestRes(data) {
  */
 export function classRoomData(data) {
   // let url = `${baseUrl}classroom/${data.classroomId}/statics`
-  let url = `http://apidev.teamsking.com:9008/api/v1/course/classroom/${data.classroomId}/statics`
+  let url = `http://apidev.tskedu.com:9008/api/v1/course/classroom/${data.classroomId}/statics`
   return commonsAjax(url, data, 'post')
 }
 

@@ -589,7 +589,7 @@
       & div:last-child
         margin-right 0
     .test-warp
-      pading-top 20px
+      padding-top 20px
       .img-span
         display inline-block
         .img-icon

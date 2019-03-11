@@ -27,8 +27,8 @@ module.exports = {
     port: 8080,
     proxy: {
       '/api': {
-         target: 'http://192.168.10.48:9008',
-        // target: 'http://apidev.teamsking.com:9008',
+         // target: 'http://192.168.10.48:9008',
+        target: 'http://apidev.tskedu.cn:9008',
         secure: false,
         ws: true,
         changeOrigin: true

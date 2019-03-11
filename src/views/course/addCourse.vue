@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div class="addCourse">
-      <span>课程信息</span>
-      <el-button plain  type="primary" style="float:right" @click="$router.push('/course/list')">返回</el-button>
-    </div>
+    <mb-nav :pathList="[{path:'/course/list',name:'课程列表'}]" nowName = '创建课程'></mb-nav>
     <div class="addCourse-center">
       <el-form :model="Course" :rules="courseRules" ref="Course" label-width="100px">
         <el-form-item label="课程名称" required prop="courseName">
@@ -326,11 +323,13 @@
   import vueCropper from 'vue-cropper'
   import addTeachers from './upCourse/addTeacher.vue'
   import coverPreview from './coverPreview.vue'
+  import mbNav from '@/components/breadcrumb'
   import { categories, tags, instructorList, teachersList, saveCourse, courseInfo , putCourse} from '../../api/course'
   import { formatDate } from '../../utils/utils'
   export default {
     components:{
       addTeachers,
+      mbNav,
       coverPreview,
       vueCropper
     },
@@ -903,6 +902,21 @@
       this.addEditor1 = this.editor1.customConfig.onchange = function (html) {
         self.CourseInfoEntity.courseDescription = html
       }
+      this.editor1.customConfig.menus = [
+        'head',  // 标题
+        'bold',  // 粗体
+        'fontSize',  // 字号
+        'italic',  // 斜体
+        'underline',  // 下划线
+        'strikeThrough',  // 删除线
+        // 'link',  // 插入链接
+        'list',  // 列表
+        'justify',  // 对齐方式
+        'table',  // 表格
+        'code',  // 插入代码
+        'undo',  // 撤销
+      ]
+      this.editor1.customConfig.zIndex = 10
       this.editor1.create()
       //教学目标
       this.editor2 = new wangEditor('#editor2')
@@ -911,10 +925,23 @@
       }
       this.editor2.customConfig.zIndex = 100
       this.addEditor2 = this.editor2.customConfig.onchange = function (html) {
-        console.log('教学安排')
-        console.log(html)
         self.CourseInfoEntity.teachingTarget = html
       }
+      this.editor2.customConfig.menus = [
+        'head',  // 标题
+        'bold',  // 粗体
+        'fontSize',  // 字号
+        'italic',  // 斜体
+        'underline',  // 下划线
+        'strikeThrough',  // 删除线
+        // 'link',  // 插入链接
+        'list',  // 列表
+        'justify',  // 对齐方式
+        'table',  // 表格
+        'code',  // 插入代码
+        'undo',  // 撤销
+      ]
+      this.editor2.customConfig.zIndex = 10
       this.editor2.create()
       //教学安排
       this.editor3 = new wangEditor('#editor3')
@@ -925,6 +952,21 @@
       this.addEditor3 = this.editor3.customConfig.onchange = function (html) {
         self.CourseInfoEntity.teachingArrangement = html
       }
+      this.editor3.customConfig.menus = [
+        'head',  // 标题
+        'bold',  // 粗体
+        'fontSize',  // 字号
+        'italic',  // 斜体
+        'underline',  // 下划线
+        'strikeThrough',  // 删除线
+        // 'link',  // 插入链接
+        'list',  // 列表
+        'justify',  // 对齐方式
+        'table',  // 表格
+        'code',  // 插入代码
+        'undo',  // 撤销
+      ]
+      this.editor3.customConfig.zIndex = 10
       this.editor3.create()
     }
   }

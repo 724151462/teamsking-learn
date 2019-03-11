@@ -1,8 +1,6 @@
 <template>
   <div class="addTest">
-    <div class="title">
-      <div>添加试题</div>
-    </div>
+    <mb-nav :pathList="[{path:'/course/resource/test',name:'试题管理'}]" nowName = '添加试题'></mb-nav>
     <div style="padding-right: 35%">
       <el-form :model="testData" ref="testData" >
         <el-form-item label="题干" required>
@@ -69,10 +67,14 @@
 
 <script>
   import E from 'wangeditor'
+  import mbNav from '@/components/breadcrumb'
   import {saveQuiz} from '@/api/library'
 
   export default {
     name: "addTest",
+    components:{
+      mbNav
+    },
     created () {
       this.testData.catalogId = Number(this.$route.params.catalog)
     },
@@ -120,14 +122,14 @@
         'italic',  // 斜体
         'underline',  // 下划线
         'strikeThrough',  // 删除线
-        'link',  // 插入链接
+        // 'link',  // 插入链接
         'list',  // 列表
         'justify',  // 对齐方式
-        // 'image',  // 插入图片，图片试题暂时不做
         'table',  // 表格
         'code',  // 插入代码
         'undo',  // 撤销
       ]
+      editor.customConfig.zIndex = 10
       editor.create()
     },
     methods:{

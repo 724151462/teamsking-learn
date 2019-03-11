@@ -1,11 +1,6 @@
 <template>
   <div class="editTest">
-    <div class="title">
-      <div>
-        <!--<span style="cursor: pointer" @click="toTest">试题管理</span> > -->
-        编辑试题
-      </div>
-    </div>
+    <mb-nav :pathList="[{path:'/course/resource/test',name:'试题管理'}]" nowName = '编辑试题'></mb-nav>
     <div style="padding-right: 35%">
       <el-form :model="quizData" ref="testForm">
         <el-form-item label="题干" required>
@@ -71,9 +66,13 @@
 
 <script>
   import E from 'wangeditor'
+  import mbNav from '@/components/breadcrumb'
   import {quizInfo, putQuiz} from '@/api/library'
   export default {
     name: "editTest",
+    components:{
+      mbNav
+    },
     created () {
       this.getQuizInfo()
     },
@@ -122,14 +121,14 @@
         'italic',  // 斜体
         'underline',  // 下划线
         'strikeThrough',  // 删除线
-        'link',  // 插入链接
+        // 'link',  // 插入链接
         'list',  // 列表
         'justify',  // 对齐方式
-        'image',  // 插入图片
         'table',  // 表格
         'code',  // 插入代码
         'undo',  // 撤销
       ]
+      this.editor.customConfig.zIndex = 10
       this.editor.create()
       //获取数据
       // this.getQuizInfo()

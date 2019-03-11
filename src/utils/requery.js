@@ -39,7 +39,12 @@ axios.interceptors.request.use(
         console.log('refreshToken过期，请重新登录')
         /*清除本地保存的auth*/
         removeToken()
-        Globe_VM.$router.push({ path: '/login' })
+        sessionStorage.clear();
+        if(Globe_VM.$router.currentRoute.path == '/login'){
+          window.reload()
+        }else{
+          Globe_VM.$router.push({ path: '/login' })
+        }
         refreshSubscribers = []
         return false
       }
@@ -63,7 +68,8 @@ axios.interceptors.request.use(
                 /*成功刷新token*/
                 config.headers.token = res.data.token
                 /*更新reToken,Token*/
-                twoWeeksExchange(res.data.token,res.data.refreshToken)
+                Cookie.set('BackstageToken', res.data.token, { expires: 7 })
+                Cookie.set('tokenLive',Date.now() + 10 * 1000 * 60 , { expires: 7 })
                 /*执行数组里的函数,重新发起被挂起的请求*/
                 onRrefreshed(res.data.token)
                 /*执行onRefreshed函数后清空数组中保存的请求*/
