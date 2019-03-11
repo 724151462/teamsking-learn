@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Layout from '@/views/layout/index.vue'
 import Header from '@/views/layout/header.vue'
 
-const _import = require('./_import_' + process.env.NODE_ENV)
+const _import = import('./_import_' + process.env.NODE_ENV)
 
 Vue.use(Router)
 
