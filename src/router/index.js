@@ -863,6 +863,6 @@ export const constantRouterMap = [{
 
 export default new Router({
   routes: constantRouterMap,
-  // mode: 'history'
+  mode: 'history'
 })
 
