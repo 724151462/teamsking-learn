@@ -72,20 +72,20 @@ export default {
         }
       ],
       tableData: [
-        {
-          zyname: "资源名",
-          notesTitle: "笔记标题11",
-          notesContent: "<p>笔记内容</p>",
-          fbr: "发布人",
-          fbsj: "2018-1-1"
-        },
-        {
-          zyname: "资源名",
-          notesTitle: "笔记标题",
-          notesContent: "笔记内容",
-          fbr: "发布人",
-          fbsj: "2018-1-1"
-        }
+        // {
+        //   zyname: "资源名",
+        //   notesTitle: "笔记标题11",
+        //   notesContent: "<p>笔记内容</p>",
+        //   fbr: "发布人",
+        //   fbsj: "2018-1-1"
+        // },
+        // {
+        //   zyname: "资源名",
+        //   notesTitle: "笔记标题",
+        //   notesContent: "笔记内容",
+        //   fbr: "发布人",
+        //   fbsj: "2018-1-1"
+        // }
       ],
       sysButton: [
         {

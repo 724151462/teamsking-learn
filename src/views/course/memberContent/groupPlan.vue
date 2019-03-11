@@ -125,14 +125,14 @@
             <span style="display: inline-block; width:150px">{{list.teamName || '未分组'}}</span>
             </el-checkbox>
             <div class="imgs">
-              <img :src="list.avatar" style="width:112px" class="img">
+              <img :src="list.avatar || require('@/assets/images/default_avatar.png')" style="width:50px">
             </div>
             <div class="right">
               <div>
                 <span class="name">{{list.realName}}</span>
                 <span class="sys" v-if="Number(list.assistantStatus) === 1">助教</span>
               </div>
-              <div class="student">{{list.studentNo}}</div>
+              <div style="font-size:12px">{{list.studentNo}}</div>
             </div>
           </div>
         </div>
@@ -692,10 +692,10 @@ export default {
   .all-member {
     padding-bottom: 10px;
     height: 600px;
-    overflow: scroll;
+    overflow-y: scroll;
 
     .member-list {
-      border-bottom: 1px solid #CCCCCC;
+      border-bottom: 1px solid rgb(220, 223, 230);
       padding-top: 5px;
       padding-bottom: 5px;
       display: flex;
@@ -711,15 +711,11 @@ export default {
         border-radius: 50%;
         margin-left: 20px;
         margin-right: 20px;
-
-        img {
-          width: auto;
-        }
       }
 
       .right {
         .name {
-          font-size: 18px;
+          font-size: 14px;
         }
 
         .sys {
@@ -733,6 +729,9 @@ export default {
         }
       }
     }
+  }
+  .all-member::-webkit-scrollbar {
+    display: none;
   }
 }
 </style>

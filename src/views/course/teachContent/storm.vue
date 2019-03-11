@@ -6,10 +6,14 @@
         :tables="tables"
         :buttonStylus="sysButton"
         @showComponentInfo="showComponentInfo"
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
       ></tableNoHeader>
     </div>
     <el-dialog :visible.sync="show" title="全部回答">
-      <div v-for="(answer, index) in answerList" :key="index">
+      <div v-for="(answer, index) in answerList" :key="index" style="margin: 10px auto">
         <div class="content">
           <div style="display: flex">
             <div>
@@ -21,11 +25,11 @@
             </div>
           </div>
 
-          <div>
-            <el-button size="small" @click="addScore(answer)">加分</el-button>
+          <div class="add-score-right">
+            <el-button size="small" type="primary" @click="addScore(answer)">加分</el-button>
+            <span style="float:right">回答日期：{{answer.createTime}}</span>
           </div>
         </div>
-        <span style="float:right">回答日期：{{answer.createTime}}</span>
       </div>
     </el-dialog>
   </div>
@@ -37,6 +41,7 @@ import { interactList, interactBS, stormAddScore } from "@/api/course";
 export default {
   data() {
     return {
+      loading: true,
       stormParams: { courseId: this.$route.query.id },
       tables: [
         {
@@ -57,22 +62,22 @@ export default {
         }
       ],
       tableData: [
-        {
-          zyname: "资源名",
-          notesTitle: "笔记标题1",
-          notesContent: "<p>笔记内容</p>",
-          fbr: "发布人",
-          fbsj: "2018-1-1",
-          popover: "dsawf"
-        },
-        {
-          zyname: "资源名",
-          notesTitle: "笔记标题",
-          notesContent: "笔记内容",
-          fbr: "发布人",
-          fbsj: "2018-1-1",
-          popover: "twqfwq"
-        }
+        // {
+        //   zyname: "资源名",
+        //   notesTitle: "笔记标题1",
+        //   notesContent: "<p>笔记内容</p>",
+        //   fbr: "发布人",
+        //   fbsj: "2018-1-1",
+        //   popover: "dsawf"
+        // },
+        // {
+        //   zyname: "资源名",
+        //   notesTitle: "笔记标题",
+        //   notesContent: "笔记内容",
+        //   fbr: "发布人",
+        //   fbsj: "2018-1-1",
+        //   popover: "twqfwq"
+        // }
       ],
       sysButton: [
         {
@@ -117,6 +122,7 @@ export default {
         });
       });
       this.tableData = stormArr;
+      this.loading = false
     });
   },
   components: {
@@ -172,7 +178,16 @@ export default {
 
   .student {
     margin-left: 12px;
+    display flex
+    flex-direction column
+    justify-content space-between
   }
+}
+.add-score-right {
+  display flex
+  flex-direction column
+  justify-content space-between
+  align-items flex-end
 }
 </style>
 

@@ -8,6 +8,10 @@
       :tables="tables"
       :buttonStylus="tableStylus"
       @showComponentInfo="showComponentInfo"
+      v-loading="loading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
     ></itemTable>
     <el-dialog :visible.sync="isDialog" width="60%" title="投票结果">
       <div class="main">
@@ -53,6 +57,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       quesParams: { courseId: this.$route.query.id },
       quesObj: {},
       tables: [
@@ -74,24 +79,24 @@ export default {
         }
       ],
       tableData: [
-        {
-          title: "投票问卷1",
-          center: "所属章",
-          fbr: "状态超好",
-          time: "5/4"
-        },
-        {
-          title: "投票问卷1",
-          center: "所属章",
-          fbr: "状态超好",
-          time: "5/4"
-        },
-        {
-          title: "投票问卷1",
-          center: "所属章",
-          fbr: "状态超好",
-          time: "5/4"
-        }
+        // {
+        //   title: "投票问卷1",
+        //   center: "所属章",
+        //   fbr: "状态超好",
+        //   time: "5/4"
+        // },
+        // {
+        //   title: "投票问卷1",
+        //   center: "所属章",
+        //   fbr: "状态超好",
+        //   time: "5/4"
+        // },
+        // {
+        //   title: "投票问卷1",
+        //   center: "所属章",
+        //   fbr: "状态超好",
+        //   time: "5/4"
+        // }
       ],
       tableStylus: [
         {
@@ -129,6 +134,7 @@ export default {
         });
       });
       this.tableData = stormArr;
+      this.loading = false
     });
   },
   methods: {

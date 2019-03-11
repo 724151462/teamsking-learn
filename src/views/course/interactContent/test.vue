@@ -21,7 +21,7 @@
           >
             <div style="display:inline-block; height:100px;width:50%;">
               <!-- <el-button size="small" style="margin: 20px 50px" @click="addTestBtn">点击添加试题</el-button> -->
-              <span>{{item.quizTitle}}</span>
+              <span>{{item}}</span>
               <div style="margin-top:20px">
                 <p
                   style="margin-bottom:5px"
@@ -196,6 +196,7 @@ export default {
     addTab(params) {
       // let activeName = this.testContentArrValue;
       params.forEach((element, i) => {
+        console.log(element)
         element.title = `第${i + 1}题`;
         element.quizTitle = element.catalogName;
         element.name = String(element.quizId);
@@ -208,8 +209,10 @@ export default {
       //   name: String(params.quizId),
       //   content: "New Tab content"
       // });
+      console.log(params)
       this.testObj.quizList = params;
-      // this.testContentArrValue = activeName;
+      console.log(this.testObj.quizList.option[0].option)
+      this.testContentArrValue = params[params.length-1].name;
     },
     removeTab(targetName) {
       let tabs = this.testObj.quizList;
@@ -364,7 +367,7 @@ export default {
       let checkedList = this.$refs.tree.getCheckedNodes().filter(element => {
         return element.catalogId === undefined;
       });
-      console.log(this.checkedQuiz);
+      
       checkedList.forEach(element => {
         let option = [];
         if (element.disabled !== true) {
@@ -379,6 +382,7 @@ export default {
           // this.$set(element, 'disabled', true)
         }
       });
+      console.log(checkedList);
       this.addTab(checkedList);
       this.dialogVisible = false
     }

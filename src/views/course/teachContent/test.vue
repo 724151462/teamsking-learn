@@ -6,6 +6,10 @@
         :tables="tables" 
         :buttonStylus="sysButton" 
         @showComponentInfo="showComponentInfo"
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
       ></tableNoHeader>
     </div>
   </div>
@@ -18,6 +22,7 @@
   export default {
     data() {
       return {
+        loading: true,
         tables:[
           {
             name:'测验名称',
@@ -41,20 +46,20 @@
           },
         ],
         tableData:[
-          {
-            zyname:'资源名',
-            notesTitle:'笔记标题1',
-            notesContent:'<p>笔记内容</p>',
-            fbr:'发布人',
-            fbsj:'2018-1-1',
-          },
-          {
-            zyname:'资源名',
-            notesTitle:'笔记标题',
-            notesContent:'笔记内容',
-            fbr:'发布人',
-            fbsj:'2018-1-1',
-          },
+          // {
+          //   zyname:'资源名',
+          //   notesTitle:'笔记标题1',
+          //   notesContent:'<p>笔记内容</p>',
+          //   fbr:'发布人',
+          //   fbsj:'2018-1-1',
+          // },
+          // {
+          //   zyname:'资源名',
+          //   notesTitle:'笔记标题',
+          //   notesContent:'笔记内容',
+          //   fbr:'发布人',
+          //   fbsj:'2018-1-1',
+          // },
         ],
         sysButton:[
           {
@@ -88,6 +93,7 @@
           element.submitStatus = `${element.submitCount}/${element.allCount}`
         });
         this.tableData = response.data.pageData
+        this.loading = false
       })
     },
     components: {
