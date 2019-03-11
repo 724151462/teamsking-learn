@@ -179,7 +179,7 @@ import {
 } from "@/utils/auth";
 import { getErrorMsg } from "@/utils/utils";
 import MenuUtils from "@/utils/MenuUtils";
-import { static_routes } from "@/router/static_routes";
+// import { static_routes } from "@/router/static_routes.json";
 // import {compare} from '@/utils/MenuUtils'
 import {
   mobileForgot,

@@ -1,5 +1,4 @@
-let static_routes = [
-    {
+{
         "menuId": 1,
         "name": "课程中心",
         "parentId": 0,
@@ -1825,5 +1824,3 @@ let static_routes = [
         "isLeaf": null
     }
 ]
-
-export {static_routes}
