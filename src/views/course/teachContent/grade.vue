@@ -2,7 +2,7 @@
   <div>
     <div class="grade-head">
       <div class="import-btn">
-        <span>学生人数: 55人</span>
+        <span>学生人数: {{tableData.length}}人</span>
         <el-upload
           ref="upload"
           accept=".xls, .xlsx"
@@ -31,6 +31,10 @@
       :data="tableData"
       style="width: 100%"
       :default-sort="{prop: 'score', order: 'descending'}"
+      v-loading="loading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
     >
       <el-table-column label="姓名" width="180">
         <template slot-scope="scope">
@@ -121,6 +125,7 @@ import { sysStudentInfo } from "@/api/school";
 export default {
   data() {
     return {
+      loading: true,
       file: "",
       dialogShow: false,
       scoreParams: {
@@ -134,17 +139,17 @@ export default {
       scoreRight: {},
       //数据
       tableData: [
-        {
-          score: "78",
-          realName: "王小虎1",
-          videoScore: "43",
-          quizScore: "42",
-          homeworkScore: "17",
-          stormScore: "15",
-          voteScore: "23",
-          offlineScore: "33",
-          studentInfo: {}
-        }
+        // {
+        //   score: "78",
+        //   realName: "王小虎1",
+        //   videoScore: "43",
+        //   quizScore: "42",
+        //   homeworkScore: "17",
+        //   stormScore: "15",
+        //   voteScore: "23",
+        //   offlineScore: "33",
+        //   studentInfo: {}
+        // }
       ],
       // 导入后返回的data
       resData: []
@@ -161,6 +166,7 @@ export default {
           realName: ""
         };
       });
+      this.loading = false
       this.tableData = response.data.pageData;
     });
     // 成绩权重

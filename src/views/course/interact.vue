@@ -142,6 +142,7 @@ import {
   interactStatus
 } from "@/api/course";
 import Cookie from "js-cookie";
+import { arrSort } from '@/utils/arrSort'
 export default {
   data() {
     return {
@@ -186,12 +187,12 @@ export default {
         time: item.time || null,
         action: 1
       }).then(response => {
-        if (response.code === 200) {
-          chapter.interactions.splice(interactIndex, 1);
+        if (response.code === 200) {          
           this.$message({
             message: "活动已置为开始",
             type: "success"
           });
+          this.getInteracts()
         }
         this.setEndTimeDialog = false;
       });
@@ -202,12 +203,12 @@ export default {
         interactionType: item.interactionType,
         action: 2
       }).then(response => {
-        if (response.code === 200) {
-          chapter.interactions.splice(interactIndex, 1);
+        if (response.code === 200) {         
           this.$message({
             message: "活动已置为结束",
             type: "success"
           });
+          this.getInteracts()
         }
       });
     },
@@ -215,7 +216,17 @@ export default {
       let endTime = this.endTimeForm;
       this.temParams.time = endTime;
       console.log(this.temParams);
-      this.start(this.temParams);
+      this.start(this.temParams).then(response => {
+        if (response.code === 200) {
+          
+          this.$message({
+            message: "活动已置为开始",
+            type: "success"
+          });
+          this.getInteracts()
+          this.setEndTimeDialog = false;
+        }
+      });
     },
     toDetail(val) {
       console.log(val.interactionStatus);
@@ -273,9 +284,7 @@ export default {
       Cookie.set('interactionStatus', value)
       this.interactParams.interactionStatus = value;
       console.log(this.interactParams);
-      interactList(this.interactParams).then(response => {
-        this.interactList = response.data
-      });
+      this.getInteracts()
     },
     editInteraction(item) {
       console.log(item);
@@ -345,7 +354,9 @@ export default {
         let localInteractId = []
         response.data.forEach(element=> {
           localInteractId.push(element.chapterId)
+          element.interactions = arrSort(element.interactions, 'interactionType')
         })
+        console.log(response.data)
         localStorage.setItem('localInteractId', JSON.stringify(localInteractId))
         this.interactList = response.data;
         // this.interactList = response.data

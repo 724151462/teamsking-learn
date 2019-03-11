@@ -35,7 +35,7 @@
                 <a class="list" @click="deleteCourse(list.courseId)" v-if="list.courseStatus === 40 || list.courseStatus === 10">删除</a>
               </div>
               <el-button type="success" @click="goCourseModel(list.courseId)" v-if="list.courseStatus === 30">课堂模式</el-button>
-              <el-button type="primary" @click="goCourseChapter(list.courseId, list.courseName)">教学管理</el-button>
+              <el-button type="primary" @click="goCourseChapter(list)">教学管理</el-button>
             </div>
           </div>
 
@@ -219,12 +219,26 @@ export default {
         query: {id: e}
       })
     },
-    goCourseChapter(e,name) {
-      sessionStorage.setItem('courseName', name)
-      this.$router.push({
-        path: '/course/list/chapter',
-        query: {id: e}
-      })
+    goCourseChapter(e) {
+      sessionStorage.setItem('courseName', e.courseName)
+      console.log(e)
+      if(e.courseStatus === 40) {
+        this.$confirm('该课程已关闭，如添加内容可能造成学生成绩变动', '提示', {
+          confirmButtonText: '确认进入',
+          cancelButtonText: '再看看',
+          type: 'warning'
+        }).then(() => {
+          this.$router.push({
+            path: '/course/list/chapter',
+            query: {id: e.courseId}
+          })
+        })
+      }else{
+        this.$router.push({
+          path: '/course/list/chapter',
+          query: {id: e.courseId}
+        })
+      }
     },
     goAddCourse (e) {
       this.$router.push({

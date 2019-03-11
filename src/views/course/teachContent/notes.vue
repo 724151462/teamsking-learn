@@ -1,6 +1,14 @@
 <template>
   <div class="note">
-    <tableNoHeader :tableData="tableData" :tables="tables" :buttonStylus="sysButton" @showComponentInfo="showComponentInfo"></tableNoHeader>
+    <tableNoHeader 
+      :tableData="tableData" 
+      :tables="tables" 
+      :buttonStylus="sysButton" 
+      @showComponentInfo="showComponentInfo"
+      v-loading="loading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"></tableNoHeader>
     <adialog :dialogConfig="dialogConfig"
       :dataObj="dataObj"
       :formData="formData"
@@ -22,6 +30,7 @@
     },
     data(){
       return{
+        loading: true,
         tables:[
           {
             name:'笔记标题',
@@ -47,22 +56,22 @@
           },
         ],
         tableData:[
-          {
-            zyname:'资源名',
-            notesTitle:'笔记标题1',
-            notesContent:'<p>笔记内容1</p>',
-            fbr:'发布人',
-            fbsj:'2018-1-1',
-            popover: 'dsawf'
-          },
-          {
-            zyname:'资源名',
-            notesTitle:'笔记标题',
-            notesContent:'笔记内容',
-            fbr:'发布人',
-            fbsj:'2018-1-1',
-            popover: 'twqfwq'
-          },
+          // {
+          //   zyname:'资源名',
+          //   notesTitle:'笔记标题1',
+          //   notesContent:'<p>笔记内容1</p>',
+          //   fbr:'发布人',
+          //   fbsj:'2018-1-1',
+          //   popover: 'dsawf'
+          // },
+          // {
+          //   zyname:'资源名',
+          //   notesTitle:'笔记标题',
+          //   notesContent:'笔记内容',
+          //   fbr:'发布人',
+          //   fbsj:'2018-1-1',
+          //   popover: 'twqfwq'
+          // },
         ],
         sysButton:[
           {
@@ -147,6 +156,7 @@
           element.popover = element.noteContent
         });
         this.tableData = response.data.pageData
+        this.loading = false
       })
     },
     methods:{

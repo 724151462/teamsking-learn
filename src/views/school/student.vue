@@ -1,13 +1,7 @@
 <template>
     <div class="student">
 
-        <el-row>
-            <el-col :span="24">
-                <div class="grid-content bg-purple-dark">
-                    学生管理
-                </div>
-            </el-col>
-        </el-row>
+        <header-the-again headerTitle="学生管理"></header-the-again>
 
         <el-form ref="form2" :model="searchForm" :inline="true" label-width="100px" class="form-query">
             <el-form-item>
@@ -178,6 +172,7 @@
 
 <script>
 import tableTheAgain from '../../components/table-theAgain'
+import headerTheAgain from '../../components/header-theAgain'
 import {
     sysCollegeList,
     sysStudentPage,
@@ -303,7 +298,8 @@ import { setTimeout } from 'timers';
             }
         },
         components:{
-            tableTheAgain
+            tableTheAgain,
+            headerTheAgain
         },
         mounted(){
             // 学生列表
