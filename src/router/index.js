@@ -852,6 +852,11 @@ export const constantRouterMap = [{
         component: _import('classModel/modelContent/modelResource'),
         name: 'modelMain',
       },
+      {
+        path: '*',
+        component: _import('errorPage/404'),
+        hidden: true
+      }
     ]
   },
   // {
