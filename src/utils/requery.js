@@ -34,12 +34,12 @@ axios.interceptors.request.use(
     /*判断是否已登录*/
     if (authTmp) {
       /*判断refresh_token是否过期*/
-      Cookie.get('BackstageReToken')
       if (!getReToken()) {
         console.log('refreshToken过期，请重新登录')
         /*清除本地保存的auth*/
         removeToken()
         sessionStorage.clear();
+        console.log(Globe_VM.$router.currentRoute.path)
         if(Globe_VM.$router.currentRoute.path == '/login'){
           window.reload()
         }else{
@@ -50,7 +50,7 @@ axios.interceptors.request.use(
       }
       /*判断token是否将要过期*/
       if (checkToken() && config.url.indexOf('/api/v1/token/accessToken?refreshTokenString=') === -1 && config.headers.token) {
-        console.log('')
+        console.log('token即将过期')
         /*判断是否正在刷新*/
         if (!window.isRefreshing) {
           /*将刷新token的标志置为true*/

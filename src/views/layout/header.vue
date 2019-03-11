@@ -9,7 +9,7 @@
         <el-menu
           :default-active="defaultActiveIndex"
           background-color="rgb(70,76,92)"
-          style="font-size:20px"
+          style="font-size:16px"
           text-color="#fff"
           active-text-color="#fff"
           class="el-menu-demo"
@@ -39,7 +39,7 @@
       </div>
       <el-dropdown class="avator" trigger="click">
         <span class="el-dropdown-link userinfo-inner">
-            <img :src="$store.state.userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
+            <img :src="userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
             <span>{{this.realName}}</span>
             <i class="el-icon-caret-bottom"></i>
           </span>

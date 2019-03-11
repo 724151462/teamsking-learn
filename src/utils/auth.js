@@ -21,7 +21,7 @@ export function removeToken () {
 export function twoWeeksExchange (token,reToken) {
   let inFifteenMinutes = new Date(new Date().getTime() + 6 * 24 * 60 * 60 * 1000);
 
-  Cookie.set('tokenLive',Date.now() + 10 * 1000 * 60 , { expires: 7 })
+  Cookie.set('tokenLive',Date.now() + 6 * 1000 * 60 * 60 * 24 , { expires: 7 })
 
   Cookie.set(reTokenKey, reToken, { expires: 15 })
   // Cookie.set(TokenKey, token, { expires: inFifteenMinutes })

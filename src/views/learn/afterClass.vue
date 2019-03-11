@@ -326,9 +326,9 @@
         tooltip: {
           trigger: 'axis'
         },
-        legend: {
-          data:['学习时段']
-        },
+        // legend: {
+        //   data:['各时段学习人数']
+        // },
         grid: {
           left: '3%',
           right: '4%',
@@ -358,7 +358,7 @@
           data: [0, 10,20,30,40,50,60]
         },
         series: [{
-          name:'学习时段',
+          name:'各时段学习人数',
           data: [this.studyTime.zeroPoint,
             this.studyTime.onePoint,this.studyTime.twoPoint,this.studyTime.threePoint,this.studyTime.fourPoint,
             this.studyTime.fivePoint,this.studyTime.sixPoint,this.studyTime.sevenPoint,this.studyTime.eightPoint,
@@ -400,45 +400,45 @@
           value: this.other.docWatchCount
         }, {
           name: '人均日行为学习数',
-          value: this.other.studyBehaviorthRate
+          value: `${this.other.studyBehaviorthRate}%`
         }
       ]
-      //圆球偏移,大小，在一定范围内随机
+      //大小,颜色
       let datalist = [
       {//人均学习
-        offset: [Math.random() * 10 , Math.random() * (65 - 60) + 60],
-        symbolSize: Math.random() * (180 - 120) + 120,
+        offset: [5 , 60],
+        symbolSize: 120,
         opacity: 1,
         color: colorArr1[Math.floor(Math.random() * 3-1)]
       },
       {//人均笔记
-        offset: [Math.random() * (45 - 35) + 35, Math.random() * (90 - 80) + 80],
+        offset: [20, 85],
         symbolSize: 90,
         opacity: 1,
         color: colorArr2[Math.floor(Math.random() * 5-1)]
       },
-        {
+      {
         //登录次数
-        offset: [Math.random() * (75 - 60) + 60, Math.random() * (85 - 85) + 70],
-        symbolSize: Math.random() * (110 - 90) + 90,
+        offset: [40,70],
+        symbolSize: 90,
         opacity: 1,
         color: colorArr3[Math.floor(Math.random() * 5-1)]
       },
-        {
+      {
         //视频资源
-        offset: [Math.random() * (35 - 25) + 25, Math.random() * (38 - 30) + 30],
-        symbolSize:  Math.random() * (150 - 140) + 140,
+        offset: [20, 30],
+        symbolSize:  140,
         color: 'rgb(97, 200, 127)'
       },
-        {
+      {
         //教案资源观看
-        offset: [50, 15],
+        offset: [35, 15],
         symbolSize: 100,
         color: 'rgb(112, 83, 182)'
       },
-        {
+      {
         //人均日学习
-        offset: [75, Math.random() * 35],
+        offset: [50, 35],
         symbolSize: 120,
         color: colorArr6[Math.floor(Math.random() * 5-1)]
       }
@@ -476,12 +476,12 @@
           }
         },
         grid: {
-          show: false,
+          show: true,
         },
         xAxis: [{
           gridIndex: 0,
           type: 'value',
-          show: false,
+          show: true,
           min: 0,
           max: 100,
           nameLocation: 'middle',
@@ -490,7 +490,7 @@
         yAxis: [{
           gridIndex: 0,
           min: 0,
-          show: false,
+          show: true,
           max: 100,
           nameLocation: 'middle',
           nameGap: 30
