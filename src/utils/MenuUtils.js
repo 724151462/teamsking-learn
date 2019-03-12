@@ -12,7 +12,7 @@ function generaMenu(data){
     if(item.list != null) {
       generaMenu(item.list)
     }
-    item.component = () => import(`@/views/${item.component}`)
+    item.component = _import(item.component)
     item.children = item.list
     item.path = item.url
     delete item.list
