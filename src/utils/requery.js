@@ -1,27 +1,50 @@
 import axios from 'axios'
 import qs from 'qs'
 import Globe_VM from '../main'
-import { getToken, removeToken , getReToken, checkToken,twoWeeksExchange} from './auth'
-import {reToken} from "../api/login";
+import {
+  getToken,
+  removeToken,
+  getReToken,
+  checkToken,
+  twoWeeksExchange
+} from './auth'
+import {
+  reToken
+} from "../api/login";
 import Cookie from "js-cookie";
 
 // axios.defaults.headers.token = '1f905951b9b371530396ea07f6cbe94a'
 
-axios.defaults.baseURL = '/'
+
+/*第一层if判断生产环境和开发环境*/
+if (process.env.NODE_ENV === 'production') {
+  /*第二层if，根据.env文件中的VUE_APP_FLAG判断是生产环境还是测试环境*/
+  if (process.env.VUE_APP_FLAG === 'pro') {
+    //production 生产环境
+    axios.defaults.baseURL = ' https://api.tskedu.com';
+  } else {
+    axios.defaults.baseURL = ' http://apidev.tskedu.cn:9008';
+    //test 测试环境
+  }
+} else {
+  //dev 开发环境
+  axios.defaults.baseURL = '/api/v1';
+}
+
+// axios.defaults.baseURL = '/'
 axios.defaults.timeout = 10000
 axios.defaults.responseType = 'json'
-
 
 /*是否有请求正在刷新token*/
 window.isRefreshing = false
 /*被挂起的请求数组*/
 let refreshSubscribers = []
 /*push所有请求到数组中*/
-function subscribeTokenRefresh (cb) {
+function subscribeTokenRefresh(cb) {
   refreshSubscribers.push(cb)
 }
 /*刷新请求（refreshSubscribers数组中的请求得到新的token之后会自执行，用新的token去请求数据）*/
-function onRrefreshed (token) {
+function onRrefreshed(token) {
   refreshSubscribers.map(cb => cb(token))
 }
 
@@ -30,7 +53,7 @@ function onRrefreshed (token) {
  */
 axios.interceptors.request.use(
   config => {
-    const authTmp  = Cookie.get('BackstageToken')
+    const authTmp = Cookie.get('BackstageToken')
     /*判断是否已登录*/
     if (authTmp) {
       /*判断refresh_token是否过期*/
@@ -40,10 +63,12 @@ axios.interceptors.request.use(
         /*清除本地保存的auth*/
         removeToken()
         sessionStorage.clear();
-        if(Globe_VM.$router.currentRoute.path == '/login'){
+        if (Globe_VM.$router.currentRoute.path == '/login') {
           window.reload()
-        }else{
-          Globe_VM.$router.push({ path: '/login' })
+        } else {
+          Globe_VM.$router.push({
+            path: '/login'
+          })
         }
         refreshSubscribers = []
         return false
@@ -57,10 +82,12 @@ axios.interceptors.request.use(
           window.isRefreshing = true
           console.log('正在刷新Token')
           /*发起刷新token的请求*/
-          reToken({refreshTokenString:Cookie.get('BackstageReToken')})
-            .then(res=>{
+          reToken({
+              refreshTokenString: Cookie.get('BackstageReToken')
+            })
+            .then(res => {
               console.log(res)
-              if(res.code ===200){
+              if (res.code === 200) {
                 console.log(res)
                 console.log('刷新Token完毕')
                 /*将标志置为false*/
@@ -68,21 +95,27 @@ axios.interceptors.request.use(
                 /*成功刷新token*/
                 config.headers.token = res.data.token
                 /*更新reToken,Token*/
-                Cookie.set('BackstageToken', res.data.token, { expires: 7 })
-                Cookie.set('tokenLive',Date.now() + 10 * 1000 * 60 , { expires: 7 })
+                Cookie.set('BackstageToken', res.data.token, {
+                  expires: 7
+                })
+                Cookie.set('tokenLive', Date.now() + 10 * 1000 * 60, {
+                  expires: 7
+                })
                 /*执行数组里的函数,重新发起被挂起的请求*/
                 onRrefreshed(res.data.token)
                 /*执行onRefreshed函数后清空数组中保存的请求*/
                 refreshSubscribers = []
                 // console.log(res);
-              }else{
+              } else {
                 console.log('请重新登录')
               }
-            }).catch(err=>{
-            console.log(err)
-            removeToken()
-            Globe_VM.$router.push({ path: '/login' })
-          })
+            }).catch(err => {
+              console.log(err)
+              removeToken()
+              Globe_VM.$router.push({
+                path: '/login'
+              })
+            })
         }
         //console.log(config)
         /*把请求(token)=>{....}都push到一个数组中*/
@@ -111,11 +144,13 @@ axios.interceptors.request.use(
  */
 axios.interceptors.response.use(
   res => {
-      if (Number(res.data.code) === 401) {
-        console.log('拦截到响应')
-        removeToken()
-        Globe_VM.$router.push({ path: '/login' })
-      }
+    if (Number(res.data.code) === 401) {
+      console.log('拦截到响应')
+      removeToken()
+      Globe_VM.$router.push({
+        path: '/login'
+      })
+    }
     if (res.data) {
       return Promise.reject(res.data)
     }
@@ -126,14 +161,16 @@ axios.interceptors.response.use(
   }
 )
 
-export function commonsAjax (url, data, method, headers) {
+export function commonsAjax(url, data, method, headers) {
   return new Promise((resolve, reject) => {
     let date = {
       url: url,
       method: method
     }
     if (getToken()) {
-      date.headers = {token: getToken()}
+      date.headers = {
+        token: getToken()
+      }
     }
     if (data !== '' && method === 'get') {
       date.url += '?' + qs.stringify(data)
@@ -141,13 +178,13 @@ export function commonsAjax (url, data, method, headers) {
     if (data !== '' && method === 'post') {
       date.data = data
     }
-    if( data !== '' && method === 'delete'){
+    if (data !== '' && method === 'delete') {
       date.data = data
     }
-    if( data !== '' && method === 'put'){
+    if (data !== '' && method === 'put') {
       date.data = data
     }
-    if( data !== '' && method === 'patch'){
+    if (data !== '' && method === 'patch') {
       date.data = data
     }
     axios(date).then(res => {
