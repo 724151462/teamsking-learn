@@ -114,7 +114,6 @@ export function getFileDetail(data) {
  * 移动资源
  */
 export function moveRes(data) {
-  // let url = `http://apidev.tskedu.com:9008/api/v1/library/catalog/resource`
   let url = `/library//catalog/resource`
   return commonsAjax(url, data, 'patch')
 }

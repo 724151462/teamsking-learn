@@ -338,7 +338,7 @@ export function memberEditList(data) {
  */
 export function memberUpload(data) {
   console.log(data)
-  let url = `http://192.168.10.48:9008/api/v1/sys/course/${data.get('courseId')}/user/excel`
+  let url = `/sys/course/${data.get('courseId')}/user/excel`
   // let url = `/course/${data.get('courseId')}/score/excel`
   return commonsAjax(url, data, 'post')
 }
@@ -348,8 +348,8 @@ export function memberUpload(data) {
  * 确认上传
  */
 export function userModify(data) {
-  // let url = `http://192.168.10.48:9008/api/v1/sys/course/0608367675f54267aa6960fd0557cc1b/score/excel`
-  let url = `http://apidev.tskedu.com:9008/api/v1/sys/course/${data.courseId}/user/excel`
+  // let url = `/sys/course/0608367675f54267aa6960fd0557cc1b/score/excel`
+  let url = `/sys/course/${data.courseId}/user/excel`
   return commonsAjax(url, '', 'put')
 }
 
@@ -825,7 +825,7 @@ export function scoreUpload(data) {
  */
 export function scoreModify(data) {
   console.log(data)
-  // let url = `http://192.168.10.48:9008/api/v1/sys/course/0608367675f54267aa6960fd0557cc1b/score/excel`
+  // let url = `/sys/course/0608367675f54267aa6960fd0557cc1b/score/excel`
   let url = `/course/${data.courseId}/score/excel`
   return commonsAjax(url, '', 'put')
 }
@@ -878,7 +878,7 @@ export function classSave(data) {
  * 课堂章节列表
  */
 export function classChapter(data) {
-  let url = `http://apidev.tskedu.com:9008/api/v1/classroom/course/chapter/list/${data.courseId}`
+  let url = `/classroom/course/chapter/list/${data.courseId}`
   return commonsAjax(url, '', 'get')
 }
 
@@ -897,7 +897,7 @@ export function classItem(data) {
  * 课堂测试
  */
 export function classTest(data) {
-  let url = `http://apidev.tskedu.com:9008/api/v1/classroom/course/chapter/exams`
+  let url = `/classroom/course/chapter/exams`
   return commonsAjax(url, data, 'post')
 }
 
@@ -905,7 +905,7 @@ export function classTest(data) {
  * 课堂保存测试
  */
 export function classTestSave(data) {
-  let url = `http://apidev.tskedu.com:9008/api/v1/classroom/course/exam`
+  let url = `/classroom/course/exam`
   return commonsAjax(url, data, 'post')
 }
 
@@ -914,7 +914,7 @@ export function classTestSave(data) {
  * 课堂头脑风暴列表
  */
 export function classStromeGet(data) {
-  let url = `http://apidev.tskedu.com:9008/api/v1/course/${data.courseId}/interaction/storm/${data.classroomId}`
+  let url = `/course/${data.courseId}/interaction/storm/${data.classroomId}`
   return commonsAjax(url, data, 'get')
 }
 
@@ -923,7 +923,7 @@ export function classStromeGet(data) {
  * 课堂保存头脑风暴
  */
 export function classStromeSave(data) {
-  let url = `http://apidev.tskedu.com:9008/api/v1/course/interaction/storm/classroom`
+  let url = `/course/interaction/storm/classroom`
   return commonsAjax(url, data, 'post')
 }
 
@@ -931,7 +931,7 @@ export function classStromeSave(data) {
  * 课堂已结束测试结果
  */
 export function classTestRes(data) {
-  let url = `http://apidev.tskedu.com:9008/api/v1/classroom/course/exam/${data.examId}/statics`
+  let url = `/classroom/course/exam/${data.examId}/statics`
   return commonsAjax(url, data, 'post')
 }
 /**
@@ -939,7 +939,7 @@ export function classTestRes(data) {
  */
 export function classRoomData(data) {
   // let url = `/course/classroom/${data.classroomId}/statics`
-  let url = `http://apidev.tskedu.com:9008/api/v1/course/classroom/${data.classroomId}/statics`
+  let url = `/course/classroom/${data.classroomId}/statics`
   return commonsAjax(url, data, 'post')
 }
 
