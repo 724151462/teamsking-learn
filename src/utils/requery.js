@@ -19,15 +19,15 @@ import Cookie from "js-cookie";
 /*第一层if判断生产环境和开发环境*/
 if (process.env.NODE_ENV === 'production') {
   /*第二层if，根据.env文件中的VUE_APP_FLAG判断是生产环境还是测试环境*/
-  if (process.env.VUE_APP_FLAG === 'pro') {
+  if (process.env.VUE_APP_FLAG === 'prod') {
     //production 生产环境
-    axios.defaults.baseURL = ' https://api.tskedu.com';
+    axios.defaults.baseURL = 'https://api.tskedu.com';
   } else {
-    axios.defaults.baseURL = ' http://apidev.tskedu.cn:9008';
-    //test 测试环境
+    //dev 测试环境
+    axios.defaults.baseURL = 'http://apidev.tskedu.cn:9008';
   }
 } else {
-  //dev 开发环境
+  //本地 开发环境
   axios.defaults.baseURL = '/api/v1';
 }
 
