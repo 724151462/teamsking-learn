@@ -72,6 +72,8 @@ axios.interceptors.request.use(
         refreshSubscribers = []
         return false
       }
+      // console.log(config.url);
+      
       /*判断token是否将要过期*/
       if (checkToken() && config.url.indexOf('/api/v1/token/accessToken?refreshTokenString=') === -1 && config.headers.token) {
         console.log('token即将过期')

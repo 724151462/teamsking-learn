@@ -97,18 +97,17 @@
         studyVideoRate:[]
       },
       other:{
-        docWatchCount: 0,//文档资源观看
-        loginCount: 0,
-        noteRate: 0,
-        studyBehaviorthRate: 0,
-        studyLengthRate: 0,
-        videoCount: 0,
-        //docWatchCount: 2,//教案观看
-        // libraryCount: 2,  //人均参加活动
-        // loginCount: 3,  //登录次数
-        // noteRate: 1900,  //人均笔记
-        // studyBehaviorthRate: 0, // 人均日行为
-        // studyLengthRate: 13,  //人均学习时长
+        activitiesPerCapita: null,
+        docWatchCount: 0,//文档资源观看次数
+        loginCount: 0,  //登录次数
+        examRate: "0",  //测试人均参与率 
+        homeworkRate: "0",  //作业人均完成率
+        noteAverageCount: "100",  //人均笔记数
+        stormRate: "0",  //头脑风暴人均参与率
+        studyBehaviorthRate: "0", //人均学习时长
+        studyLengthRate: "0", //人均学习时长
+        videoCount: 0, // 视频资源观看次数
+        voteRate: "0", //投票人均参与率
       }
     };
   },
