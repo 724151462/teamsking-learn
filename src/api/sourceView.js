@@ -4,7 +4,7 @@ import { commonsAjax } from '../utils/requery'
  * 活动列表
  */
 export function chapterView(data) {
-    let url = `/course/chapter/section/item/${data.itemId}/view`
+    let url = `/api/v1/course/chapter/section/item/${data.itemId}/view`
     return commonsAjax(url, '', 'get')
   }
 
@@ -12,7 +12,7 @@ export function chapterView(data) {
  * 资源列表
  */
 export function getResourceViewByUrl(data) {
-  let url = `/docview/url`
+  let url = `/api/v1/docview/url`
   return commonsAjax(url, data, 'post')
 }
   
