@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Layout from '@/views/layout/index.vue'
 import Header from '@/views/layout/header.vue'
 
-const _import = import('./_import_' + process.env.NODE_ENV)
+const _import = require('./_import_' + process.env.NODE_ENV)
 
 Vue.use(Router)
 
@@ -851,22 +851,18 @@ export const constantRouterMap = [{
         path: '/course/modelResource',
         component: _import('classModel/modelContent/modelResource'),
         name: 'modelMain',
-      },
-      {
-        path: '*',
-        component: _import('errorPage/404'),
-        hidden: true
       }
     ]
   },
-  // {
-  //   path: '/*',
-  //   redirect: '/404'
-  // },
+  {
+    path: '*',
+    redirect: '/404'
+  },
 ]
 
 export default new Router({
-  routes: constantRouterMap,
-  // mode: 'history'
+  mode: 'hash',
+  routes: constantRouterMap
+  
 })
 

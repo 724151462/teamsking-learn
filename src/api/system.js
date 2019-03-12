@@ -1,99 +1,94 @@
 import { commonsAjax } from '../utils/requery'
 
-const devUrl = 'api/v1/sys/' // 开发环境
-const prodUrl = 'http://apidev.tskedu.com:9008/api/v1/sys/' // 生产环境
-const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
-
-
 /**
  * 请求角色列表 
  * */
 export function sysRolePage (data) {
-  return commonsAjax(`${baseUrl}page`,data,'get')
+  return commonsAjax(`/sys/page`,data,'get')
 }
 
 /**
  * 角色列表 
  * */
 export function sysRoleList (data) {
-  return commonsAjax(`${baseUrl}role/list`,data,'get')
+  return commonsAjax(`/sys/role/list`,data,'get')
 }
 
 /**
  * 添加角色 
  * */
 export function sysRoleAdd (data) {
-  return commonsAjax(`${baseUrl}role`,data,'post')
+  return commonsAjax(`/sys/role`,data,'post')
 }
 
 /**
  * 编辑角色 
  * */
 export function sysRoleEdit (data) {
-  return commonsAjax(`${baseUrl}role`,data,'put')
+  return commonsAjax(`/sys/role`,data,'put')
 }
 
 /**
  * 设置权限 
  * */
 export function sysRolePower (data) {
-  return commonsAjax(`${baseUrl}role/edit`,data,'post')
+  return commonsAjax(`/sys/role/edit`,data,'post')
 }
 
 /**
  * 设置权限 
  * */
 export function sysRolePowerGet (data) {
-  return commonsAjax(`${baseUrl}role/info/${data.roleId}`,data,'get')
+  return commonsAjax(`/sys/role/info/${data.roleId}`,data,'get')
 }
 
 /**
  * 删除角色
  * */
 export function sysRoleDelete (list) {
-  return commonsAjax(`${baseUrl}role`,list,'delete')
+  return commonsAjax(`/sys/role`,list,'delete')
 }
 
 /*
 *  添加权限菜单
 * */
 export function sysUserMenuAdd (data) {
-  return commonsAjax(`${baseUrl}/menu`,data,'post')
+  return commonsAjax(`/sys/menu`,data,'post')
 }
 
 /*
 *  删除权限菜单 
 * */
 export function sysUserMenuDel (data) {
-  return commonsAjax(`${baseUrl}/menu/${data.menuId}`,'','delete')
+  return commonsAjax(`/sys/menu/${data.menuId}`,'','delete')
 }
 
 /*
 *  查询用户权限菜单 
 * */
 export function sysUserMenuList () {
-  return commonsAjax(`${baseUrl}user/menu/list`,{},'get')
+  return commonsAjax(`/sys/user/menu/list`,{},'get')
 }
 
 /*
 *  查询用户权限菜单 
 * */
 export function sysUserMenuTree () {
-  return commonsAjax(`${baseUrl}menu/tree`,{},'get')
+  return commonsAjax(`/sys/menu/tree`,{},'get')
 }
 
 /**
  * 创建租户
  **/
 export function sysTenantManager (data) {
-  return commonsAjax(`${baseUrl}tenant/manager`,data,'post')
+  return commonsAjax(`/sys/tenant/manager`,data,'post')
 }
 
 /**
  * 分页查询租户管理员 
  * */
 export function sysTenantManagerPage (data) {
-  return commonsAjax(`${baseUrl}tenant/manager/page`,data,'get')
+  return commonsAjax(`/sys/tenant/manager/page`,data,'get')
 }
 
 
@@ -109,7 +104,7 @@ export function tenantMod (data) {
  * 分页查询系统消息
  * */
 export function sysManage (data) {
-  return commonsAjax(`${baseUrl}message`,'','get')
+  return commonsAjax(`/sys/message`,'','get')
 }
 
 
@@ -117,14 +112,14 @@ export function sysManage (data) {
  * 管理员删除消息
  * */
 export function sysMessageDel (data) {
-  return commonsAjax(`${baseUrl}message`,data.messageIds,'delete')
+  return commonsAjax(`/sys/message`,data.messageIds,'delete')
 }
 
 /**
  * 课程消息新增
  */
 export function courseMsgAdd(data) {
-  let url = `${baseUrl}message/course`
+  let url = `/sys/message/course`
   return commonsAjax(url, data, 'post')
 }
 
@@ -141,7 +136,7 @@ export function courseCatalogList(data) {
  * 获取课程分类
  */
 export function courseCatalogAdd(data) {
-  let url = `${baseUrl}category`
+  let url = `/sys/category`
   return commonsAjax(url, data, 'post')
 }
 
@@ -149,7 +144,7 @@ export function courseCatalogAdd(data) {
  * 获取课程分类
  */
 export function courseCatalogEdit(data) {
-  let url = `${baseUrl}category`
+  let url = `/sys/category`
   return commonsAjax(url, data, 'put')
 }
 
@@ -157,7 +152,7 @@ export function courseCatalogEdit(data) {
  * 获取课程分类
  */
 export function courseCatalogDel(data) {
-  let url = `${baseUrl}category`
+  let url = `/sys/category`
   return commonsAjax(url, data, 'delete')
 }
 
@@ -165,7 +160,7 @@ export function courseCatalogDel(data) {
  * 系统消息新增
  */
 export function sysMsgAdd(data) {
-  let url = `${baseUrl}message/user`
+  let url = `/sys/message/user`
   return commonsAjax(url, data, 'post')
 }
 
@@ -174,7 +169,7 @@ export function sysMsgAdd(data) {
  * 校管信息列表
  */
 export function schoolMsg(data) {
-  let url = `${baseUrl}tenant/message`
+  let url = `/sys/tenant/message`
   return commonsAjax(url, data, 'get')
 }
 
@@ -183,7 +178,7 @@ export function schoolMsg(data) {
  * 设置平台信息
  */
 export function platformInfo(data) {
-  let url = `${baseUrl}tenant/info`
+  let url = `/sys/tenant/info`
   return commonsAjax(url, data, 'put')
 }
 
@@ -192,7 +187,7 @@ export function platformInfo(data) {
  * 获取平台信息
  */
 export function getPlatformInfo(data) {
-  let url = `${baseUrl}tenant/info`
+  let url = `/sys/tenant/info`
   return commonsAjax(url, '', 'get')
 }
 
@@ -201,7 +196,7 @@ export function getPlatformInfo(data) {
  * 设置轮播
  */
 export function bannerList(data) {
-  let url = `${baseUrl}tenant/carousel/list`
+  let url = `/sys/tenant/carousel/list`
   return commonsAjax(url, data, 'get')
 }
 
@@ -210,7 +205,7 @@ export function bannerList(data) {
  * 添加轮播图
  */
 export function addBanner(data) {
-  let url = `${baseUrl}tenant/carousel`
+  let url = `/sys/tenant/carousel`
   return commonsAjax(url, data, 'post')
 }
 
@@ -218,7 +213,7 @@ export function addBanner(data) {
  * 删除轮播图
  */
 export function delBanner(data) {
-  let url = `${baseUrl}tenant/carousel`
+  let url = `/sys/tenant/carousel`
   return commonsAjax(url, data, 'delete')
 }
 
@@ -226,7 +221,7 @@ export function delBanner(data) {
  * 修改轮播图
  */
 export function modBanner(data) {
-  let url = `${baseUrl}tenant/carousel`
+  let url = `/sys/tenant/carousel`
   return commonsAjax(url, data, 'put')
 }
 
@@ -235,7 +230,7 @@ export function modBanner(data) {
  * 名师风采列表
  */
 export function teacherRecList(data) {
-  let url = `${baseUrl}recommend/teacher/page`
+  let url = `/sys/recommend/teacher/page`
   return commonsAjax(url, data, 'get')
 }
 
@@ -243,7 +238,7 @@ export function teacherRecList(data) {
  * 推荐教师选择列表
  */
 export function teacherAllList(data) {
-  let url = `${baseUrl}recommend/tenant/teacher/page`
+  let url = `/sys/recommend/tenant/teacher/page`
   return commonsAjax(url, data, 'get')
 }
 
@@ -251,7 +246,7 @@ export function teacherAllList(data) {
  * 推荐课程列表
  */
 export function courseRecList(data) {
-  let url = `${baseUrl}recommend/course/page`
+  let url = `/sys/recommend/course/page`
   return commonsAjax(url, data, 'get')
 }
 
@@ -259,7 +254,7 @@ export function courseRecList(data) {
  * 推荐课程列表
  */
 export function courseAllList(data) {
-  let url = `${baseUrl}recommend/tenant/course/page`
+  let url = `/sys/recommend/tenant/course/page`
   return commonsAjax(url, data, 'get')
 }
 
@@ -268,7 +263,7 @@ export function courseAllList(data) {
  * 推荐移除
  */
 export function recRemove(data) {
-  let url = `${baseUrl}recommend`
+  let url = `/sys/recommend`
   return commonsAjax(url, data, 'delete')
 }
 
@@ -276,7 +271,7 @@ export function recRemove(data) {
  * 添加推荐
  */
 export function recAdd(data) {
-  let url = `${baseUrl}recommend`
+  let url = `/sys/recommend`
   return commonsAjax(url, data, 'post')
 }
 
@@ -284,7 +279,7 @@ export function recAdd(data) {
  * 修改推荐
  */
 export function recMod(data) {
-  let url = `${baseUrl}recommend`
+  let url = `/sys/recommend`
   return commonsAjax(url, data, 'put')
 }
 
