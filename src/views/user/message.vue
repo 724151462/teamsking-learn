@@ -27,6 +27,7 @@
           </div>
         </div>
         <el-pagination
+          v-show="messageData.length !== 0"
           style="margin: 20px 0"
           background
           layout="prev, pager, next"

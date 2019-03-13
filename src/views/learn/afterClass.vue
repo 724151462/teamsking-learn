@@ -97,17 +97,17 @@
         studyVideoRate:[]
       },
       other:{
-        activitiesPerCapita: 0,
-        docWatchCount: 0,//文档资源观看次数
-        loginCount: 0,  //登录次数
-        examRate: "0",  //测试人均参与率 
-        homeworkRate: "0",  //作业人均完成率
-        noteAverageCount: "100",  //人均笔记数
-        stormRate: "0",  //头脑风暴人均参与率
-        studyBehaviorthRate: "0", //人均学习时长
         studyLengthRate: "0", //人均学习时长
-        videoCount: 0, // 视频资源观看次数
+        noteAverageCount: "100",  //人均笔记数
+        loginCount: 0,  //登录次数
+        activitiesPerCapita: 0, //人均参加活动次数
         voteRate: "0", //投票人均参与率
+        stormRate: "0",  //头脑风暴人均参与率
+        studyBehaviorthRate: "0", //人均日学习行为数
+        videoCount: 0, // 视频资源观看次数
+        docWatchCount: 0,//文档资源观看次数
+        homeworkRate: "0",  //作业人均完成率
+        examRate: "0",  //测试人均参与率 
       }
     };
   },
@@ -264,7 +264,7 @@
           trigger: 'axis'
         },
         legend: {
-          data:['文档观看次数','视频观看次数',]
+          data:['平均文档观看次数','平均视频观看次数',]
         },
         grid: {
           left: '3%',
@@ -286,17 +286,17 @@
         },
         yAxis: {
           type: 'value',
-          min: yMin,
-          max: yMax,
+          min: yMin ,
+          max: yMax ,
         },
         series: [
           {
-            name:'文档观看次数',
+            name:'平均文档观看次数',
             type:'line',
             data:studyDocNum
           },
           {
-            name:'视频观看次数',
+            name:'平均视频观看次数',
             type:'line',
             data:studyVideoNum
           }
@@ -325,9 +325,9 @@
         tooltip: {
           trigger: 'axis'
         },
-        // legend: {
-        //   data:['各时段学习人数']
-        // },
+        legend: {
+          data:['各时段学习人数']
+        },
         grid: {
           left: '3%',
           right: '4%',
@@ -377,20 +377,30 @@
       let colorArr1=['rgb(241, 86, 85)','rgb(24, 207, 202)','#447eda'],
         colorArr2=['#F4A460','#F4A460','#800000','#C0C0C0','#FF6347'],
         colorArr3=['#00FFFF','#00FF7F','#006400','#FFD700','#DAA520'],
-        colorArr4=[],
-        colorArr5=[],
         colorArr6=['#FFC125','#FFC0CB','#FFBBFF','#FFB90F','rgb(252, 134, 64)'];
 
       let plantCap =[
         {
           name: '人均学习时长',
-          value: this.other.studyLengthRate
+          value: `${this.other.studyLengthRate}分钟`
         }, {
           name: '人均笔记数',
-          value: this.other.noteRate
+          value: this.other.noteAverageCount
         }, {
           name: '登录次数',
           value: this.other.loginCount
+        }, {
+          name: '人均参加活动次数',
+          value:  this.other.activitiesPerCapita
+        }, {
+          name: '投票人均参与率',
+          value: `${this.other.voteRate}%`
+        }, {
+          name: '头脑风暴\n人均参与率',
+          value: `${this.other.stormRate}%`
+        }, {
+          name: '人均日学习行为数',
+          value: `${this.other.studyBehaviorthRate}次`
         }, {
           name: '视频资源观看次数',
           value: this.other.videoCount
@@ -398,13 +408,16 @@
           name: '文档资源观看次数',
           value: this.other.docWatchCount
         }, {
-          name: '人均日行为学习数',
-          value: `${this.other.studyBehaviorthRate}%`
+          name: '作业人均完成率',
+          value: `${this.other.homeworkRate}%`
+        }, {
+          name: '测试人均参与率',
+          value: `${this.other.examRate}%`
         }
       ]
       //大小,颜色
       let datalist = [
-      {//人均学习
+      {//人均学习时长
         offset: [5 , 60],
         symbolSize: 120,
         opacity: 1,
@@ -418,27 +431,68 @@
       },
       {
         //登录次数
-        offset: [40,70],
-        symbolSize: 90,
+        offset: [30,70],
+        symbolSize: 80,
         opacity: 1,
         color: colorArr3[Math.floor(Math.random() * 5-1)]
       },
       {
-        //视频资源
+        //人均参加活动次数
+        offset: [65,10],
+        symbolSize: 100,
+        opacity: 1,
+        color:'rgb(241, 86, 85)'
+      },
+       {
+        //投票人均参与率
+        offset: [50,80],
+        symbolSize: 100,
+        opacity: 1,
+        color: 'rgb(244, 123, 193)'
+      },
+       {
+        //头脑风暴人均参与率
+        offset: [70,60],
+        symbolSize: 120,
+        opacity: 1,
+        color: 'rgb(24, 207, 202)'
+      },
+       {
+        //人均日学习行为数
+        offset: [90,85],
+        symbolSize: 100,
+        opacity: 1,
+        color: 'rgb(169, 147, 221)'
+      },
+       {
+        //视频资源观看数
+        offset: [85,20],
+        symbolSize: 100,
+        opacity: 1,
+        color: 'rgb(252, 134, 64)'
+      },
+      {
+        //视文档资源观看数
         offset: [20, 30],
         symbolSize:  140,
         color: 'rgb(97, 200, 127)'
       },
       {
-        //教案资源观看
+        //作业人均完成率
         offset: [35, 15],
         symbolSize: 100,
         color: 'rgb(112, 83, 182)'
       },
       {
-        //人均日学习
+        //测试人均参与率
         offset: [50, 35],
         symbolSize: 120,
+        color: colorArr6[Math.floor(Math.random() * 5-1)]
+      },
+      {
+        //视频资源观看次数
+        offset: [80, 35],
+        symbolSize: 100,
         color: colorArr6[Math.floor(Math.random() * 5-1)]
       }
       ];
@@ -475,12 +529,12 @@
           }
         },
         grid: {
-          show: true,
+          show: false,
         },
         xAxis: [{
           gridIndex: 0,
           type: 'value',
-          show: true,
+          show: false,
           min: 0,
           max: 100,
           nameLocation: 'middle',
@@ -489,7 +543,7 @@
         yAxis: [{
           gridIndex: 0,
           min: 0,
-          show: true,
+          show: false,
           max: 100,
           nameLocation: 'middle',
           nameGap: 30
@@ -533,6 +587,8 @@
         }
       }
       myCourseList(data).then(res=>{
+        console.log(res);
+        
         this.courseList =[];
         res.data.pageData.forEach((item)=>{
           item.courseStatus == 30 ? this.courseList.push(item) : '';
