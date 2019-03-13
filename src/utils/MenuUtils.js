@@ -12,13 +12,17 @@ function generaMenu(data){
     if(item.list != null) {
       generaMenu(item.list)
     }
-    item.component = _import(item.component)
+    try {
+      item.component = _import(item.component)
+    }
+    catch(err){
+      console.log(item)
+    }
     item.children = item.list
     item.path = item.url
     delete item.list
     delete item.comment
     delete item.icon
-    delete item.isLeaf
     delete item.menuCode
     delete item.open
     delete item.orderNo

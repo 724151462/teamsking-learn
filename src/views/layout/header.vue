@@ -136,7 +136,7 @@ export default {
       removeToken();
       removeUserId();
       this.$store.state.allMenu = []
-      sessionStorage.removeItem('menuList')
+      localStorage.removeItem('menuList')
       this.$router.push("/login");
     },
     handleSelect(index) {
