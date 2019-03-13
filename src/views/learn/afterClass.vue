@@ -97,7 +97,7 @@
         studyVideoRate:[]
       },
       other:{
-        activitiesPerCapita: null,
+        activitiesPerCapita: 0,
         docWatchCount: 0,//文档资源观看次数
         loginCount: 0,  //登录次数
         examRate: "0",  //测试人均参与率 
