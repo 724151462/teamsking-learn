@@ -1,47 +1,50 @@
 <template>
   <div class="test">
-    <div class="title">
-      <div>试题管理</div>
-    </div>
-
-    <div style="display: flex;margin: 25px 0;">
-      <div style="display: flex">
-        <div style="width: 300px">
-          <el-input
-            placeholder="搜索试题"
-            v-model="input">
-          </el-input>
-        </div>
-        <div>
-          <el-button icon="el-icon-search" class="search-btn" @click="searchTestList(0,input)"></el-button>
-        </div>
-      </div>
-      <div style="" class="btn-warp" >
-        <div>
-          <el-button type="success" @click="downTemp">下载模板</el-button>
-        </div>
-        <div>
-          <!--<el-button @click="uploadDialog = true">导入模板</el-button>-->
-          <el-upload
-            :http-request="upTestFile"
-            action="string"
-            :show-file-list="false">
-            <el-button >导入</el-button>
-          </el-upload>
-        </div>
-      </div>
-    </div>
+    <tip title="试题管理"></tip>
+    <!--<div style="display: flex;margin: 25px 0;">-->
+      <!--<div style="" class="btn-warp" >-->
+        <!--<div>-->
+          <!--<el-button type="success" @click="downTemp">下载模板</el-button>-->
+        <!--</div>-->
+        <!--<div>-->
+          <!--<el-upload-->
+            <!--:http-request="upTestFile"-->
+            <!--action="string"-->
+            <!--:show-file-list="false">-->
+            <!--<el-button >导入</el-button>-->
+          <!--</el-upload>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
     <div class="test-warp">
       <div class="test-title">
-        <div style="flex: 1"></div>
-        <div>
-          <!--全选-->
-          <!--<el-checkbox v-model="isCheckAll" @change="checkAll">全选</el-checkbox>-->
+        <div style="flex: 1">
           <el-button type="primary" size="small" @click="goCreateCatalog('',0)">创建目录</el-button>
           <el-button type="info" size="small"
                      v-bind:class="{ active: deleteArr.length>0}"
                      @click="deleteCatalog">删除</el-button>
           <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
+          <el-button type="success" size="small" @click="downTemp">下载模板</el-button>
+          <el-upload
+            style="display: inline-block;margin-left: 10px"
+            :http-request="upTestFile"
+            action="string"
+            :show-file-list="false">
+            <el-button style="padding: 9px 20px;">导入</el-button>
+          </el-upload>
+        </div>
+        <div>
+          <div style="display: flex">
+            <div style="width: 300px">
+              <el-input
+                placeholder="搜索试题"
+                v-model="input">
+              </el-input>
+            </div>
+            <div>
+              <el-button icon="el-icon-search" class="search-btn" @click="searchTestList(0,input)"></el-button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="test-body">
@@ -162,6 +165,7 @@
     upQuiz, testFileFoldRename,
     moveTest,
   } from "../../../../api/library";
+  import tip from '@/components/tip'
 
   export default {
     // components:{uposs},
@@ -169,7 +173,8 @@
       this.getTestList(0)
     },
     components:{
-      UpOss
+      UpOss,
+      tip
     },
     data() {
       return {
@@ -608,7 +613,7 @@
       display flex
       height 50px
       align-items center
-      background-color #f4f4f4
+      border-bottom: 1px solid #e3e8ee;
     .test-body
       .folder-img
         width: 20px;margin: -5px 10px;

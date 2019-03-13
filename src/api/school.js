@@ -1,7 +1,3 @@
-const devUrl = '/api/v1/sys/' // 开发环境
-const prodUrl = 'http://apidev.tskedu.com:9008/api/v1/sys/' // 生产环境
-const baseUrl = process.env.NODE_ENV === 'production' ? prodUrl : devUrl
-
 import { commonsAjax } from '../utils/requery'
 
 /**
@@ -14,14 +10,13 @@ import { commonsAjax } from '../utils/requery'
  * @param data
  */
 export function sysCollegePage (data) {
-  return commonsAjax(`${baseUrl}college/page/`, data, 'get')
-  // return commonsAjax('/api/v1/course/page', data, 'get')
+  return commonsAjax(`/api/v1/sys/college/page/`, data, 'get')
 }
 /**
  * 查看班级列表
  */
 export function classPage (data) {
-  return commonsAjax(`${baseUrl}class/page`, data, 'get')
+  return commonsAjax(`/api/v1/sys/class/page`, data, 'get')
 }
 
 /***
@@ -29,8 +24,7 @@ export function classPage (data) {
  * @param data
  */
 export function sysCollege (data) {
-  return commonsAjax(`${baseUrl}college`,data,'post')
-  //return commonsAjax('/api/v1/course/page', data, 'get')
+  return commonsAjax(`/api/v1/sys/college`,data,'post')
 }
 
 /***
@@ -38,7 +32,7 @@ export function sysCollege (data) {
  * @param data
  */
 export function sysCollegeDelete( data ){
-  return commonsAjax(`${baseUrl}college`,data,'delete')
+  return commonsAjax(`/api/v1/sys/college`,data,'delete')
 }
 
 /***
@@ -46,7 +40,7 @@ export function sysCollegeDelete( data ){
  * @param id
  */
 export function sysTenantTeacher( id ){
-  let url = `${baseUrl}tenant/teacher/`+id;
+  let url = `/api/v1/sys/tenant/teacher/`+id;
   return commonsAjax(url,'','get')
 }
 
@@ -54,36 +48,36 @@ export function sysTenantTeacher( id ){
  * 修改院信息
  */
 export function sysCollegeEdit(data){
-  return commonsAjax(`${baseUrl}college`,data,'put')
+  return commonsAjax(`/api/v1/sys/college`,data,'put')
 }
 
 /****
  * 获取院列表
  */
 export function sysCollegeList(){
-  return commonsAjax(`${baseUrl}college/list`,'','get')
+  return commonsAjax(`/api/v1/sys/college/list`,'','get')
 }
 
 /***
  * 获取系列表
  */
 export function sysDepartmentPage(data){
-  return commonsAjax(`${baseUrl}department/page`,data,'get')
+  return commonsAjax(`/api/v1/sys/department/page`,data,'get')
 }
 
 /**
  * 获取全部的系
- * ${baseUrl}department/list
+ * /sys/department/list
  * */
 export function sysDepartmentList(){
-  return commonsAjax(`${baseUrl}department/list`,{ collegeId : -1 },'get')
+  return commonsAjax(`/api/v1/sys/department/list`,{ collegeId : -1 },'get')
 }
 /**
  * 获取全部的系
- * ${baseUrl}department/list
+ * /sys/department/list
  * */
 export function DepartmentList(data){
-  return commonsAjax(`${baseUrl}department/list`,data,'get')
+  return commonsAjax(`/api/v1/sys/department/list`,data,'get')
 }
 
 /***
@@ -91,7 +85,7 @@ export function DepartmentList(data){
  * @Param ( collegedId,departmentName,manager )
  */
 export function sysDepartment(data){
-  return commonsAjax(`${baseUrl}department`,data,'post')
+  return commonsAjax(`/api/v1/sys/department`,data,'post')
 }
 
 /***
@@ -99,14 +93,14 @@ export function sysDepartment(data){
  * @param data
  */
 export function sysDepartmentEdit(data){
-  return commonsAjax(`${baseUrl}department`,data,'put')
+  return commonsAjax(`/api/v1/sys/department`,data,'put')
 }
 
 /***
  * 删除系
  */
 export function sysDepartmentDelete(data){
-  return commonsAjax(`${baseUrl}department`,data,'delete');
+  return commonsAjax(`/api/v1/sys/department`,data,'delete');
 }
 
 
@@ -114,27 +108,26 @@ export function sysDepartmentDelete(data){
  * 获取专业列表
  */
 export function sysSpecialityPage(data){
-  //return commonsAjax('${baseUrl}speciality/page',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
-  return commonsAjax(`${baseUrl}speciality/page`,data,'get')
+  return commonsAjax(`/api/v1/sys/speciality/page`,data,'get')
 }
 /**
- * 添加专业 ${baseUrl}speciality
+ * 添加专业 /sys/speciality
  * */
 export function sysSpeciality(data){
-  return commonsAjax(`${baseUrl}speciality`,data,'post')
+  return commonsAjax(`/api/v1/sys/speciality`,data,'post')
 }
 /**
  * 修改专业
  * */
 export function sysSpecialityEdit(data){
-  return commonsAjax(`${baseUrl}speciality`,data,'put')
+  return commonsAjax(`/api/v1/sys/speciality`,data,'put')
 }
 
 /***
- *  删除专业  ${baseUrl}speciality
+ *  删除专业  /sys/speciality
  */
 export function sysSpecialityDelete(data){
-  return commonsAjax(`${baseUrl}speciality`,data,'delete')
+  return commonsAjax(`/api/v1/sys/speciality`,data,'delete')
 }
 
 /***
@@ -148,8 +141,7 @@ export function sysStudentPage(data){
   let studentClass = data.studentClass || -1
   let studentInfo = data.search || ''
 
-  //return commonsAjax('${baseUrl}student/page',{ studentId:1,pageIndex:1,pageSize:10  },'get')
-  let url = `${baseUrl}student/page?collegeId=${college}&departmentId=${department}&classId=${studentClass}&specialityId=${speciality}&pageSize=10&pageIndex=${data.pageIndex || 1}&search=${studentInfo}`
+  let url = `/api/v1/sys/student/page?collegeId=${college}&departmentId=${department}&classId=${studentClass}&specialityId=${speciality}&pageSize=10&pageIndex=${data.pageIndex || 1}&search=${studentInfo}`
   return commonsAjax(url,'','get')
 }
 
@@ -158,7 +150,7 @@ export function sysStudentPage(data){
 * 学生启用/禁用
 */
 export function sysStudentSwitch(data){
-  let url = `${baseUrl}student/${data.id}/${data.status}`
+  let url = `/api/v1/sys/student/${data.id}/${data.status}`
   return commonsAjax(url, '', 'get')
 }
 
@@ -167,8 +159,7 @@ export function sysStudentSwitch(data){
  * 获取专业列表
  */
 export function sysSpecialityList(data){
-  //return commonsAjax('${baseUrl}speciality/list',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
-  return commonsAjax(`${baseUrl}speciality/list`, data, 'get')
+  return commonsAjax(`/api/v1/sys/speciality/list`, data, 'get')
 }
 
 
@@ -176,8 +167,7 @@ export function sysSpecialityList(data){
  * 获取班级列表
  */
 export function sysClassList(data){
-  //return commonsAjax('${baseUrl}speciality/list',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
-  return commonsAjax(`${baseUrl}class/list`, data, 'get')
+  return commonsAjax(`/api/v1/sys/class/list`, data, 'get')
 }
 
 
@@ -185,8 +175,7 @@ export function sysClassList(data){
  * 添加新学生
  */
 export function sysStudentAdd(data){
-  //return commonsAjax('${baseUrl}student',{ collegeId:1,pageIndex:1,pageSize:10  },'get')
-  return commonsAjax(`${baseUrl}student`, data, 'post')
+  return commonsAjax(`/api/v1/sys/student`, data, 'post')
 }
 
 
@@ -194,7 +183,7 @@ export function sysStudentAdd(data){
  * 获取学生信息
  */
 export function sysStudentInfo(data){
-  return commonsAjax(`${baseUrl}student/${data.studentId}`, '', 'get')
+  return commonsAjax(`/api/v1/sys/student/${data.studentId}`, '', 'get')
 }
 
 
@@ -202,7 +191,7 @@ export function sysStudentInfo(data){
  * 修改学生信息
  */
 export function sysStudentModify(data){
-  let url = `${baseUrl}student`
+  let url = `/api/v1/sys/student`
   return commonsAjax(url,data,'put')
 }
 
@@ -210,7 +199,7 @@ export function sysStudentModify(data){
  * 删除学生信息
  */
 export function sysStudentDelete(data){
-  let url = `${baseUrl}student`
+  let url = `/api/v1/sys/student`
   return commonsAjax(url,data,'delete')
 }
 
@@ -221,8 +210,7 @@ export function sysTeacherPage(data){
   let college = data.college || -1
   let department = data.department || -1
   let teacherInfo = data.teacherInfo || ''
-  //return commonsAjax('${baseUrl}student/page',{ studentId:1,pageIndex:1,pageSize:10  },'get')
-  let url = `${baseUrl}teacher/page?collegeId=${college}&departmentId=${department}&search=${teacherInfo}&pageIndex=${data.pageIndex}`
+  let url = `/api/v1/sys/teacher/page?collegeId=${college}&departmentId=${department}&search=${teacherInfo}&pageIndex=${data.pageIndex}`
   return commonsAjax(url,'','get')
 }
 
@@ -230,7 +218,7 @@ export function sysTeacherPage(data){
 * 教师启用/禁用
 */
 export function sysTeacherSwitch(data){
-  let url = `${baseUrl}teacher/${data.id}/${data.status}`
+  let url = `/api/v1/sys/teacher/${data.id}/${data.status}`
   return commonsAjax(url, '', 'get')
 }
 
@@ -239,7 +227,7 @@ export function sysTeacherSwitch(data){
 * 添加教师
 */
 export function sysTeacherAdd(data){
-  return commonsAjax(`${baseUrl}teacher`, data, 'post')
+  return commonsAjax(`/api/v1/sys/teacher`, data, 'post')
 }
 
 
@@ -247,7 +235,7 @@ export function sysTeacherAdd(data){
  * 重置教师密码
  */
 export function sysTeacherReset(data){
-  let url = `${baseUrl}teacher/passwd`
+  let url = `/api/v1/sys/teacher/passwd`
   return commonsAjax(url,data,'post')
 }
 
@@ -256,7 +244,7 @@ export function sysTeacherReset(data){
 * 教师id查询
 */
 export function sysTeacherId(data){
-  let url = `${baseUrl}teacher/${data.id}`
+  let url = `/api/v1/sys/teacher/${data.id}`
   return commonsAjax(url, '', 'get')
 }
 
@@ -265,7 +253,7 @@ export function sysTeacherId(data){
 * 教师id查询
 */
 export function sysTeacherModify(data){
-  let url = `${baseUrl}teacher`
+  let url = `/api/v1/sys/teacher`
   return commonsAjax(url, data, 'put')
 }
 
@@ -277,14 +265,14 @@ export function sysTeacherModify(data){
  * 获取证书列表
  */
 export function sysCertificatePage(data){
-  return commonsAjax(`${baseUrl}certificate/page`,data,'get')
+  return commonsAjax(`/api/v1/sys/certificate/page`,data,'get')
 }
 
 /***
  * 保存证书
  */
 export function sysSaveCertificate(data){
-  return commonsAjax(`${baseUrl}/certificate`,data,'post')
+  return commonsAjax(`/api/v1/sys/certificate`,data,'post')
 }
 
 
@@ -292,7 +280,7 @@ export function sysSaveCertificate(data){
  * 查看证书
  */
 export function sysCertificateId(data){
-  return commonsAjax(`${baseUrl}certificate/${data.id}`, '' ,'get')
+  return commonsAjax(`/api/v1/sys/certificate/${data.id}`, '' ,'get')
 }
 
 
@@ -300,7 +288,7 @@ export function sysCertificateId(data){
  * 审核
  */
 export function sysCertificateAudit(data){
-  return commonsAjax(`${baseUrl}certificate`, data ,'put')
+  return commonsAjax(`/api/v1/sys/certificate`, data ,'put')
 }
 
 
@@ -308,7 +296,7 @@ export function sysCertificateAudit(data){
  * 审核详情
  */
 export function sysCertificateDetail(data){
-  return commonsAjax(`${baseUrl}certificate/${data}/audit`, '' ,'get')
+  return commonsAjax(`/api/v1/sys/certificate/${data}/audit`, '' ,'get')
 }
 
 
@@ -319,7 +307,7 @@ export function sysCertificateDetail(data){
  * 获取课程列表
  */
 export function sysCoursePage(data){
-  return commonsAjax('/api/v1/course/page',data,'get')
+  return commonsAjax('/course/page',data,'get')
 }
 
 
@@ -331,46 +319,46 @@ export function sysCourseId(data){
 }
 
 /***
- * 分页查询班级列表 ${baseUrl}class/page
+ * 分页查询班级列表 /sys/class/page
  */
 
 
 export function sysClassPage(data){
-  return commonsAjax(`${baseUrl}class/page`,data,'get')
+  return commonsAjax(`/api/v1/sys/class/page`,data,'get')
 }
 
 /**
- * 添加班级 ${baseUrl}class
+ * 添加班级 /sys/class
  * */
 export function sysClass(data){
-  return commonsAjax(`http://120.36.137.90:8008/api/v1/class`,data,'post')
+  return commonsAjax(`/api/v1/class`,data,'post')
 }
 
 /**
- *  修改班级 ${baseUrl}class
+ *  修改班级 /sys/class
  */
 export function sysClassUpdate(data){
-  return commonsAjax(`${baseUrl}class`,data,'put')
+  return commonsAjax(`/api/v1/sys/class`,data,'put')
 }
 
 /**
- * 删除班级  ${baseUrl}class
+ * 删除班级  /sys/class
  */
 export function sysClassDelete(data){
-  return commonsAjax(`${baseUrl}class`,data,'delete')
+  return commonsAjax(`/api/v1/sys/class`,data,'delete')
 }
 
 
 /**
- * 获取名师风采列表 ${baseUrl}recommend/teacher/page
+ * 获取名师风采列表 /sys/recommend/teacher/page
  * */
 export function sysRecommenTeacherPage(){
-  return commonsAjax(`${baseUrl}recommend/teacher/page`,{},'get')
+  return commonsAjax(`/api/v1/sys/recommend/teacher/page`,{},'get')
 }
 
 /***
- * 获取名师列表   ${baseUrl}recommend/tenant/teacher/page
+ * 获取名师列表   /sys/recommend/tenant/teacher/page
  */
 export function sysRecommenTenantTeacherPage(){
-  return commonsAjax(`${baseUrl}recommend/tenant/teacher/page`,{},'get')
+  return commonsAjax(`/api/v1/sys/recommend/tenant/teacher/page`,{},'get')
 }

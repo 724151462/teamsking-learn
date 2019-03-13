@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div class="addCourse">
-      <span>课程信息</span>
-      <el-button plain  type="primary" style="float:right" @click="$router.push('/course/list')">返回</el-button>
-    </div>
+    <mb-nav :pathList="[{path:'/course/list',name:'课程列表'}]" nowName = '创建课程'></mb-nav>
     <div class="addCourse-center">
       <el-form :model="Course" :rules="courseRules" ref="Course" label-width="100px">
         <el-form-item label="课程名称" required prop="courseName">
@@ -248,7 +245,7 @@
       <el-row>
         <div class="top">
           <span>满分：100分</span>
-          <!--<span style="margin-left: 10px;">当前已分配权重：<span style="color: red;">{{this.temTotle}}%</span></span>-->
+          <span style="margin-left: 10px;">当前已分配权重：<span style="color: red;">{{this.temTotle}}%</span></span>
           <span style="text-align: right;float: right">*单项考核权重为0则不计入成绩！</span>
         </div>
         <div class="center">
@@ -326,11 +323,13 @@
   import vueCropper from 'vue-cropper'
   import addTeachers from './upCourse/addTeacher.vue'
   import coverPreview from './coverPreview.vue'
+  import mbNav from '@/components/breadcrumb'
   import { categories, tags, instructorList, teachersList, saveCourse, courseInfo , putCourse} from '../../api/course'
   import { formatDate } from '../../utils/utils'
   export default {
     components:{
       addTeachers,
+      mbNav,
       coverPreview,
       vueCropper
     },
@@ -425,7 +424,7 @@
           beginTime: [{ required: true, message: '请选择开始时间', trigger: 'blur' }],
           endTime: [{ required: true, message: '请选择结束时间', trigger: 'blur' }],
         },
-        temTotle:0,
+        temTotle:0, //当前已设权重
         begTimeDis:false
       }
     },
@@ -434,6 +433,17 @@
       courseTime(a){
         this.Course.beginTime = formatDate(new Date(a[0]).getTime())
         this.Course.endTime = formatDate(new Date(a[1]).getTime())
+      },
+     'CourseSetEntity': {
+        deep: true,
+          handler: function(val, oldVal) {
+            this.isUpdata ? delete val.courseId : '';
+            let total = 0;
+          Object.values(val).forEach((item)=>{
+            total += Number(item)
+          })
+          this.temTotle = total
+        }
       }
     },
     created(){
@@ -448,10 +458,10 @@
       //课程编辑时获取该课程的数据
       getUpData(e){
         courseInfo(e).then(res=>{
-          console.log(res)
+          // console.log(res)
           //后台请求到的数据不完全适合展示，需要清洗
           let data = this.upDataFilter(res.data)
-          console.log(data)
+          // console.log(data)
           //已发布并且已经开始的课程不能修改开始时间
           if(data.course.courseStatus == 30){
             let begin = new Date(data.course.beginTime).getTime(),
@@ -827,8 +837,6 @@
       goPutCourse () {
         let data = this.goDataFilter()
         let loading = this.$loading(this.loadingCss)
-        console.log('请求发送前的数据')
-        console.log(data)
         putCourse(data).then(res=>{
           // console.log(res)
           loading.close()
@@ -854,26 +862,27 @@
       },
       //成绩权重设置完毕
       sysTemOver () {
-        delete this.CourseSetEntity.courseId
-        let arr = Object.values(this.CourseSetEntity),
-            totle = 0;
+        this.isUpdata ? delete this.CourseSetEntity.courseId : '';
+        let totle = 0;
         Object.values(this.CourseSetEntity).forEach((item)=>{
           totle += Number(item)
         })
-        console.log(totle)
-        if(totle>100){
-          this.$message.warning('权重不可超过100%')
-          return false
+        if(totle !== 100){
+          this.$message.warning('权重不可超过或小于100%')
         }else{
           this.isSysTem = false
         }
       },
       //取消成绩权重设置
       sysTemCancel () {
-        for (let i in this.CourseSetEntity) {
-          this.CourseSetEntity[i] = 0
+        if(this.isUpdata){
+          this.isSysTem = false
+        }else{
+          for (let i in this.CourseSetEntity) {
+            this.CourseSetEntity[i] = 0
+          }
+          this.isSysTem = false
         }
-        this.isSysTem = false
       },
     },
     mounted(){
@@ -893,6 +902,21 @@
       this.addEditor1 = this.editor1.customConfig.onchange = function (html) {
         self.CourseInfoEntity.courseDescription = html
       }
+      this.editor1.customConfig.menus = [
+        'head',  // 标题
+        'bold',  // 粗体
+        'fontSize',  // 字号
+        'italic',  // 斜体
+        'underline',  // 下划线
+        'strikeThrough',  // 删除线
+        // 'link',  // 插入链接
+        'list',  // 列表
+        'justify',  // 对齐方式
+        'table',  // 表格
+        'code',  // 插入代码
+        'undo',  // 撤销
+      ]
+      this.editor1.customConfig.zIndex = 10
       this.editor1.create()
       //教学目标
       this.editor2 = new wangEditor('#editor2')
@@ -901,10 +925,23 @@
       }
       this.editor2.customConfig.zIndex = 100
       this.addEditor2 = this.editor2.customConfig.onchange = function (html) {
-        console.log('教学安排')
-        console.log(html)
         self.CourseInfoEntity.teachingTarget = html
       }
+      this.editor2.customConfig.menus = [
+        'head',  // 标题
+        'bold',  // 粗体
+        'fontSize',  // 字号
+        'italic',  // 斜体
+        'underline',  // 下划线
+        'strikeThrough',  // 删除线
+        // 'link',  // 插入链接
+        'list',  // 列表
+        'justify',  // 对齐方式
+        'table',  // 表格
+        'code',  // 插入代码
+        'undo',  // 撤销
+      ]
+      this.editor2.customConfig.zIndex = 10
       this.editor2.create()
       //教学安排
       this.editor3 = new wangEditor('#editor3')
@@ -915,6 +952,21 @@
       this.addEditor3 = this.editor3.customConfig.onchange = function (html) {
         self.CourseInfoEntity.teachingArrangement = html
       }
+      this.editor3.customConfig.menus = [
+        'head',  // 标题
+        'bold',  // 粗体
+        'fontSize',  // 字号
+        'italic',  // 斜体
+        'underline',  // 下划线
+        'strikeThrough',  // 删除线
+        // 'link',  // 插入链接
+        'list',  // 列表
+        'justify',  // 对齐方式
+        'table',  // 表格
+        'code',  // 插入代码
+        'undo',  // 撤销
+      ]
+      this.editor3.customConfig.zIndex = 10
       this.editor3.create()
     }
   }

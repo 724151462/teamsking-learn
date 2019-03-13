@@ -18,6 +18,9 @@ const state = {
 const mutations = {
   setAllMenu: (state, list)=> {
     // console.log('rwq', list)
+    if(state.allMenu.length !== 0) {
+      return
+    }
     list.forEach(element => {
       state.allMenu.push(element)
     });

@@ -4,7 +4,7 @@ function resolve (dir) {
 }
 module.exports = {
   // 基本路径
-  baseUrl: './',
+  baseUrl: '/',
   assetsDir: 'assets',
   // 输出文件目录
   outputDir: 'dist',
@@ -27,10 +27,8 @@ module.exports = {
     port: 8080,
     proxy: {
       '/api': {
-        //  target: 'http://192.168.10.48:9008',
+         // target: 'http://192.168.10.48:9008',
         target: 'http://apidev.tskedu.cn:9008',
-        // target: 'http://192.168.11.61:9008',
-        // target: 'https://wap.roobbc.com',
         secure: false,
         ws: true,
         changeOrigin: true

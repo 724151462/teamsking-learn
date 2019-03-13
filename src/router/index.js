@@ -8,7 +8,13 @@ const _import = require('./_import_' + process.env.NODE_ENV)
 Vue.use(Router)
 
 
-export const constantRouterMap = [{
+export const constantRouterMap = [
+  {
+    path: '/',
+    component: _import('login/index'),
+    hidden: true
+  },
+  {
     path: '/login',
     component: _import('login/index'),
     hidden: true
@@ -17,6 +23,10 @@ export const constantRouterMap = [{
     path: '/404',
     component: _import('errorPage/404'),
     hidden: true
+  },
+  {
+    path: '*',
+    component: _import('errorPage/404'),
   },
   // {
   //   path: '/course',    // 访问路径
@@ -847,7 +857,7 @@ export const constantRouterMap = [{
         path: '/course/modelResource',
         component: _import('classModel/modelContent/modelResource'),
         name: 'modelMain',
-      },
+      }
     ]
   },
   // {
@@ -857,6 +867,7 @@ export const constantRouterMap = [{
 ]
 
 export default new Router({
+  // mode: 'history',
   routes: constantRouterMap
 })
 
