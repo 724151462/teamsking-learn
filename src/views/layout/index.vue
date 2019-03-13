@@ -20,29 +20,31 @@
             position: fixed"
       >
         <el-menu
-          router
+          :default-active="activeIndex"
           unique-opened
           collapse-transition
           @open="handleOpen"
           :default-openeds="defaultOpens"
           ref="menu"
+          @select="handelSelect"
+          router
         >
           <template v-for="issue in nodes">
-            <!-- issue.name:{{issue.name}}<br>leftNavState:{{$store.state.leftNavState}} -->
+            <!-- 筛选出父级 -->
             <template v-if="issue.name === $store.state.leftNavState">
-              <!-- 注意：这里就是leftNavState状态作用之处，当该值与router的根路由的name相等时加载相应菜单组 -->
-              <template v-for="(item,index) in issue.children">
-                <el-submenu v-if="!item.leaf" :index="String(index)" :key="index">
+              <template v-for="item in issue.children">
+                <!-- 菜单目录层 -->
+                <el-submenu v-if="!item.isLeaf" :index="String(item.menuId)" :key="item.menuId">
                   <template slot="title">
                     <i :class="item.iconCls"></i>
                     <span slot="title">{{item.name}}</span>
                   </template>
                   <template v-for="term in item.children">
+                    <!-- 子菜单展示 -->
                     <el-menu-item
                      v-if="term.showCode !== 2"
-                    :key="term.path"
+                    :key="term.menuId"
                     :index="term.path"
-                    :class="$route.path===term.path?'is-active':''"
 
                   >
                     <i :class="term.iconCls"></i>
@@ -50,10 +52,10 @@
                     </el-menu-item>
                   </template>    
                 </el-submenu>
+                <!-- 单个菜单显示 -->
                 <el-menu-item
-                  v-else-if="item.leaf&&item.children&&item.children.length"
-                  :index="item.children[0].path"
-                  :class="$route.path===item.children[0].path?'is-active':''"
+                  v-else-if="item.isLeaf&&item.children&&item.children.length"
+                  :index="item.children[0].path" :key="item.menuId"
                 >
                   <i :class="item.iconCls"></i>
                   <span slot="title">{{item.children[0].name}}</span>
@@ -73,7 +75,6 @@
 <script>
 import headers from "./header.vue";
 import { constantRouterMap } from "@/router/index";
-import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -81,12 +82,10 @@ export default {
   },
   data() {
     return {
+      activeIndex: '',
       nodes: [],
       defaultOpens: [String(sessionStorage.getItem("defaultOpens"))] || []
     };
-  },
-  computed: {
-    ...mapGetters(["currentMenu"])
   },
   created() {
     //这里没有直接使用this.$router.options.routes，是因为addRoute的路由规则，在这里this.$router.options.routes获取不到
@@ -97,7 +96,7 @@ export default {
 			let data = this.$store.state.allMenu
 			this.nodes.push(...data)
 			console.log(this.nodes)
-			sessionStorage.setItem('isLoadNodes', 'true')
+			localStorage.setItem('isLoadNodes', 'true')
 		// }
   },
   methods: {
@@ -105,12 +104,14 @@ export default {
       // console.log(params)
       sessionStorage.setItem("defaultOpens", params[0]);
     },
-    curentOpen(val) {
-      console.log(val);
+    handelSelect(...params) {
+      console.log(params);
+      this.activeIndex = params[0]
     }
   },
   watch: {
     $route: function(to, from) {
+      this.activeIndex = this.$route.path
       // 路由改变时执行
       console.info(
         "$store.state.leftNavState:" + this.$store.state.leftNavState

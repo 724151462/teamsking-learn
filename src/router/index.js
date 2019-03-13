@@ -8,7 +8,13 @@ const _import = require('./_import_' + process.env.NODE_ENV)
 Vue.use(Router)
 
 
-export const constantRouterMap = [{
+export const constantRouterMap = [
+  {
+    path: '/',
+    component: _import('login/index'),
+    hidden: true
+  },
+  {
     path: '/login',
     component: _import('login/index'),
     hidden: true
@@ -850,14 +856,14 @@ export const constantRouterMap = [{
       }
     ]
   },
-  {
-    path: '*',
-    redirect: '/404'
-  },
+  // {
+  //   path: '/*',
+  //   redirect: '/404'
+  // },
 ]
 
 export default new Router({
-  mode: 'history',
+  // mode: 'history',
   routes: constantRouterMap
   
 })

@@ -21,16 +21,16 @@ Vue.config.productionTip = false
 window.STOMP_CLIENT = ''
 
 var routeList = []
-let data = JSON.parse(window.sessionStorage.getItem('menuList'))
+let data = JSON.parse(localStorage.getItem('menuList'))
 if (data){
   //这里是防止用户手动刷新页面，整个app要重新加载,动态新增的路由，会消失，所以我们重新add一次
   let routes = MenuUtils(data)
   console.log(routes)
   router.addRoutes(routes)
-  if(sessionStorage.getItem('isLoadNodes')) {
+  if(localStorage.getItem('isLoadNodes')) {
     store.commit('setAllMenu', routes)
   }
-  window.sessionStorage.removeItem('isLoadNodes')
+  localStorage.removeItem('isLoadNodes')
 }
 router.beforeEach((to, from, next) => {
 
@@ -40,14 +40,28 @@ router.beforeEach((to, from, next) => {
     routeList.splice(index + 1, routeList.length - index - 1)
   } else {
     routeList.push(to.name)
+    next()
   }
-  to.meta.routeList = routeList
-  var n = (to.path.split('/')).length - 1;
-  console.log('timess', n)
-  if (n <= 3) {
-    Cookie.set('path', to.path)
+  /*如果本地 存在 token 则 不允许直接跳转到 登录页面*/
+  // console.log(from.path)
+  if(Cookie.get('BackstageToken')){
+    if(to.path == "/login"){
+      localStorage.setItem('isLoadNodes', 'true')
+      next({
+        path:'/course/list'
+      });
+    }else {
+      next();
+    }
+  }else{
+    if(to.path == "/login"){
+      next()
+    }else {
+      next({
+        path:'/login'
+      });
+    }
   }
-  next()
 })
 
 const Globe_VM = new Vue({

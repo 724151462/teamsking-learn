@@ -187,7 +187,7 @@
             saveUserInfo(res.data.userId)
             sysUserMenuList()
             .then(response=> {
-              sessionStorage.setItem('menuList',JSON.stringify(response.data))
+              localStorage.setItem('menuList',JSON.stringify(response.data))
               let routes = MenuUtils(response.data)
               this.$store.commit('setAllMenu', routes)
               console.log(routes)
