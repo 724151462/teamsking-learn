@@ -72,7 +72,7 @@ const Globe_VM = new Vue({
 
 export default Globe_VM
 
-
+console.log('环境:', process.env.NODE_ENV)
 if(process.env.NODE_ENV === "development"){
   //开发测试
   // window.onerror = function(errorMessage, scriptURI, lineNumber,columnNumber,errorObj) {

@@ -233,11 +233,9 @@ export default {
     this.schoolInit();
   },
   methods: {
-    schoolInit(key = "") {
-      let data = { searchKey: key };
-      getTenant(data)
+    schoolInit() {
+      getTenant()
         .then(res => {
-          // console.log(res)
           if (res.code === 200) {
             this.schoolList = res.data;
           } else {

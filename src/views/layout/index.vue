@@ -121,7 +121,6 @@ export default {
         sessionStorage.setItem('defaultOpens', 0)
         this.defaultOpens = [String(sessionStorage.getItem("defaultOpens"))];
       }
-      
       console.log(this.defaultOpens);
     },
     defaultOpens: function(val) {
