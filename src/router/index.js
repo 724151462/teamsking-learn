@@ -863,6 +863,5 @@ export const constantRouterMap = [{
 export default new Router({
   mode: 'hash',
   routes: constantRouterMap
-  
 })
 
