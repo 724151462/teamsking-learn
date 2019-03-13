@@ -22,7 +22,7 @@ if (process.env.NODE_ENV === 'production') {
     window.sockterUrl = 'wss://api.tskedu.com/websocket'
   } else {
     //dev 测试环境
-    axios.defaults.baseURL = 'http://apidev.tskedu.cn:9008';
+    axios.defaults.baseURL = 'https://apidev.tskedu.cn:9008';
     window.sockterUrl = 'wss://apidev.tskedu.cn:9008/websocket'
   }
 } else {
