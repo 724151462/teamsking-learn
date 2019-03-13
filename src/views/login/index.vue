@@ -216,8 +216,8 @@ export default {
       schoolList: [], //租户列表
       searchKey: "", //搜索
       data: {
-        userName: "admin",
-        password: "abc123",
+        userName: "",
+        password: "",
         tenantId: ""
       },
       rules: {
