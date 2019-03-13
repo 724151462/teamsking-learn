@@ -289,8 +289,8 @@ export default {
     goLoginDebug() {
       let data = {
         tenantId: 1,
-        loginAccount: "admin",
-        passwd: "abc123"
+        loginAccount: "",
+        passwd: ""
       };
       logins(data)
         .then(res => {

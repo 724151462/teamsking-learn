@@ -307,7 +307,7 @@ export function sysCertificateDetail(data){
  * 获取课程列表
  */
 export function sysCoursePage(data){
-  return commonsAjax('/course/page',data,'get')
+  return commonsAjax('/api/v1/tenant/course/page',data,'get')
 }
 
 
