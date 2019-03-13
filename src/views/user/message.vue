@@ -9,7 +9,9 @@
       <el-button size="small" @click ="del">删除</el-button>
       <div style="margin: 15px 0;"></div>
       <div>
-        <div v-show="messageData.length == 0">暂无消息</div>
+        <div v-show="messageData.length == 0">
+          <img :src="require('@/assets/images/no-data.png')" width="500px" height="500px" alt="">
+          </div>
         <div v-for="(message) in messageData" :key="message.id" class="message-item">
           <div style="padding-right: 20px">
             <el-checkbox v-model="message.selected" @change="checkChange(message.userMessageId, $event)"></el-checkbox>

@@ -329,7 +329,7 @@
         }
         emailFotgotCheck(data)
           .then(res=>{
-            console.log(res)
+            // console.log(res)
             if (res.code === 200) {
               this.forgotPass.isEmailRest = true
             } else {

@@ -393,7 +393,7 @@
           name: '人均参加活动次数',
           value:  this.other.activitiesPerCapita
         }, {
-          name: '投票人均参与率',
+          name: '投票\n人均参与率',
           value: `${this.other.voteRate}%`
         }, {
           name: '头脑风暴\n人均参与率',
@@ -408,10 +408,10 @@
           name: '文档资源观看次数',
           value: this.other.docWatchCount
         }, {
-          name: '作业人均完成率',
+          name: '作业\n人均完成率',
           value: `${this.other.homeworkRate}%`
         }, {
-          name: '测试人均参与率',
+          name: '测试\n人均参与率',
           value: `${this.other.examRate}%`
         }
       ]
@@ -628,10 +628,11 @@
     //获取其它行为的统计数据
     otherData(data){
       afterOther(data).then(res=>{
-        // console.log('其它行为',res)
+        console.log('其它行为',res)
         this.other = res.data
         this.otherChartInit()
       }).catch((err)=>{
+        console.log(err);
       })
     },
   }

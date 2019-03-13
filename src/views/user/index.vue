@@ -180,7 +180,7 @@
         title="确认密码"
         :visible.sync="checkMobileDialog"
         width="30%">
-        <span>身份认证</span>
+        <span style="margin-right:20px;">身份认证</span>
         <el-input class="input-width" type="password" placeholder="请输入登录密码" v-model="password"></el-input>
       <span slot="footer" class="dialog-footer">
         <el-button @click="()=>{checkMobileDialog = false;this.password=''}">取 消</el-button>
