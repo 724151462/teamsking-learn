@@ -13,9 +13,6 @@ import {
 } from "../api/login";
 import Cookie from "js-cookie";
 
-// axios.defaults.headers.token = '1f905951b9b371530396ea07f6cbe94a'
-
-
 /*第一层if判断生产环境和开发环境*/
 if (process.env.NODE_ENV === 'production') {
   /*第二层if，根据.env文件中的VUE_APP_FLAG判断是生产环境还是测试环境*/

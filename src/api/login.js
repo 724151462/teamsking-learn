@@ -10,8 +10,8 @@ export function reToken (data) {
 /**
  * 获取租户列表用于登录
  * */
-export function getTenant (data) {
-  return commonsAjax(`/api/v1/login/tenant`, data, 'get')
+export function getTenant () {
+  return commonsAjax('/api/v1/login/tenant', '', 'get')
 }
 
 /**
