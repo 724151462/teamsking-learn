@@ -1,29 +1,28 @@
 <template>
-    <el-row class="header">
-        <el-col :span="24">
-            <div class="grid-content bg-purple-dark">
-                {{ headerTitle }}
-            </div>
-        </el-col>
-    </el-row>
+  <div class="header">
+    <div class="header-text">{{ headerTitle }}</div>
+    <div class="button-ground"><slot></slot></div>
+  </div>
 </template>
 <script>
 export default {
   props:['headerTitle'],
   data(){
     return {
-
     }
   }
 }
-
 </script>
 <style scoped lang="stylus" type="text/stylus">
   .header
-    .grid-content
-      margin-bottom: 20px
-      box-sizing: border-box
-      padding: 10px 0 10px 10px
-      background: #f5f7fa
-
+    display flex
+    border-bottom: 1px solid #c0c4cc;
+    padding-bottom 20px
+    margin-bottom 20px
+    .header-text
+      font-size 15px
+      color: #303133
+    .button-ground
+      flex 1
+      text-align right
 </style>

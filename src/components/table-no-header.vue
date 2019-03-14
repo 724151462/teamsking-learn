@@ -79,7 +79,7 @@
       }
     },
     mounted() {
-      console.log(this.tables)
+      // console.log(this.tables)
     }
   }
 </script>

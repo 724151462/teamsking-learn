@@ -450,10 +450,9 @@
         }).then(()=>{
           userApi.getMeInfo().then(res=>{
             if(Number(res.code) === 200) {
-              console.log(res.data)
+              // console.log(res.data)
               this.userInfo = JSON.parse(JSON.stringify(res.data))
               this.$store.commit('CHANGE_AVATAR', res.data.avatar)
-
               this.infoForm = JSON.parse(JSON.stringify(res.data))
             }else{
               this.$message.error(getErrorMsg(res.msg))

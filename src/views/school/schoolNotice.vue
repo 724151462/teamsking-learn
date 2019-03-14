@@ -1,6 +1,7 @@
 <template>
+  
   <div>
-    <div style="text-align: right;padding-top: 10px;padding-bottom: 10px;">
+    <div style="padding-top: 10px;padding-bottom: 10px;">
       <el-button size="small" type="primary" @click="isDialog = true">添加</el-button>
       <el-button size="small" type="primary" @click="delMult">删除选中项</el-button>
     </div>
@@ -10,6 +11,15 @@
       :buttonStylus="tableStylus"
       v-on:showComponentInfo="typeFun"
     ></itemTable>
+    <el-pagination
+      v-show="totalPage >= 10"
+      style="margin: 20px 0;text-align:right"
+      background
+      layout="prev, pager, next"
+      :current-page="currentPage"
+      @current-change="handleCurrentChange"
+      :total="totalPage">
+    </el-pagination>
     <el-dialog :visible.sync="isDialog" width="60%">
       <el-form>
         <el-form-item label="标 题：">
@@ -50,7 +60,8 @@ export default {
       tables: [
         {
           name: "通知标题",
-          prop: "title"
+          prop: "title",
+          width:'200'
         },
         {
           name: "通知内容",
@@ -58,33 +69,18 @@ export default {
         },
         {
           name: "发布人",
-          prop: "realName"
+          prop: "realName",
+          width:'100'
         },
         {
           name: "发布时间",
-          prop: "publishTime"
+          prop: "publishTime",
+          width:'190'
         }
       ],
-      tableData: [
-        {
-          title: "通知标题sss",
-          content: "我是通知内容",
-          fbr: "xxx老师",
-          time: "2018-1-1"
-        },
-        {
-          title: "通知标题sss",
-          content: "我是通知内容",
-          fbr: "xxx老师",
-          time: "2018-1-1"
-        },
-        {
-          title: "通知标题sss",
-          content: "我是通知内容",
-          fbr: "xxx老师",
-          time: "2018-1-1"
-        }
-      ],
+      tableData: [],
+      currentPage:1,
+      totalPage:10,
       tableStylus: [
         {
           name: "删除",
@@ -107,10 +103,16 @@ export default {
     this.getMessageList()
   },
   methods: {
-    getMessageList() {
-        schoolMsg().then(response => {
-            this.tableData = response.data.pageData;
-        });
+    //分页页码改变
+    handleCurrentChange(page){
+      this.getMessageList(page)
+    },
+    getMessageList(page = 1) {
+      schoolMsg({pageIndex:page}).then(response => {
+          this.tableData = response.data.pageData;
+          this.totalPage = response.data.totalPage * 10
+          this.currentPage = response.data.pageIndex
+      });
     },
     typeFun(...params) {
       switch (params[0]) {
@@ -124,7 +126,7 @@ export default {
           let delId = params[1].forEach(element => {
             this.delArr.push(element.messageId);
           });
-          console.log(params[1]);
+          // console.log(params[1]);
           break;
         default:
           break;

@@ -18,7 +18,7 @@
           <el-button type="info" size="small"
                      v-bind:class="{ active: deleteArr.length>0}"
                      @click="deleteCatalog" >删除</el-button>
-          <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
+          <!-- <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button> -->
         </div>
         <div>
           <div style="display: flex">

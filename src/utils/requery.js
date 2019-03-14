@@ -144,7 +144,6 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   res => {
     if (Number(res.data.code) === 401) {
-      console.log('拦截到响应')
       removeToken()
       Globe_VM.$router.push({
         path: '/login'

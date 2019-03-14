@@ -7,10 +7,7 @@
       style="
           background:#ffffff;
           height: calc(100% - 80px);
-          width:calc(100% - 40px);
-          margin-top: 20px;
-          margin-left:20px;
-          margin-right:20px;"
+          margin-top: 20px;"
     >
       <el-aside
         width="220px"
@@ -65,7 +62,7 @@
           </template>
         </el-menu>
       </el-aside>
-      <el-main style="margin-left: 220px">
+      <el-main style="margin-left: 220px;margin-bottom:40px">
         <router-view></router-view>
       </el-main>
     </el-container>
@@ -95,7 +92,7 @@ export default {
 		// if (!isLoadNodes) {
 			let data = this.$store.state.allMenu
 			this.nodes.push(...data)
-			console.log(this.nodes)
+			// console.log(this.nodes)
 			localStorage.setItem('isLoadNodes', 'true')
 		// }
   },
@@ -105,7 +102,7 @@ export default {
       sessionStorage.setItem("defaultOpens", params[0]);
     },
     handelSelect(...params) {
-      console.log(params);
+      // console.log(params);
       this.activeIndex = params[0]
     }
   },
@@ -113,18 +110,18 @@ export default {
     $route: function(to, from) {
       this.activeIndex = this.$route.path
       // 路由改变时执行
-      console.info(
-        "$store.state.leftNavState:" + this.$store.state.leftNavState
-      );
+      // console.info(
+      //   "$store.state.leftNavState:" + this.$store.state.leftNavState
+      // );
       // this.defaultOpens = [String(sessionStorage.getItem("defaultOpens"))];
       if(to.matched[0].path !== from.matched[0].path) {
         sessionStorage.setItem('defaultOpens', 0)
         this.defaultOpens = [String(sessionStorage.getItem("defaultOpens"))];
       }
-      console.log(this.defaultOpens);
+      // console.log(this.defaultOpens);
     },
     defaultOpens: function(val) {
-      console.log(val);
+      // console.log(val);
       // return String(sessionStorage.getItem('defaultOpens'))
     }
   }

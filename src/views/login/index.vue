@@ -50,7 +50,7 @@
         </div>
       </div>
     </div>
-    <!-- <el-button type="danger" style="position: fixed;left:50%;top: 20px;" @click="goLoginDebug">测试登陆</el-button> -->
+    <el-button type="danger" style="position: fixed;left:50%;top: 20px;" @click="goLoginDebug">测试登陆</el-button>
     <el-dialog
       title="找回密码"
       :visible.sync="forgotPass.dialogVisible"
@@ -253,16 +253,16 @@ export default {
           tenantId: tenantId,
           loginAccount: this.data.userName,
           passwd: this.data.password
-        };
+        };        
       logins(data)
         .then(res => {
-          console.log(res);
+          // console.log(res);
           if (res.code === 200) {
             // console.log(res)
             twoWeeksExchange(res.data.token, res.data.refreshToken);
             saveUserInfo(res.data.userId);
             sysUserMenuList().then(response => {
-              console.log(static_routes);
+              // console.log(static_routes);
               let static_routes = response.data
               // sessionStorage.setItem('menuList',JSON.stringify(response.data))
               localStorage.setItem("menuList", JSON.stringify(static_routes));
@@ -287,17 +287,28 @@ export default {
     goLoginDebug() {
       let data = {
         tenantId: 1,
-        loginAccount: "admin",
+        loginAccount: "888888",
         passwd: "abc123"
       };
       logins(data)
         .then(res => {
-          // console.log(res)
+          // console.log(res);
           if (res.code === 200) {
-            console.log("登录成功");
+            // console.log(res)
             twoWeeksExchange(res.data.token, res.data.refreshToken);
             saveUserInfo(res.data.userId);
-            this.$router.replace("/course");
+            sysUserMenuList().then(response => {
+              // console.log(static_routes);
+              let static_routes = response.data
+              // sessionStorage.setItem('menuList',JSON.stringify(response.data))
+              localStorage.setItem("menuList", JSON.stringify(static_routes));
+              // let routes = MenuUtils(response.data)
+              let routes = MenuUtils(static_routes);
+              // console.log(routes)
+              this.$store.commit("setAllMenu", routes);
+              this.$router.addRoutes(routes);
+              this.$router.replace("/course/list");
+            });
           } else {
             this.$message({
               message: getErrorMsg(res.msg),

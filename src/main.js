@@ -25,7 +25,7 @@ let data = JSON.parse(localStorage.getItem('menuList'))
 if (data){
   //这里是防止用户手动刷新页面，整个app要重新加载,动态新增的路由，会消失，所以我们重新add一次
   let routes = MenuUtils(data)
-  console.log(routes)
+  // console.log(routes)
   router.addRoutes(routes)
   if(localStorage.getItem('isLoadNodes')) {
     store.commit('setAllMenu', routes)
@@ -72,7 +72,6 @@ const Globe_VM = new Vue({
 
 export default Globe_VM
 
-console.log('环境:', process.env.NODE_ENV)
 if(process.env.NODE_ENV === "development"){
   //开发测试
   // window.onerror = function(errorMessage, scriptURI, lineNumber,columnNumber,errorObj) {

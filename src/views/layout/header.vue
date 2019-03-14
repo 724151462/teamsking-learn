@@ -2,9 +2,8 @@
   <div>
     <div class="header">
       <div style="display: flex;flex: 1">
-        <router-link to="/course" class="login">
-          <span>天擎智课</span>
-          <span class="sizes">后台管理</span>
+        <router-link to="/course" class="login" style="margin-top:10px;text-align:center">
+          <img :src="require('@/assets/images/header_logo.png')" height="40px"/>
         </router-link>
         <el-menu
           :default-active="defaultActiveIndex"
@@ -15,38 +14,33 @@
           class="el-menu-demo"
           mode="horizontal"
           @select="handleSelect"
-          :router="true"
-        >
+          :router="true">
           <el-menu-item :index="item.path" v-for="item in nav" :key="item.id">{{item.name}}</el-menu-item>
           <!-- <el-menu-item index="/learn">学习管理</el-menu-item>
           <el-menu-item index="/school">校管中心</el-menu-item>
           <el-menu-item index="/system">系统管理</el-menu-item> -->
-          <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path"
->
-                    <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
+          <!-- <el-menu-item v-for="(item,index) in $router.options.routes" v-if="item.type&&item.menuShow" :key="index" :index="item.children[0].path">
+          <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
           </el-menu-item>-->
         </el-menu>
       </div>
-      <div style="margin-right: 30px;margin-top: 15px;color: white;">
-        <router-link :to="{path: '/user/message'}" style="display: inline-block;vertical-align: middle">
-          <el-badge :value="$store.state.msgNum" class="item" v-if="$store.state.msgNum > 0">
-            <i class="el-icon-bell" style="font-size: 30px;cursor: pointer"></i>
-          </el-badge>
-          <el-badge v-else>
-            <i class="el-icon-bell" style="font-size: 30px;cursor: pointer"></i>
-          </el-badge>
-        </router-link>
-      </div>
       <el-dropdown class="avator" trigger="click">
         <span class="el-dropdown-link userinfo-inner">
-            <img :src="userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
-            <span>{{this.realName}}</span>
+          <el-badge :value="$store.state.msgNum" class="item" v-if="$store.state.msgNum > 0">
+            <img :src="this.$store.state.userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
+          </el-badge>
+          <el-badge v-else>
+            <img :src="this.$store.state.userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
+          </el-badge>
+            <span style="margin-left:10px">{{this.realName}}</span>
             <i class="el-icon-caret-bottom"></i>
-          </span>
+        </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item>
             <router-link to="/user/index">个人中心</router-link>
-            <!--<div ><span style="color: #555;font-size: 14px;"></span></div>-->
+          </el-dropdown-item>
+          <el-dropdown-item divided>
+            <router-link to="/user/message">消息管理</router-link>
           </el-dropdown-item>
           <el-dropdown-item divided @click.native="doLogout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
@@ -74,21 +68,20 @@
 <script>
 import { menuList, logout ,reToken} from "@/api/login";
 import { constantRouterMap } from "@/router/index";
-import { removeToken, getUserId, removeUserId } from "@/utils/auth";
+import { removeToken, getUserId, removeUserInfo } from "@/utils/auth";
 import { getUserInfo, getMeInfo, userInit } from "../../api/user";
 import {unReadyMsg} from '@/api/course'
 import {getErrorMsg} from "../../utils/utils";
 import MenuUtils from '@/utils/MenuUtils'
+import Cookie from 'js-cookie'
 
 export default {
   props: ["navs"],
   data() {
     return {
       defaultActiveIndex: "/course",
-      nav: [
-        
-      ],
-      realName: "",
+      nav: [],
+      realName: '',
       userAvatar: require('../../assets/images/user.png'),
       menuList: constantRouterMap,
       nameInit: "",
@@ -97,7 +90,7 @@ export default {
     };
   },
   created() {
-    console.log(this.$store.state.allMenu)
+    // console.log(this.$store.state.allMenu)
     // menuList().then((response)=>{
     // console.log(this.storeNav, '``````', response.data)
     // console.log(this.$router)
@@ -119,24 +112,27 @@ export default {
         }
       )
 			this.nav.push(...this.$store.state.allMenu)
-			console.log(this.nodes)
+			// console.log(this.nodes)
 			sessionStorage.setItem('isLoadNodes', 'true')
 		// }
     this.fetchNavData();
-    this.getUserInfo();
+    if(!Cookie.get('realName')){
+      this.getUserInfo();
+    }
+    this.realName = Cookie.get('realName');
     this.getMsg();
   },
   methods: {
     jumpTo(url) {
-      console.log(url);
       this.$router.push(url);
     },
     //退出登录
     doLogout() {
       removeToken();
-      removeUserId();
+      removeUserInfo();
       this.$store.state.allMenu = []
       localStorage.removeItem('menuList')
+      logout();
       this.$router.push("/login");
     },
     handleSelect(index) {
@@ -162,9 +158,11 @@ export default {
           if (Number(res.code) === 200) {
             this.realName = res.data.realName;
             status = res.data.initStatus
-            res.data.avatar ? this.userAvatar= res.data.avatar : this.userAvatar = require('../../assets/images/user.png')
-            sessionStorage.setItem("realName", res.data.realName);
-            sessionStorage.setItem("tenantId", res.data.gender);
+            // res.data.avatar ? this.userAvatar= res.data.avatar : this.userAvatar = require('../../assets/images/user.png')
+            this.$store.commit('CHANGE_AVATAR', res.data.avatar)
+            Cookie.set('avatar',res.data.avatar)
+            Cookie.set("realName", res.data.realName);
+            Cookie.set("tenantId", res.data.gender);
           } else {
             // this.$message.error('请登录')
             // this.$message.error(getErrorMsg(res.msg));
@@ -184,7 +182,7 @@ export default {
       userInit(data)
         .then(res=>{
           if (Number(res.code) === 200) {
-            console.log(res.data)
+            // console.log(res.data)
             this.$message.success('修改成功');
             this.nameDialog = false
           } else {
@@ -245,9 +243,7 @@ export default {
     color: #ffffff;
     font-size: 22px;
     line-height: 60px;
-    padding-left: 20px;
-    margin-right: 80px;
-
+    width 220px
     .sizes {
       font-size: 16px;
       margin-left: 10px;

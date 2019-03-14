@@ -1,35 +1,27 @@
 <template>
   <div class="teacher">
 
-    <header-the-again headerTitle="教师管理"></header-the-again>
-    <el-form ref="form" :model="searchForm" :inline="true" label-width="100px" class="form-query">
-      <el-form-item label="输入搜索：">
-        <el-input v-model="searchForm.teacherInfo" placeholder="老师名称/工号/手机号"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.college" :readonly="true" placeholder="院" @change="collegeChange">
-            <el-option 
-            v-for="(item, index) in searchCollegeList" 
-            :key="index" 
-            :label="item.collegeName"
-            :value="item.collegeId">
-            </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.department" :readonly="true" placeholder="系" @change="departmentChange">
-            <el-option 
-            v-for="(item, index) in searchDepartmentList" 
-            :key="index" 
-            :label="item.departmentName"
-            :value="item.departmentId">
-            </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="teacherSearch">查询</el-button>
-      </el-form-item>
-    </el-form>
+    <header-the-again headerTitle="教师管理">
+      <el-input v-model="searchForm.teacherInfo" placeholder="老师名称/工号/手机号" style="width:200px"></el-input>
+      <el-select v-model="searchForm.college" :readonly="true" placeholder="院" @change="collegeChange">
+          <el-option 
+          v-for="(item, index) in searchCollegeList" 
+          :key="index" 
+          :label="item.collegeName"
+          :value="item.collegeId">
+          </el-option>
+      </el-select>
+      <el-select v-model="searchForm.department" :readonly="true" placeholder="系" @change="departmentChange">
+        <el-option 
+        v-for="(item, index) in searchDepartmentList" 
+        :key="index" 
+        :label="item.departmentName"
+        :value="item.departmentId">
+        </el-option>
+      </el-select>
+      <el-button type="primary" @click="teacherSearch">查询</el-button>
+    </header-the-again>
+
     <table-the-again
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"

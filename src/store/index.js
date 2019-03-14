@@ -12,7 +12,7 @@ const state = {
   modelActive: Cookie.get('modelActive') || "1",
   msgNum:0,
   isFullScreen:false,
-  userAvatar:require('@/assets/images/user.png')
+  userAvatar:Cookie.get('avatar') || require('@/assets/images/user.png')
 }
 
 const mutations = {

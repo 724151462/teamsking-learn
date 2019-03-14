@@ -51,8 +51,10 @@
           .el-input__inner
             height 32px
             line-height 32px
-
-
+    .student
+      .my-input
+        input 
+          border 0
   .el-table .warning-row {
     background: oldlace !important;
   }

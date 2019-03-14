@@ -42,9 +42,12 @@ export function getUserId () {
   return Cookie.get('userId')
 }
 //退出登录时移除用户ID
-export function removeUserId () {
+export function removeUserInfo () {
   Cookie.remove('tokenLive')
   Cookie.remove(reTokenKey)
+  Cookie.remove('avatar')
+  Cookie.remove('realName')
+  Cookie.remove('tenantId')
   return Cookie.remove('userId')
 }
 

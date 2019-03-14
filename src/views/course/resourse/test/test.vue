@@ -23,14 +23,14 @@
           <el-button type="info" size="small"
                      v-bind:class="{ active: deleteArr.length>0}"
                      @click="deleteCatalog">删除</el-button>
-          <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
+          <!-- <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button> -->
           <el-button type="success" size="small" @click="downTemp">下载模板</el-button>
           <el-upload
             style="display: inline-block;margin-left: 10px"
             :http-request="upTestFile"
             action="string"
             :show-file-list="false">
-            <el-button style="padding: 9px 20px;">导入</el-button>
+            <el-button  type="success" style="padding: 9px 20px;">导入</el-button>
           </el-upload>
         </div>
         <div>
