@@ -1,0 +1,11 @@
+生产环境:
+https://api.tskedu.com
+wss://api.tskedu.com/websocket        
+
+开发环境：
+http://apidev.tskedu.cn:9008
+ws://api.tskedu.com/websocket
+
+测试环境：
+http://apidev.tskedu.cn:9008
+ws://api.tskedu.com/websocket

@@ -64,8 +64,7 @@ export default {
           background: 'rgba(0, 0, 0, 0.7)'
         });
         let connect = new Promise((resolve, reject)=>{
-          // let url = 'ws://192.168.10.48:9008/websocket',
-          let url = 'wss://api.tskedu.com/websocket',
+          let url = window.sockterUrl,
             token = sessionStorage.getItem('token'),
             userId = sessionStorage.getItem('userId'),
             courseId = sessionStorage.getItem('courseId');

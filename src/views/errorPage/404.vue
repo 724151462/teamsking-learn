@@ -10,7 +10,7 @@
           <div>
             <p style="margin-bottom: 20px"><b >404</b></p>
             <p>这个网页被老师没收了!!!
-              <router-link to="/course/list" style="color: #777;margin-left: 10px;">返回首页</router-link>
+              <router-link to="/login" style="color: #777;margin-left: 10px;">返回首页</router-link>
             </p>
           </div>
         </div>

@@ -1,18 +1,12 @@
 <template>
   <div class="activity">
-    <!--<div class="title">-->
-      <!--<div>活动管理</div>-->
-    <!--</div>-->
     <tip title="活动管理"></tip>
     <div class="test-warp">
       <div class="test-title">
         <div style="flex: 1">
           <!--全选-->
           <el-button type="primary" size="small" @click="goCreateCatalog('',0)">创建目录</el-button>
-          <el-button type="info"
-                     size="small"
-                     v-bind:class="{ active: deleteArr.length>0}"
-                     @click="deleteCatalog">删除</el-button>
+          <el-button type="info" size="small" v-bind:class="{ active: deleteArr.length>0}" @click="deleteCatalog">删除</el-button>
           <el-button type="danger" size="small" @click="checkAll(true)">清空库</el-button>
         </div>
         <div>
@@ -192,15 +186,15 @@
     methods:{
       //点击弹出新建目录的弹窗
       goCreateCatalog(data,id) {
-          this.newCatalog.catalogId = id
-          this.createCatalog = true
+        this.newCatalog.catalogId = id
+        this.createCatalog = true
       },
       //点击弹出重命名的弹窗
       goRenameCatalog(data,id) {
         let parentId =  data.parentId || 0
         this.expan = [parentId]
         this.newCatalog.catalogId = id
-          this.renameCatalog = true
+        this.renameCatalog = true
       },
       //全选操作
       checkAll(flag){
@@ -383,30 +377,30 @@
             this.initVoteInfo(id)
           }
         },
-        //移动文件夹、
-        remove(data){
-          removeAc(data).then(res => {
-            console.log(res)
-            if (Number(res.code) === 200) {
-              this.$message.success('移动成功');
-              // this.getTestList(0)
-            } else {
-              this.$message.error(res.data.message);
-            }
-          })
-        },
+      //移动文件夹、
+      remove(data){
+        removeAc(data).then(res => {
+          console.log(res)
+          if (Number(res.code) === 200) {
+            this.$message.success('移动成功');
+            // this.getTestList(0)
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+      },
         //获取作业的信息
-        initExamInfo(id){
-          let loading = this.$loading(this.loadingCss)
-          getExamInfo(id).then(res => {
-            if (Number(res.code) === 200) {
-              loading.close()
-              console.log(res)
-            } else {
-              this.$message.error(res.data.message);
-            }
-          })
-        },
+      initExamInfo(id){
+        let loading = this.$loading(this.loadingCss)
+        getExamInfo(id).then(res => {
+          if (Number(res.code) === 200) {
+            loading.close()
+            console.log(res)
+          } else {
+            this.$message.error(res.data.message);
+          }
+        })
+      },
       //获取头脑风暴的信息
       initStormInfo(id){
         let loading = this.$loading(this.loadingCss)
@@ -447,14 +441,11 @@
       handleDrop(draggingNode, dropNode, dropType) {
         //console.log(dropType)
         //console.log('拖拽的',dropNode.label,dropNode)
-
         let type= draggingNode.data.catalogId ? 1 :2,
           beforeId = type == 1 ? draggingNode.data.catalogId: draggingNode.data.resourceId,
           afterType = dropNode.data.catalogId ? 1 : 2,
           afterId = type == 1 ? dropNode.data.catalogId: dropNode.data.resourceId;
-
         let data = {}
-
         switch (dropType) {
           case 'inner':
             data = {id:beforeId, type:type, inCatalogId:afterId}
@@ -589,7 +580,6 @@
       & div:last-child
         margin-right 0
     .test-warp
-      padding-top 20px
       .img-span
         display inline-block
         .img-icon

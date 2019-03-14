@@ -243,7 +243,7 @@ export default {
 
   .login {
     color: #ffffff;
-    font-size: 30px;
+    font-size: 22px;
     line-height: 60px;
     padding-left: 20px;
     margin-right: 80px;

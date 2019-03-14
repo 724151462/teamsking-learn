@@ -50,13 +50,12 @@
         </div>
       </div>
     </div>
-    <el-button type="danger" style="position: fixed;left:50%;top: 20px;" @click="goLoginDebug">测试登陆</el-button>
+    <!-- <el-button type="danger" style="position: fixed;left:50%;top: 20px;" @click="goLoginDebug">测试登陆</el-button> -->
     <el-dialog
       title="找回密码"
       :visible.sync="forgotPass.dialogVisible"
       :before-close="noRest"
-      width="500px"
-    >
+      width="500px">
       <!--通过手机号修改密码-->
       <div class="forgot-box" v-show="!forgotPass.isMail">
         <el-input
@@ -179,7 +178,6 @@ import {
 } from "@/utils/auth";
 import { getErrorMsg } from "@/utils/utils";
 import MenuUtils from "@/utils/MenuUtils";
-// import { static_routes } from "@/router/static_routes.json";
 // import {compare} from '@/utils/MenuUtils'
 import {
   mobileForgot,
@@ -273,7 +271,7 @@ export default {
               // console.log(routes)
               this.$store.commit("setAllMenu", routes);
               this.$router.addRoutes(routes);
-              this.$router.replace("/course");
+              this.$router.replace("/course/list");
             });
           } else {
             this.$message({

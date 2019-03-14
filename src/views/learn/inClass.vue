@@ -208,14 +208,7 @@ export default {
           prop: "createTime"
         }
       ],
-      tableData: [
-        {
-          title: "数据待填充",
-        },
-        {
-          title: "数据待填充",
-        }
-      ],
+      tableData: [],
       isChart1:true,
       isChart1Data:false,
       isChart2:true,
@@ -232,11 +225,6 @@ export default {
       },
       tableData1: []
     };
-  },
-  mounted() {
-    //获取前七天的数据
-    //this.changeDate(7)
-    // this.getBehaviorData()
   },
   created () {
     this.myCourseData()
@@ -562,9 +550,4 @@ export default {
 };
 </script>
 <style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 </style>
