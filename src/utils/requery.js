@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === 'production') {
   } else {
     //dev 测试环境
     axios.defaults.baseURL = 'http://apidev.tskedu.cn:9008';
-    window.sockterUrl = 'wss://apidev.tskedu.cn:9008/websocket'
+    window.sockterUrl = 'ws://apidev.tskedu.cn:9008/websocket'
   }
 } else {
   //本地 开发环境

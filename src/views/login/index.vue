@@ -271,7 +271,7 @@ export default {
               // console.log(routes)
               this.$store.commit("setAllMenu", routes);
               this.$router.addRoutes(routes);
-              this.$router.replace("/course");
+              this.$router.replace("/course/list");
             });
           } else {
             this.$message({
