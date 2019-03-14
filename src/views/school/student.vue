@@ -1,8 +1,6 @@
 <template>
     <div class="student">
-
-        <header-the-again headerTitle="学生管理"></header-the-again>
-
+        <tip title="学生管理"></tip>
         <el-form ref="form2" :model="searchForm" :inline="true" label-width="100px" class="form-query">
             <el-form-item>
                 <el-select v-model="searchForm.college" :readonly="true" placeholder="院" @change="collegeChange">
@@ -184,6 +182,7 @@ import {
     sysStudentModify,
     sysStudentDelete
 } from '../../api/school';
+import tip from '@/components/tip'
 import { setTimeout } from 'timers';
     export default{
         name:'',
@@ -299,17 +298,21 @@ import { setTimeout } from 'timers';
         },
         components:{
             tableTheAgain,
-            headerTheAgain
+            headerTheAgain,
+            tip
         },
         mounted(){
+            // async function init() {
+            //   let getCollege =  await sysCollegeList()
+            //   let getDepartment = await sysDepartmentList()
+            // }
             // 学生列表
             sysStudentPage({"pageIndex": this.pageIndex})
             .then((response)=>{
-                console.log(response.data.pageData.status)
+                console.log('学生列表',response.data.pageData.status)
                 let dataArr = []
                 response.data.pageData.forEach(element => {
                     element.status = String(element.status)
-                    console.log(typeof(element.status))
                     dataArr.push(element)
                 });
                 this.totalCount = Number(response.data.totalCount)
@@ -321,12 +324,7 @@ import { setTimeout } from 'timers';
                 if (response.code === 200){
                     this.collegeList = response.data
                     this.searchCollegeList = response.data
-                    let all = {"collegeId": -1, "collegeName": "全部"}
-                    let nullOption = {"collegeId": -2, "collegeName": "无院"}
-                    this.collegeList.unshift(nullOption)
-                    this.collegeList.unshift(all)
-                    // this.searchCollegeList.unshift(all)
-                    console.log(this.collegeList)
+                    console.log('院列表',this.collegeList)
                 }
             })
             // 系列表
