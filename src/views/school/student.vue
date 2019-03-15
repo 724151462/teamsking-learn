@@ -1,97 +1,135 @@
 <template>
   <div class="student">
     <header-the-again headerTitle="学生管理">
-      <!-- 
-            <el-select v-model="searchForm.department" :readonly="true" placeholder="系" @change="departmentChange">
-                <el-option 
-                v-for="(item, index) in searchDepartmentList" 
-                :key="index" 
-                :label="item.departmentName"
-                :value="item.departmentId">
-                </el-option>
-      </el-select>-->
-      <el-select
-        v-model="searchForm.college"
-        :readonly="true"
-        placeholder="院"
-        @change="collegeChange"
-      >
-        <el-option
-          v-for="(item, index) in searchCollegeList"
-          :key="index"
-          :label="item.collegeName"
-          :value="item.collegeId"
-        ></el-option>
-      </el-select>
-      <el-select v-model="searchForm.speciality" placeholder="专业" @change="specialityChange">
-        <el-option
-          v-for="(item, index) in searchSpecialityList"
-          :key="index"
-          :label="item.specialityName"
-          :value="item.specialityId"
-        ></el-option>
-      </el-select>
-      <el-select v-model="searchForm.studentClass" placeholder="班级">
-        <el-option
-          v-for="(item, index) in classSearchList"
-          :key="index"
-          :label="item.className"
-          :value="item.classId"
-        ></el-option>
-      </el-select>
-      <el-input style="width:200px" v-model="searchForm.search" placeholder="选择输入姓名/学号"></el-input>
-      <el-button type="primary" @click="searchStudent">查询</el-button>
+      <div style="display:inline-block;position: relative;">
+        <el-input style="width:230px" v-model="searchForm.search" placeholder="输入姓名或学号"></el-input>
+        <el-button
+          type="primary"
+          style="position: absolute;right:0;border-radius: 0;"
+          @click="searchStudent"
+        >搜索</el-button>
+      </div>
     </header-the-again>
-    <el-table
-      :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
-      border
-      style="width: 100%"
-    >
+    <div style="font-size:15px">
+      <el-button type="text" style="font-size:16px">＋添加学生</el-button>
+      <el-button type="text" style="font-size:16px">批量删除</el-button>
+    </div>
+    <el-table :data="tableData3" border style="width: 100%">
       <el-table-column type="selection" width="40"></el-table-column>
       <el-table-column prop="realName" label="姓名" width="100"></el-table-column>
       <el-table-column prop="studentNo" label="学号" width="100"></el-table-column>
       <!-- <el-table-column prop="realName" label="姓名" width="100"></el-table-column> -->
-      <el-table-column width="170" prop="date">
+      <el-table-column width="170" prop="collegeName">
         <template slot="header" slot-scope="scope">
-          <el-input class="my-input" v-model="search" size="small" placeholder="学院(点此可筛选)"/>
+          <el-select
+            class="my-select"
+            filterable
+            clearable
+            v-model="searchForm.college"
+            :readonly="true"
+            placeholder="院(点此可筛选)"
+            @change="filterChange"
+            @clear="filterChange"
+          >
+            <el-option
+              v-for="(item, index) in searchCollegeList"
+              :key="index"
+              :label="item.collegeName"
+              :value="item.collegeId"
+            ></el-option>
+          </el-select>
         </template>
       </el-table-column>
       <el-table-column width="170" prop="departmentName">
         <template slot="header" slot-scope="scope">
-          <el-input class="my-input" v-model="search" size="small" placeholder="系(点此可筛选)"/>
+          <el-select
+            class="my-select"
+            filterable
+            clearable
+            v-model="searchForm.department"
+            :readonly="true"
+            placeholder="系(点此可筛选)"
+            @change="filterChange"
+            @clear="filterChange"
+          >
+            <el-option
+              v-for="(item, index) in searchDepartmentList"
+              :key="index"
+              :label="item.departmentName"
+              :value="item.departmentId"
+            ></el-option>
+          </el-select>
         </template>
       </el-table-column>
-      <el-table-column width="170" prop="specialityName">
+      <el-table-column min-width="170" prop="specialityName">
         <template slot="header" slot-scope="scope">
-          <el-input class="my-input" v-model="search" size="mini" placeholder="专业(点此可筛选)"/>
+          <el-select
+            v-model="searchForm.speciality"
+            class="my-select"
+            filterable
+            clearable
+            placeholder="专业(点此可筛选)"
+            @change="filterChange"
+            @clear="filterChange"
+          >
+            <el-option
+              v-for="(item, index) in searchSpecialityList"
+              :key="index"
+              :label="item.specialityName"
+              :value="item.specialityId"
+            ></el-option>
+          </el-select>
         </template>
       </el-table-column>
-            <el-table-column width="170" prop="className">
+      <el-table-column min-width="170" prop="className">
         <template slot="header" slot-scope="scope">
-          <el-input class="my-input" v-model="search" size="mini" placeholder="班级(点此可筛选)"/>
+          <el-select
+            class="my-select"
+            filterable
+            clearable
+            v-model="searchForm.studentClass"
+            placeholder="班级(点此可筛选)"
+            @change="filterChange"
+            @clear="filterChange"
+          >
+            <el-option
+              v-for="(item, index) in classSearchList"
+              :key="index"
+              :label="item.className"
+              :value="item.classId"
+            ></el-option>
+          </el-select>
         </template>
       </el-table-column>
-    <el-table-column prop="createTime" label="创建时间" width="100"></el-table-column>
-
-      <el-table-column fixed="right" width="250" align="right">
-        <template slot="header" slot-scope="scope">
-          <el-input v-model="search" size="mini" placeholder="输入关键字搜索"/>
-        </template>
+      <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
+      <el-table-column fixed="right" label="是否启用" width="85">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">Delete</el-button>
+          <el-switch
+            v-model="scope.row.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-value="1"
+            inactive-value="2"
+          ></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" width="250" label="操作" align="center">
+        <template slot-scope="scope">
+          <el-button size="mini" @click="editStudent()">编辑</el-button>
+          <el-button size="mini" type="danger" @click="delStudent([scope.row])">删除</el-button>
+          <el-button size="mini" type="primary" @click="handleDelete(scope.$index, scope.row)">重置密码</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- <table-the-again
-            :tableTitle="tableTitle"
-            :tableOperate="tableOperate"
-            :columnNameList="columnNameList"
-            :tableData="tableData3"
-            :operateList="operateList"
-            @showComponentInfo="showComponentInfo"
-            switchColumn='open'>
-    </table-the-again>-->
+      :tableTitle="tableTitle"
+      :tableOperate="tableOperate"
+      :columnNameList="columnNameList"
+      :tableData="tableData3"
+      :operateList="operateList"
+      @showComponentInfo="showComponentInfo"
+      switchColumn="open"
+    ></table-the-again>-->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%">
       <el-form ref="form1" :model="form" label-width="80px">
         <el-form-item label="学号">
@@ -101,10 +139,10 @@
           <el-input v-model="form.realName"></el-input>
         </el-form-item>
         <!-- <el-form-item label="性别">
-                    <el-radio-group v-model="form.sex">
-                        <el-radio label="男"></el-radio>
-                        <el-radio label="女"></el-radio>
-                    </el-radio-group>
+          <el-radio-group v-model="form.sex">
+              <el-radio label="男"></el-radio>
+              <el-radio label="女"></el-radio>
+          </el-radio-group>
         </el-form-item>-->
         <el-form-item label="手机号码">
           <el-input v-model="form.mobile" :disabled="mobileEnable"></el-input>
@@ -191,6 +229,7 @@ import {
   sysStudentPage,
   sysStudentSwitch,
   sysDepartmentList,
+  DepartmentList,
   sysSpecialityList,
   sysClassList,
   sysStudentAdd,
@@ -198,33 +237,12 @@ import {
   sysStudentDelete
 } from "../../api/school";
 import tip from "@/components/tip";
+import searchInput from "@/components/search-input";
 import { setTimeout } from "timers";
 export default {
   name: "",
   data() {
     return {
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄"
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄"
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄"
-        }
-      ],
       search: "",
       classSearchList: [],
       state4: "",
@@ -298,6 +316,7 @@ export default {
         }
       ],
       tableData3: [],
+      filterSelect: {},
       selectOptions: [],
       dialogVisible: false,
       // 院列表
@@ -336,25 +355,13 @@ export default {
   components: {
     tableTheAgain,
     headerTheAgain,
-    tip
+    searchInput
   },
   mounted() {
     // 院列表
-    sysCollegeList().then(response => {
-      if (response.code === 200) {
-        this.collegeList = response.data;
-        this.searchCollegeList = response.data;
-        console.log("院列表", response.data);
-      }
-    });
+    this.collegeInit();
     // 系列表
-    sysDepartmentList().then(response => {
-      if (response.code === 200) {
-        this.departmentRows = response.data;
-        this.searchDepartmentList = response.data;
-        console.log("系列表", response.data);
-      }
-    });
+    this.departmentInit();
     // 专业列表
     sysSpecialityList({ collegeId: -1, departmentId: -1 }).then(response => {
       if (response.code === 200) {
@@ -372,133 +379,58 @@ export default {
       }
     });
     // 学生列表
-    sysStudentPage({ pageIndex: this.pageIndex }).then(response => {
-      console.log("学生列表", response.data.pageData);
-      let dataArr = [];
-      response.data.pageData.forEach(element => {
-        element.status = String(element.status);
-        dataArr.push(element);
-      });
-      this.totalCount = Number(response.data.totalCount);
-      this.tableData3 = dataArr;
-    });
+    this.studentInit();
   },
-  watch: {
-    // collegeId: function(val){
-    //     console.log(val)
-    //     if(val == -1 || val == -2 || val == '无院'){
-    //         this.departmentList = this.departmentRows
-    //     }else{
-    //         this.departmentList = this.departmentRows.filter(function (x) { return x.collegeId == val });
-    //     }
-    //     if (this.departmentList.length>0) {
-    //         console.log(this.departmentId)
-    //         if (this.departmentId) {
-    //             this.departmentId = this.departmentId
-    //             return
-    //         }
-    //         this.departmentId = this.departmentList[0].departmentId
-    //     }else{
-    //         this.departmentId = ""
-    //     }
-    // },
-    // departmentId: function(val){
-    //     console.log('depid', val)
-    //     if(val == -1 || val == -2 || val == '无系'){
-    //         this.specialityList = this.specialityRows
-    //     }else{
-    //         this.specialityList = this.specialityRows.filter(function (x) { return x.departmentId == val });
-    //     }
-    //     if (this.specialityList.length>0) {
-    //         if (this.specialityId) {
-    //             this.specialityId = this.specialityId
-    //             return
-    //         }
-    //         this.specialityId = this.specialityList[0].specialityId
-    //     }else{
-    //         this.specialityId = ""
-    //     }
-    // },
-    // specialityId: function(val){
-    //     if(val == -1 || val == -2 || val == '无专业'){
-    //         this.classList = this.classRows
-    //     }else{
-    //         this.classList = this.classRows.filter(function (x) { return x.specialityId == val });
-    //     }
-    //     if (this.classList.length>0) {
-    //         if (this.classId) {
-    //             this.classId = this.classId
-    //             return
-    //         }
-    //         this.classId = this.classList[0].classId
-    //     }else{
-    //         this.classId = ""
-    //     }
-    // }
-  },
+  watch: {},
   methods: {
+    //获取院列表
+    collegeInit() {
+      sysCollegeList().then(response => {
+        if (response.code === 200) {
+          this.collegeList = response.data;
+          this.searchCollegeList = response.data;
+          console.log("院列表", response.data);
+        }
+      });
+    },
+    //获取系列表
+    departmentInit(id = -1) {
+      DepartmentList({ collegeId: id }).then(response => {
+        if (response.code === 200) {
+          this.departmentRows = response.data;
+          this.searchDepartmentList = response.data;
+          console.log("系列表", response.data);
+        }
+      });
+    },
+    studentInit(data) {
+      let newData = {};
+      Object.assign(newData, data, { pageIndex: this.pageIndex });
+      sysStudentPage(newData).then(response => {
+        console.log("学生列表", response.data.pageData);
+        let dataArr = [];
+        response.data.pageData.forEach(element => {
+          element.status = String(element.status);
+          dataArr.push(element);
+        });
+        this.totalCount = Number(response.data.totalCount);
+        this.tableData3 = dataArr;
+      });
+    },
     handleEdit(index, row) {
       console.log(index, row);
     },
     handleDelete(index, row) {
       console.log(index, row);
     },
-    // 院搜索值变化
-    collegeChange(value) {
-      // console.log(value)
-      // console.log('a',this.departmentRows)
-      // console.log(this.departmentRows)
-      this.searchForm.department = -1;
-      if (value === -1) {
-        console.log("coid", this.departmentRows);
-        this.searchDepartmentList = this.departmentRows;
-        // this.searchForm.department = -1
-      } else if (value === -2) {
-        this.searchDepartmentList = this.departmentRows.filter(item => {
-          console.log("coid", item);
-          return (
-            item.collegeId == null ||
-            item.departmentId == -1 ||
-            item.departmentId == -2
-          );
-        });
-      } else {
-        console.log("list", this.departmentRows);
-        this.searchDepartmentList = this.departmentRows.filter(item => {
-          console.log("coid", item);
-          return (
-            item.collegeId == value ||
-            item.departmentId == -1 ||
-            item.departmentId == -2
-          );
-        });
-        console.log("121", this.searchDepartmentList);
-        // this.searchForm.department = -1
-      }
+    // 院值变化
+    filterChange(value) {
+      this.studentInit(this.searchForm);
     },
-    // 系搜索值变化
+    collegeChange() {},
+    // 系值变化
     departmentChange(value) {
-      console.log("dep", value);
-      this.searchForm.speciality = -1;
-      if (value === -1) {
-        this.searchSpecialityList = this.specialityRows;
-      } else if (value === -2) {
-        this.searchSpecialityList = this.specialityRows.filter(item => {
-          return (
-            item.departmentId == null ||
-            item.specialityId == -1 ||
-            item.specialityId == -2
-          );
-        });
-      } else {
-        this.searchSpecialityList = this.specialityRows.filter(item => {
-          return (
-            item.departmentId == value ||
-            item.specialityId == -1 ||
-            item.specialityId == -2
-          );
-        });
-      }
+      this.studentInit(this.searchForm);
     },
     // 专业搜索值变化
     specialityChange(value) {
@@ -512,7 +444,6 @@ export default {
           return item.specialityId == value || item.classId == -1;
         });
       }
-
       // console.log(this.classSearchList)
     },
     // 查找按钮事件
@@ -576,12 +507,6 @@ export default {
           this.dialogVisible = true;
           break;
         case "edit":
-          this.dialogTitle = "编辑学生";
-          this.initStudent(info);
-          this.mobileEnable = true;
-          console.log(this.mobileEnable);
-          this.formEvent = "editStudent";
-          this.dialogVisible = true;
           break;
       }
     },
@@ -594,8 +519,16 @@ export default {
       // });
       console.log(123);
     },
+    editStudent() {
+      this.dialogTitle = "编辑学生";
+      this.initStudent(info);
+      this.mobileEnable = true;
+      console.log(this.mobileEnable);
+      this.formEvent = "editStudent";
+      this.dialogVisible = true;
+    },
     delStudent(student) {
-      console.log(student.length);
+      // console.log(student.length);
       let delArr = [];
       if (student.length == undefined) {
         delArr.push(student.studentId);
@@ -604,7 +537,6 @@ export default {
           delArr.push(element.studentId);
         });
       }
-
       this.$confirm("是否删除学生？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -617,6 +549,7 @@ export default {
                 type: "success",
                 message: "删除成功!"
               });
+              this.studentInit();
             }
           });
         })

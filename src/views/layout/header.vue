@@ -26,7 +26,7 @@
       </div>
       <el-dropdown class="avator" trigger="click">
         <span class="el-dropdown-link userinfo-inner">
-          <el-badge :value="$store.state.msgNum" class="item" v-if="$store.state.msgNum > 0">
+          <el-badge style="border:0" :value="$store.state.msgNum" class="item" v-if="$store.state.msgNum > 0">
             <img :src="this.$store.state.userAvatar" alt style="width: 35px;height: 35px;border-radius: 50%">
           </el-badge>
           <el-badge v-else>

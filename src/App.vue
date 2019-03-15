@@ -22,6 +22,9 @@
         padding-bottom: 0;
       .interact .el-tooltip__popper
         cursor pointer
+    .header
+      .el-badge__content
+        border 0
     /*试题管理*/
     .test .cell,.resource .cell ,.activity .cell
       text-align center
@@ -52,9 +55,17 @@
             height 32px
             line-height 32px
     .student
-      .my-input
-        input 
-          border 0
+      .my-select
+        padding 0
+        div
+          padding 0
+          span
+            // display none
+          input 
+            padding-left 0
+            border 0
+            border-radius 0
+            border-bottom 1px solid #dcdfe6
   .el-table .warning-row {
     background: oldlace !important;
   }

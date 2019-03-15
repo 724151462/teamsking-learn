@@ -134,7 +134,6 @@ export function sysSpecialityDelete(data){
  * 获取学生列表
  */
 export function sysStudentPage(data){
-  console.log('ewq',data)
   let college = data.college || -1
   let department = data.department || -1
   let speciality = data.speciality || -1
