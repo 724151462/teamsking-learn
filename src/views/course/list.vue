@@ -7,8 +7,8 @@
         <el-button round size="small" @click="courseType(40)">已关闭</el-button>
         <el-button type="primary" style="float: right" @click="goAddCourse">创建课程</el-button>
         <div class="list-search" style="float:right">
-          <el-input v-model="listQuery.courseName" type="text" placeholder="请输入课程名称" style="width:180px;margin-left: 100px;"></el-input>
-          <el-button type="primary" @click="getList">搜索</el-button>
+          <el-input v-model="listQuery.courseName" type="text" placeholder="请输入课程名称" style="width:250px;margin-left: 30px;"></el-input>
+          <el-button type="primary" style="position: relative;right: -70px;border-radius: 0" @click="getList">搜索</el-button>
         </div>
       </el-row>
 
@@ -126,7 +126,7 @@ export default {
     //     setTimeout(()=>{
     //       this.$router.push({ path: '/learn' });
     //     }, 1000)
-        
+
     //   })
   },
   methods: {

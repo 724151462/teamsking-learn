@@ -733,15 +733,13 @@ export default {
         courseId: this.courseId,
         sectionName: jieName
       }).then(response => {
+        console.log('添加节后：',response.data)
         this.sourceData.forEach((element, i) => {
           if (element.chapterId === this.tempChapter) {
             element.catalogSection.push(response.data);
           }
         });
-        this.$message({
-          message: "添加节成功",
-          type: "success"
-        });
+        this.$message.success("添加节成功");
       });
       // this.sourceData.push({chapter: chapterName})
     },
@@ -772,7 +770,7 @@ export default {
       }
       if (info.contentType === 10) {
         return require("@/assets/images/vedio.png");
-      } 
+      }
     },
     // 字幕信息
     strUrl(info) {
