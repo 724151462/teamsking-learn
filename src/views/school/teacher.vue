@@ -3,16 +3,16 @@
 
     <header-the-again headerTitle="教师管理">
       <el-input v-model="searchForm.teacherInfo" placeholder="老师名称/工号/手机号" style="width:200px"></el-input>
-      <el-select v-model="searchForm.college" :readonly="true" placeholder="院" @change="collegeChange">
+      <!-- <el-select v-model="searchForm.college" :readonly="true" placeholder="院" @change="collegeChange">
           <el-option 
           v-for="(item, index) in searchCollegeList" 
           :key="index" 
           :label="item.collegeName"
           :value="item.collegeId">
           </el-option>
-      </el-select>
+      </el-select> -->
       <el-select v-model="searchForm.department" :readonly="true" placeholder="系" @change="departmentChange">
-        <el-option 
+        <el-option
         v-for="(item, index) in searchDepartmentList" 
         :key="index" 
         :label="item.departmentName"
@@ -23,6 +23,7 @@
     </header-the-again>
 
     <table-the-again
+      :slotData="{collegeName:searchCollegeList}"
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
       :columnNameList="columnNameList"
@@ -30,6 +31,15 @@
       :operateList="operateList"
       switchColumn='open'
       @showComponentInfo="showComponentInfo">
+      <el-select filterable
+            clearable class="my-select" slot="collegeName" v-model="searchForm.college" :readonly="true" placeholder="院" @change="collegeChange">
+        <el-option 
+        v-for="(item, index) in searchCollegeList" 
+        :key="index" 
+        :label="item.collegeName"
+        :value="item.collegeId">
+        </el-option>
+      </el-select>
     </table-the-again>
 
     <el-pagination
@@ -89,6 +99,8 @@
           },
           {
             name:'院',
+            slot:true,
+            width:200,
             prop:'collegeName'
           },
           {
@@ -187,10 +199,6 @@
           if (response.code === 200){
               this.collegeList = response.data
               this.searchCollegeList = response.data
-              let all = {"collegeId": -1, "collegeName": "全部"}
-            // this.collegeList.unshift(all)
-              this.searchCollegeList.unshift(all)
-              console.log(this.collegeList)
           }
       })
       // 系列表

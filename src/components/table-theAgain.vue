@@ -1,11 +1,9 @@
 <template>
-    <!--
+  <!--
         这个组件是对ele的el-table进行的二次封装。
-
         说明：
         操作按钮事件  对一条记录进行操作，不管什么操作,都返回该行数据给父组件
                       对表格进行操作，不管什么操作，都返回选中的行信息给父组件
-
         需要传入的参数：
             表的名称：tableTitle
             对表的操作：tableOperate
@@ -41,145 +39,147 @@
                         type:'check'
                     }
                 ],
-    -->
-    <div class="table-theAgain">
-        <div class="tableOperate">
-            <el-button v-for="(item,index) in tableOperate" :key="index"  type="primary" class="" @click="onSubmit(item.type,multipleSelection)" >{{ item.content }}</el-button>
-        </div>
-
-        <el-table
-                ref="multipleTable"
-                :data="tableData"
-                tooltip-effect="dark"
-                style="width: 95%;margin-left:2.5%;position: relative"
-                @selection-change="handleSelectionChange">
-
-            <el-table-column :label="tableTitle" class="addButton" >
-              <template v-for="(list,index) in columnNameList">
-                <template v-if="list.formatter">
-                  <el-table-column :label="list.name"
-                                   align="center"
-                                    :key="index">
-                    <template scope="scope">
-                      <div>
-                        {{ list.formatter(scope.row[list.prop],scope.row) }}
-                      </div>
-                    </template>
-                  </el-table-column>
-                </template>
-                <template v-else-if="list.imgList">
-                  <el-table-column :label="list.name"
-                                   align="center"
-                                   :key="index">
-                    <template scope="scope">
-                      <div>
-                        <img v-for="(item, index) in scope.row[list.prop]" :src="item.imgUrl" :key="index"/>
-                      </div>
-                    </template>
-                  </el-table-column>
-                </template>
-                <template v-else>
-
-                  <el-table-column
-                                   :prop="list.prop"
-                                   :label="list.name"
-                                   :width="list.width"
-                                   :type="list.type"
-                                   align="center"
-                                   :key="index">
-                  </el-table-column>
-                </template>
-              </template>
-
-                <el-table-column
-                    label="是否启用"
-                    fit="true"
-                    align="center"
-                    v-if="switchColumn == 'open'">
-                  <template slot-scope="scope">
-                    <el-switch
-                        v-model="scope.row.status"
-                        active-value=1
-                        inactive-value=2
-                        active-color="#13ce66"
-                        inactive-color="#ff4949"
-                        @change="onSubmit('switch',scope.row)">
-                    </el-switch>
-                  </template>
-                </el-table-column>
-
-                <el-table-column
-                        v-if="operateList"
-                        fixed="right"
-                        label="操作"
-                        :width="operateList.length * 100"
-                        align="center">
-                    <template slot-scope="scope">
-
-                         <el-button  v-for="(item,index) in operateList"  @click="onSubmit(item.type,scope.row)"
-                                    :key="index"
-                                   v-if="item.type === 'edit'"
-                                   size="small">{{ item.content }}</el-button>
-                        <el-button v-for="(item,index) in operateList" @click="onSubmit(item.type,scope.row)"
-                                    :key="index"
-                                   v-if="item.type === 'delete'"
-                                   type="danger"
-                                   size="small">{{ item.content }}</el-button>
-                        <el-button v-for="(item,index) in operateList" @click="onSubmit(item.type,scope.row)"
-                                    :key="index"
-                                   v-if="item.type !== 'delete' && item.type !== 'edit'"
-                                   type="primary"
-                                   size="small">{{ item.content }}</el-button>
-                    </template>
-                </el-table-column>
-
-            </el-table-column>
-        </el-table>
+  -->
+  <div class="table-theAgain">
+    <div class="tableOperate">
+      <el-button
+        v-for="(item,index) in tableOperate"
+        :key="index"
+        type="text"
+        style="font-size:16px"
+        @click="onSubmit(item.type,multipleSelection)"
+      >{{ item.content }}</el-button>
     </div>
+    <el-table
+      ref="multipleTable"
+      border
+      :data="tableData"
+      tooltip-effect="dark"
+      @selection-change="handleSelectionChange"
+    >
+      <template v-for="(list,index) in columnNameList">
+        <template v-if="list.formatter">
+          <el-table-column :label="list.name" align="center" :key="index">
+            <template scope="scope">
+              <div>{{ list.formatter(scope.row[list.prop],scope.row) }}</div>
+            </template>
+          </el-table-column>
+        </template>
+        <template v-else-if="list.imgList">
+          <el-table-column :label="list.name" align="center" :key="index">
+            <template scope="scope">
+              <div>
+                <img v-for="(item, index) in scope.row[list.prop]" :src="item.imgUrl" :key="index">
+              </div>
+            </template>
+          </el-table-column>
+        </template>
+        <template v-else-if="list.slot">
+          <el-table-column :prop="list.prop" :width="list.width" align="center" :key="index">
+            <template slot="header" slot-scope="scope">
+              <slot :name="list.prop" :data="slotData[list.prop]"></slot>
+            </template>
+          </el-table-column>
+        </template>
+        <template v-else>
+          <el-table-column
+            :prop="list.prop"
+            :label="list.name"
+            :width="list.width"
+            :type="list.type"
+            align="center"
+            :key="index"
+          ></el-table-column>
+        </template>
+      </template>
+      <el-table-column label="是否启用" fit="true" align="center" v-if="switchColumn == 'open'">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            active-value="1"
+            inactive-value="2"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            @change="onSubmit('switch',scope.row)"
+          ></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column
+        v-if="operateList"
+        fixed="right"
+        label="操作"
+        :width="operateList.length * 100"
+        align="center"
+      >
+        <template slot-scope="scope">
+          <el-button
+            v-for="(item,index) in operateList"
+            @click="onSubmit(item.type,scope.row)"
+            :key="index"
+            v-if="item.type === 'edit'"
+            size="small"
+          >{{ item.content }}</el-button>
+          <el-button
+            v-for="(item,index) in operateList"
+            @click="onSubmit(item.type,scope.row)"
+            :key="index"
+            v-if="item.type === 'delete'"
+            type="danger"
+            size="small"
+          >{{ item.content }}</el-button>
+          <el-button
+            v-for="(item,index) in operateList"
+            @click="onSubmit(item.type,scope.row)"
+            :key="index"
+            v-if="item.type !== 'delete' && item.type !== 'edit'"
+            type="primary"
+            size="small"
+          >{{ item.content }}</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 <script>
-    export default{
-        props:[ 'tableTitle','tableOperate','columnNameList','tableData','operateList','switchColumn' ],
-        data(){
-            return {
-                multipleSelection: [],
-              //value2: true
-            }
-        },
-        methods:{
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-                console.log( this.multipleSelection )
-            },
-            onSubmit( type,info ) {
-                console.log( '子组件类型：' , type , '\n子组件信息:' , info );
-                this.$emit('showComponentInfo',type,info);
-            }
-        },
-      created:function(){
-          //console.log('是否开启',this.switchColumn,'类型',typeof(this.switchColumn ) )
-          //console.log('fff', this.tableData)
-      }
-
+export default {
+  props: [
+    "tableTitle",
+    "tableOperate",
+    "columnNameList",
+    "tableData",
+    "operateList",
+    "switchColumn",
+    "slotData"
+  ],
+  data() {
+    return {
+      multipleSelection: []
+      //value2: true
+    };
+  },
+  methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+      console.log(this.multipleSelection);
+    },
+    onSubmit(type, info) {
+      console.log("子组件类型：", type, "\n子组件信息:", info);
+      this.$emit("showComponentInfo", type, info);
     }
-
+  },
+  created: function() {
+    //console.log('是否开启',this.switchColumn,'类型',typeof(this.switchColumn ) )
+    //console.log('fff', this.tableData)
+  }
+};
 </script>
 <style scoped lang="stylus" type="text/stylus">
-    .table-theAgain
-        position relative
+.table-theAgain {
+  position: relative;
 
-        .tableOperate
-            box-sizing:border-box
-            padding-left: 10px
-            padding-right: 10px
-            position:absolute;
-            top:4px
-            right:50px;
-            display:inline-block
-            z-index:1
-
-        a
-            display:inline-block
-            margin-right:5px
-
+  .tableOperate, a {
+    display: inline-block;
+    margin-right: 5px;
+  }
+}
 </style>

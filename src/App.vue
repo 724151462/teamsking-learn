@@ -54,28 +54,28 @@
           .el-input__inner
             height 32px
             line-height 32px
-    .student
-      .my-select
+    .my-select
+      padding 0
+      div
+        padding-left 0
         padding 0
-        div
-          padding 0
-          span
-            // display none
-          input 
-            padding-left 0
-            border 0
-            border-radius 0
-            border-bottom 1px solid #dcdfe6
-  .el-table .warning-row {
-    background: oldlace !important;
-  }
+        span
+          // display none
+        input 
+          padding-left 0
+          border 0
+          border-radius 0
+          border-bottom 1px solid #dcdfe6
+    .el-table .warning-row {
+      background: oldlace !important;
+    }
 
-  .el-table .success-row {
-    background: #f0f9eb !important;
-  }
-  .modelStrome .el-textarea__inner
-    min-height 200px !important
-  .modelVote .el-textarea__inner
-    min-height 200px !important
+    .el-table .success-row {
+      background: #f0f9eb !important;
+    }
+    .modelStrome .el-textarea__inner
+      min-height 200px !important
+    .modelVote .el-textarea__inner
+      min-height 200px !important
 </style>
 

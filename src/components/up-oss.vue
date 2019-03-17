@@ -81,7 +81,7 @@
         }
         let file = this.fileData.target.files[0]
         let name = new Date().getTime() + file.name.replace(/[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g, '')
-        console.log(file.type)
+        // console.log(file.type)
         if(this.fileType !== '') {
           let chekcType = this.fileType.split(',').some(element=> {
             return file.type === element
@@ -130,7 +130,6 @@
               request.append('success_action_status', '200')
               request.append('Signature', res.data.signature)
               request.append('file', this.fileData.target.files[0])
-
               return request
             }else {
               loading.close()
