@@ -77,7 +77,7 @@
         <template v-else-if="list.slot">
           <el-table-column :prop="list.prop" :width="list.width" align="center" :key="index">
             <template slot="header" slot-scope="scope">
-              <slot :name="list.prop" :data="slotData[list.prop]"></slot>
+              <slot :name="list.prop"></slot>
             </template>
           </el-table-column>
         </template>
@@ -89,7 +89,8 @@
             :type="list.type"
             align="center"
             :key="index"
-          ></el-table-column>
+          >
+          </el-table-column>
         </template>
       </template>
       <el-table-column label="是否启用" fit="true" align="center" v-if="switchColumn == 'open'">
@@ -99,7 +100,7 @@
             active-value="1"
             inactive-value="2"
             active-color="#13ce66"
-            inactive-color="#ff4949"
+            inactive-color="#dcdfe6"
             @change="onSubmit('switch',scope.row)"
           ></el-switch>
         </template>

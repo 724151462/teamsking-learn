@@ -14,8 +14,8 @@
       <el-button type="text" style="font-size:16px">＋添加学生</el-button>
       <el-button type="text" style="font-size:16px">批量删除</el-button>
     </div>
-    <div style="border: 1px solid #ebebeb;border-radius: 3px;transition: .2s;">
-    <el-table :data="tableData3" style="width: 100%;">
+    <div >
+    <el-table :data="tableData3" border style="width: 100%;">
       <el-table-column type="selection" width="50"></el-table-column>
       <el-table-column prop="realName" label="姓名" width="100"></el-table-column>
       <el-table-column prop="studentNo" label="学号" width="100"></el-table-column>

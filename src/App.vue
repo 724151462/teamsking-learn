@@ -60,12 +60,25 @@
         padding-left 0
         padding 0
         span
-          // display none
+          i
+            color #909399!important
         input 
           padding-left 0
           border 0
           border-radius 0
           border-bottom 1px solid #dcdfe6
+          &::-webkit-input-placeholder{
+            color:#909399;
+          }
+          &::-moz-placeholder{   /* Mozilla Firefox 19+ */
+            color:#909399;
+          }
+          &:-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
+            color:#909399;
+          }
+          &:-ms-input-placeholder{  /* Internet Explorer 10-11 */ 
+            color:#909399;
+          }
     .el-table .warning-row {
       background: oldlace !important;
     }
