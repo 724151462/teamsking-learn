@@ -8,6 +8,13 @@ export function sysRolePage (data) {
 }
 
 /**
+ * 管理员列表 
+ * */
+export function sysManagerPage (data) {
+  return commonsAjax(`/api/v1/sys/tenant/manager/page`,data,'get')
+}
+
+/**
  * 角色列表 
  * */
 export function sysRoleList (data) {
@@ -328,5 +335,48 @@ export function modTag(data) {
  */
 export function delTag(data) {
   let url = `/api/v1/sys/tag`
+  return commonsAjax(url, data, 'delete')
+}
+
+
+// =========帮助中心============
+
+/**
+ * 帮助中心列表
+ */
+export function helpList(data) {
+  let url = `/api/v1/sys/helpnav/tree`
+  return commonsAjax(url, data, 'get')
+}
+
+/**
+ * 帮助详情
+ */
+export function helpDetail(data) {
+  let url = `/api/v1/sys/helpcontent/page`
+  return commonsAjax(url, data, 'get')
+}
+
+/**
+ * 修改标题
+ */
+export function editQuestionTitle(data) {
+  let url = `/api/v1/sys/helpnav`
+  return commonsAjax(url, data, 'put')
+}
+
+/**
+ * 新增标题
+ */
+export function addQuestionTitle(data) {
+  let url = `/api/v1/sys/helpnav`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 删除标题
+ */
+export function delQuestionTitle(data) {
+  let url = `/api/v1/sys/helpnav`
   return commonsAjax(url, data, 'delete')
 }

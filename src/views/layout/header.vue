@@ -12,9 +12,7 @@
           style="font-size:16px"
           text-color="#fff"
           active-text-color="#fff"
-          class="el-menu-demo"
           mode="horizontal"
-          @select="handleSelect"
           :router="true"
         >
           <el-menu-item :index="item.path" v-for="item in nav" :key="item.id">{{item.name}}</el-menu-item>
@@ -98,20 +96,6 @@ export default {
   },
   created() {
     console.log(this.$store.state.allMenu)
-    // menuList().then((response)=>{
-    // console.log(this.storeNav, '``````', response.data)
-    // console.log(this.$router)
-
-    // this.nav = this.$router.options.routes.filter(item=> {
-    //     console.log(item)
-    //     if(item.level ===1) {
-    //       return item
-    //     }
-    //   }
-    // )
-    // let isLoadNodes = sessionStorage.getItem('isLoadNodes')
-		// if (!isLoadNodes) {
-      let data = this.$store.state.allMenu
       this.$store.state.allMenu.filter(item=> {
           if(item.level ===1) {
             return item
@@ -121,7 +105,6 @@ export default {
 			this.nav.push(...this.$store.state.allMenu)
 			console.log(this.nodes)
 			sessionStorage.setItem('isLoadNodes', 'true')
-		// }
     this.fetchNavData();
     this.getUserInfo();
     this.getMsg();
@@ -138,9 +121,6 @@ export default {
       this.$store.state.allMenu = []
       localStorage.removeItem('menuList')
       this.$router.push("/login");
-    },
-    handleSelect(index) {
-      this.defaultActiveIndex = index;
     },
     fetchNavData(to,from) {
       //console.log(to,from)
