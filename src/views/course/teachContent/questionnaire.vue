@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div style="text-align: right;padding-top: 10px;padding-bottom: 10px;">
+    <!-- <div style="text-align: right;padding-top: 10px;padding-bottom: 10px;">
       <el-button type="success">导出excel</el-button>
-    </div>
+    </div> -->
     <itemTable
       :tableData="tableData"
       :tables="tables"

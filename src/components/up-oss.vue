@@ -65,6 +65,7 @@
       },
       //捕获到文件
       upInput(event){
+        
         if(event){
           this.fileData = event
           this.fileName = new Date().getTime() + event.target.files[0].name
@@ -79,9 +80,11 @@
           this.ossCheck()
           return false
         }
+        alert(1)
         let file = this.fileData.target.files[0]
         let name = new Date().getTime() + file.name.replace(/[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g, '')
-        // console.log(file.type)
+        console.log(file.type)
+        
         if(this.fileType !== '') {
           let chekcType = this.fileType.split(',').some(element=> {
             return file.type === element

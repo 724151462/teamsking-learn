@@ -36,7 +36,9 @@
             </div>
           </template>
           <el-collapse accordion v-model="activeSection" @change="sectionChange">
-            <span v-if="chapter.catalogSection.length ==0" style="color: red;">此章下面没有节，需UI切图</span>
+            <div v-if="chapter.catalogSection.length == 0" class="title-container new-section">
+              <span @click.stop="addJieBtn(chapter)">+ 添加节</span>
+            </div>
             <el-collapse-item
               v-else
               style="margin-left: 30px"
@@ -54,7 +56,11 @@
                   </div>
                 </div>
               </template>
-              <span v-if="jie.catalogItem.length ==0" style="color: red;">此节下面没有资源，需UI切图</span>
+              <div v-if="jie.catalogItem.length ==0" style="margin: 0 auto; width:90%;">
+                <div class="itemTitleContainer" style="background: #eee">
+                  <span @click.stop="addContentBtn(jie)" style="cursor: pointer">+添加内容</span>
+                </div>
+              </div>
               <div
                 v-else
                 style="margin: 0 auto; width:90%;"
@@ -549,7 +555,7 @@ export default {
           message: "添加章成功",
           type: "success"
         });
-        this.sourceData.push(response.data);
+        this.getChapterList()
       });
     },
     // 删除章
@@ -733,13 +739,11 @@ export default {
         courseId: this.courseId,
         sectionName: jieName
       }).then(response => {
-        console.log('添加节后：',response.data)
-        this.sourceData.forEach((element, i) => {
-          if (element.chapterId === this.tempChapter) {
-            element.catalogSection.push(response.data);
-          }
+        this.getChapterList()
+        this.$message({
+          message: "添加节成功",
+          type: "success"
         });
-        this.$message.success("添加节成功");
       });
       // this.sourceData.push({chapter: chapterName})
     },
@@ -1159,6 +1163,14 @@ export default {
     border: 1px solid rgb(230, 230, 230);
     padding: 0 10px;
     border-radius: 5px;
+  }
+
+  .new-section {
+    margin-left 70px
+    width 88%
+    background #eee
+    color #3399ff
+    cursor pointer
   }
 
   .title-container:hover {

@@ -4,10 +4,10 @@
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.roleName"  style="width: 200px;margin-left: 10px;" placeholder="姓名/昵称"></el-input>
+        <el-input v-model="form.search"  style="width: 200px;margin-left: 10px;" placeholder="姓名/昵称"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="queryRoleList">查询</el-button>
+        <el-button type="primary" @click="getManagerPage">查询</el-button>
       </el-form-item>
     </el-form>
 
@@ -17,6 +17,7 @@
          :columnNameList="columnNameList"
          :tableData="tableData.pageData"
          :operateList="operateList"
+         switchColumn = 'open'
          @showComponentInfo="showComponentInfo">
     </table-the-again>
 
@@ -36,14 +37,21 @@
         :before-close="handleClose"
         style="min-width: 800px">
 
-      <div class="pop-academy">
-        <div class="item-title">
-          <span class="color-red">*</span><span>请输入角色名：</span>
-        </div>
-        <div class="item-input">
-          <el-input class="input-pop"  v-model="addForm.data.roleName"  placeholder="学生名称" clearable></el-input>
-        </div>
-      </div>
+      <el-form ref="managerForm" :model="form">
+        <el-form-item label="管理员用户名">
+          <el-input style="width: 300px" v-model="form.realName" type="text" placeholder="请输入管理员用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="是否启用">
+          <el-switch
+            active-value=1
+            inactive-value=2
+            v-model="form.status" 
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
+        </el-form-item>
+        <span style="color: red">* </span> <span>提示：创建的管理员用户，默认初始密码都是abc123456</span>
+      </el-form>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -51,36 +59,6 @@
       </span>
     </el-dialog>
 
-    <el-dialog
-        :title="addForm.title"
-        :visible.sync="menuDialogVisible"
-        width="60%"
-        :before-close="handleClose"
-        style="min-width: 800px">
-
-      <div class="pop-academy">
-
-        权限菜单列表: <br /><br /><br />
-
-        <el-tree
-            :data="data2"
-            show-checkbox
-            node-key="id"
-            :default-expanded-keys="[2, 3]"
-            :default-checked-keys="[5]"
-            :props="defaultProps">
-        </el-tree>
-
-
-        <!--{{ addForm.data.menuList }}-->
-
-      </div>
-
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="menuDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="menuDialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
 
 
   </div>
@@ -91,7 +69,7 @@
   import tableTheAgain from '@/components/table-theAgain'
 
 
-  import { sysRolePage } from '../../api/system'
+  import { sysManagerPage } from '../../api/system'
   import { sysRoleAdd } from '../../api/system'
   import { sysRoleEdit } from '../../api/system'
   import { sysRoleDelete } from '../../api/system'
@@ -106,7 +84,7 @@
     data(){
       return {
         addForm:{
-          title:'添加角色',
+          title:'',
           data:{
             roleName:'',
           }
@@ -114,7 +92,6 @@
         menuDialogVisible:false,
         dialogVisible:false,
         form:{
-          title:'添加学生',
         },
         tableTitle:'学生管理列表',
         tableOperate:[
@@ -128,7 +105,7 @@
           },
            {
             content:'创建管理员',
-            type:'created'
+            type:'create'
           },
          
         ],
@@ -138,24 +115,16 @@
           },
           {
             name:'工号',
-            prop:'roleName'
+            prop:'managerId'
           },
           {
             name:'用户名',
-            prop:'createTime'
-          },
-          {
-            name:'用户昵称',
-            prop:'createName'
+            prop:'realName'
           },
           {
             name:'创建时间',
-            prop:'createName'
-          },
-          {
-            name:'状态',
-            prop:'createName'
-          },
+            prop:'createTime'
+          }
         ],
         operateList:[
           {
@@ -220,7 +189,7 @@
       }
     },
     created:function(){
-      this.queryRoleList();
+      this.getManagerPage();
     },
     mounted:function(){
       sysUserMenuList().then(
@@ -253,29 +222,23 @@
       showComponentInfo:function(type,info){
         console.log('type',type,'info',info);
         switch(type){
-          case 'created':
-            console.log('here is created');
-            this.appendRole();
-            break;
-          case 'edit':
-            console.log('here is edit');
-            this.editRole(info);
-            break;
-          case 'delete':
-            this.delete('one',info);
-            break;
-          case 'deleteList':
-            this.delete('list',info);
-            break;
-          case 'set':
-            this.editMenu(info);
-            break;
+          case 'create':
+            this.addForm.title = '添加管理员'
+            this.form = {}
+            this.dialogVisible = true
+            break
+          case 'switch':
+            console.log(info)
+            break
         }
       },
-      queryRoleList:function () {
+      getManagerPage:function () {
         console.log('this.form',this.form);
-        sysRolePage(this.form).then(
+        sysManagerPage(this.form).then(
           res => {
+            res.data.pageData.forEach(element => {
+              element.status = String(element.status)
+            });
             this.tableData=res.data;
             console.log("tableData",this.tableData)
           }
@@ -283,77 +246,14 @@
           error => console.log('error',error)
         )
       },
-      appendRole:function(){
-        this.dialogVisible = true;
-        this.addForm.title = '添加角色';
-        this.addForm.data={ roleName:'' }
-      },
-      editRole:function(roleInfo){
-        this.dialogVisible = true;
-        this.addForm.title = '编辑角色';
-        this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data' , this.addForm.data );
-      },
-      editMenu:function(roleInfo){
-        this.menuDialogVisible = true;
-        this.addForm.title = '设置权限';
-        this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );
-      },
-      save:function(){
-        if( this.addForm.title === '添加角色'){
-          console.log( '添加角色的信息:', this.addForm.data);
-          sysRoleAdd( this.addForm.data).then(
-            res => {
-              console.log('添加角色:',res);
-            }
-          ).catch(
-            error => console.log('添加角色出错',error)
-          )
-        }else if( this.addForm.title === '编辑角色' ){
-          console.log('编辑提交的信息:',this.addForm.data);
-          sysRoleEdit( this.addForm.data ).then(
-            res =>{
-              console.log( '编辑的信息返回：',res);
-            }
-          ).catch(
-            error => {
-              console.log(error)
-            }
-          );
+      save() {
+        if(this.addForm.title === '添加管理员'){
+          
         }
-        this.dialogVisible = false;
-        setTimeout( ()=>{ this.queryRoleList() },300);
-      },
-      delete:function(type,list){
-        let roleIdList = [];
-        switch (type) {
-          case 'one':
-            roleIdList.push(list.roleId);
-            break;
-          case 'list':
-            list.filter(
-              element => {
-                roleIdList.push( element.roleId );
-                return true;
-              }
-            );
-            break;
-        }
-        sysRoleDelete(roleIdList).then(
-          res => {
-            console.log('删除成功的信息:',res);
-          }
-        ).catch(
-          error => {
-            console.log("删除失败:",error);
-          }
-        )
-        setTimeout( () => { this.queryRoleList() },300 );
       },
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;
-        this.queryRoleList();
+        this.getManagerPage();
       },
       handleClose(done) {
         done();

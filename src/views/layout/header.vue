@@ -11,10 +11,9 @@
           style="font-size:16px"
           text-color="#fff"
           active-text-color="#fff"
-          class="el-menu-demo"
           mode="horizontal"
-          @select="handleSelect"
-          :router="true">
+          :router="true"
+        >
           <el-menu-item :index="item.path" v-for="item in nav" :key="item.id">{{item.name}}</el-menu-item>
           <!-- <el-menu-item index="/learn">学习管理</el-menu-item>
           <el-menu-item index="/school">校管中心</el-menu-item>
@@ -90,21 +89,7 @@ export default {
     };
   },
   created() {
-    // console.log(this.$store.state.allMenu)
-    // menuList().then((response)=>{
-    // console.log(this.storeNav, '``````', response.data)
-    // console.log(this.$router)
-
-    // this.nav = this.$router.options.routes.filter(item=> {
-    //     console.log(item)
-    //     if(item.level ===1) {
-    //       return item
-    //     }
-    //   }
-    // )
-    // let isLoadNodes = sessionStorage.getItem('isLoadNodes')
-		// if (!isLoadNodes) {
-      let data = this.$store.state.allMenu
+    console.log(this.$store.state.allMenu)
       this.$store.state.allMenu.filter(item=> {
           if(item.level ===1) {
             return item
@@ -114,7 +99,6 @@ export default {
 			this.nav.push(...this.$store.state.allMenu)
 			// console.log(this.nodes)
 			sessionStorage.setItem('isLoadNodes', 'true')
-		// }
     this.fetchNavData();
     if(!Cookie.get('realName')){
       this.getUserInfo();
@@ -134,9 +118,6 @@ export default {
       localStorage.removeItem('menuList')
       logout();
       this.$router.push("/login");
-    },
-    handleSelect(index) {
-      this.defaultActiveIndex = index;
     },
     fetchNavData(to,from) {
       //console.log(to,from)

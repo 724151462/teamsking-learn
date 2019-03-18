@@ -35,7 +35,7 @@
     >
       <div class="dialog-header" slot="header">
         <span>{{dataObj.userName}}</span>
-        <el-button type="warning" size="small" @click="repulse">打回作业</el-button>
+        <!-- <el-button type="warning" size="small" @click="repulse">打回作业</el-button> -->
       </div>
     </adialog>
   </div>
