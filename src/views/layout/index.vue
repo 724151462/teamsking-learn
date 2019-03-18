@@ -108,6 +108,7 @@ export default {
   },
   watch: {
     $route: function(to, from) {
+      console.log(this.$route.path)
       this.activeIndex = this.$route.path
       // 路由改变时执行
       // console.info(
