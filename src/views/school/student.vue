@@ -10,121 +10,7 @@
         >搜索</el-button>
       </div>
     </header-the-again>
-    <div style="font-size:15px">
-      <el-button type="text" style="font-size:16px">＋添加学生</el-button>
-      <el-button type="text" style="font-size:16px">批量删除</el-button>
-    </div>
-    <div >
-    <el-table :data="tableData3" border style="width: 100%;">
-      <el-table-column type="selection" width="50"></el-table-column>
-      <el-table-column prop="realName" label="姓名" width="100"></el-table-column>
-      <el-table-column prop="studentNo" label="学号" width="100"></el-table-column>
-      <!-- <el-table-column prop="realName" label="姓名" width="100"></el-table-column> -->
-      <el-table-column width="170" prop="collegeName">
-        <template slot="header" slot-scope="scope">
-          <el-select
-            class="my-select"
-            filterable
-            clearable
-            v-model="searchForm.college"
-            :readonly="true"
-            placeholder="院(点此可筛选)"
-            @change="filterChange"
-            @clear="filterChange"
-          >
-            <el-option
-              v-for="(item, index) in searchCollegeList"
-              :key="index"
-              :label="item.collegeName"
-              :value="item.collegeId"
-            ></el-option>
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column width="170" prop="departmentName">
-        <template slot="header" slot-scope="scope">
-          <el-select
-            class="my-select"
-            filterable
-            clearable
-            v-model="searchForm.department"
-            :readonly="true"
-            placeholder="系(点此可筛选)"
-            @change="filterChange"
-            @clear="filterChange"
-          >
-            <el-option
-              v-for="(item, index) in searchDepartmentList"
-              :key="index"
-              :label="item.departmentName"
-              :value="item.departmentId"
-            ></el-option>
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column min-width="170" prop="specialityName">
-        <template slot="header" slot-scope="scope">
-          <el-select
-            v-model="searchForm.speciality"
-            class="my-select"
-            filterable
-            clearable
-            placeholder="专业(点此可筛选)"
-            @change="filterChange"
-            @clear="filterChange"
-          >
-            <el-option
-              v-for="(item, index) in searchSpecialityList"
-              :key="index"
-              :label="item.specialityName"
-              :value="item.specialityId"
-            ></el-option>
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column min-width="170" prop="className">
-        <template slot="header" slot-scope="scope">
-          <el-select
-            class="my-select"
-            filterable
-            clearable
-            v-model="searchForm.studentClass"
-            placeholder="班级(点此可筛选)"
-            @change="filterChange"
-            @clear="filterChange"
-          >
-            <el-option
-              v-for="(item, index) in classSearchList"
-              :key="index"
-              :label="item.className"
-              :value="item.classId"
-            ></el-option>
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
-      <el-table-column fixed="right" label="是否启用" width="85">
-        <template slot-scope="scope">
-          <el-switch
-            v-model="scope.row.status"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            active-value="1"
-            inactive-value="2"
-          ></el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column fixed="right" width="250" label="操作" align="center">
-        <template slot-scope="scope">
-          <el-button size="mini" @click="editStudent()">编辑</el-button>
-          <el-button size="mini" type="danger" @click="delStudent([scope.row])">删除</el-button>
-          <el-button size="mini" type="primary" @click="handleDelete(scope.$index, scope.row)">重置密码</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    </div>
-
-    <!-- <table-the-again
+    <table-the-again
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
       :columnNameList="columnNameList"
@@ -132,7 +18,82 @@
       :operateList="operateList"
       @showComponentInfo="showComponentInfo"
       switchColumn="open"
-    ></table-the-again>-->
+    >
+      <template slot="collegeName" slot-scope="scope">
+        <el-select
+          class="my-select"
+          filterable
+          clearable
+          v-model="searchForm.college"
+          :readonly="true"
+          placeholder="院(点此可筛选)"
+          @change="filterChange"
+          @clear="filterChange"
+        >
+          <el-option
+            v-for="(item, index) in searchCollegeList"
+            :key="index"
+            :label="item.collegeName"
+            :value="item.collegeId"
+          ></el-option>
+        </el-select>
+      </template>
+      <template slot="departmentName" slot-scope="scope">
+        <el-select
+          class="my-select"
+          filterable
+          clearable
+          v-model="searchForm.department"
+          :readonly="true"
+          placeholder="系(点此可筛选)"
+          @change="filterChange"
+          @clear="filterChange"
+        >
+          <el-option
+            v-for="(item, index) in searchDepartmentList"
+            :key="index"
+            :label="item.departmentName"
+            :value="item.departmentId"
+          ></el-option>
+        </el-select>
+      </template>
+      <template slot="specialityName" slot-scope="scope">
+        <el-select
+          v-model="searchForm.speciality"
+          class="my-select"
+          filterable
+          clearable
+          placeholder="专业(点此可筛选)"
+          @change="filterChange"
+          @clear="filterChange"
+        >
+          <el-option
+            v-for="(item, index) in searchSpecialityList"
+            :key="index"
+            :label="item.specialityName"
+            :value="item.specialityId"
+          ></el-option>
+        </el-select>
+      </template>
+      <template slot="className" slot-scope="scope">
+        <el-select
+          class="my-select"
+          filterable
+          clearable
+          v-model="searchForm.studentClass"
+          placeholder="班级(点此可筛选)"
+          @change="filterChange"
+          @clear="filterChange"
+        >
+          <el-option
+            v-for="(item, index) in classSearchList"
+            :key="index"
+            :label="item.className"
+            :value="item.classId"
+          ></el-option>
+        </el-select>
+      </template>
+    </table-the-again>
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%">
       <el-form ref="form1" :model="form" label-width="80px">
         <el-form-item label="学号">
@@ -266,7 +227,7 @@ export default {
       timeout: "",
       tableOperate: [
         {
-          content: "添加学生",
+          content: "+添加学生",
           type: "addStudent"
         },
         {
@@ -284,23 +245,36 @@ export default {
         },
         {
           name: "学号",
+          minWidth: 100,
           prop: "studentNo"
+        },
+        {
+          name: "院",
+          prop: "collegeName",
+          slot: true,
+          minWidth: 200
         },
         {
           name: "系",
           prop: "departmentName",
-          fit: true
+          slot: true,
+          minWidth: 200
         },
         {
           name: "专业",
-          prop: "specialityName"
+          prop: "specialityName",
+          slot: true,
+          minWidth: 200
         },
         {
           name: "班级",
-          prop: "className"
+          prop: "className",
+          slot: true,
+          minWidth: 200
         },
         {
           name: "创建时间",
+          minWidth: 200,
           prop: "createTime"
         }
       ],
@@ -510,6 +484,12 @@ export default {
           this.dialogVisible = true;
           break;
         case "edit":
+          this.dialogTitle = "编辑学生";
+          this.initStudent(info);
+          this.mobileEnable = true;
+          console.log(this.mobileEnable);
+          this.formEvent = "editStudent";
+          this.dialogVisible = true;
           break;
       }
     },

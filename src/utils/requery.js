@@ -97,7 +97,7 @@ axios.interceptors.request.use(
                 Cookie.set('BackstageToken', res.data.token, {
                   expires: 7
                 })
-                Cookie.set('tokenLive', Date.now() + 10 * 1000 * 60, {
+                Cookie.set('tokenLive', Date.now() + 6 * 1000 * 60 * 60 * 24 , {
                   expires: 7
                 })
                 /*执行数组里的函数,重新发起被挂起的请求*/

@@ -13,25 +13,21 @@
 
         数据结构：
             tableTitle:string,
-            tableOperate:[
-                {
-                    content:'批量删除',
-                    type:'check'
-                }
-            ]
+            tableOperate:[{content:'批量删除',}]
             columnNameList:[
                 {
                   type:'selection'   //多选框
                 }
                 {
                     name:'工号',
-                    prop:'id'
+                    prop:'id'，
+                    slot: true, //表头自定义，name="prop"
                 }
             ],
             ableData3: [
-                    {
-                        id:'20180900', //属性名称跟columnNameList中的prop一一对应
-                    }
+              {
+                  id:'20180900', //属性名称跟columnNameList中的prop一一对应
+              }
             ],
             operateList:[
                     {
@@ -46,7 +42,7 @@
         v-for="(item,index) in tableOperate"
         :key="index"
         type="text"
-        style="font-size:16px"
+        style="font-size:16px;margin-right:10px"
         @click="onSubmit(item.type,multipleSelection)"
       >{{ item.content }}</el-button>
     </div>
@@ -75,7 +71,13 @@
           </el-table-column>
         </template>
         <template v-else-if="list.slot">
-          <el-table-column :prop="list.prop" :width="list.width" align="center" :key="index">
+          <el-table-column
+            :min-width="list.minWidth"
+            :prop="list.prop"
+            :width="list.width"
+            align="center"
+            :key="index"
+          >
             <template slot="header" slot-scope="scope">
               <slot :name="list.prop"></slot>
             </template>
@@ -87,13 +89,14 @@
             :label="list.name"
             :width="list.width"
             :type="list.type"
+            :min-width="list.minWidth"
             align="center"
             :key="index"
-          >
-          </el-table-column>
+            :formatter="formatter"
+          ></el-table-column>
         </template>
       </template>
-      <el-table-column label="是否启用" fit="true" align="center" v-if="switchColumn == 'open'">
+      <el-table-column width="80px" fixed="right" label="是否启用" fit="true" align="center" v-if="switchColumn == 'open'">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
@@ -109,7 +112,7 @@
         v-if="operateList"
         fixed="right"
         label="操作"
-        :width="operateList.length * 100"
+        :width="operateList.length * 80"
         align="center"
       >
         <template slot-scope="scope">
@@ -117,24 +120,7 @@
             v-for="(item,index) in operateList"
             @click="onSubmit(item.type,scope.row)"
             :key="index"
-            v-if="item.type === 'edit'"
-            size="small"
-          >{{ item.content }}</el-button>
-          <el-button
-            v-for="(item,index) in operateList"
-            @click="onSubmit(item.type,scope.row)"
-            :key="index"
-            v-if="item.type === 'delete'"
-            type="danger"
-            size="small"
-          >{{ item.content }}</el-button>
-          <el-button
-            v-for="(item,index) in operateList"
-            @click="onSubmit(item.type,scope.row)"
-            :key="index"
-            v-if="item.type !== 'delete' && item.type !== 'edit'"
-            type="primary"
-            size="small"
+             type="text"
           >{{ item.content }}</el-button>
         </template>
       </el-table-column>
@@ -159,6 +145,16 @@ export default {
     };
   },
   methods: {
+    formatter(row, column) {
+      //对没有数据的行进行填充
+      if (!row[column.property]) {
+        if (row[column.property] == "0") {
+          return row[column.property];
+        }
+        return "-";
+      }
+      return row[column.property];
+    },
     handleSelectionChange(val) {
       this.multipleSelection = val;
       console.log(this.multipleSelection);

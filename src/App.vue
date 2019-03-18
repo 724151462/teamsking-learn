@@ -56,6 +56,7 @@
             line-height 32px
     .my-select
       padding 0
+      width inherit
       div
         padding-left 0
         padding 0
@@ -64,6 +65,7 @@
             color #909399!important
         input 
           padding-left 0
+          padding-right 17px!important
           border 0
           border-radius 0
           border-bottom 1px solid #dcdfe6

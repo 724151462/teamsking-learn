@@ -19,11 +19,6 @@
             name: '标准',
             img: require('../../assets/images/mould.png'),
             value: 1
-          },
-          {
-            name: '简约',
-            img: require('../../assets/images/mould2.png'),
-            value: 2
           }
         ]
       };

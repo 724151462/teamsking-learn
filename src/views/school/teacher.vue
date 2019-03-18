@@ -88,12 +88,12 @@ export default {
       dialogVisible: false,
       tableOperate: [
         {
-          content: "添加教师",
+          content: "+添加教师",
           type: "addTeacher"
         },
         {
           content: "批量重置密码",
-          type: "resetAll"
+          type: "resetAll",
         }
       ],
       tableTitle: "教师管理列表",
@@ -103,31 +103,34 @@ export default {
         },
         {
           name: "姓名",
-          prop: "teacherName"
+          prop: "teacherName",
         },
         {
           name: "工号",
+          minWidth:100,
           prop: "teacherNumber"
         },
         {
           name: "手机号",
-          prop: "mobile"
+          prop: "mobile",
+          minWidth:150
         },
         {
           name: "院",
           slot: true,
-          width: 200,
-          prop: "collegeName"
+          minWidth: 200,
+          prop: "collegeName",
         },
         {
           name: "系",
           slot: true,
-          width: 200,
+          minWidth: 200,
           prop: "departmentName"
         },
         {
           name: "创建课程",
-          prop: "courseCount"
+          prop: "courseCount",
+          width:85,
         }
       ],
       operateList: [
@@ -140,36 +143,7 @@ export default {
           type: "resetPassword"
         }
       ],
-      tableData3: [
-        {
-          id: "20180900",
-          userType: "管理员",
-          userName: "10",
-          createdTime: "2017-06-15 14:35:51",
-          status: "启用"
-        },
-        {
-          id: "20180900",
-          userType: "管理员",
-          userName: "10",
-          createdTime: "2017-06-15 14:35:51",
-          status: "启用"
-        },
-        {
-          id: "20180900",
-          userType: "管理员",
-          userName: "10",
-          createdTime: "2017-06-15 14:35:51",
-          status: "启用"
-        },
-        {
-          id: "20180900",
-          userType: "管理员",
-          userName: "10",
-          createdTime: "2017-06-15 14:35:51",
-          status: "启用"
-        }
-      ],
+      tableData3: [],
       popContentItem: [],
       textarea: "",
       searchForm: {
