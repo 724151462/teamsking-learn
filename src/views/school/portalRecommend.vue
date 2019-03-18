@@ -55,10 +55,6 @@ export default {
           type: "index"
         },
         {
-          name: "课程ID",
-          prop: "courseId"
-        },
-        {
           name: "课程名称",
           prop: "courseName"
         },

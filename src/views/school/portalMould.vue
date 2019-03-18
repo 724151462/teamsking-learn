@@ -2,8 +2,7 @@
   <div class="container">
     <div class="mould-container" v-for="(item, index) in mouldList" :key="index">
       <div class="item-container">
-        <el-radio v-model="item.value" :label="item.name">
-        </el-radio>
+        <el-radio v-model="rIndex" :label="item.name"></el-radio>
         <img :src="item.img" style="width:500px" alt="">
       </div>
     </div>
@@ -20,7 +19,8 @@
             img: require('../../assets/images/mould.png'),
             value: 1
           }
-        ]
+        ],
+        rIndex:'标准',
       };
     },
     methods: {
@@ -33,7 +33,7 @@
 <style scoped lang="stylus" type="text/stylus">
 .container
   display: flex;
-  justify-content: space-around;
+  // justify-content: space-around;
   margin-top: 50px
   .mould-container
     display: flex

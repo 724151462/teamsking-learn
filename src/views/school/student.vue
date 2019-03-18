@@ -2,12 +2,14 @@
   <div class="student">
     <header-the-again headerTitle="学生管理">
       <div style="display:inline-block;position: relative;">
-        <el-input style="width:230px" v-model="searchForm.search" placeholder="输入姓名或学号"></el-input>
-        <el-button
-          type="primary"
-          style="position: absolute;right:0;border-radius: 0;"
-          @click="searchStudent"
-        >搜索</el-button>
+        <el-input
+          style="width:230px"
+          class="input-with-select"
+          v-model="searchForm.search"
+          placeholder="输入姓名或学号"
+        >
+          <el-button slot="append" @click="searchStudent" icon="el-icon-search"></el-button>
+        </el-input>
       </div>
     </header-the-again>
     <table-the-again
@@ -94,6 +96,7 @@
         </el-select>
       </template>
     </table-the-again>
+
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%">
       <el-form ref="form1" :model="form" label-width="80px">
         <el-form-item label="学号">
@@ -210,7 +213,6 @@ export default {
       search: "",
       classSearchList: [],
       state4: "",
-      timeout: null,
       searchForm: {
         college: "",
         department: "",
@@ -224,7 +226,6 @@ export default {
       searchClassList: [],
       searchStudentList: [],
       tableTitle: "学生列表",
-      timeout: "",
       tableOperate: [
         {
           content: "+添加学生",
@@ -425,29 +426,13 @@ export default {
     },
     // 查找按钮事件
     searchStudent() {
-      // let {studentClass, college, department, speciality , studentInfo} = this.searchForm
-
-      console.log(this.classSearchList);
-      if (!this.searchForm.studentClass) {
-        this.searchForm.studentClass = -1;
-      }
-      if (!this.searchForm.college) {
-        this.searchForm.college = -1;
-      }
-      if (!this.searchForm.department) {
-        this.searchForm.department = -1;
-      }
-      if (!this.searchForm.speciality) {
-        this.searchForm.speciality = -1;
-      }
-      console.log("12344", this.searchForm);
       this.searchForm.pageIndex = 1;
       sysStudentPage(this.searchForm).then(response => {
-        console.log(response);
+        // console.log(response);
         let dataArr = [];
         response.data.pageData.forEach(element => {
           element.status = String(element.status);
-          console.log(typeof element.status);
+          // console.log(typeof element.status);
           dataArr.push(element);
         });
         this.tableData3 = dataArr;
@@ -455,19 +440,15 @@ export default {
       });
     },
     showComponentInfo: function(type, info) {
-      console.log(
-        "父组件接收到的类型：" + type + "父组件接收到的信息：" + info
-      );
+      // console.log(
+      //   "父组件接收到的类型：" + type + "父组件接收到的信息：" + info
+      // );
       switch (type) {
         case "check":
-          //console.log(info);
           this.check(info);
           break;
         case "switch":
-          let switchInfo = { id: info.studentId, status: info.status };
-          sysStudentSwitch(switchInfo).then(response => {
-            console.log(response);
-          });
+          this.changeStatus(info)
           break;
         case "delete":
           this.delStudent(info);
@@ -480,14 +461,14 @@ export default {
           this.formEvent = "addNewStudent";
           this.initStudent();
           this.mobileEnable = false;
-          console.log(this.mobileEnable);
+          // console.log(this.mobileEnable);
           this.dialogVisible = true;
           break;
         case "edit":
           this.dialogTitle = "编辑学生";
           this.initStudent(info);
           this.mobileEnable = true;
-          console.log(this.mobileEnable);
+          // console.log(this.mobileEnable);
           this.formEvent = "editStudent";
           this.dialogVisible = true;
           break;
@@ -510,6 +491,7 @@ export default {
       this.formEvent = "editStudent";
       this.dialogVisible = true;
     },
+    //删除学会
     delStudent(student) {
       // console.log(student.length);
       let delArr = [];
@@ -537,10 +519,6 @@ export default {
           });
         })
         .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
         });
     },
     ensureBtn() {
@@ -549,6 +527,27 @@ export default {
       } else if (this.formEvent == "editStudent") {
         this.editStudent();
       }
+    },
+    //是否启用学生
+    changeStatus(info){
+      let switchInfo = { id: info.studentId, status: info.status };
+
+      this.$confirm("变更学生状态", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        sysStudentSwitch(switchInfo).then(response => {
+            if (response.code === 200) {
+              this.$message.success('操作成功');
+              this.studentInit();
+            }else{
+              this.$message.success('操作失败，请重试');
+            }
+        });
+      }).catch(() => {
+        this.studentInit();
+      });
     },
     // 添加新学生
     addNewStudent: function() {
@@ -658,10 +657,13 @@ export default {
 <style scoped lang="stylus" type="text/stylus">
 .my-input {
   padding: 0;
-
   input {
     border: 0;
   }
+}
+
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
 }
 
 .student {
