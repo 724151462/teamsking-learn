@@ -26,8 +26,8 @@
           @open="handleOpen"
           :default-openeds="defaultOpens"
           ref="menu"
-          @select="handelSelect"
           router
+          style="height: 100%"
         >
           <template v-for="issue in nodes">
             <!-- 筛选出父级 -->
@@ -103,10 +103,6 @@ export default {
     handleOpen(...params) {
       // console.log(params)
       sessionStorage.setItem("defaultOpens", params[0]);
-    },
-    handelSelect(...params) {
-      console.log(params);
-      this.activeIndex = params[0]
     }
   },
   watch: {
