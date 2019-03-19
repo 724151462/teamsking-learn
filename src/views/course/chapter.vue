@@ -798,7 +798,7 @@ export default {
       }
       if (info.contentType === 10) {
         return require("@/assets/images/vedio.png");
-      } 
+      }
     },
     // 字幕信息
     strUrl(info) {

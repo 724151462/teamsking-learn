@@ -1,14 +1,18 @@
 <template>
     <div class="course">
-        <el-form ref="form" :model="searchForm" :inline="true" label-width="100px" class="form-query">
-            <el-form-item label="输入搜索：">
-                <el-input v-model="searchForm.searchString" placeholder="课程名称/课程ID"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="courseSearch">查询</el-button>
-            </el-form-item>
-        </el-form>
-        <Dialog 
+        <header-the-again headerTitle="课程管理">
+            <div style="display:inline-block;position: relative;">
+                <el-input
+                    v-model="searchForm.searchString"
+                    style="width:230px"
+                    placeholder="课程名称/课程ID"></el-input>
+                <el-button
+                    type="primary"
+                    style="position: absolute;right:0;border-radius: 0;"
+                    @click="courseSearch">查询</el-button>
+            </div>
+        </header-the-again>
+        <Dialog
             :dialogConfig="dialogConfig"
             :formData="formData"
             :dataObj="dataObj"
@@ -51,6 +55,7 @@
 
 <script>
 import tableTheAgain from '../../components/table-theAgain'
+import headerTheAgain from "@/components/header-theAgain";
 import Dialog from '@/components/dialog'
 import {
     sysCoursePage,
@@ -81,7 +86,7 @@ export default {
                 labelWidth: '120',
                 inputWidth: '70',
                 top: '10'
-            }, 
+            },
             formData:[{
                 key: '课程id：',
                 inputType: 'string',
@@ -205,7 +210,8 @@ export default {
     },
     components:{
         tableTheAgain,
-        Dialog
+        Dialog,
+        headerTheAgain
     },
     methods:{
         // 页码改变
@@ -242,7 +248,7 @@ export default {
                     this.show = true
                     break;
                 case 'delete':
-                    
+
             }
 
         },

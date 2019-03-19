@@ -2,126 +2,17 @@
   <div class="student">
     <header-the-again headerTitle="学生管理">
       <div style="display:inline-block;position: relative;">
-        <el-input style="width:230px" v-model="searchForm.search" placeholder="输入姓名或学号"></el-input>
-        <el-button
-          type="primary"
-          style="position: absolute;right:0;border-radius: 0;"
-          @click="searchStudent"
-        >搜索</el-button>
+        <el-input
+          style="width:230px"
+          class="input-with-select"
+          v-model="searchForm.search"
+          placeholder="输入姓名或学号"
+        >
+          <el-button slot="append" @click="searchStudent" icon="el-icon-search"></el-button>
+        </el-input>
       </div>
     </header-the-again>
-    <div style="font-size:15px">
-      <el-button type="text" style="font-size:16px">＋添加学生</el-button>
-      <el-button type="text" style="font-size:16px">批量删除</el-button>
-    </div>
-    <el-table :data="tableData3" border style="width: 100%">
-      <el-table-column type="selection" width="40"></el-table-column>
-      <el-table-column prop="realName" label="姓名" width="100"></el-table-column>
-      <el-table-column prop="studentNo" label="学号" width="100"></el-table-column>
-      <!-- <el-table-column prop="realName" label="姓名" width="100"></el-table-column> -->
-      <el-table-column width="170" prop="collegeName">
-        <template slot="header" slot-scope="scope">
-          <el-select
-            class="my-select"
-            filterable
-            clearable
-            v-model="searchForm.college"
-            :readonly="true"
-            placeholder="院(点此可筛选)"
-            @change="filterChange"
-            @clear="filterChange"
-          >
-            <el-option
-              v-for="(item, index) in searchCollegeList"
-              :key="index"
-              :label="item.collegeName"
-              :value="item.collegeId"
-            ></el-option>
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column width="170" prop="departmentName">
-        <template slot="header" slot-scope="scope">
-          <el-select
-            class="my-select"
-            filterable
-            clearable
-            v-model="searchForm.department"
-            :readonly="true"
-            placeholder="系(点此可筛选)"
-            @change="filterChange"
-            @clear="filterChange"
-          >
-            <el-option
-              v-for="(item, index) in searchDepartmentList"
-              :key="index"
-              :label="item.departmentName"
-              :value="item.departmentId"
-            ></el-option>
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column min-width="170" prop="specialityName">
-        <template slot="header" slot-scope="scope">
-          <el-select
-            v-model="searchForm.speciality"
-            class="my-select"
-            filterable
-            clearable
-            placeholder="专业(点此可筛选)"
-            @change="filterChange"
-            @clear="filterChange"
-          >
-            <el-option
-              v-for="(item, index) in searchSpecialityList"
-              :key="index"
-              :label="item.specialityName"
-              :value="item.specialityId"
-            ></el-option>
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column min-width="170" prop="className">
-        <template slot="header" slot-scope="scope">
-          <el-select
-            class="my-select"
-            filterable
-            clearable
-            v-model="searchForm.studentClass"
-            placeholder="班级(点此可筛选)"
-            @change="filterChange"
-            @clear="filterChange"
-          >
-            <el-option
-              v-for="(item, index) in classSearchList"
-              :key="index"
-              :label="item.className"
-              :value="item.classId"
-            ></el-option>
-          </el-select>
-        </template>
-      </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
-      <el-table-column fixed="right" label="是否启用" width="85">
-        <template slot-scope="scope">
-          <el-switch
-            v-model="scope.row.status"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            active-value="1"
-            inactive-value="2"
-          ></el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column fixed="right" width="250" label="操作" align="center">
-        <template slot-scope="scope">
-          <el-button size="mini" @click="editStudent()">编辑</el-button>
-          <el-button size="mini" type="danger" @click="delStudent([scope.row])">删除</el-button>
-          <el-button size="mini" type="primary" @click="handleDelete(scope.$index, scope.row)">重置密码</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <!-- <table-the-again
+    <table-the-again
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
       :columnNameList="columnNameList"
@@ -129,7 +20,83 @@
       :operateList="operateList"
       @showComponentInfo="showComponentInfo"
       switchColumn="open"
-    ></table-the-again>-->
+    >
+      <template slot="collegeName" slot-scope="scope">
+        <el-select
+          class="my-select"
+          filterable
+          clearable
+          v-model="searchForm.college"
+          :readonly="true"
+          placeholder="院(点此可筛选)"
+          @change="filterChange"
+          @clear="filterChange"
+        >
+          <el-option
+            v-for="(item, index) in searchCollegeList"
+            :key="index"
+            :label="item.collegeName"
+            :value="item.collegeId"
+          ></el-option>
+        </el-select>
+      </template>
+      <template slot="departmentName" slot-scope="scope">
+        <el-select
+          class="my-select"
+          filterable
+          clearable
+          v-model="searchForm.department"
+          :readonly="true"
+          placeholder="系(点此可筛选)"
+          @change="filterChange"
+          @clear="filterChange"
+        >
+          <el-option
+            v-for="(item, index) in searchDepartmentList"
+            :key="index"
+            :label="item.departmentName"
+            :value="item.departmentId"
+          ></el-option>
+        </el-select>
+      </template>
+      <template slot="specialityName" slot-scope="scope">
+        <el-select
+          v-model="searchForm.speciality"
+          class="my-select"
+          filterable
+          clearable
+          placeholder="专业(点此可筛选)"
+          @change="filterChange"
+          @clear="filterChange"
+        >
+          <el-option
+            v-for="(item, index) in searchSpecialityList"
+            :key="index"
+            :label="item.specialityName"
+            :value="item.specialityId"
+          ></el-option>
+        </el-select>
+      </template>
+      <template slot="className" slot-scope="scope">
+        <el-select
+          class="my-select"
+          filterable
+          clearable
+          v-model="searchForm.studentClass"
+          placeholder="班级(点此可筛选)"
+          @change="filterChange"
+          @clear="filterChange"
+        >
+          <el-option
+            v-for="(item, index) in classSearchList"
+            :key="index"
+            :label="item.className"
+            :value="item.classId"
+          ></el-option>
+        </el-select>
+      </template>
+    </table-the-again>
+
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%">
       <el-form ref="form1" :model="form" label-width="80px">
         <el-form-item label="学号">
@@ -246,7 +213,6 @@ export default {
       search: "",
       classSearchList: [],
       state4: "",
-      timeout: null,
       searchForm: {
         college: "",
         department: "",
@@ -260,10 +226,9 @@ export default {
       searchClassList: [],
       searchStudentList: [],
       tableTitle: "学生列表",
-      timeout: "",
       tableOperate: [
         {
-          content: "添加学生",
+          content: "+添加学生",
           type: "addStudent"
         },
         {
@@ -281,23 +246,36 @@ export default {
         },
         {
           name: "学号",
+          minWidth: 100,
           prop: "studentNo"
+        },
+        {
+          name: "院",
+          prop: "collegeName",
+          slot: true,
+          minWidth: 200
         },
         {
           name: "系",
           prop: "departmentName",
-          fit: true
+          slot: true,
+          minWidth: 200
         },
         {
           name: "专业",
-          prop: "specialityName"
+          prop: "specialityName",
+          slot: true,
+          minWidth: 200
         },
         {
           name: "班级",
-          prop: "className"
+          prop: "className",
+          slot: true,
+          minWidth: 200
         },
         {
           name: "创建时间",
+          minWidth: 200,
           prop: "createTime"
         }
       ],
@@ -448,29 +426,13 @@ export default {
     },
     // 查找按钮事件
     searchStudent() {
-      // let {studentClass, college, department, speciality , studentInfo} = this.searchForm
-
-      console.log(this.classSearchList);
-      if (!this.searchForm.studentClass) {
-        this.searchForm.studentClass = -1;
-      }
-      if (!this.searchForm.college) {
-        this.searchForm.college = -1;
-      }
-      if (!this.searchForm.department) {
-        this.searchForm.department = -1;
-      }
-      if (!this.searchForm.speciality) {
-        this.searchForm.speciality = -1;
-      }
-      console.log("12344", this.searchForm);
       this.searchForm.pageIndex = 1;
       sysStudentPage(this.searchForm).then(response => {
-        console.log(response);
+        // console.log(response);
         let dataArr = [];
         response.data.pageData.forEach(element => {
           element.status = String(element.status);
-          console.log(typeof element.status);
+          // console.log(typeof element.status);
           dataArr.push(element);
         });
         this.tableData3 = dataArr;
@@ -478,19 +440,15 @@ export default {
       });
     },
     showComponentInfo: function(type, info) {
-      console.log(
-        "父组件接收到的类型：" + type + "父组件接收到的信息：" + info
-      );
+      // console.log(
+      //   "父组件接收到的类型：" + type + "父组件接收到的信息：" + info
+      // );
       switch (type) {
         case "check":
-          //console.log(info);
           this.check(info);
           break;
         case "switch":
-          let switchInfo = { id: info.studentId, status: info.status };
-          sysStudentSwitch(switchInfo).then(response => {
-            console.log(response);
-          });
+          this.changeStatus(info)
           break;
         case "delete":
           this.delStudent(info);
@@ -503,10 +461,16 @@ export default {
           this.formEvent = "addNewStudent";
           this.initStudent();
           this.mobileEnable = false;
-          console.log(this.mobileEnable);
+          // console.log(this.mobileEnable);
           this.dialogVisible = true;
           break;
         case "edit":
+          this.dialogTitle = "编辑学生";
+          this.initStudent(info);
+          this.mobileEnable = true;
+          // console.log(this.mobileEnable);
+          this.formEvent = "editStudent";
+          this.dialogVisible = true;
           break;
       }
     },
@@ -527,6 +491,7 @@ export default {
       this.formEvent = "editStudent";
       this.dialogVisible = true;
     },
+    //删除学会
     delStudent(student) {
       // console.log(student.length);
       let delArr = [];
@@ -554,10 +519,6 @@ export default {
           });
         })
         .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
         });
     },
     ensureBtn() {
@@ -566,6 +527,27 @@ export default {
       } else if (this.formEvent == "editStudent") {
         this.editStudent();
       }
+    },
+    //是否启用学生
+    changeStatus(info){
+      let switchInfo = { id: info.studentId, status: info.status };
+
+      this.$confirm("变更学生状态", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        sysStudentSwitch(switchInfo).then(response => {
+            if (response.code === 200) {
+              this.$message.success('操作成功');
+              this.studentInit();
+            }else{
+              this.$message.success('操作失败，请重试');
+            }
+        });
+      }).catch(() => {
+        this.studentInit();
+      });
     },
     // 添加新学生
     addNewStudent: function() {
@@ -675,10 +657,13 @@ export default {
 <style scoped lang="stylus" type="text/stylus">
 .my-input {
   padding: 0;
-
   input {
     border: 0;
   }
+}
+
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
 }
 
 .student {

@@ -213,6 +213,7 @@ export default {
 .header {
   position fixed
   top 0
+  max-width 1920px
   z-index 100
   width: 100%;
   height: 60px;

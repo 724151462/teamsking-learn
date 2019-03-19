@@ -34,7 +34,6 @@
         </template>
       </template>
       
-      
       <el-table-column
           fixed="right"
           label="操作"

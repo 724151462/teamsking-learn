@@ -5,12 +5,14 @@
       <el-button size="small" type="primary" @click="isDialog = true">添加</el-button>
       <el-button size="small" type="primary" @click="delMult">删除选中项</el-button>
     </div>
-    <itemTable
+    <table-the-again
+      :tableOperate="tableOperate"
+      :columnNameList="tables"
       :tableData="tableData"
-      :tables="tables"
-      :buttonStylus="tableStylus"
-      v-on:showComponentInfo="typeFun"
-    ></itemTable>
+      :operateList="tableStylus"
+      @showComponentInfo="showComponentInfo"
+    >
+    </table-the-again>
     <el-pagination
       v-show="totalPage >= 10"
       style="margin: 20px 0;text-align:right"
@@ -49,11 +51,11 @@
 </template>
 
 <script>
-import itemTable from "@/components/table-no-header.vue";
+import tableTheAgain from "../../components/table-theAgain";
 import { schoolMsg, sysMessageDel,sysMsgAdd } from "@/api/system";
 export default {
   components: {
-    itemTable
+    tableTheAgain
   },
   data() {
     return {
@@ -78,12 +80,22 @@ export default {
           width:'190'
         }
       ],
+      tableOperate: [
+        {
+          content: "+添加学生",
+          type: "addStudent"
+        },
+        {
+          content: "批量删除",
+          type: "deleteAll"
+        }
+      ],
       tableData: [],
       currentPage:1,
       totalPage:10,
       tableStylus: [
         {
-          name: "删除",
+          content: "删除",
           type: "delete"
         }
       ],
@@ -114,7 +126,7 @@ export default {
           this.currentPage = response.data.pageIndex
       });
     },
-    typeFun(...params) {
+    showComponentInfo(...params) {      
       switch (params[0]) {
         case "delete":
           this.delArr = [];

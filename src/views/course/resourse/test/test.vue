@@ -1,5 +1,6 @@
 <template>
-  <div class="test">
+<div>
+    <div class="test">
     <tip title="试题管理"></tip>
     <!--<div style="display: flex;margin: 25px 0;">-->
       <!--<div style="" class="btn-warp" >-->
@@ -155,6 +156,8 @@
         </span>
     </el-dialog>
   </div>
+</div>
+
 </template>
 
 <script>

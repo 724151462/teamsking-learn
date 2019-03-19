@@ -133,7 +133,6 @@
               request.append('success_action_status', '200')
               request.append('Signature', res.data.signature)
               request.append('file', this.fileData.target.files[0])
-
               return request
             }else {
               loading.close()

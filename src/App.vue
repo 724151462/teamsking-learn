@@ -54,21 +54,36 @@
           .el-input__inner
             height 32px
             line-height 32px
-    .student
-      .my-select
+    .my-select
+      padding 0
+      width inherit
+      div
+        padding-left 0
         padding 0
-        div
-          padding 0
-          span
-            // display none
-          input 
-            padding-left 0
-            border 0
-            border-radius 0
-            border-bottom 1px solid #dcdfe6
-  .el-table .warning-row {
-    background: oldlace !important;
-  }
+        span
+          i
+            color #909399!important
+        input 
+          padding-left 0
+          padding-right 17px!important
+          border 0
+          border-radius 0
+          border-bottom 1px solid #dcdfe6
+          &::-webkit-input-placeholder{
+            color:#909399;
+          }
+          &::-moz-placeholder{   /* Mozilla Firefox 19+ */
+            color:#909399;
+          }
+          &:-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
+            color:#909399;
+          }
+          &:-ms-input-placeholder{  /* Internet Explorer 10-11 */ 
+            color:#909399;
+          }
+    .el-table .warning-row {
+      background: oldlace !important;
+    }
 
   .el-table .success-row {
     background: #f0f9eb !important;
@@ -115,5 +130,12 @@
     opacity: .6;
     z-index: 6000;
   }
+    .el-table .success-row {
+      background: #f0f9eb !important;
+    }
+    .modelStrome .el-textarea__inner
+      min-height 200px !important
+    .modelVote .el-textarea__inner
+      min-height 200px !important
 </style>
 
