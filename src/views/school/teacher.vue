@@ -7,7 +7,8 @@
           type="primary"
           style="position: absolute;right:0;border-radius: 0;"
           @click="teacherSearch"
-        >查询</el-button>
+          icon="el-icon-search"
+        ></el-button>
       </div>
     </header-the-again>
 

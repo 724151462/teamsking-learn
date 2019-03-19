@@ -7,9 +7,7 @@
         <div class="tq_loading__loading-wrapper">
           <square :background="'#409eff'"></square>
         </div>
-        <div class="tq_loading__text">
-          正在加载
-        </div>
+        <div class="tq_loading__text">正在加载</div>
       </div>
     </div>
     <div class="login" :style="bgImg">
@@ -67,7 +65,8 @@
       title="找回密码"
       :visible.sync="forgotPass.dialogVisible"
       :before-close="noRest"
-      width="500px">
+      width="500px"
+    >
       <!--通过手机号修改密码-->
       <div class="forgot-box" v-show="!forgotPass.isMail">
         <el-input
@@ -274,7 +273,7 @@ export default {
           loginAccount: this.data.userName,
           passwd: this.data.password
         };
-      this.$store.commit("SHOWLOADING");        
+      this.$store.commit("SHOWLOADING");
       logins(data)
         .then(res => {
           // console.log(res);
@@ -284,7 +283,7 @@ export default {
             saveUserInfo(res.data.userId);
             sysUserMenuList().then(response => {
               // console.log(static_routes);
-              let static_routes = response.data
+              let static_routes = response.data;
               // sessionStorage.setItem('menuList',JSON.stringify(response.data))
               localStorage.setItem("menuList", JSON.stringify(static_routes));
               // let routes = MenuUtils(response.data)
@@ -293,8 +292,10 @@ export default {
               this.$store.commit("setAllMenu", routes);
               this.$router.addRoutes(routes);
               this.$router.replace("/course/list");
-            });
-            this.$store.commit("HIDELOADING");
+            })
+            .then(()=>{
+              this.$store.commit("HIDELOADING");
+            })
           } else {
             this.$message({
               message: getErrorMsg(res.msg),
@@ -322,7 +323,7 @@ export default {
             saveUserInfo(res.data.userId);
             sysUserMenuList().then(response => {
               // console.log(static_routes);
-              let static_routes = response.data
+              let static_routes = response.data;
               // sessionStorage.setItem('menuList',JSON.stringify(response.data))
               localStorage.setItem("menuList", JSON.stringify(static_routes));
               // let routes = MenuUtils(response.data)
@@ -346,9 +347,9 @@ export default {
     //切换为手机号方式
     changeMobile() {
       this.forgotPass.isMail = false;
-      (this.forgotPass.codeBtn = false),
-        (this.forgotPass.codeBtnTime = 0),
-        (this.forgotPass.forgotForm.email = "");
+      this.forgotPass.codeBtn = false;
+      this.forgotPass.codeBtnTime = 0;
+      this.forgotPass.forgotForm.email = "";
       this.forgotPass.forgotForm.password = "";
       this.forgotPass.forgotForm.rePassWord = "";
       this.forgotPass.forgotForm.mobile = "";

@@ -233,7 +233,7 @@
                   }
                 }
               }
-              return str
+              return str || '-'
             }
           },
           {

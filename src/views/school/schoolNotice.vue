@@ -45,11 +45,12 @@
           <el-input
             type="textarea"
             :rows="6"
-            style="width: 500px;padding-bottom:10px"
+            :maxlength="1000"
+            style="width: 500px;"
             placeholder="请输入内容"
             v-model="addUp.content"
           ></el-input>
-          <span style="position:relative;display:inline-bloke">
+          <span style="position:relative;display:inline-bloke;right:50px;top:30px">
             <span style="color:red;">{{this.contentLength}}</span>/1000
           </span>
         </el-form-item>

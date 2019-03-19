@@ -143,7 +143,7 @@ axios.interceptors.request.use(
  */
 axios.interceptors.response.use(
   res => {
-    if (Number(res.data.code) === 401) {
+    if (res.data && Number(res.data.code) === 401) {
       removeToken()
       Globe_VM.$router.push({
         path: '/login'
