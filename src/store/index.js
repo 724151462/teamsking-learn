@@ -3,9 +3,11 @@ import Vuex from 'vuex'
 import socket from './modules/socket'
 import { stat } from 'fs';
 import Cookie from 'js-cookie'
+import Globe_VM from '../main'
 import {
   SHOWLOADING,
-  HIDELOADING
+  HIDELOADING,
+  DELETECONFIRM
 } from './mutation-types'
 
 Vue.use(Vuex)
@@ -17,7 +19,8 @@ const state = {
   modelActive: Cookie.get('modelActive') || "1",
   msgNum:0,
   isFullScreen:false,
-  userAvatar:Cookie.get('avatar') || require('@/assets/images/user.png')
+  userAvatar:Cookie.get('avatar') || require('@/assets/images/user.png'),
+  delete: false
 }
 
 const mutations = {
@@ -26,6 +29,18 @@ const mutations = {
   },
   [HIDELOADING](state){
     state.showLoading = false;
+  },
+  [DELETECONFIRM](state, msg, title='提示'){
+    Globe_VM.$confirm(msg, title, {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }).then(() => {
+      state.delete = true
+    })
+    .catch(action => {
+      state.delete = false
+    });
   },
   setAllMenu: (state, list)=> {
     // console.log('rwq', list)
