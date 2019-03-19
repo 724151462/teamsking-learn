@@ -1,6 +1,7 @@
 <template>
   <ol class="breadcrumb">
-    <li v-for="list in pathList" :key="list.id"><a :href="'/#' + list.path">{{list.name}}</a></li>
+    <router-link v-for="list in pathList" :key="list.id" :to="list.path">{{list.name}}</router-link>
+    <span style="color: rgb(119,119,119)">/</span>
     <li class="active">{{nowName}}</li>
   </ol>
 </template>
