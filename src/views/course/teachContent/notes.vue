@@ -1,14 +1,22 @@
 <template>
   <div class="note">
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <tableNoHeader 
       :tableData="tableData" 
       :tables="tables" 
       :buttonStylus="sysButton" 
-      @showComponentInfo="showComponentInfo"
-      v-loading="loading"
-      element-loading-text="拼命加载中"
-      element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0, 0, 0.8)"></tableNoHeader>
+      @showComponentInfo="showComponentInfo"></tableNoHeader>
     <adialog :dialogConfig="dialogConfig"
       :dataObj="dataObj"
       :formData="formData"
@@ -23,14 +31,16 @@
   import tableNoHeader from '@/components/table-no-header.vue'
   import adialog from '@/components/dialog'
   import {noteList,noteDelete} from '@/api/course'
+  import { mapGetters } from "vuex";
+  import Square from "@/components/cubeShadow.vue";
   export default {
     components:{
       tableNoHeader,
-      adialog
+      adialog,
+      Square
     },
     data(){
       return{
-        loading: true,
         tables:[
           {
             name:'笔记标题',
@@ -146,17 +156,21 @@
         }
       }
     },
+    computed: {
+      ...mapGetters(["showLoading"])
+    },
     created(){
       this.$emit('teachingNav','notes')
     },
     mounted() {
+      this.$store.commit("SHOWLOADING");
       noteList(this.listQuery)
       .then(response=> {
         response.data.pageData.forEach(element => {
           element.popover = element.noteContent
         });
         this.tableData = response.data.pageData
-        this.loading = false
+        this.$store.commit("HIDELOADING");
       })
     },
     methods:{

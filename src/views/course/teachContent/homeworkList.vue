@@ -1,13 +1,17 @@
 <template>
   <div>
-    <!-- <el-steps :active="0" align-center :space="350" finish-status="success">
-      <el-step title="作业提交阶段" >
-        <span slot="description" style="color:gray">2019-01-13 00:00:00结束</span>
-      </el-step>
-      <el-step title="成绩公布">
-        <span slot="description" style="color:gray">2019-01-13 00:00:00结束</span>
-      </el-step>
-    </el-steps> -->
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <div  class="margin-sides" style="font-size: 15px">
       <span style="color: red">注：</span>
       <span style="color: rgb(72,191,247)">老师在提交作业阶段可随时查看，可打回不满意的作业。<br>
@@ -23,10 +27,6 @@
         :tables="tables" 
         :buttonStylus="sysButton" 
         @showComponentInfo="showComponentInfo"
-        v-loading="loading"
-        element-loading-text="拼命加载中"
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(0, 0, 0, 0.8)"
       ></tableNoHeader>
     </div>
   </div>
@@ -37,10 +37,11 @@
   import tableNoHeader from '@/components/table-no-header.vue'
   import adialog from '@/components/dialog'
   import {homeWorkList} from '@/api/course'
+  import { mapGetters } from "vuex";
+  import Square from "@/components/cubeShadow.vue";
   export default {
     data() {
       return {
-        loading: true,
         tables:[
           {
             name:'作业题目',
@@ -125,7 +126,11 @@
     created(){
       this.$emit('teachingNav','operation')
     },
+    computed: {
+      ...mapGetters(["showLoading"])
+    },
     mounted() {
+      this.$store.commit("SHOWLOADING");
       homeWorkList({courseId:this.$route.query.id})
       .then(response=> {
         response.data.pageData.forEach(element=> {
@@ -145,14 +150,15 @@
           element.submitStatus = `${element.submitCount}/${element.allCount}/${element.notReviewCount}`
         })
         this.tableData = response.data.pageData
-        this.loading = false
+        this.$store.commit("HIDELOADING");
         console.log(this.tableData)
       })
 
     },
     components: {
       tableNoHeader,
-      adialog
+      adialog,
+      Square
     },
     methods: {
       showComponentInfo(...params) {

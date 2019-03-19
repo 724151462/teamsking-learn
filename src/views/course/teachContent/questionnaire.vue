@@ -1,17 +1,22 @@
 <template>
   <div>
-    <!-- <div style="text-align: right;padding-top: 10px;padding-bottom: 10px;">
-      <el-button type="success">导出excel</el-button>
-    </div> -->
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <itemTable
       :tableData="tableData"
       :tables="tables"
       :buttonStylus="tableStylus"
       @showComponentInfo="showComponentInfo"
-      v-loading="loading"
-      element-loading-text="拼命加载中"
-      element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0, 0, 0.8)"
     ></itemTable>
     <el-dialog :visible.sync="isDialog" width="60%" title="投票结果">
       <div class="main">
@@ -51,13 +56,15 @@
 <script>
 import itemTable from "@/components/table-no-header.vue";
 import { interactList, interactVote } from "@/api/course";
+import { mapGetters } from "vuex";
+import Square from "@/components/cubeShadow.vue";
 export default {
   components: {
-    itemTable
+    itemTable,
+    Square
   },
   data() {
     return {
-      loading: true,
       quesParams: { courseId: this.$route.query.id },
       quesObj: {},
       tables: [
@@ -111,10 +118,14 @@ export default {
       }
     };
   },
+  computed: {
+    ...mapGetters(["showLoading"])
+  },
   created() {
     this.$emit("teachingNav", "questionnaire");
   },
   mounted() {
+    this.$store.commit("SHOWLOADING");
     interactList(this.quesParams).then(response => {
       let stormArr = [];
       response.data.forEach(element => {
@@ -134,7 +145,7 @@ export default {
         });
       });
       this.tableData = stormArr;
-      this.loading = false
+      this.$store.commit("HIDELOADING");
     });
   },
   methods: {

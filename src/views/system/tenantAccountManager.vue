@@ -1,20 +1,21 @@
 <template>
   <div class="role">
-    <header-the-again headerTitle="租户账号管理"></header-the-again>
-
-    <el-form ref="form" :inline="true" label-width="100px" class="form-query">
-      <el-form-item label="输入搜索：">
-        <el-input v-model="searchForm.search"  style="width: 200px;margin-left: 10px;" placeholder="用户名/姓名"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="searchForm.tenantId" placeholder="请选择学校">
-          <el-option v-for="tenant in tenantlist" :key="tenant.tenantId" :label="tenant.tenantName" :value="tenant.tenantId"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="queryTenantList">查询</el-button>
-      </el-form-item>
-    </el-form>
+    <header-the-again headerTitle="租户账号管理">
+      <el-form ref="form" :inline="true" label-width="100px" class="form-query">
+        <el-form-item label="输入搜索：">
+          <el-input v-model="searchForm.search"  style="width: 200px;margin-left: 10px;" placeholder="用户名/姓名"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="searchForm.tenantId" placeholder="请选择学校">
+            <el-option v-for="tenant in tenantlist" :key="tenant.tenantId" :label="tenant.tenantName" :value="tenant.tenantId"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="queryTenantList">查询</el-button>
+        </el-form-item>
+      </el-form>
+    </header-the-again>
+    
 
     <table-the-again
         :tableTitle="tableTitle"

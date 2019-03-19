@@ -1,15 +1,23 @@
 <template>
   <div>
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <div>
       <tableNoHeader
         :tableData="tableData"
         :tables="tables"
         :buttonStylus="sysButton"
         @showComponentInfo="showComponentInfo"
-        v-loading="loading"
-        element-loading-text="拼命加载中"
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(0, 0, 0, 0.8)"
       ></tableNoHeader>
     </div>
     <el-dialog :visible.sync="show" title="全部回答">
@@ -38,10 +46,11 @@
 <script>
 import tableNoHeader from "@/components/table-no-header.vue";
 import { interactList, interactBS, stormAddScore } from "@/api/course";
+import { mapGetters } from "vuex";
+import Square from "@/components/cubeShadow.vue";
 export default {
   data() {
     return {
-      loading: true,
       stormParams: { courseId: this.$route.query.id },
       tables: [
         {
@@ -91,10 +100,14 @@ export default {
       show: false
     };
   },
+  computed: {
+    ...mapGetters(["showLoading"])
+  },
   created() {
     this.$emit("teachingNav", "storm");
   },
   mounted() {
+    this.$store.commit("SHOWLOADING");
     interactList(this.stormParams).then(response => {
       let stormArr = [];
       response.data.forEach(element => {
@@ -122,11 +135,12 @@ export default {
         });
       });
       this.tableData = stormArr;
-      this.loading = false
+      this.$store.commit("HIDELOADING");
     });
   },
   components: {
-    tableNoHeader
+    tableNoHeader,
+    Square
   },
   methods: {
     showComponentInfo(...params) {

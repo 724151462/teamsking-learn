@@ -1,15 +1,23 @@
 <template>
   <div>
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <div>
       <tableNoHeader
         :tableData="tableData" 
         :tables="tables" 
         :buttonStylus="sysButton" 
         @showComponentInfo="showComponentInfo"
-        v-loading="loading"
-        element-loading-text="拼命加载中"
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(0, 0, 0, 0.8)"
       ></tableNoHeader>
     </div>
   </div>
@@ -19,10 +27,11 @@
 <script>
   import tableNoHeader from '@/components/table-no-header.vue'
   import {testList} from '@/api/course'
+  import { mapGetters } from "vuex";
+  import Square from "@/components/cubeShadow.vue";
   export default {
     data() {
       return {
-        loading: true,
         tables:[
           {
             name:'测验名称',
@@ -72,10 +81,14 @@
         }
       }
     },
+    computed: {
+      ...mapGetters(["showLoading"])
+    },
     created(){
       this.$emit('teachingNav','test')
     },
     mounted() {
+      this.$store.commit("SHOWLOADING");
       testList(this.testListParmas)
       .then(response=> {
         response.data.pageData.forEach(element => {
@@ -93,11 +106,12 @@
           element.submitStatus = `${element.submitCount}/${element.allCount}`
         });
         this.tableData = response.data.pageData
-        this.loading = false
+        this.$store.commit("HIDELOADING");
       })
     },
     components: {
       tableNoHeader,
+      Square
     },
     methods: {
       showComponentInfo(...params) {

@@ -1,16 +1,15 @@
 <template>
   <div class="role">
-    <header-the-again headerTitle="菜单管理"></header-the-again>
-
-    <el-form ref="form" :inline="true" label-width="100px" class="form-query">
-      <el-form-item label="输入搜索：">
-        <el-input v-model="form.name"  style="width: 200px;margin-left: 10px;" placeholder="菜单名称"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="getMenuList">查询</el-button>
-      </el-form-item>
-    </el-form>
-
+    <header-the-again headerTitle="菜单管理">
+      <el-form ref="form" :inline="true" label-width="100px" class="form-query">
+        <el-form-item label="输入搜索：">
+          <el-input v-model="form.name"  style="width: 200px;margin-left: 10px;" placeholder="菜单名称"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="getMenuList">查询</el-button>
+        </el-form-item>
+      </el-form>
+    </header-the-again>
     <table-the-again
         :tableTitle="tableTitle"
         :tableOperate="tableOperate"

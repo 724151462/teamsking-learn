@@ -1,17 +1,15 @@
 <template>
   <div class="help">
-    <header-the-again headerTitle="帮助中心"></header-the-again>
-
-    <el-form ref="form" :inline="true" label-width="100px" class="form-query">
-            <el-form-item label="输入搜索：">
-                <el-input placeholder="请输入关键字"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" >查询</el-button>
-            </el-form-item>
-    </el-form>
-
-
+    <header-the-again headerTitle="帮助中心">
+      <el-form ref="form" :inline="true" label-width="100px" class="form-query">
+              <el-form-item label="输入搜索：">
+                  <el-input placeholder="请输入关键字"></el-input>
+              </el-form-item>
+              <el-form-item>
+                  <el-button type="primary" >查询</el-button>
+              </el-form-item>
+      </el-form>
+    </header-the-again>
 
     <el-row class="tac">
       <el-col :span="10" style="min-width:400px;">
@@ -28,16 +26,21 @@
                     <i :class="item.iconCls"></i>
                     <span slot="title">{{item.navName}}</span>
                     <div class="operation parent">
-                      <span @click.stop="addQuestion(item)" style="margin-right: 10px">新增问题</span>
-                      <span @click.stop="edit(item)" style="margin-right: 10px">编辑</span>
-                      <span @click.stop="del(item)">删除</span>
+                      <el-tooltip content="添加问题类型" placement="top">
+                        <i class="el-icon-plus" @click.stop="addQuestion(item)" style="margin-right: 10px"></i>
+                      </el-tooltip>
+                      <el-tooltip content="修改" placement="top">
+                        <i class="el-icon-edit" @click.stop="edit(item)" style="margin-right: 10px"></i>
+                      </el-tooltip>
+                      <el-tooltip content="删除" placement="top">
+                        <i class="el-icon-delete" @click.stop="del(item)"></i>
+                      </el-tooltip>
                     </div>
                     
                   </template>
                   <template v-for="term in item.children">
                     <!-- 子菜单展示 -->
                     <el-menu-item
-                     v-if="term.showCode !== 2"
                     :key="term.navId"
                     :index="String(term.navId)"
 
@@ -47,8 +50,15 @@
                     <span v-if="term.navId === activeIndex">123</span>
                     <span slot="title">{{term.navName}}</span>
                     <div class="operation children">
-                      <span @click.stop="edit(term)" style="margin-right: 10px">编辑</span>
-                      <span @click.stop="del(term)">删除</span>
+                      <el-tooltip content="添加具体问题" placement="top">
+                        <i class="el-icon-plus" @click.stop="addQuestion(item)" style="margin-right: 10px; color: #909399"></i>
+                      </el-tooltip>
+                      <el-tooltip content="修改" placement="top">
+                        <i class="el-icon-edit" @click.stop="edit(item)" style="margin-right: 10px; color: #909399"></i>
+                      </el-tooltip>
+                      <el-tooltip content="删除" placement="top">
+                        <i class="el-icon-delete" @click.stop="del(item)" style=" color: #909399"></i>
+                      </el-tooltip>
                     </div>
                     
                   </template>
@@ -77,16 +87,39 @@
           v-for="(item,index) in contentList" 
           :key="item.helpContentId" 
           v-model="activeName" accordion>
-            <el-collapse-item :title="index+1 + ':' + item.title" :name="item.helpContentId">
-              <div id="triangle-up"></div>
+            <el-collapse-item :name="item.helpContentId">
+              <template slot="title">
+                {{index+1 + ':' + item.title}}
+              </template>
+              <div class="operation children">
+                <el-tooltip content="添加具体问题" placement="top">
+                  <i class="el-icon-plus" @click.stop="addQuestion(item)" style="margin-right: 10px; color: #909399"></i>
+                </el-tooltip>
+                <el-tooltip content="修改" placement="top">
+                  <i class="el-icon-edit" @click.stop="edit(item)" style="margin-right: 10px; color: #909399"></i>
+                </el-tooltip>
+                <el-tooltip content="删除" placement="top">
+                  <i class="el-icon-delete" @click.stop="del(item)" style=" color: #909399"></i>
+                </el-tooltip>
+              </div>
               <div class="answer">答:{{item.content}}</div>
             </el-collapse-item>
          </el-collapse>
+         </div>
+         <div class="addContent">
+           <el-button type="primary" @click="addContent">
+             添加内容
+           </el-button>
          </div>
        </el-col>
 
      
     </el-row>
+    <el-dialog :visible.sync="addContentShow">
+      <el-form>
+
+      </el-form>
+    </el-dialog>
     <!-- <el-pagination
         background
         layout="prev, pager, next"
@@ -113,6 +146,7 @@
     },
     data(){
       return{
+        addContentShow: false,
         dialogTitle: '',
         questionForm: {},
         problemContent: '',
@@ -203,6 +237,9 @@
         helpDetail({navId: questionId}).then(response=> {
           this.contentList = response.data.pageData
         })
+      },
+      addContent() {
+
       }
     }
   }
@@ -210,14 +247,12 @@
 
 <style lang="stylus" scoped>
   .operation
-    position relative
-    left 320px
+    position absolute
+    left 360px
     display inline-block
     font-size 12px
     color #fff
-    opacity  0
-  .children
-    left 180px
+    display none
   .answer
     padding: 5px;
     border: 1px solid rgb(197,234,254);
@@ -241,13 +276,16 @@
     background rgb(64, 158, 254)
     color #fff
     .children
-      opacity 1
+      display inline-block
+    i 
+      color: rgb(144, 147, 153) !important;
+    
   .el-submenu__title:hover
     background #409EFF
     color #fff
     .parent
       color #000
-      opacity 1
+      display inline-block
   .el-submenu__title
     &:hover
       background #409EFF

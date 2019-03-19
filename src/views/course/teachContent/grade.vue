@@ -1,5 +1,17 @@
 <template>
   <div>
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <div class="grade-head">
       <div class="import-btn">
         <span>学生人数: {{tableData.length}}人</span>
@@ -31,10 +43,6 @@
       :data="tableData"
       style="width: 100%"
       :default-sort="{prop: 'score', order: 'descending'}"
-      v-loading="loading"
-      element-loading-text="拼命加载中"
-      element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0, 0, 0.8)"
     >
       <el-table-column label="姓名" width="180">
         <template slot-scope="scope">
@@ -122,10 +130,11 @@ import {
   scoreModify
 } from "@/api/course";
 import { sysStudentInfo } from "@/api/school";
+import { mapGetters } from "vuex";
+import Square from "@/components/cubeShadow.vue";
 export default {
   data() {
     return {
-      loading: true,
       file: "",
       dialogShow: false,
       scoreParams: {
@@ -155,10 +164,15 @@ export default {
       resData: []
     };
   },
+  computed: {
+    ...mapGetters(["showLoading"])
+  },
   created() {
     this.$emit("teachingNav", "grade");
+    
   },
   mounted() {
+    this.$store.commit("SHOWLOADING");
     // 成绩列表
     scoreList(this.scoreParams).then(response => {
       response.data.pageData.forEach(element => {
@@ -166,13 +180,16 @@ export default {
           realName: ""
         };
       });
-      this.loading = false
       this.tableData = response.data.pageData;
+      this.$store.commit("HIDELOADING");
     });
     // 成绩权重
     scoreRight(this.scoreParams).then(response => {
       this.scoreRight = response.data;
     });
+  },
+  components: {
+    Square
   },
   methods: {
     getStudentId(item) {

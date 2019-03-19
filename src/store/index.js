@@ -3,9 +3,14 @@ import Vuex from 'vuex'
 import socket from './modules/socket'
 import { stat } from 'fs';
 import Cookie from 'js-cookie'
+import {
+  SHOWLOADING,
+  HIDELOADING
+} from './mutation-types'
 
 Vue.use(Vuex)
 const state = {
+  showLoading:false,
   allMenu: [],
   filterMenu: [],
   leftNavState: '课程中心' ,
@@ -16,6 +21,12 @@ const state = {
 }
 
 const mutations = {
+  [SHOWLOADING](state){
+    state.showLoading = true;
+  },
+  [HIDELOADING](state){
+    state.showLoading = false;
+  },
   setAllMenu: (state, list)=> {
     // console.log('rwq', list)
     if(state.allMenu.length !== 0) {
@@ -69,20 +80,19 @@ const mutations = {
 }
 
 const getters = {
-  currentMenu: (state)=> {
-    // state.filterMenu = state.allMenu.filter(element => {
-    //   element.list
-    // });
+  showLoading(state){
+    return state.showLoading
   }
+}
+
+const actions = {
 }
 
 export default new Vuex.Store({
   state,
   mutations,
   getters,
-  actions: {
-
-  },
+  actions,
   modules: {
     socket
   }

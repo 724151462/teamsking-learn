@@ -77,5 +77,43 @@
     min-height 200px !important
   .modelVote .el-textarea__inner
     min-height 200px !important
+    
+  /*加载动画*/
+  .tq_loading-wrapper {
+    position: fixed;
+    z-index: 99999;
+    width: 91px;
+    min-height: 91px;
+    text-align: center;
+    border-radius: 5px;
+    color: #fff;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .tq_loading__loading-wrapper {
+    position: absolute;
+    top: 17%;
+    left: 17%;
+  }
+  .tq_loading__text {
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: white;
+    position: absolute;
+    bottom: -16px;
+    text-align: center;
+    width: 100%;
+  }
+  .tq_loading__mask {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: #000;
+    opacity: .6;
+    z-index: 6000;
+  }
 </style>
 

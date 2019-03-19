@@ -8,9 +8,7 @@
         :to="list.url">{{list.name}}</router-link>
     </div>
     <div class="buttom">
-      <transition :name="fade"> 
-        <router-view @teachingNav="teachingNavs"></router-view>
-      </transition>
+      <router-view @teachingNav="teachingNavs"></router-view>
     </div>
   </div>
 </template>
@@ -94,10 +92,4 @@
       border: 1px solid #f4f4f4
       width: calc(100% - 20px)
       padding: 10px
-    .fade-enter-active, .fade-leave-active {
-      transition opacity .4s
-    }
-    .fade-enter, .fade-leave-active {
-      opacity 0
-    }
 </style>

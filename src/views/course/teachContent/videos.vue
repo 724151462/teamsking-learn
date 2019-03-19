@@ -1,5 +1,17 @@
 <template>
   <div style="margin-top: 30px">
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <jiaTable
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
@@ -7,10 +19,6 @@
       :tableData="tableData"
       :operateList="operateList"
       @showComponentInfo="showComponentInfo"
-      v-loading="loading"
-      element-loading-text="拼命加载中"
-      element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0, 0, 0.8)"
     ></jiaTable>
     <el-dialog title="学生观看详情" :visible.sync="isDialog">
       <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
@@ -33,10 +41,11 @@ import {
   videoList,
   videoDetail
 } from '@/api/course'
+import { mapGetters } from "vuex";
+import Square from "@/components/cubeShadow.vue";
   export default {
     data() {
       return {
-        loading: true,
         tableTitle:"视频列表",
         tableTitle1:"学生列表",
         tableData:[
@@ -110,7 +119,11 @@ import {
         }
       }
     },
+    computed: {
+      ...mapGetters(["showLoading"])
+    },
     mounted() {
+      this.$store.commit("SHOWLOADING");
       videoList({courseId: this.$route.query.id})
       .then(response=> {
         response.data.pageData.forEach(element => {
@@ -118,7 +131,7 @@ import {
           element.videoLength = this.timeTransfer(element.videoLength)
         });
         this.tableData = response.data.pageData
-        this.loading = false
+        this.$store.commit("HIDELOADING");
       })
     },
     methods:{
@@ -179,7 +192,10 @@ import {
     created(){
       this.$emit('teachingNav','videos')
     },
-    components: {jiaTable}
+    components: {
+      jiaTable,
+      Square
+    }
   }
 </script>
 

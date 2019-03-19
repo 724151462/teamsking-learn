@@ -1,5 +1,17 @@
 <template>
   <div class="login-warp">
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <div class="login" :style="bgImg">
       <div class="login-center">
         <div class="left">
@@ -178,6 +190,8 @@ import {
 } from "@/utils/auth";
 import { getErrorMsg } from "@/utils/utils";
 import MenuUtils from "@/utils/MenuUtils";
+import { mapGetters } from "vuex";
+import Square from "@/components/cubeShadow.vue";
 // import {compare} from '@/utils/MenuUtils'
 import {
   mobileForgot,
@@ -230,6 +244,12 @@ export default {
   created() {
     this.schoolInit();
   },
+  computed: {
+    ...mapGetters(["showLoading"])
+  },
+  components: {
+    Square
+  },
   methods: {
     schoolInit() {
       getTenant()
@@ -253,7 +273,8 @@ export default {
           tenantId: tenantId,
           loginAccount: this.data.userName,
           passwd: this.data.password
-        };        
+        };
+      this.$store.commit("SHOWLOADING");        
       logins(data)
         .then(res => {
           // console.log(res);
@@ -273,11 +294,13 @@ export default {
               this.$router.addRoutes(routes);
               this.$router.replace("/course/list");
             });
+            this.$store.commit("HIDELOADING");
           } else {
             this.$message({
               message: getErrorMsg(res.msg),
               type: "error"
             });
+            this.$store.commit("HIDELOADING");
           }
         })
         .catch(error => {

@@ -1,5 +1,17 @@
 <template>
   <div class="course-tab-container">
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <div>
       <span class="shuxian">|</span>
       <span style="font-size:20px;font-weight: bold;margin-left: 10px">教学模式</span>
@@ -339,6 +351,8 @@ import {
 } from "@/api/course";
 import { getResList, localUpload, getTestFileFold } from "@/api/library";
 import { fileKind } from '@/utils/utils'
+import { mapGetters } from "vuex";
+import Square from "@/components/cubeShadow.vue";
 
 export default {
   data() {
@@ -454,6 +468,10 @@ export default {
       tempItemIndex: ""
     };
   },
+  computed: {
+    ...mapGetters(["showLoading"])
+  },
+
   created() {
     this.$emit("courseName", sessionStorage.getItem("courseName"));
     this.getChapterList();
@@ -546,6 +564,7 @@ export default {
       }
     },
     addChapter(chapterName) {
+      this.$store.commit("SHOWLOADING");
       chaptersAdd({
         chapterStatus: 1,
         courseId: this.courseId,
@@ -556,6 +575,7 @@ export default {
           type: "success"
         });
         this.getChapterList()
+        this.$store.commit("HIDELOADING");
       });
     },
     // 删除章
@@ -697,6 +717,7 @@ export default {
       formType.contentId = resource[0].resourceId;
       this.dialogVisible = false;
       console.log("ft", formType);
+      this.$store.commit("SHOWLOADING");
       itemAdd(formType).then(response => {
         if (response.code === 200) {
           this.tempSection.catalogItem.push(response.data);
@@ -709,6 +730,7 @@ export default {
           this.activeSection = String(response.data.sectionId)
           sessionStorage.setItem('activeSection', response.data.sectionId)
           // this.getChapterList();
+          this.$store.commit("HIDELOADING");
         }
       });
     },
@@ -734,16 +756,18 @@ export default {
     addJie(jieName) {
       console.log("jiename", jieName);
       console.log("zhangID", this.tempChapter);
+      this.$store.commit("SHOWLOADING");
       sectionAdd({
         chapterId: this.tempChapter,
         courseId: this.courseId,
         sectionName: jieName
       }).then(response => {
-        this.getChapterList()
         this.$message({
           message: "添加节成功",
           type: "success"
         });
+        this.getChapterList()
+        this.$store.commit("HIDELOADING");
       });
       // this.sourceData.push({chapter: chapterName})
     },
@@ -1067,6 +1091,7 @@ export default {
     contentAdd(formName) {
       itemAdd(formName).then(response => {
         console.log(response.data);
+        this.$store.commit("SHOWLOADING");
         if (response.code === 200) {
           this.localVideoDialog = false;
           this.dialogVisible = false;
@@ -1077,6 +1102,7 @@ export default {
             message: "添加内容成功",
             type: "success"
           });
+          this.$store.commit("HIDELOADING");
         }
       });
     }
@@ -1110,7 +1136,8 @@ export default {
     adialog,
     videoPlayer,
     Tree,
-    upOss
+    upOss,
+    Square
   }
 };
 </script>
