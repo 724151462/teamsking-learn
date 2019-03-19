@@ -164,16 +164,19 @@
     },
     mounted() {
       this.$store.commit("SHOWLOADING");
-      noteList(this.listQuery)
-      .then(response=> {
-        response.data.pageData.forEach(element => {
-          element.popover = element.noteContent
-        });
-        this.tableData = response.data.pageData
-        this.$store.commit("HIDELOADING");
-      })
+      this.getNoteList()
     },
     methods:{
+      getNoteList() {
+        noteList(this.listQuery)
+          .then(response=> {
+            response.data.pageData.forEach(element => {
+              element.popover = element.noteContent
+            });
+            this.tableData = response.data.pageData
+            this.$store.commit("HIDELOADING");
+        })
+      },
       showComponentInfo (e,data,index) {
         console.log(e,data,index)
         switch (e) {
@@ -186,15 +189,26 @@
             break;
           case 'delete':
             this.delArr.push(data.noteId)
-            noteDelete(this.delArr)
-            .then(response=> {
-              if(response.code === 200) {
-                this.$message({
-                  message: '删除成功',
-                  type: 'success'
-                })
+            this.$store.commit(
+              'DELETECONFIRM',{
+                title: '提示',
+                message: '确认删除笔记?', 
+                fn:() => {
+                  noteDelete(this.delArr)
+                  .then(response=> {
+                    if(response.code === 200) {
+                      this.$message({
+                        message: '删除成功',
+                        type: 'success'
+                      })
+                    }
+                    this.getNoteList()
+                  })
+                }
               }
-            })
+              
+            )
+            
           default:
             break;
         }
