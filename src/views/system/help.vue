@@ -234,34 +234,45 @@ import { delContent } from '../../api/system';
         this.questionDialog = true
       },
       del(item) {
-        this.$store.commit('DELETECONFIRM', '确认删除问题?', '',
-        delQuestionTitle([item.navId])
-        .then(response=> {
-          if(response.code === 200) {
-            this.$message({
-              message: '删除成功',
-              type: 'success'
-            })
-            this.getHelpList()
-          }
-        }))
-        this.$confirm('确认删除问题?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          delQuestionTitle([item.navId])
-          .then(response=> {
-            if(response.code === 200) {
-              this.$message({
-                message: '删除成功',
-                type: 'success'
+        this.$store.commit(
+          'DELETECONFIRM',{
+            title: '提示',
+            message: '确认删除问题?', 
+            fn:() => {
+              delQuestionTitle([item.navId])
+              .then(response=> {
+                if(response.code === 200) {
+                  this.$message({
+                    message: '删除成功',
+                    type: 'success'
+                  })
+                  this.getHelpList()
+                }
               })
-              this.getHelpList()
             }
-          })
-        }).catch(() => {     
-        });
+          }
+          
+        )
+        // this.$confirm('确认删除问题?', '提示', {
+        //   confirmButtonText: '确定',
+        //   cancelButtonText: '取消',
+        //   type: 'warning'
+        // }).then(() => {
+        //   delQuestionTitle([item.navId])
+        //   .then(response=> {
+        //     if(response.code === 200) {
+        //       this.$message({
+        //         message: '删除成功',
+        //         type: 'success'
+        //       })
+        //       this.getHelpList()
+        //     }
+        //   })
+        // }).catch(() => {     
+        // });
+        
+      },
+      delConfirm() {
         
       },
        handleOpen(key, keyPath) {

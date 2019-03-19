@@ -29,13 +29,13 @@ const mutations = {
   [HIDELOADING](state){
     state.showLoading = false;
   },
-  [DELETECONFIRM](state, msg, title='提示', fn){
-    Globe_VM.$confirm(msg, title, {
+  [DELETECONFIRM](state, data){
+    Globe_VM.$confirm(data.message, data.title, {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
-      fn
+      data.fn()
     }).catch(() => {
       Globe_VM.$message({
         type: 'info',
