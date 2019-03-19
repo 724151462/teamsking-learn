@@ -19,8 +19,7 @@ const state = {
   modelActive: Cookie.get('modelActive') || "1",
   msgNum:0,
   isFullScreen:false,
-  userAvatar:Cookie.get('avatar') || require('@/assets/images/user.png'),
-  delete: false
+  userAvatar:Cookie.get('avatar') || require('@/assets/images/user.png')
 }
 
 const mutations = {
@@ -30,16 +29,18 @@ const mutations = {
   [HIDELOADING](state){
     state.showLoading = false;
   },
-  [DELETECONFIRM](state, msg, title='提示'){
+  [DELETECONFIRM](state, msg, title='提示', fn){
     Globe_VM.$confirm(msg, title, {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning',
+      type: 'warning'
     }).then(() => {
-      state.delete = true
-    })
-    .catch(action => {
-      state.delete = false
+      fn
+    }).catch(() => {
+      Globe_VM.$message({
+        type: 'info',
+        message: '已取消删除'
+      });
     });
   },
   setAllMenu: (state, list)=> {
