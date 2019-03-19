@@ -138,13 +138,7 @@
             key: '笔记内容：',
             inputType: 'textarea',
             value: 'noteContent'
-          },
-          {
-            key:'笔记图片',
-            inputType:'img',
-            value:'imgSrc',
-            imgWidth: 50
-          },
+          }
         ]
       }
     },
