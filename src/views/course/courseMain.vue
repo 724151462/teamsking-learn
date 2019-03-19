@@ -42,6 +42,8 @@
         case '/course/list/discuss':
           this.activeIndex = '6'
           break;
+        default:
+          this.activeIndex = '4'
       }
     },
     methods: {
@@ -87,7 +89,6 @@
         }
       },
       courseName(val) {
-        console.log
         this.currentCourse = val
       }
     }
