@@ -21,11 +21,11 @@
 
       <el-form-item label="老师介绍" required class="info-warp">
         <el-input
-                type="textarea"
-                v-model="data.instructorInfo"
-                resize="none" :rows="5"
-                @keyup.native="infoChange($event)"
-                maxlength="1000"></el-input>
+          type="textarea"
+          v-model="data.instructorInfo"
+          resize="none" :rows="5"
+          @keyup.native="infoChange($event)"
+          maxlength="1000"></el-input>
         <span class="info-num"><span class="text-red">{{this.instructorInfoNum}}</span>/1000</span>
       </el-form-item>
 

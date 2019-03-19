@@ -315,12 +315,7 @@ export default {
             }
           });
         })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消重置"
-          });
-        });
+        .catch(() => {});
     },
     handleClose(done) {
       this.$confirm("确认关闭？")

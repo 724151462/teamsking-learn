@@ -54,6 +54,9 @@
           .el-input__inner
             height 32px
             line-height 32px
+    .has-text-input
+      input 
+        padding-right 50px
     .my-select
       padding 0
       width inherit

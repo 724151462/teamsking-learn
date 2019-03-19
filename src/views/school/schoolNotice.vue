@@ -1,18 +1,13 @@
 <template>
-  
   <div>
-    <div style="padding-top: 10px;padding-bottom: 10px;">
-      <el-button size="small" type="primary" @click="isDialog = true">添加</el-button>
-      <el-button size="small" type="primary" @click="delMult">删除选中项</el-button>
-    </div>
+    <header-the-again headerTitle="消息管理"></header-the-again>
     <table-the-again
       :tableOperate="tableOperate"
       :columnNameList="tables"
       :tableData="tableData"
       :operateList="tableStylus"
       @showComponentInfo="showComponentInfo"
-    >
-    </table-the-again>
+    ></table-the-again>
     <el-pagination
       v-show="totalPage >= 10"
       style="margin: 20px 0;text-align:right"
@@ -20,30 +15,54 @@
       layout="prev, pager, next"
       :current-page="currentPage"
       @current-change="handleCurrentChange"
-      :total="totalPage">
-    </el-pagination>
-    <el-dialog :visible.sync="isDialog" width="60%">
+      :total="totalPage"
+    ></el-pagination>
+    <el-dialog
+      :before-close="()=>{
+            isDialog = false;
+            addUp.title = ''
+            addUp.content = ''
+          }"
+      title="发布通知"
+      :visible.sync="isDialog"
+      width="60%"
+    >
       <el-form>
         <el-form-item label="标 题：">
           <el-input
             v-model="addUp.title"
-            placeholder="请输入内容"
-            style="width: 300px;margin-left:22px;"
+            placeholder="请输入标题"
+            class="has-text-input"
+            :debounce="10"
+            :maxlength="100"
+            style="width: 360px;margin-left:22px;"
           ></el-input>
+          <span style="position:relative;right:50px;">
+            <span style="color:red">{{this.titleLength}}</span>/100
+          </span>
         </el-form-item>
         <el-form-item label="通知内容：">
           <el-input
             type="textarea"
             :rows="6"
-            style="width: 500px;"
+            style="width: 500px;padding-bottom:10px"
             placeholder="请输入内容"
             v-model="addUp.content"
           ></el-input>
+          <span style="position:relative;display:inline-bloke">
+            <span style="color:red;">{{this.contentLength}}</span>/1000
+          </span>
         </el-form-item>
       </el-form>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="isDialog = false">取 消</el-button>
+        <el-button
+          @click="()=>{
+            isDialog = false;
+            addUp.title = ''
+            addUp.content = ''
+          }"
+        >取 消</el-button>
         <el-button type="primary" @click="ensureAdd">确 定</el-button>
       </span>
     </el-dialog>
@@ -52,18 +71,25 @@
 
 <script>
 import tableTheAgain from "../../components/table-theAgain";
-import { schoolMsg, sysMessageDel,sysMsgAdd } from "@/api/system";
+import headerTheAgain from "../../components/header-theAgain";
+import { schoolMsg, sysMessageDel, sysMsgAdd } from "@/api/system";
+import { getErrorMsg } from "../../utils/utils";
+
 export default {
   components: {
-    tableTheAgain
+    tableTheAgain,
+    headerTheAgain
   },
   data() {
     return {
       tables: [
         {
+          type: "selection"
+        },
+        {
           name: "通知标题",
           prop: "title",
-          width:'200'
+          width: "220"
         },
         {
           name: "通知内容",
@@ -72,18 +98,18 @@ export default {
         {
           name: "发布人",
           prop: "realName",
-          width:'100'
+          width: "100"
         },
         {
           name: "发布时间",
           prop: "publishTime",
-          width:'190'
+          width: "190"
         }
       ],
       tableOperate: [
         {
-          content: "+添加学生",
-          type: "addStudent"
+          content: "+新增通知",
+          type: "addInfo"
         },
         {
           content: "批量删除",
@@ -91,8 +117,8 @@ export default {
         }
       ],
       tableData: [],
-      currentPage:1,
-      totalPage:10,
+      currentPage: 1,
+      totalPage: 10,
       tableStylus: [
         {
           content: "删除",
@@ -105,6 +131,10 @@ export default {
         content: "",
         messageType: 20
       },
+      //标题长度
+      titleLength: 0,
+      //内容长度
+      contentLength: 0,
       delArr: []
     };
   },
@@ -112,82 +142,113 @@ export default {
     this.$emit("upCoursesNav", "notice");
   },
   mounted() {
-    this.getMessageList()
+    this.getMessageList();
+  },
+  watch: {
+    addUp: {
+      deep: true,
+      handler: function(value, oldVal) {
+        this.titleLength = value.title.length;
+        this.contentLength = value.content.length;
+      }
+    }
   },
   methods: {
     //分页页码改变
-    handleCurrentChange(page){
-      this.getMessageList(page)
+    handleCurrentChange(page) {
+      this.getMessageList(page);
+    },
+    //关闭弹窗
+    closeDiage() {
+      isDialog = false;
     },
     getMessageList(page = 1) {
-      schoolMsg({pageIndex:page}).then(response => {
-          this.tableData = response.data.pageData;
-          this.totalPage = response.data.totalPage * 10
-          this.currentPage = response.data.pageIndex
+      schoolMsg({ pageIndex: page }).then(response => {
+        this.tableData = response.data.pageData;
+        this.totalPage = response.data.totalPage * 10;
+        this.currentPage = response.data.pageIndex;
       });
     },
-    showComponentInfo(...params) {      
+    showComponentInfo(...params) {
       switch (params[0]) {
         case "delete":
           this.delArr = [];
-          this.delArr.push(params[1].messageId)
-          this.delMsg()
+          this.delArr.push(params[1].messageId);
+          this.delMsg();
           break;
-        case "selected":
+        case "addInfo":
+          this.isDialog = true;
+          break;
+        case "deleteAll":
           this.delArr = [];
-          let delId = params[1].forEach(element => {
+          params[1].forEach(element => {
             this.delArr.push(element.messageId);
           });
-          // console.log(params[1]);
+          this.delMult();
           break;
         default:
           break;
       }
     },
     delMult() {
-      this.delMsg()
+      if (this.delArr.length == 0) {
+        return false;
+      }
+      this.delMsg();
     },
     delMsg() {
-        console.log(this.delArr)
-        sysMessageDel({ messageIds: this.delArr })
-        .then(response=> {
-            if(response.code === 200) {
-                this.getMessageList()
-                this.$message({
-                    message: '删除成功',
-                    type: 'success'
-                })
+      this.$confirm("是否删除？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          sysMessageDel({ messageIds: this.delArr }).then(response => {
+            if (response.code === 200) {
+              this.getMessageList();
+              this.$message({
+                message: "删除成功",
+                type: "success"
+              });
             }
-            if(response.code === 403) {
-                this.$message({
-                    message: '没有权限删除',
-                    type: 'warning'
-                })
+            if (response.code === 403) {
+              this.$message({
+                message: "没有权限删除",
+                type: "warning"
+              });
             }
-        });
+          });
+        })
+        .catch(() => {});
     },
+    //添加通知
     ensureAdd() {
-        this.addUp.courseId = this.$route.query.id
-        sysMsgAdd(this.addUp)
-        .then(response=> {
-        if(response.code === 200) {
-            this.tableData.push(response.data)
-            this.$message({
-            message: '添加成功',
-            type: 'success'
-            })
-        }else if(response.code === 440){
-            this.$message({
-                message: '标题或内容过短',
-                type: 'warning'
-            })
-        }
-        this.isDialog = false
-    }) 
+      this.addUp.courseId = this.$route.query.id;
+      sysMsgAdd(this.addUp)
+        .then(response => {
+          if (response.code === 200) {
+            this.tableData.push(response.data);
+            this.$message.success("发布成功");
+            this.getMessageList();
+            this.isDialog = false;
+            this.addUp.title = "";
+            this.addUp.content = "";
+          } else if (response.code === 440) {
+            let msg = getErrorMsg(response.msg);
+            this.$message.warning(msg);
+          }
+        })
+        .catch(err => {
+          let msg = getErrorMsg(err.msg);
+          this.$message.error(msg);
+        });
     }
-  },
+  }
 };
 </script>
 
-<style scoped>
+<style scoped lang="stylus" type="text/stylus">
+.el-textarea__inner {
+  padding-bottom: 15px;
+}
 </style>
