@@ -380,3 +380,27 @@ export function delQuestionTitle(data) {
   let url = `/api/v1/sys/helpnav`
   return commonsAjax(url, data, 'delete')
 }
+
+/**
+ * 新增内容
+ */
+export function addContent(data) {
+  let url = `/api/v1/sys/helpcontent`
+  return commonsAjax(url, data, 'post')
+}
+
+/**
+ * 修改内容
+ */
+export function editContent(data) {
+  let url = `/api/v1/sys/helpcontent`
+  return commonsAjax(url, data, 'put')
+}
+
+/**
+ * 删除内容
+ */
+export function delContent(data) {
+  let url = `/api/v1/sys/helpcontent`
+  return commonsAjax(url, data, 'delete')
+}
