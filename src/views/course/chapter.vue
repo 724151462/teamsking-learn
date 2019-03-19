@@ -27,7 +27,10 @@
       </div>
     </div>
     <div class="main-container">
-      <span v-if="sourceData.length === 0" style="color: red;">这是一门啥都没有的课程，需要UI切图</span>
+      <div v-if="sourceData.length === 0" style="display: flex;flex-direction: column;align-items: center;">
+        <img :src="require('@/assets/images/nothing.png')"/>
+        <span>这是一门比脸还干净的课</span>
+      </div>
       <el-collapse accordion v-model="activeChapter" @change="chapterChange" v-else>
         <el-collapse-item
           v-for="(chapter, chapterIndex) in sourceData"
