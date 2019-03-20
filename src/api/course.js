@@ -26,7 +26,7 @@ export function coursePage(data) {
   return commonsAjax(`/api/v1/course/page`, data, 'get')
 }
 /**
- * 获取我能管理的课程列表
+ * 学习中心下：获取我能管理的课程列表
  */
 export function myCourseList(data) {
   return commonsAjax(`/api/v1/me/course/list`, data, 'post')
@@ -113,7 +113,7 @@ export function instructorList(data) {
  * 获取教师列表
  */
 export function teachersList(data) {
-  let url = `/api/v1/tenant/` + data + '/teachers'
+  let url = '/api/v1/tenant/teachers'
   return commonsAjax(url, '', 'get')
 }
 

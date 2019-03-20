@@ -308,42 +308,6 @@ export default {
           console.log(error);
         });
     },
-    goLoginDebug() {
-      let data = {
-        tenantId: 1,
-        loginAccount: "888888",
-        passwd: "abc123"
-      };
-      logins(data)
-        .then(res => {
-          // console.log(res);
-          if (res.code === 200) {
-            // console.log(res)
-            twoWeeksExchange(res.data.token, res.data.refreshToken);
-            saveUserInfo(res.data.userId);
-            sysUserMenuList().then(response => {
-              // console.log(static_routes);
-              let static_routes = response.data;
-              // sessionStorage.setItem('menuList',JSON.stringify(response.data))
-              localStorage.setItem("menuList", JSON.stringify(static_routes));
-              // let routes = MenuUtils(response.data)
-              let routes = MenuUtils(static_routes);
-              // console.log(routes)
-              this.$store.commit("setAllMenu", routes);
-              this.$router.addRoutes(routes);
-              this.$router.replace("/course/list");
-            });
-          } else {
-            this.$message({
-              message: getErrorMsg(res.msg),
-              type: "error"
-            });
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
     //切换为手机号方式
     changeMobile() {
       this.forgotPass.isMail = false;

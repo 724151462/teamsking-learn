@@ -157,7 +157,6 @@ export default {
         })
         .catch(function(error) {
           this.$store.commit("HIDELOADING");
-          this.$store.commit("HIDELOADING");
           this.$message.error("上传失败");
           console.log("error", error);
         });

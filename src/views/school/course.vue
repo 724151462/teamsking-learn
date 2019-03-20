@@ -2,7 +2,7 @@
   <div class="course">
     <header-the-again headerTitle="课程管理">
       <div style="display:inline-block;position: relative;">
-        <el-input v-model="searchForm.searchString" style="width:230px" placeholder="课程名称/课程ID"></el-input>
+        <el-input v-model="searchForm.courseName" style="width:230px" placeholder="输入课程名称搜索"></el-input>
         <el-button
           type="primary"
           style="position: absolute;right:0;border-radius: 0;"
@@ -10,7 +10,6 @@
         >查询</el-button>
       </div>
     </header-the-again>
-    <Dialog :dialogConfig="dialogConfig" :formData="formData" :dataObj="dataObj" :show.sync="show"></Dialog>
     <table-the-again
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
@@ -28,12 +27,22 @@
       @current-change="pageChange"
     ></el-pagination>
 
-    <el-dialog title="课程评价详情" :visible.sync="dialogVisible" width="60%" :before-close="handleClose">
-      {{ this.popContentItem }}
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">保 存</el-button>
-      </span>
+    <el-dialog
+      :visible.sync="show"
+      width="350px"
+      style="box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)"
+    >
+      <div style="width:280px;margin: 0 auto">
+        <img :src="courseInfo.courseCover" width="280" height="160" alt>
+        <p style="margin: 10px 0">创建人：{{courseInfo.userCount}}</p>
+        <p style="margin: 10px 0">课程名称：{{courseInfo.courseName}}</p>
+        <p style="margin: 10px 0">一级分类：{{courseInfo.courseCategoryParentName}}</p>
+        <p style="margin: 10px 0" v-show="courseInfo.courseCategoryName">二级分类：{{courseInfo.courseCategoryName}}</p>
+        <p style="margin: 10px 0">学生人数：{{courseInfo.userCount}}</p>
+        <p style="margin: 10px 0">当前状态：{{courseInfo.courseStatus | reallyStatus}}</p>
+        <p style="margin: 10px 0">开始时间：{{courseInfo.beginTime}}</p>
+        <p style="margin: 10px 0">结束时间：{{courseInfo.endTime}}</p>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -41,7 +50,6 @@
 <script>
 import tableTheAgain from "../../components/table-theAgain";
 import headerTheAgain from "@/components/header-theAgain";
-import Dialog from "@/components/dialog";
 import { getErrorMsg } from "@/utils/utils";
 import { sysCoursePage, sysCourseId } from "@/api/school";
 import { courseDel } from "@/api/course";
@@ -58,7 +66,7 @@ export default {
       totalCount: 0,
       searchForm: {
         pageIndex: 1,
-        searchString: "",
+        courseName: "",
         pageSize: 10
       },
       dialogVisible: false,
@@ -119,7 +127,19 @@ export default {
           value: ""
         }
       ],
-      dataObj: {},
+      courseInfo: {
+        beginTime: "2018-12-12",
+        courseCategoryName: "高斯数学",
+        courseCategoryParentName: "数学",
+        courseCover:
+          "http://tskedu-course.oss-cn-beijing.aliyuncs.com/154850266372770334.jpeg",
+        courseId: "059d392723b647b1b3489747ea554185",
+        courseName: "uu",
+        courseStatus: 30,
+        difficultyStatus: 10,
+        endTime: "2019-09-20",
+        userCount: 1
+      },
       show: false,
       tableTitle: "课程管理列表",
       columnNameList: [
@@ -137,9 +157,9 @@ export default {
           minWidth: "100"
         },
         {
-          name: "二级分类",
-          prop: "courseCategoryName",
-          minWidth: "100"
+          name: "创建人",
+          prop: "courseStatus",
+          width: "80",
         },
         {
           name: "开课时间",
@@ -152,7 +172,7 @@ export default {
           minWidth: "130"
         },
         {
-          name: "课程人数",
+          name: "学生人数",
           prop: "userCount",
           width: "80"
         }
@@ -175,9 +195,31 @@ export default {
   mounted() {
     this.getCoursePage();
   },
+  filters: {
+    reallyStatus: function(value) {
+      switch (value) {
+        case 10:
+          return "未发布";
+          break;
+        case 20:
+          return "预发布";
+          break;
+        case 30:
+          return "已发布";
+          break;
+        case 40:
+          return "已关闭";
+          break;
+        case 50:
+          return "已归档";
+          break;
+        default:
+          break;
+      }
+    }
+  },
   components: {
     tableTheAgain,
-    Dialog,
     headerTheAgain
   },
   methods: {
@@ -198,21 +240,12 @@ export default {
       });
     },
     showComponentInfo: function(type, info) {
-      console.log(
-        "父组件接收到的类型：" + type + "父组件接收到的信息：" + info
-      );
+      // console.log(
+      //   "父组件接收到的类型：" , type , "父组件接收到的信息：" , info
+      // );
       switch (type) {
         case "check":
-          //console.log(info);
-          this.dialogConfig = {
-            btnShow: false,
-            title: "查看课程"
-          };
-          sysCourseId(info.courseId).then(response => {
-            this.dataObj = this.handleData(response.data);
-            this.dataObj.courseSchool = "字段未知";
-            console.log(response);
-          });
+          this.courseInfo = info;
           this.show = true;
           break;
         case "delete":
@@ -226,8 +259,8 @@ export default {
                 this.delCourse(info.courseId);
               })
               .catch(() => {});
-          }else{
-            this.$message.warning('只有未发布和已关闭的课程可以删除');
+          } else {
+            this.$message.warning("只有未发布和已关闭的课程可以删除");
           }
           break;
         case "add":
@@ -242,19 +275,12 @@ export default {
     delCourse(id) {
       courseDel([id]).then(response => {
         if (response.code === 200) {
-          this.$message.success('删除成功');
+          this.$message.success("删除成功");
           this.getCoursePage();
         } else {
           this.$message.error(getErrorMsg(response.msg));
         }
       });
-    },
-    handleClose(done) {
-      this.$confirm("确认关闭？")
-        .then(_ => {
-          done();
-        })
-        .catch(_ => {});
     },
     onSubmit: function() {
       console.log("onSubmit!!");
