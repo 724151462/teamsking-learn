@@ -16,9 +16,11 @@
     </el-form-item>
     <el-form-item label="logo" required>
       <upOss :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo" :fileKind="'img'"></upOss>
+      <div><img width="100px" :src="logoSrc" alt=""></div>
     </el-form-item>
     <el-form-item label="平台图片" required>
       <upOss :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic" :fileKind="'img'"></upOss>
+      <div><img width="100px" :src="platSrc" alt=""></div>
     </el-form-item>
     <el-button type="primary" @click="saveInfo" style="margin-left: 200px;margin-top: 20px">保存</el-button>
   </el-form>
@@ -34,6 +36,8 @@
 
     data() {
       return {
+        logoSrc: '',
+        platSrc: '',
         platformData: {
           name: '',
           introduct: ''
@@ -64,10 +68,12 @@
       upLogo(...params) {
         console.log(params)
         this.platformData.tenantLogo = params[0]
+        this.logoSrc = params[0]
       },
       upPic(...params) {
         console.log(params)
         this.platformData.tenantPic = params[0]
+        this.platSrc = params[0]
       },
     },
     components: {

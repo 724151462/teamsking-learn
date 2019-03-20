@@ -463,6 +463,11 @@ div {
           margin-left: 10px;
         }
       }
+      .interact-right {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
       .item-detail {
         display: flex;

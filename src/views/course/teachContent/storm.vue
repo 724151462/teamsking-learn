@@ -150,8 +150,15 @@ export default {
         case "view":
           interactBS({ stormId: params[1].interactionId }).then(response => {
             this.answerList = response.data;
-          });
-          this.show = true;
+            if(this.answerList.length === 0) {
+            this.$message({
+                message: '暂无数据',
+                    type: 'warning'
+                  })
+                }else{
+                  this.show = true;
+                }
+            });
           break;
 
         default:

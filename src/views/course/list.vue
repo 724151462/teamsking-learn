@@ -29,7 +29,7 @@
             <div class="button">
               <div class="top">
                 <a class="list" @click="upData(list.courseId)" v-if="list.courseStatus !== 40">编辑</a>
-                <a class="list" @click="copyCourse(list.courseId)" >复制</a>
+                <a class="list" @click="copyCourse(list)" >复制</a>
                 <a class="list" @click="closeCourse(list.courseId)" v-if="list.courseStatus === 30">关闭</a>
                 <a class="list" v-else-if="list.courseStatus === 10" @click="release(list.courseId)">发布</a>
                 <a class="list" @click="deleteCourse(list.courseId)" v-if="list.courseStatus === 40 || list.courseStatus === 10">删除</a>
@@ -87,6 +87,13 @@
           <el-button type="primary" @click="isDialog = false">保 存</el-button>
         </div>
       </el-dialog>
+      <el-dialog title="复制课程" :visible.sync="copyDialog">
+        <el-input placeholder="输入课程名" v-model="copyCourseObj.courseName"></el-input>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="questionDialog = false">取 消</el-button>
+            <el-button type="primary" @click="ensureCopy">确 定</el-button>
+          </span>
+      </el-dialog>
     </div>
 </template>
 
@@ -110,7 +117,9 @@ export default {
         pageSize: 10,
         courseName: '',
         courseStatus: ''
-      }
+      },
+      copyDialog: false, // 复制弹窗
+      copyCourseObj: {}  // 复制的课程
     }
   },
   created () {
@@ -173,16 +182,28 @@ export default {
         }
       })
     },
-    copyCourse (id) {
-      copy(id)
-      .then(response=> {
-        if(response.code === 200) {
-          this.$message({
-            message: '复制成功',
-            type: 'success'
-          })
-          this.getList()
-        }
+    copyCourse (course) {
+      let data = Object.assign({}, course)
+      this.copyCourseObj = data
+      this.copyCourseObj.courseName = this.copyCourseObj.courseName + '(复制)'
+      this.copyDialog = true
+      
+    },
+    ensureCopy() {
+      console.log(this.copyCourseObj)
+      let data = {
+        courseName: this.copyCourseObj.courseName,
+        id: this.copyCourseObj.courseId
+      }
+      copy(data)
+        .then(response=> {
+          if(response.code === 200) {
+            this.$message({
+              message: '复制成功',
+              type: 'success'
+            })
+            this.getList()
+          }
       })
     },
     closeCourse(id) {

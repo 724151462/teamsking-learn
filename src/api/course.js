@@ -57,8 +57,8 @@ export function publish(data) {
  * 复制课程
  */
 export function copy(data) {
-  let url = `/api/v1/course/` + data + '/copy'
-  return commonsAjax(url, '', 'get')
+  let url = `/api/v1/course/` + data.id + '/copy'
+  return commonsAjax(url, data, 'get')
 }
 
 /**

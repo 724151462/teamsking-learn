@@ -127,7 +127,10 @@ import Square from "@/components/cubeShadow.vue";
       videoList({courseId: this.$route.query.id})
       .then(response=> {
         response.data.pageData.forEach(element => {
-          element.schedule = (element.schedule * 100).toFixed(2)
+          if(element.schedule === 0 || element.schedule === null) {
+            element.schedule = 0.001
+          }
+          element.schedule = Number((element.schedule * 100).toFixed(2))
           element.videoLength = this.timeTransfer(element.videoLength)
         });
         this.tableData = response.data.pageData
