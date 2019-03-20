@@ -21,7 +21,6 @@
           >
             <div style="display:inline-block; height:100px;width:50%;">
               <!-- <el-button size="small" style="margin: 20px 50px" @click="addTestBtn">点击添加试题</el-button> -->
-              <span>{{item}}</span>
               <div style="margin-top:20px">
                 <p
                   style="margin-bottom:5px"
@@ -211,7 +210,7 @@ export default {
       // });
       console.log(params)
       this.testObj.quizList = params;
-      console.log(this.testObj.quizList.option[0].option)
+      // console.log(this.testObj.quizList.option[0].option)
       this.testContentArrValue = params[params.length-1].name;
     },
     removeTab(targetName) {
@@ -382,7 +381,7 @@ export default {
           // this.$set(element, 'disabled', true)
         }
       });
-      console.log(checkedList);
+      // console.log(checkedList);
       this.addTab(checkedList);
       this.dialogVisible = false
     }
