@@ -408,5 +408,5 @@ import { delContent } from '../../api/system';
   .collapse-title
     display flex
     justify-content space-between
-    width 100%
+    width 94%
 </style>
