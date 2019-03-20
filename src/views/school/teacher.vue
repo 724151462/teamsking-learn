@@ -167,7 +167,6 @@
       }
     },
     mounted(){
-      this.$store.commit('getCollegeList')
       // 教师列表
       sysTeacherPage({"pageIndex": this.pageIndex})
       .then((response)=>{

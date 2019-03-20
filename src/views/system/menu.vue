@@ -10,24 +10,15 @@
         </el-form-item>
       </el-form>
     </header-the-again>
-    <table-the-again
-        :tableTitle="tableTitle"
-        :tableOperate="tableOperate"
-        :columnNameList="columnNameList"
-        :tableData="tableData.data"
-        :operateList="operateList"
-        @showComponentInfo="showComponentInfo">
-    </table-the-again>
-
-    <el-pagination
-        background
-        layout="prev, pager, next"
-        :page-size="tableData.pageSize"
-        :page-count="tableData.totalPage"
-        :current-page="tableData.pageIndex"
-        @current-change="handleCurrentChange">
-    </el-pagination>
-
+    <el-tree
+      :data="menuData.data"
+      show-checkbox
+      :props="defaultProps"
+      node-key="menuId"
+      default-expand-all
+      :expand-on-click-node="false"
+      :render-content="renderContent">
+    </el-tree>
     <el-dialog
         :title="addForm.title"
         :visible.sync="dialogVisible"
@@ -44,8 +35,13 @@
         <el-form-item label="组件加载路径" prop="component">
           <el-input v-model="routeConfig.component"></el-input>
         </el-form-item>
-        <el-form-item label="父级菜单，默认为0">
-          <el-input v-model="routeConfig.parentId"></el-input>
+        <el-form-item label="是否侧边栏显示">
+          <el-radio v-model="routeConfig.showCode" label="1">
+            是
+          </el-radio>
+          <el-radio v-model="routeConfig.showCode" label="2">
+            否
+          </el-radio>
         </el-form-item>
         <el-form-item label="菜单类型">
           <el-radio v-model="routeConfig.type" label="0">
@@ -100,7 +96,12 @@ import { get } from 'http';
     data(){
       return {
         routeConfig: {
+          showCode: '1',
           type: '2'
+        },
+        defaultProps: {
+          children: 'list',
+          label: 'name'
         },
         rules: {
           name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
@@ -120,55 +121,7 @@ import { get } from 'http';
         form:{
         },
         tableTitle:'角色管理列表',
-        tableOperate:[
-          {
-            content:'创建菜单',
-            type:'created'
-          },
-          // {
-          //   content:'批量删除',
-          //   type:'deleteList'
-          // }
-        ],
-        columnNameList:[
-          {
-            type:'selection'
-          },
-          {
-            name:'菜单编号',
-            prop:'menuId'
-          },
-          {
-            name:'菜单名',
-            prop:'name'
-          },
-          {
-            name:'父级菜单',
-            prop:'parentId'
-          },
-          // {
-          //   name:'创建时间',
-          //   prop:'createName'
-          // },
-          {
-            name:'创建人',
-            prop:'createName'
-          },
-        ],
-        operateList:[
-          {
-            content:'删除',
-            type:'delete'
-          },
-          {
-            content:'编辑',
-            type:'edit'
-          }
-        ],
-        tableData:[],
-
-
-
+        menuData: []
       }
     },
     created:function(){
@@ -204,39 +157,44 @@ import { get } from 'http';
 
     },
     methods:{
-      showComponentInfo:function(type,info){
-        console.log('type',type,'info',info);
-        switch(type){
-          case 'created':
-            this.appendRole();
-            break;
-          case 'edit':
-            console.log('here is edit');
-            this.editRole(info);
-            break;
-          case 'delete':
-            this.delete('one',info);
-            break;
-          case 'deleteList':
-            this.delete('list',info);
-            break;
-          case 'set':
-            this.editMenu(info);
-            break;
+      renderContent(h, { node, data, store }) {
+        return (
+          <span class="custom-tree-node">
+            <span>{node.label}</span>
+            <span>
+              <el-button size="mini" type="text" on-click={ () => this.appendMenu(data) }>Append</el-button>
+              <el-button size="mini" type="text" on-click={ () => this.remove(node, data) }>Delete</el-button>
+            </span>
+          </span>);
+      },
+      append(data) {
+        console.log(data)
+        const newChild = { menuId: data.menuId, label: data.labe, list: [] };
+        if (!data.list) {
+          this.$set(data, 'list', []);
         }
+        data.list.push(newChild);
+      },
+
+      remove(node, data) {
+        const parent = node.parent;
+        const children = parent.data.list || parent.data;
+        const index = children.findIndex(d => d.id === data.id);
+        children.splice(index, 1);
       },
       getMenuList:function () {
         sysUserMenuList().then(
           res => {
-            this.tableData = res;
-            console.log('this.tableData',this.tableData);
+            this.menuData = res;
+            console.log('this.menuData',this.menuData);
           }
         ).catch()
       },
-      appendRole:function(){
+      appendMenu(data){
+        console.log(data)
+        this.routeConfig.parentId = data.menuId
         this.dialogVisible = true;
         this.addForm.title = '添加菜单';
-        this.addForm.data={ roleName:'' }
       },
       editRole:function(roleInfo){
         /*this.dialogVisible = true;
@@ -250,7 +208,7 @@ import { get } from 'http';
         this.addForm.data  = roleInfo;
         console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );*/
       },
-      save:function(){
+      save(){
         if( this.addForm.title === '添加菜单'){
           this.$refs['menuForm'].validate((valid) => {
             if (valid) {
@@ -261,6 +219,8 @@ import { get } from 'http';
                     message: '添加成功',
                     type: 'success'
                   })
+                  this.getMenuList()
+                  this.dialogVisible = false
                 }else{
                   this.$message({
                     message: response.msg,
