@@ -8,7 +8,6 @@ import 'vue-video-player/src/custom-theme.css'
 import 'video.js/dist/video-js.css'
 import Cookie from 'js-cookie'
 import MenuUtils from '@/utils/MenuUtils'
-
 Vue.use(ElementUI)
 
 Vue.prototype.loadingCss = {
@@ -19,7 +18,6 @@ Vue.prototype.loadingCss = {
 };
 Vue.config.productionTip = false
 window.STOMP_CLIENT = ''
-
 var routeList = []
 let data = JSON.parse(localStorage.getItem('menuList'))
 if (data){

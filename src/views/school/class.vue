@@ -197,7 +197,6 @@
             type:'selection'
           },
           {
-
             name:'编号',
             prop:'classId'
           },
