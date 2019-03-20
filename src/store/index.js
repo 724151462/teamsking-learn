@@ -17,6 +17,7 @@ const state = {
   modelActive: Cookie.get('modelActive') || "1",
   msgNum:0,
   isFullScreen:false,
+  loadingText: '正在加载',
   userAvatar:Cookie.get('avatar') || require('@/assets/images/user.png')
 }
 
@@ -39,6 +40,9 @@ const mutations = {
   //�޸�δ����Ϣ
   MSG_READY:(state, data)=>{
     state.msgNum = state.msgNum - Number(data)
+  },
+  SET_LOADING_TEXT:(state,data)=>{
+    state.loadingText = data
   },
   SET_MSG:(state, data)=>{
     state.msgNum = Number(data)
@@ -74,7 +78,7 @@ const mutations = {
         document.webkitExitFullscreen();
       }
       state.isFullScreen = false
-      // console.log('�˳�ȫ��')
+      // console.log('全屏')
     }
   }
 }

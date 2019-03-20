@@ -70,10 +70,8 @@ axios.interceptors.request.use(
         refreshSubscribers = []
         return false
       }
-      // console.log(config.url);
-      
       /*判断token是否将要过期*/
-      if (checkToken() && config.url.indexOf('/api/v1/token/accessToken?refreshTokenString=') === -1 && config.headers.token) {
+      if (checkToken() && config.url.indexOf('/api/v1/token/accessToken') === -1 && config.headers.token) {
         console.log('token即将过期')
         /*判断是否正在刷新*/
         if (!window.isRefreshing) {
@@ -82,43 +80,38 @@ axios.interceptors.request.use(
           console.log('正在刷新Token')
           /*发起刷新token的请求*/
           reToken({
-              refreshTokenString: Cookie.get('BackstageReToken')
+            refreshTokenString: Cookie.get('BackstageReToken')
+          }).then(res => {
+            console.log(res)
+            if (res.code === 200) {
+              console.log('刷新Token完毕')
+              /*将标志置为false*/
+              window.isRefreshing = false
+              /*成功刷新token*/
+              config.headers.token = res.data.token
+              /*更新reToken,Token*/
+              twoWeeksExchange(res.data.token, res.data.refreshToken)
+              /*执行数组里的函数,重新发起被挂起的请求*/
+              onRrefreshed(res.data.token)
+              /*执行onRefreshed函数后清空数组中保存的请求*/
+              refreshSubscribers = []
+              // console.log(res);
+            } else {
+              console.log('请重新登录')
+            }
+          }).catch(err => {
+            console.log('刷新Token失败');
+            console.log(err)
+            removeToken()
+            Globe_VM.$router.push({
+              path: '/login'
             })
-            .then(res => {
-              console.log(res)
-              if (res.code === 200) {
-                console.log(res)
-                console.log('刷新Token完毕')
-                /*将标志置为false*/
-                window.isRefreshing = false
-                /*成功刷新token*/
-                config.headers.token = res.data.token
-                /*更新reToken,Token*/
-                Cookie.set('BackstageToken', res.data.token, {
-                  expires: 7
-                })
-                Cookie.set('tokenLive', Date.now() + 6 * 1000 * 60 * 60 * 24 , {
-                  expires: 7
-                })
-                /*执行数组里的函数,重新发起被挂起的请求*/
-                onRrefreshed(res.data.token)
-                /*执行onRefreshed函数后清空数组中保存的请求*/
-                refreshSubscribers = []
-                // console.log(res);
-              } else {
-                console.log('请重新登录')
-              }
-            }).catch(err => {
-              console.log(err)
-              removeToken()
-              Globe_VM.$router.push({
-                path: '/login'
-              })
-            })
+          })
         }
         //console.log(config)
         /*把请求(token)=>{....}都push到一个数组中*/
         let retry = new Promise((resolve, reject) => {
+          console.log('被挂起的请求：', config);
           subscribeTokenRefresh((token) => {
             config.headers.token = token
             /*将请求挂起*/
@@ -126,6 +119,7 @@ axios.interceptors.request.use(
           })
         })
         return retry
+
       }
       return config
     } else {

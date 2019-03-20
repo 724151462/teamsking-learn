@@ -23,7 +23,6 @@
       background
       layout="prev, pager, next"
       :total="totalCount"
-      :page-size="5"
       @current-change="pageChange"
     ></el-pagination>
 
@@ -235,8 +234,12 @@ export default {
     // 列表请求
     getCoursePage() {
       sysCoursePage(this.searchForm).then(response => {
+        console.log(response);
+        
         this.tableData3 = response.data.pageData;
         this.totalCount = Number(response.data.totalCount);
+      }).catch(err=>{
+        this.$message.error('数据获取失败')
       });
     },
     showComponentInfo: function(type, info) {

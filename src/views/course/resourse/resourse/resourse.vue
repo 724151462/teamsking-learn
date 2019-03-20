@@ -1,16 +1,6 @@
 <template>
   <div class="resource">
     <tip title="资源管理"></tip>
-    <!--loading-->
-    <div v-show="showLoading">
-      <div class="tq_loading__mask"></div>
-      <div class="tq_loading-wrapper">
-        <div class="tq_loading__loading-wrapper">
-          <square :background="'#409eff'"></square>
-        </div>
-        <div class="tq_loading__text">loading...</div>
-      </div>
-    </div>
     <div class="radio-group" style="overflow: hidden">
       <div style="flex:1">
         <el-radio v-model="radio" :label="0" @change="radioChange(radio)">全部文件</el-radio>
@@ -227,10 +217,8 @@ import {
 import { fileKind } from "@/utils/utils";
 import { getResourceViewByUrl } from "@/api/sourceView";
 import videoPlayer from "@/components/video-pay";
-import { mapGetters } from "vuex";
 import UpOss from "@/components/up-oss";
 import Cookie from "js-cookie";
-import Square from "@/components/cubeShadow.vue";
 import tip from "@/components/tip";
 import { setTimeout } from "timers";
 export default {
@@ -238,14 +226,10 @@ export default {
   created() {
     this.getResource(0);
   },
-  computed: {
-    ...mapGetters(["showLoading"])
-  },
   components: {
     UpOss,
     videoPlayer,
-    tip,
-    Square
+    tip
   },
   data() {
     return {
@@ -372,29 +356,34 @@ export default {
         resourceType: id,
         searchKey: key
       };
-      if(isLoading){
-              this.$store.commit("SHOWLOADING");
+      if (isLoading) {
+        this.$store.commit("SHOWLOADING");
       }
-      getResList(data).then(res => {
-        this.$store.commit("HIDELOADING");
-        // console.log(res)
-        if (Number(res.code) === 200) {
-          //如果试题库为空，则初始化新建一个默认的文件夹
-          if (res.data.length === 0) {
-            this.newCatalog = {
-              catalogId: 0,
-              catalogName: "默认文件夹"
-            };
-            this.newFileFold();
+      getResList(data)
+        .then(res => {
+          this.$store.commit("HIDELOADING");
+          // console.log(res)
+          if (Number(res.code) === 200) {
+            //如果试题库为空，则初始化新建一个默认的文件夹
+            if (res.data.length === 0) {
+              this.newCatalog = {
+                catalogId: 0,
+                catalogName: "默认文件夹"
+              };
+              this.newFileFold();
+            }
+            this.resourceData = this.filterData(res.data);
+          } else {
+            this.$message({
+              message: "资源获取失败",
+              type: "error"
+            });
           }
-          this.resourceData = this.filterData(res.data);
-        } else {
-          this.$message({
-            message: "资源获取失败",
-            type: "error"
-          });
-        }
-      });
+        })
+        .catch(err => {
+          console.log(err);
+          this.$store.commit("HIDELOADING");
+        });
     },
     //判断文档类型
     getIcon(name) {
@@ -602,7 +591,7 @@ export default {
       localUpload(data).then(res => {
         if (Number(res.code) === 200) {
           this.$message.success("上传成功");
-          this.getResource(0,null,false);
+          this.getResource(0, null, false);
         } else {
           this.$message.error("资源保存失败");
         }

@@ -137,11 +137,13 @@ export default {
         })
         .catch(err => {
           console.log(err);
-          this.$message.error("获取验签失败请联系管理员s");
+          console.log('获取验签失败');
+          this.$message.error("获取验签失败,请重试");
         });
     },
     //上传文件到OSS
     startUp(request) {
+      this.$store.commit("SET_LOADING_TEXT", "正在上传...");
       this.$store.commit("SHOWLOADING");
       axios({
         method: "post",
@@ -150,12 +152,16 @@ export default {
         headers: { "Content-Type": "multipart/form-data" }
       })
         .then(res => {
+          this.$store.commit("SET_LOADING_TEXT", "正在加载");
+
           this.$store.commit("HIDELOADING");
           let url = this.imageData.host + "/" + this.imageData.key;
           this.inputNull();
           this.$emit("ossUp", url, this.fileName, this.fileSize);
         })
         .catch(function(error) {
+          this.$store.commit("SET_LOADING_TEXT", "正在加载");
+
           this.$store.commit("HIDELOADING");
           this.$message.error("上传失败");
           console.log("error", error);

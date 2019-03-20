@@ -291,18 +291,13 @@
       },
       // 获取所有试题列表
       getTestList(id,key){
-        let loading = this.$loading({
-          lock: true,
-          text: 'loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
+      this.$store.commit("SHOWLOADING");
         let data = {
           quizType: id,
           searchKey:key
         }
         getTestFileFold(data).then(res => {
-          loading.close()
+                    this.$store.commit("HIDELOADING");
           console.log(res)
           if (Number(res.code) === 200) {
             //如果试题库为空，则初始化新建一个默认的文件夹
@@ -343,16 +338,12 @@
       },
       //新建文件夹
       newFileFold(){
-        let loading = this.$loading({
-          lock: true,
-          text: 'loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
+      this.$store.commit("SHOWLOADING");
+
         let data = this.newCatalog
         this.expan = [this.newCatalog.catalogId]
         newTestFileFold(data).then(res => {
-          loading.close()
+                    this.$store.commit("HIDELOADING");
           console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('文件夹新建成功');
@@ -377,9 +368,9 @@
         let upFile = item.file
         let fileFormData = new FormData();
         fileFormData.append('file', upFile);
-        let loading = this.$loading(this.loadingCss)
+      this.$store.commit("SHOWLOADING");
         upQuiz(fileFormData).then(res => {
-          loading.close()
+                    this.$store.commit("HIDELOADING");
           console.log(res)
           this.$message.success('新增' + res.data.totalCount + '个试题')
         }).catch(error => {
@@ -406,17 +397,13 @@
       },
       // 删除试题
       delQuiz(id,parentId) {
-        let loading = this.$loading({
-          lock: true,
-          text: 'loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
+      this.$store.commit("SHOWLOADING");
+
         this.quizArr.push(Number(id))
         let arr = [...this.quizArr]
         this.expan = [parentId]
         deleteQuiz(arr).then(res => {
-          loading.close()
+                    this.$store.commit("HIDELOADING");
           console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('试题删除成功');
@@ -428,16 +415,12 @@
       },
       //删除文件夹
       deleteCatalog(){
-        let loading = this.$loading({
-          lock: true,
-          text: 'loading',
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
-        });
+      this.$store.commit("SHOWLOADING");
+
         let catalogIds = [...this.deleteArr]
         console.log(catalogIds)
         deleteTestFileFold(this.deleteArr).then(res => {
-          loading.close()
+                    this.$store.commit("HIDELOADING");
           console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('删除成功');

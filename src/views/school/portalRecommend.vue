@@ -38,7 +38,13 @@
 <script>
 import tableTheAgain from "../../components/table-theAgain";
 
-import { courseRecList, courseAllList, recRemove, recAdd, recMod } from "../../api/system";
+import {
+  courseRecList,
+  courseAllList,
+  recRemove,
+  recAdd,
+  recMod
+} from "../../api/system";
 
 export default {
   components: {
@@ -73,10 +79,15 @@ export default {
           type: "delete"
         }
       ],
-      tableOperate: [],
+      tableOperate: [
+        {
+          content: "+添加",
+          type: "add"
+        }
+      ],
       form: {
         recommendType: 10,
-        sourceIds: ''
+        sourceIds: ""
       },
       options: [],
       btnType: "",
@@ -103,7 +114,7 @@ export default {
                   message: "删除成功",
                   type: "success"
                 });
-                this.getRecList()
+                this.getRecList();
               }
             }
           );
@@ -121,19 +132,19 @@ export default {
     },
     ensureBtn() {
       if (this.btnType === "add") {
-        if(this.recommendData.length >= 4) {
+        if (this.recommendData.length >= 4) {
           this.$message({
-            message: '最多添加4门课程，您可以尝试替换课程',
-            type: 'warning'
-          })
-          this.dialogVisible = false
-          return
+            message: "最多添加4门课程，您可以尝试替换课程",
+            type: "warning"
+          });
+          this.dialogVisible = false;
+          return;
         }
         console.log(this.form);
         let form = {
           sourceIds: [this.form.sourceIds],
           recommendType: 10
-        }
+        };
         recAdd(form)
           .then(response => {
             if (response.code === 200) {
@@ -141,7 +152,7 @@ export default {
                 message: "添加成功",
                 type: "success"
               });
-              this.getRecList()
+              this.getRecList();
             } else if (response.code === 1000) {
               this.$message({
                 message: response.msg,
@@ -174,7 +185,7 @@ export default {
                 message: "修改成功",
                 type: "success"
               });
-              this.getRecList()
+              this.getRecList();
             } else if (response.code === 1000) {
               this.$message({
                 message: response.msg,
@@ -192,15 +203,14 @@ export default {
       }
     },
     getRecList() {
-      courseRecList()
-      .then(res => {
+      courseRecList().then(res => {
         console.log("res", res);
         this.recommendData = res.data.page.pageData;
-      })
+      });
     }
   },
   created: function() {
-    this.getRecList()
+    this.getRecList();
     courseAllList().then(response => {
       this.options = response.data.pageData;
     });
