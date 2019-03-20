@@ -35,6 +35,14 @@
         <el-form-item label="组件加载路径" prop="component">
           <el-input v-model="routeConfig.component"></el-input>
         </el-form-item>
+        <el-form-item label="是否为叶子节点">
+          <el-radio v-model="routeConfig.isLeaf" label="1">
+            是
+          </el-radio>
+          <el-radio v-model="routeConfig.isLeaf" label="2">
+            否
+          </el-radio>
+        </el-form-item>
         <el-form-item label="是否侧边栏显示">
           <el-radio v-model="routeConfig.showCode" label="1">
             是
@@ -84,7 +92,7 @@
   import { sysRoleAdd } from '../../api/system'
   import { sysRoleEdit } from '../../api/system'
   import { sysUserMenuDel } from '../../api/system'
-  import { sysUserMenuList, sysUserMenuAdd } from '../../api/system'
+  import { sysUserMenuList, sysUserMenuAdd, sysUserMenuEdit } from '../../api/system'
 import { get } from 'http';
 
   export default {
@@ -163,7 +171,8 @@ import { get } from 'http';
             <span>{node.label}</span>
             <span>
               <el-button size="mini" type="text" on-click={ () => this.appendMenu(data) }>Append</el-button>
-              <el-button size="mini" type="text" on-click={ () => this.remove(node, data) }>Delete</el-button>
+              <el-button size="mini" type="text" on-click={ () => this.editMenu(data) }>edit</el-button>
+              <el-button size="mini" type="text" on-click={ () => this.delete(node, data) }>Delete</el-button>
             </span>
           </span>);
       },
@@ -174,13 +183,6 @@ import { get } from 'http';
           this.$set(data, 'list', []);
         }
         data.list.push(newChild);
-      },
-
-      remove(node, data) {
-        const parent = node.parent;
-        const children = parent.data.list || parent.data;
-        const index = children.findIndex(d => d.id === data.id);
-        children.splice(index, 1);
       },
       getMenuList:function () {
         sysUserMenuList().then(
@@ -196,17 +198,11 @@ import { get } from 'http';
         this.dialogVisible = true;
         this.addForm.title = '添加菜单';
       },
-      editRole:function(roleInfo){
-        /*this.dialogVisible = true;
-        this.addForm.title = '编辑角色';
-        this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data' , this.addForm.data );*/
-      },
-      editMenu:function(roleInfo){
-        /*this.menuDialogVisible = true;
-        this.addForm.title = '设置权限';
-        this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );*/
+      editMenu(data){
+        let menuForm = Object.assign({}, data)
+        this.routeConfig = menuForm
+        this.addForm.title = "修改菜单"
+        this.dialogVisible = true
       },
       save(){
         if( this.addForm.title === '添加菜单'){
@@ -233,9 +229,8 @@ import { get } from 'http';
               return false;
             }
           });
-        }else if( this.addForm.title === '编辑角色' ){
-          console.log('编辑提交的信息:',this.addForm.data);
-          sysRoleEdit( this.addForm.data ).then(
+        }else{
+          sysUserMenuEdit( this.routeConfig ).then(
             res =>{
               console.log( '编辑的信息返回：',res);
             }
@@ -247,16 +242,26 @@ import { get } from 'http';
         }
         this.dialogVisible = false;
       },
-      delete:function(type,list){
-        sysUserMenuDel(list).then(
+      delete(node,data){
+        console.log(data)
+        sysUserMenuDel({menuId: data.menuId}).then(
           res => {
             console.log('删除成功的信息:',res);
             if(res.code === 200) {
+              const parent = node.parent;
+              const children = parent.data.list || parent.data;
+              const index = children.findIndex(d => d.id === data.id);
+              children.splice(index, 1);
               this.$message({
                 message: '删除成功',
                 type: 'success'
               })
               this.getMenuList()
+            }else if(res.code === 1000){
+              this.$message({
+                message: res.msg,
+                type: 'warning'
+              })
             }
           }
         ).catch(
