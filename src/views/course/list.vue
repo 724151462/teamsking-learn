@@ -203,6 +203,7 @@ export default {
               type: 'success'
             })
             this.getList()
+            this.copyDialog = false
           }
       })
     },
