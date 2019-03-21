@@ -1,6 +1,5 @@
 <template>
   <ol class="breadcrumb">
-<<<<<<< HEAD
     <template v-for="list in pathList">
       <li :key="list.id">
         <router-link :to="list.path">
@@ -8,10 +7,6 @@
         </router-link>
       </li>
     </template>
-=======
-    <router-link v-for="list in pathList" :key="list.id" :to="list.path">{{list.name}}</router-link>
-    <span style="color: rgb(119,119,119)">/</span>
->>>>>>> dev
     <li class="active">{{nowName}}</li>
   </ol>
 </template>
