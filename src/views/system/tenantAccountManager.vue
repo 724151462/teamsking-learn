@@ -122,6 +122,7 @@
         menuDialogVisible:false,
         dialogVisible:false,
         form:{
+          status: '1'
         },
         tableTitle:'角色管理列表',
         tableOperate:[
@@ -193,7 +194,9 @@
              this.appendTenant();
              break;
            case 'edit':
-             console.log('here is edit');
+             console.log(info);
+             info.status = String(info.status)
+             info.gender = String(info.gender)
              this.editRole(info);
              break;
          }
@@ -243,6 +246,7 @@
                   message: '添加成功',
                   type: 'success'
                 })
+                this.queryTenantList()
               }else{
                 this.$message({
                   message: res.msg,
@@ -263,6 +267,7 @@
                   message: '修改成功',
                   type: 'success'
                 })
+                this.queryTenantList()
               }else{
                 this.$message({
                   message: res.msg,
@@ -307,9 +312,9 @@
       open4(errorInfo) {
         this.$message.error(errorInfo);
       },
-      handleCurrentChange:function( number ){
-        this.form.pageIndex = number;
-        // this.queryRoleList();
+      handleCurrentChange( number ){
+        this.searchForm.pageIndex = number
+        this.queryTenantList(this.searchForm);
       }
     }
   }
