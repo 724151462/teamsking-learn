@@ -55,7 +55,13 @@
     >
       <template v-for="(list,index) in columnNameList">
         <template v-if="list.formatter">
-          <el-table-column :label="list.name" align="center" :key="index">
+          <el-table-column
+            :min-width="list.minWidth"
+            :width="list.width"
+            :label="list.name"
+            align="center"
+            :key="index"
+          >
             <template scope="scope">
               <div>{{ list.formatter(scope.row[list.prop],scope.row) }}</div>
             </template>
@@ -76,6 +82,7 @@
             :prop="list.prop"
             :width="list.width"
             align="center"
+            :formatter="formatter"
             :key="index"
           >
             <template slot="header" slot-scope="scope">
@@ -96,7 +103,14 @@
           ></el-table-column>
         </template>
       </template>
-      <el-table-column width="80px" fixed="right" label="是否启用" fit="true" align="center" v-if="switchColumn == 'open'">
+      <el-table-column
+        width="80px"
+        fixed="right"
+        label="是否启用"
+        fit="true"
+        align="center"
+        v-if="switchColumn == 'open'"
+      >
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
@@ -120,7 +134,7 @@
             v-for="(item,index) in operateList"
             @click="onSubmit(item.type,scope.row)"
             :key="index"
-             type="text"
+            type="text"
           >{{ item.content }}</el-button>
         </template>
       </el-table-column>

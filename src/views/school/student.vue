@@ -8,8 +8,14 @@
           v-model="searchForm.search"
           placeholder="输入姓名或学号"
         >
-          <el-button slot="append" @click="searchStudent" icon="el-icon-search"></el-button>
+          <!-- <el-button slot="append" @click="searchStudent" icon="el-icon-search"></el-button> -->
         </el-input>
+        <el-button
+          type="primary"
+          style="position: absolute;right:0;border-radius: 0;"
+          @click="searchStudent"
+          icon="el-icon-search"
+        ></el-button>
       </div>
     </header-the-again>
     <table-the-again
@@ -28,7 +34,7 @@
           clearable
           v-model="searchForm.college"
           :readonly="true"
-          placeholder="院(点此可筛选)"
+          placeholder="院"
           @change="filterChange"
           @clear="filterChange"
         >
@@ -47,7 +53,7 @@
           clearable
           v-model="searchForm.department"
           :readonly="true"
-          placeholder="系(点此可筛选)"
+          placeholder="系"
           @change="filterChange"
           @clear="filterChange"
         >
@@ -65,7 +71,7 @@
           class="my-select"
           filterable
           clearable
-          placeholder="专业(点此可筛选)"
+          placeholder="专业"
           @change="filterChange"
           @clear="filterChange"
         >
@@ -83,7 +89,7 @@
           filterable
           clearable
           v-model="searchForm.studentClass"
-          placeholder="班级(点此可筛选)"
+          placeholder="班级"
           @change="filterChange"
           @clear="filterChange"
         >
@@ -444,11 +450,8 @@ export default {
       //   "父组件接收到的类型：" + type + "父组件接收到的信息：" + info
       // );
       switch (type) {
-        case "check":
-          this.check(info);
-          break;
         case "switch":
-          this.changeStatus(info)
+          this.changeStatus(info);
           break;
         case "delete":
           this.delStudent(info);
@@ -491,12 +494,12 @@ export default {
       this.formEvent = "editStudent";
       this.dialogVisible = true;
     },
-    //删除学会
+    //删除学生
     delStudent(student) {
       // console.log(student.length);
       let delArr = [];
-      if (student.length == undefined) {
-        delArr.push(student.studentId);
+      if (student.length == 0) {
+        return false
       } else {
         student.forEach(element => {
           delArr.push(element.studentId);
@@ -518,8 +521,7 @@ export default {
             }
           });
         })
-        .catch(() => {
-        });
+        .catch(() => {});
     },
     ensureBtn() {
       if (this.formEvent == "addNewStudent") {
@@ -529,25 +531,27 @@ export default {
       }
     },
     //是否启用学生
-    changeStatus(info){
+    changeStatus(info) {
       let switchInfo = { id: info.studentId, status: info.status };
 
       this.$confirm("变更学生状态", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(() => {
-        sysStudentSwitch(switchInfo).then(response => {
+      })
+        .then(() => {
+          sysStudentSwitch(switchInfo).then(response => {
             if (response.code === 200) {
-              this.$message.success('操作成功');
+              this.$message.success("操作成功");
               this.studentInit();
-            }else{
-              this.$message.success('操作失败，请重试');
+            } else {
+              this.$message.success("操作失败，请重试");
             }
+          });
+        })
+        .catch(() => {
+          this.studentInit();
         });
-      }).catch(() => {
-        this.studentInit();
-      });
     },
     // 添加新学生
     addNewStudent: function() {
@@ -657,6 +661,7 @@ export default {
 <style scoped lang="stylus" type="text/stylus">
 .my-input {
   padding: 0;
+
   input {
     border: 0;
   }

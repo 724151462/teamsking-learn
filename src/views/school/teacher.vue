@@ -27,7 +27,6 @@
           clearable
           class="my-select"
           v-model="searchForm.college"
-          :readonly="true"
           placeholder="院"
           @change="collegeChange"
         >

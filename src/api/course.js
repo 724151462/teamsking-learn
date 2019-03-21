@@ -110,7 +110,7 @@ export function instructorList(data) {
 }
 
 /**
- * 获取教师列表
+ * 获取租户下的教师列表
  */
 export function teachersList(data) {
   let url = '/api/v1/tenant/teachers'

@@ -10,14 +10,14 @@
       </div>
     </div>
     <div class="header">
-      <div style="display: flex;flex: 1">
-        <router-link to="/course" class="login" style="margin-top:10px;text-align:center">
+      <div style="display: flex;flex: 1;max-width: 1920px;margin: 0 auto;">
+        <router-link to="/course" class="login" style="margin-top:10px;text-align:center;">
           <img :src="require('@/assets/images/header_logo.png')" height="40px">
         </router-link>
         <el-menu
           :default-active="defaultActiveIndex"
           background-color="rgb(70,76,92)"
-          style="font-size:16px"
+          style="font-size:16px;flex:1;border-bottom:0"
           text-color="#fff"
           active-text-color="#fff"
           mode="horizontal"
@@ -31,43 +31,43 @@
           <i :class="item.iconCls"></i><span slot="title">{{item.name}}</span>
           </el-menu-item>-->
         </el-menu>
+        <el-dropdown class="avator" trigger="click">
+          <span class="el-dropdown-link userinfo-inner">
+            <el-badge
+              style="border:0"
+              :value="$store.state.msgNum"
+              class="item"
+              v-if="$store.state.msgNum > 0"
+            >
+              <img
+                :src="this.$store.state.userAvatar"
+                alt
+                style="width: 35px;height: 35px;border-radius: 50%"
+              >
+            </el-badge>
+            <el-badge v-else>
+              <img
+                :src="this.$store.state.userAvatar"
+                alt
+                style="width: 35px;height: 35px;border-radius: 50%"
+              >
+            </el-badge>
+            <span style="margin-left:10px">{{this.realName}}</span>
+            <i class="el-icon-caret-bottom"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>
+              <router-link to="/user/index">个人中心</router-link>
+            </el-dropdown-item>
+            <el-dropdown-item divided>
+              <router-link to="/user/message">消息管理</router-link>
+            </el-dropdown-item>
+            <el-dropdown-item divided @click.native="doLogout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
-      <el-dropdown class="avator" trigger="click">
-        <span class="el-dropdown-link userinfo-inner">
-          <el-badge
-            style="border:0"
-            :value="$store.state.msgNum"
-            class="item"
-            v-if="$store.state.msgNum > 0"
-          >
-            <img
-              :src="this.$store.state.userAvatar"
-              alt
-              style="width: 35px;height: 35px;border-radius: 50%"
-            >
-          </el-badge>
-          <el-badge v-else>
-            <img
-              :src="this.$store.state.userAvatar"
-              alt
-              style="width: 35px;height: 35px;border-radius: 50%"
-            >
-          </el-badge>
-          <span style="margin-left:10px">{{this.realName}}</span>
-          <i class="el-icon-caret-bottom"></i>
-        </span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>
-            <router-link to="/user/index">个人中心</router-link>
-          </el-dropdown-item>
-          <el-dropdown-item divided>
-            <router-link to="/user/message">消息管理</router-link>
-          </el-dropdown-item>
-          <el-dropdown-item divided @click.native="doLogout">退出登录</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
     </div>
-    <router-view style="margin-top: 60px;"></router-view>
+    <router-view></router-view>
     <el-dialog
       title="提示"
       :visible.sync="nameDialog"
@@ -245,7 +245,7 @@ export default {
 }
 
 .header {
-  position: fixed;
+  // position: fixed;
   top: 0;
   // max-width 1620px
   // margin 0 auto

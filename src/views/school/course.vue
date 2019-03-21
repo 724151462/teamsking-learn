@@ -7,7 +7,8 @@
           type="primary"
           style="position: absolute;right:0;border-radius: 0;"
           @click="courseSearch"
-        >查询</el-button>
+          icon="el-icon-search"
+        ></el-button>
       </div>
     </header-the-again>
     <table-the-again
@@ -33,10 +34,12 @@
     >
       <div style="width:280px;margin: 0 auto">
         <img :src="courseInfo.courseCover" width="280" height="160" alt>
-        <p style="margin: 10px 0">创建人：{{courseInfo.userCount}}</p>
         <p style="margin: 10px 0">课程名称：{{courseInfo.courseName}}</p>
         <p style="margin: 10px 0">一级分类：{{courseInfo.courseCategoryParentName}}</p>
-        <p style="margin: 10px 0" v-show="courseInfo.courseCategoryName">二级分类：{{courseInfo.courseCategoryName}}</p>
+        <p
+          style="margin: 10px 0"
+          v-show="courseInfo.courseCategoryName"
+        >二级分类：{{courseInfo.courseCategoryName}}</p>
         <p style="margin: 10px 0">学生人数：{{courseInfo.userCount}}</p>
         <p style="margin: 10px 0">当前状态：{{courseInfo.courseStatus | reallyStatus}}</p>
         <p style="margin: 10px 0">开始时间：{{courseInfo.beginTime}}</p>
@@ -84,48 +87,6 @@ export default {
           type: "add"
         }
       ],
-      formData: [
-        {
-          key: "课程名称：",
-          inputType: "string",
-          value: "courseName"
-        },
-        {
-          key: "课程价格：",
-          inputType: "string",
-          value: "coursePrice"
-        },
-        {
-          key: "课程分类：",
-          inputType: "string",
-          value: "courseCategory"
-        },
-        {
-          key: "开课时间：",
-          inputType: "string",
-          value: "beginTime"
-        },
-        {
-          key: "结课时间：",
-          inputType: "string",
-          value: "endTime"
-        },
-        {
-          key: "课程人数：",
-          inputType: "string",
-          value: "userCount"
-        },
-        {
-          key: "所属学校:",
-          inputType: "string",
-          value: "courseSchool"
-        },
-        {
-          key: "选课开放范围：",
-          inputType: "string",
-          value: ""
-        }
-      ],
       courseInfo: {
         beginTime: "2018-12-12",
         courseCategoryName: "高斯数学",
@@ -156,11 +117,6 @@ export default {
           minWidth: "100"
         },
         {
-          name: "创建人",
-          prop: "courseStatus",
-          width: "80",
-        },
-        {
           name: "开课时间",
           prop: "beginTime",
           minWidth: "130"
@@ -177,6 +133,10 @@ export default {
         }
       ],
       operateList: [
+        {
+          content: "编辑",
+          type: "edit"
+        },
         {
           content: "查看",
           type: "check"
@@ -233,14 +193,14 @@ export default {
     },
     // 列表请求
     getCoursePage() {
-      sysCoursePage(this.searchForm).then(response => {
-        console.log(response);
-        
-        this.tableData3 = response.data.pageData;
-        this.totalCount = Number(response.data.totalCount);
-      }).catch(err=>{
-        this.$message.error('数据获取失败')
-      });
+      sysCoursePage(this.searchForm)
+        .then(response => {
+          this.tableData3 = response.data.pageData;
+          this.totalCount = Number(response.data.totalCount);
+        })
+        .catch(err => {
+          this.$message.error("数据获取失败");
+        });
     },
     showComponentInfo: function(type, info) {
       // console.log(
@@ -251,9 +211,26 @@ export default {
           this.courseInfo = info;
           this.show = true;
           break;
+        case "edit":
+          this.$confirm("前往编辑课程："+info.courseName, "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          })
+            .then(() => {
+              this.$router.push({
+                path: "/course/addCourse",
+                query: {
+                  type: "upData",
+                  courseId: info.courseId
+                }
+              });
+            })
+            .catch(() => {});
+          break;
         case "delete":
           if (Number(info.courseStatus == 40) || info.courseStatus == 10) {
-            this.$confirm("删除课程？", "提示", {
+            this.$confirm("删除课程："+info.courseName, "提示", {
               confirmButtonText: "确定",
               cancelButtonText: "取消",
               type: "warning"
