@@ -317,7 +317,8 @@ import { delContent } from '../../api/system';
                 type: 'success'
               })
               this.contentList.push(response.data)
-              this.helpItemForm = {}
+              this.helpItemForm.title = ''
+              this.helpItemForm.content = ''
               this.contentForm.addContentShow = false
             }
           })

@@ -1,18 +1,17 @@
 <template>
   <div class="role">
     <header-the-again headerTitle="菜单管理">
-      <el-form ref="form" :inline="true" label-width="100px" class="form-query">
+      <!-- <el-form ref="form" :inline="true" label-width="100px" class="form-query">
         <el-form-item label="输入搜索：">
           <el-input v-model="form.name"  style="width: 200px;margin-left: 10px;" placeholder="菜单名称"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="getMenuList">查询</el-button>
         </el-form-item>
-      </el-form>
+      </el-form> -->
     </header-the-again>
     <el-tree
       :data="menuData.data"
-      show-checkbox
       :props="defaultProps"
       node-key="menuId"
       default-expand-all
@@ -65,6 +64,9 @@
         <el-form-item label="菜单级别" prop="level">
           <el-input v-model="routeConfig.level"></el-input>
         </el-form-item>
+        <el-form-item label="排序顺序">
+          <el-input v-model="routeConfig.orderNo"></el-input>
+        </el-form-item>
         <el-form-item label="权限" prop="perms">
           <el-input v-model="routeConfig.perms"></el-input>
         </el-form-item>
@@ -105,7 +107,8 @@ import { get } from 'http';
       return {
         routeConfig: {
           showCode: '1',
-          type: '2'
+          type: '2',
+          isLeaf: '2'
         },
         defaultProps: {
           children: 'list',
@@ -132,36 +135,12 @@ import { get } from 'http';
         menuData: []
       }
     },
-    created:function(){
+    created(){
      // this.queryRoleList();
      this.getMenuList(this.form)
       
     },
-    mounted:function(){
-     /* sysUserMenuList().then(
-        res => {
-          console.log("权限菜单:",res);
-
-          let menuTree = res.data.filter(
-            element => {
-              return element.parentId === 0
-            }
-          );
-
-          for( let i = 0; i < menuTree.length; i++  ){
-            menuTree[i].children = [];
-            menuTree[i].children.push( res.data.filter(
-              element => {
-                return element.parentId === menuTree[i].menuId
-              }
-            ) )
-          }
-
-
-          console.log( 'menuTree' , menuTree );*\
-
-        }
-      ).catch()*/
+    mounted(){
 
     },
     methods:{
@@ -169,10 +148,10 @@ import { get } from 'http';
         return (
           <span class="custom-tree-node">
             <span>{node.label}</span>
-            <span>
-              <el-button size="mini" type="text" on-click={ () => this.appendMenu(data) }>Append</el-button>
-              <el-button size="mini" type="text" on-click={ () => this.editMenu(data) }>edit</el-button>
-              <el-button size="mini" type="text" on-click={ () => this.delete(node, data) }>Delete</el-button>
+            <span style="position: absolute;left: 350px">
+              <el-button size="mini" type="text" on-click={ () => this.appendMenu(data) }>添加</el-button>
+              <el-button size="mini" type="text" on-click={ () => this.editMenu(data) }>编辑</el-button>
+              <el-button size="mini" type="text" on-click={ () => this.delete(node, data) }>删除</el-button>
             </span>
           </span>);
       },
@@ -205,6 +184,7 @@ import { get } from 'http';
         this.dialogVisible = true
       },
       save(){
+        this.routeConfig.isLeaf = Number(this.routeConfig.isLeaf)
         if( this.addForm.title === '添加菜单'){
           this.$refs['menuForm'].validate((valid) => {
             if (valid) {
@@ -281,43 +261,8 @@ import { get } from 'http';
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
-  .role
-    .el-pagination
-      margin:20px 2.5% 0 0
-      display:flex
-      justify-content:flex-end
-      width:95%
-
-    .pop-academy
-      box-sizing:border-box
-      display:flex
-      justify-content:flex-start
-      align-items:left
-    .color-red
-      color:red
-    .item-title
-      box-sizing border-box
-      display:flex
-      justify-content:flex-end
-      flex-shrink:0
-      width:30%
-      span
-        line-height:40px
-
-    .item-input-list
-      box-sizing:border-box
-      display:flex
-      justify-content:flex-start
-      flex-direction:column
-      width:70%
-
-    .item-input
-      margin-bottom:20px
-      display:flex
-      justify-content:flex-start
-      align-items:center
-      line-height:40px
-
-    .input-pop
-      width:200px
+  .custom-tree-node
+    color red
+    // .operation
+    //   opacity 1
 </style>
