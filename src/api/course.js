@@ -787,7 +787,7 @@ export function assetCreate(data) {
  */
 export function scoreList(data) {
   let url = `/api/v1/course/coursescore/${data.courseId}`
-  return commonsAjax(url, '', 'get')
+  return commonsAjax(url, data, 'get')
 }
 
 

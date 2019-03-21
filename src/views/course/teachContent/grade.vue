@@ -43,6 +43,8 @@
       :data="tableData"
       style="width: 100%"
       :default-sort="{prop: 'score', order: 'descending'}"
+      sortable="custom"
+      @sort-change="sortChange"
     >
       <el-table-column label="姓名" width="180">
         <template slot-scope="scope">
@@ -135,10 +137,12 @@ import Square from "@/components/cubeShadow.vue";
 export default {
   data() {
     return {
+      sortStr: '', // 搜索条件
       file: "",
       dialogShow: false,
       scoreParams: {
-        courseId: this.$route.query.id
+        courseId: this.$route.query.id,
+        orderByClause: ''
       },
       right: 20,
       form: {
@@ -173,16 +177,7 @@ export default {
   },
   mounted() {
     this.$store.commit("SHOWLOADING");
-    // 成绩列表
-    scoreList(this.scoreParams).then(response => {
-      response.data.pageData.forEach(element => {
-        element.studentInfo = {
-          realName: ""
-        };
-      });
-      this.tableData = response.data.pageData;
-      this.$store.commit("HIDELOADING");
-    });
+    this.getScoreList()
     // 成绩权重
     scoreRight(this.scoreParams).then(response => {
       this.scoreRight = response.data;
@@ -192,6 +187,23 @@ export default {
     Square
   },
   methods: {
+    getScoreList() {
+      // 成绩列表
+      scoreList(this.scoreParams).then(response => {
+        response.data.pageData.forEach(element => {
+          element.studentInfo = {
+            realName: ""
+          };
+        });
+        this.tableData = response.data.pageData;
+        this.$store.commit("HIDELOADING");
+      });
+    },
+    sortChange(item) {
+      this.scoreParams.orderByClause = item.order === 'ascending' ? item.prop : `-${item.prop}`
+      console.log(this.scoreParams)
+      this.getScoreList(this.scoreParams)
+    },
     getStudentId(item) {
       console.log(item)
       this.tableData.forEach(element => {
