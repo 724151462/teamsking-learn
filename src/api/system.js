@@ -64,6 +64,13 @@ export function sysUserMenuAdd (data) {
 }
 
 /*
+*  修改用户权限菜单 
+* */
+export function sysUserMenuEdit (data) {
+  return commonsAjax(`/api/v1/sys/menu`,data,'put')
+}
+
+/*
 *  删除权限菜单 
 * */
 export function sysUserMenuDel (data) {

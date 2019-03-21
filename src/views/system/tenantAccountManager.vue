@@ -23,7 +23,6 @@
         :columnNameList="columnNameList"
         :tableData="tableData.pageData"
         :operateList="operateList"
-        switchColumn = 'open'
         @showComponentInfo="showComponentInfo">
     </table-the-again>
 
@@ -123,6 +122,7 @@
         menuDialogVisible:false,
         dialogVisible:false,
         form:{
+          status: '1'
         },
         tableTitle:'角色管理列表',
         tableOperate:[
@@ -131,7 +131,7 @@
             type:'批量删除'
           },
           {
-            content:'创建租户',
+            content:'创建租户账号',
             type:'created'
           }
         ],
@@ -194,19 +194,11 @@
              this.appendTenant();
              break;
            case 'edit':
-             console.log('here is edit');
+             console.log(info);
+             info.status = String(info.status)
+             info.gender = String(info.gender)
              this.editRole(info);
              break;
-           /*
-           case 'delete':
-             this.delete('one',info);
-             break;
-           case 'deleteList':
-             this.delete('list',info);
-             break;
-           case 'set':
-             this.editMenu(info);
-             break;*/
          }
       },
       queryTenantList:function () {
@@ -226,15 +218,6 @@
             this.open4('查询出错' + error)
           }
         )
-        /*console.log('this.form',this.form);
-        sysRolePage(this.form).then(
-          res => {
-            this.tableData=res.data;
-            console.log("tableData",this.tableData)
-          }
-        ).catch(
-          error => console.log('error',error)
-        )*/
       },
       appendTenant:function(){
         this.dialogVisible = true;
@@ -259,7 +242,16 @@
           sysTenantManager( this.form).then(
             res => {
               if(res.code === 200){
-
+                this.$message({
+                  message: '添加成功',
+                  type: 'success'
+                })
+                this.queryTenantList()
+              }else{
+                this.$message({
+                  message: res.msg,
+                  type: 'warning'
+                })
               }
               console.log('添加租户管理员账号:',res);
             }
@@ -270,7 +262,18 @@
           console.log('编辑提交的信息:',this.form);
           sysRoleEdit( this.form ).then(
             res =>{
-              console.log( '编辑的信息返回：',res);
+              if(res.code === 200){
+                this.$message({
+                  message: '修改成功',
+                  type: 'success'
+                })
+                this.queryTenantList()
+              }else{
+                this.$message({
+                  message: res.msg,
+                  type: 'warning'
+                })
+              }
             }
           ).catch(
             error => {
@@ -278,8 +281,6 @@
             }
           );
         }
-        this.dialogVisible = false;
-        setTimeout( ()=>{ this.queryRoleList() },300);
         this.dialogVisible = false;
       },
       delete:function(type,list){
@@ -311,9 +312,9 @@
       open4(errorInfo) {
         this.$message.error(errorInfo);
       },
-      handleCurrentChange:function( number ){
-        this.form.pageIndex = number;
-        // this.queryRoleList();
+      handleCurrentChange( number ){
+        this.searchForm.pageIndex = number
+        this.queryTenantList(this.searchForm);
       }
     }
   }

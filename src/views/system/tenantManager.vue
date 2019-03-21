@@ -147,18 +147,14 @@ export default {
       tableTitle: "角色管理列表",
       tableOperate: [
         {
-          content: "删除",
-          type: "delete"
-        },
-        {
           content: "创建租户",
           type: "created"
         }
       ],
       columnNameList: [
-        {
-          type: "selection"
-        },
+        // {
+        //   type: "selection"
+        // },
         {
           name: "学校名称",
           prop: "tenantName"
@@ -185,10 +181,6 @@ export default {
           content: "修改",
           type: "edit"
         },
-        {
-          content: "添加管理员",
-          type: "add"
-        }
       ],
       tableData: []
     };

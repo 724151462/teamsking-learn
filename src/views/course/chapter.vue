@@ -476,6 +476,7 @@ export default {
   },
 
   created() {
+    this.$store.commit("SHOWLOADING");
     this.$emit("courseName", sessionStorage.getItem("courseName"));
     this.getChapterList();
     courseBaseInfo(this.courseId).then(response => {
@@ -508,6 +509,7 @@ export default {
     getChapterList() {
       chaptersList(this.courseId).then(response => {
         this.sourceData = response.data;
+        this.$store.commit("HIDELOADING");
       });
     },
     // 弹窗关闭前视频停止
