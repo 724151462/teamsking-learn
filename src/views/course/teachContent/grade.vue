@@ -193,18 +193,19 @@ export default {
   },
   methods: {
     getStudentId(item) {
-      markStudentInfo({ userId: item.userId, courseId: item.courseId }).then(
-        response => {
-          this.tableData.forEach(element => {
-            if (element.userId === item.userId) {
+      console.log(item)
+      this.tableData.forEach(element => {
+        if (element.userId === item.userId && !element.isHovered) {
+          markStudentInfo({ userId: item.userId, courseId: item.courseId }).then(
+            response => {
               // element = Object.assign(element, response.data)
               this.$set(element, "studentInfo", response.data);
+              this.$set(element, "isHovered", true);
+              // this.
             }
-          });
-          console.log("data", this.tableData);
-          // this.
+          );
         }
-      );
+      });
     },
     studentSearch() {},
     formatter(row, column) {

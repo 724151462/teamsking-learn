@@ -1,5 +1,17 @@
 <template>
   <div class="role">
+    <!--加载动画-->
+    <div v-show="showLoading">
+      <div class="tq_loading__mask"></div>
+      <div class="tq_loading-wrapper">
+        <div class="tq_loading__loading-wrapper">
+          <square :background="'#409eff'"></square>
+        </div>
+        <div class="tq_loading__text">
+          正在加载
+        </div>
+      </div>
+    </div>
     <header-the-again headerTitle="菜单管理">
       <!-- <el-form ref="form" :inline="true" label-width="100px" class="form-query">
         <el-form-item label="输入搜索：">
@@ -14,7 +26,6 @@
       :data="menuData.data"
       :props="defaultProps"
       node-key="menuId"
-      default-expand-all
       :expand-on-click-node="false"
       :render-content="renderContent">
     </el-tree>
@@ -95,12 +106,14 @@
   import { sysRoleEdit } from '../../api/system'
   import { sysUserMenuDel } from '../../api/system'
   import { sysUserMenuList, sysUserMenuAdd, sysUserMenuEdit } from '../../api/system'
+  import Square from "@/components/cubeShadow.vue";
+  import { mapGetters } from "vuex";
 import { get } from 'http';
 
   export default {
     name: "role",
     components:{
-      tableTheAgain,
+      Square,
       headerTheAgain
     },
     data(){
@@ -143,6 +156,9 @@ import { get } from 'http';
     mounted(){
 
     },
+    computed: {
+      ...mapGetters(["showLoading"])
+    },
     methods:{
       renderContent(h, { node, data, store }) {
         return (
@@ -164,9 +180,11 @@ import { get } from 'http';
         data.list.push(newChild);
       },
       getMenuList:function () {
+        this.$store.commit("SHOWLOADING");
         sysUserMenuList().then(
           res => {
             this.menuData = res;
+            this.$store.commit("HIDELOADING");
             console.log('this.menuData',this.menuData);
           }
         ).catch()
