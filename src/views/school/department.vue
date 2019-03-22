@@ -28,14 +28,14 @@
         <el-select
           filterable
           clearable
-          v-model="form.collegeId"
+          v-model="collegeId"
           class="my-select"
-          placeholder="请选择院"
+          placeholder="院"
         >
           <el-option
             v-for="item in departmentSelectList"
             :key="item.collegeId"
-            :label="item.value"
+            :label="item.collegeName"
             :value="item.collegeId"
           ></el-option>
         </el-select>
@@ -45,7 +45,6 @@
     <el-pagination
       background
       layout="prev, pager, next"
-      :page-size="tableData.pageSize"
       :page-count="tableData.totalPage"
       :current-page="tableData.pageIndex"
       @current-change="handleCurrentChange"
@@ -54,9 +53,8 @@
     <el-dialog
       :title="addForm.title"
       :visible.sync="dialogVisible"
-      width="60%"
+      width="500"
       :before-close="handleClose"
-      style="min-width: 800px"
     >
       <div class="pop-academy">
         <div class="item-title">
@@ -135,16 +133,16 @@ import { sysTenantTeacher,sysCollegeList, sysDepartmentPage} from "../../api/sch
 import { sysDepartment } from "../../api/school";
 import { sysDepartmentEdit } from "../../api/school";
 import { sysDepartmentDelete } from "../../api/school";
+import { getErrorMsg } from '../../utils/utils';
 
 export default {
   name: "",
   data() {
     return {
       departmentSelectList: [],
-      popError: "",
+      collegeId: '',
       input: "",
       form: {
-        pageSize: 5,
         pageIndex: 1,
         departmentName: "",
         collegeId: -1
@@ -181,10 +179,6 @@ export default {
         {
           type: "selection"
         },
-        // {
-        //   name: "编号",
-        //   prop: "departmentId"
-        // },
         {
           name: "院名称",
           prop: "collegeName",
@@ -240,7 +234,6 @@ export default {
   },
   methods: {
     showComponentInfo: function(type, info) {
-      //console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
       switch (type) {
         case "edit":
           //console.log(info);
@@ -262,63 +255,32 @@ export default {
     getCollegeList: function() {
       sysCollegeList()
         .then(res => {
-          console.log('院列表',res);
-          res.data.filter(element => {
-            this.departmentSelectList.push({
-              value: element.collegeName,
-              collegeId: element.collegeId
-            });
-            return true;
-          });
-          // this.departmentSelectList = [];
+          // console.log('院列表',res);
+          this.departmentSelectList = res.data;
         })
         .catch(error => {
           console.log(error);
         });
     },
-    queryDepartment: function() {
-      // let data = JSON.parse(JSON.stringify(this.form))
-      // for(let i = 0; i < data.length; i++){
-      //   if(data[i] === '' || JSON.stringify(data[i]) === '""'){
-      //     delete data[i]
-      //   }
-      // }
-      sysDepartmentPage(this.form)
+    queryDepartment: function(pageIndex = 1, departmentName = null) {
+      //  departmentName = departmentName || null
+      sysDepartmentPage({collegeId: -1,pageIndex,departmentName})
         .then(res => {
-          console.log("系信息", res.data);
+          console.log(res);
           if (res.code === 200) {
             this.tableData = res.data;
-            if (this.tableData.pageData.length > 0) {
-              //
-              for (let i = 0; i < this.tableData.pageData.length; i++) {
-                let college = this.departmentSelectList.filter(item => {
-                  return (
-                    item.collegeId === this.tableData.pageData[i].collegeId
-                  );
-                });
-                //给没有院的记录的院名称设为无分院
-                // console.log('college', college );
-                this.tableData.pageData[i].collegeName =
-                  college.length > 0 ? college[0].value : "无分院";
-                this.tableData.pageData[i].collegeId =
-                  college.length > 0 ? college[0].collegeId : -2;
-              }
-              // console.log('改造之后',this.tableData.pageData);
-            }
           } else {
-            this.error = "查询失败" + res.msg;
-            this.open4();
+            this.errMsg(getErrorMsg(res.msg));
           }
         })
         .catch(error => {
-          this.popError = "查询失败" + error;
-          this.open4();
+          this.errMsg(getErrorMsg(res.msg));
         });
     },
     save: function() {
       if (this.addForm.data.collegeId === -1) {
         this.popError = "请选择一个院";
-        this.open4();
+        this.errMsg(getErrorMsg(res.msg));
         return;
       }
       if (this.blurFunction()) {
@@ -343,7 +305,7 @@ export default {
               .then(res => {
                 if (res.code === 200) {
                   this.dialogVisible = false;
-                  this.open2("修改成功");
+                  this.successMsg("修改成功");
                   this.queryDepartment();
                 } else {
                   this.popError = "修改失败:" + res.msg;
@@ -352,13 +314,13 @@ export default {
                       { realName: "", userId: "", workNumber: "" }
                     ];
                   }
-                  this.open4();
+                  this.errMsg(getErrorMsg(res.msg));
                 }
                 console.log("sysDepartmentEdit", res);
               })
               .catch(error => {
                 this.popError = "修改失败:" + error;
-                this.open4();
+                this.errMsg(getErrorMsg(res.msg));
               });
           } else {
             //添加状态下
@@ -371,11 +333,11 @@ export default {
                 console.log("添加", res);
                 if (res.code === 200) {
                   this.dialogVisible = false;
-                  this.open2("添加成功");
+                  this.successMsg("添加成功");
                   this.queryDepartment();
                 } else {
                   this.popError = "添加失败:" + res.msg;
-                  this.open4();
+                  this.errMsg(getErrorMsg(res.msg));
                   this.addForm.data.manager = [
                     { realName: "", userId: "", workNumber: "" }
                   ];
@@ -383,7 +345,7 @@ export default {
               })
               .catch(error => {
                 this.popError = "添加失败:" + error;
-                this.open4();
+                this.errMsg(getErrorMsg(res.msg));
               });
           }
         }
@@ -409,17 +371,17 @@ export default {
           res => {
             console.log("删除：", res);
             if (res.code === 200) {
-              this.open2("删除成功");
+              this.successMsg("删除成功");
               this.queryDepartment();
             } else {
               this.popError = "删除失败:" + res.msg;
-              this.open4();
+              this.errMsg(getErrorMsg(res.msg));
             }
           }
         )
         .catch(error => {
           this.popError = "删除失败:" + error;
-          this.open4();
+          this.errMsg(getErrorMsg(res.msg));
         });
       //console.log('departmentList:',departmentList);
       let that = this;
@@ -502,7 +464,7 @@ export default {
       if (a.length > 0) {
         // console.log( '院负责人不能重复');
         this.popError = "院负责人不能重复";
-        this.open4();
+        this.errMsg(getErrorMsg(res.msg));
         return false;
       }
       return true;
@@ -528,13 +490,13 @@ export default {
             "暂无此负责人";
         });
     },
-    open2(msg) {
+    successMsg(msg) {
       this.$message({
         message: msg,
         type: "success"
       });
     },
-    open4() {
+    errMsg() {
       this.$message.error(this.popError);
     },
     querySearchAsync(queryString, cb) {

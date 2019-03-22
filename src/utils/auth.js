@@ -22,7 +22,7 @@ export function twoWeeksExchange (token,reToken) {
 
   Cookie.set('tokenLive',Date.now() + 6 * 1000 * 60 * 60 * 24 , { expires: 7 })
 
-  // Cookie.set('tokenLive',Date.now() +  1000 * 30 , { expires: 7 })
+  // Cookie.set('tokenLive',Date.now() +  1000 * 20 , { expires: 7 })
 
   Cookie.set(reTokenKey, reToken, { expires: 15 })
   // Cookie.set(TokenKey, token, { expires: inFifteenMinutes })

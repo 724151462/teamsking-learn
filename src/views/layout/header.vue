@@ -245,11 +245,11 @@ export default {
 }
 
 .header {
-  // position: fixed;
+  position: fixed;
   top: 0;
   // max-width 1620px
   // margin 0 auto
-  z-index: 2009;
+  z-index: 120;
   width: 100%;
   height: 60px;
   background: #464C5C;

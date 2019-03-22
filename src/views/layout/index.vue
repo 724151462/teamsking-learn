@@ -126,6 +126,7 @@ export default {
     background #F6F7F9
     max-width 1920px
     margin 0 auto
+    margin-top 60px 
 
 </style>
 
