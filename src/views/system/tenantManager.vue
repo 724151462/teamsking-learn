@@ -171,10 +171,6 @@ export default {
           name: "课程数",
           prop: "createName"
         },
-        {
-          name: "课程包数",
-          prop: "createName"
-        }
       ],
       operateList: [
         {

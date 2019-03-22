@@ -99,7 +99,7 @@
   import { sysRoleDelete } from '../../api/system'
   import { sysUserMenuList } from '../../api/system'
   import { sysTenantManagerPage } from '../../api/system'
-  import { sysTenantManager,tenantGet } from '../../api/system'
+  import { sysTenantManager,tenantGet, sysTenantManagerEdit } from '../../api/system'
 
   export default {
     name: "role",
@@ -163,11 +163,7 @@
           }
 
         ],
-        tableData:'',
-
-
-
-
+        tableData:[],
       }
     },
     created:function(){
@@ -227,13 +223,8 @@
       editRole:function(roleInfo){
         this.dialogVisible = true;
         this.addForm.title = '编辑角色';
-        this.form  = roleInfo;
-      },
-      editMenu:function(roleInfo){
-        /*this.menuDialogVisible = true;
-        this.addForm.title = '设置权限';
-        this.addForm.data  = roleInfo;
-        console.log( 'this.addForm.data.menuList' , this.addForm.data.menuList );*/
+        let data = Object.assign({}, roleInfo)
+        this.form  = data;
       },
       save:function(){
         if( this.addForm.title === '添加租户管理员账号'){
@@ -260,7 +251,7 @@
           )
         }else if( this.addForm.title === '编辑角色' ){
           console.log('编辑提交的信息:',this.form);
-          sysRoleEdit( this.form ).then(
+          sysTenantManagerEdit( this.form ).then(
             res =>{
               if(res.code === 200){
                 this.$message({

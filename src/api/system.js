@@ -99,6 +99,13 @@ export function sysTenantManager (data) {
 }
 
 /**
+ * 修改租户管理员
+ **/
+export function sysTenantManagerEdit (data) {
+  return commonsAjax(`/api/v1/sys/tenant/manager`,data,'put')
+}
+
+/**
  * 分页查询租户管理员 
  * */
 export function sysTenantManagerPage (data) {
