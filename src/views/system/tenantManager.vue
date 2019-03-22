@@ -35,67 +35,72 @@
       :before-close="handleClose"
       style="min-width: 800px"
     >
-      <el-form ref="form" :model="form" label-width="120px">
+      <el-form ref="form" :model="tenantData" label-width="120px">
         <el-form-item label="学校名称" required>
-          <el-input v-model="form.tenantName"></el-input>
+          <el-input v-model="tenantData.tenantName"></el-input>
         </el-form-item>
         <el-form-item label="学校简称" required>
-          <el-input v-model="form.shortName"></el-input>
+          <el-input v-model="tenantData.shortName"></el-input>
+        </el-form-item>
+        <el-form-item label="租户官网" required>
+          <el-input v-model="tenantData.tenantWebsite"></el-input>
         </el-form-item>
         <el-form-item label="logo">
-          <upOss :fileKind="'img'" :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo"></upOss>
+          <upOss :fileKind="'resource'" style="height: 100px" :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo"></upOss>
+          <img v-if="tenantData.tenantLogo" height="80px" :src="tenantData.tenantLogo" />
         </el-form-item>
-        <el-form-item label="平台图片">
-          <upOss :fileKind="'img'" :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic"></upOss>
+        <el-form-item label="平台图片" style="height: 100px">
+          <upOss :fileKind="'resource'" :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic"></upOss>
+          <img v-if="tenantData.tenantPic" height="80px" :src="tenantData.tenantPic" />
         </el-form-item>
         <el-form-item label="学校域名" required>
-          <el-input v-model="form.tenantDomain"></el-input>
+          <el-input v-model="tenantData.tenantDomain"></el-input>
         </el-form-item>
         <el-form-item label="本地部署" required>
-          <el-radio v-model="form.localDeploy" :label="1">
+          <el-radio v-model="tenantData.localDeploy" label="1">
             是
           </el-radio>
-          <el-radio v-model="form.localDeploy" :label="2">
+          <el-radio v-model="tenantData.localDeploy" label="2">
             否
           </el-radio>
         </el-form-item>
         <el-form-item label="推送平台课程" required>
-          <el-radio v-model="form.pushCourse" :label="1">
+          <el-radio v-model="tenantData.pushCourse" label="1">
             是
           </el-radio>
-          <el-radio v-model="form.pushCourse" :label="2">
+          <el-radio v-model="tenantData.pushCourse" label="2">
             否
           </el-radio>
         </el-form-item>
         <el-form-item label="授权截止日期" required>
           <el-date-picker
-            v-model="form.authorizeExpire"
+            v-model="tenantData.authorizeExpire"
             type="datetime"
             placeholder="选择日期时间"
             value-format="yyyy-MM-dd">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="授权类型" required>
-          <el-radio v-model="form.authorizeType" :label="10">
+          <el-radio v-model="tenantData.authorizeType" label="10">
             正式
           </el-radio>
-          <el-radio v-model="form.authorizeType" :label="20">
+          <el-radio v-model="tenantData.authorizeType" label="20">
             试用
           </el-radio>
         </el-form-item>
-        <el-form-item label="试用oss平台" required>
-          <el-radio v-model="form.ossPublic" :label="1">
+        <el-form-item label="使用oss平台" required>
+          <el-radio v-model="tenantData.ossPublic" label="1">
             是
           </el-radio>
-          <el-radio v-model="form.ossPublic" :label="2">
+          <el-radio v-model="tenantData.ossPublic" label="2">
             否
           </el-radio>
         </el-form-item>
         <el-form-item label="是否启用" required>
-          <el-radio v-model="form.status" :label="1">
+          <el-radio v-model="tenantData.status" label="1">
             启用
           </el-radio>
-          <el-radio v-model="form.status" :label="3">
+          <el-radio v-model="tenantData.status" label="3">
             禁用
           </el-radio>
         </el-form-item>
@@ -117,7 +122,7 @@ import { sysRoleAdd } from "../../api/system";
 import { tenantMod } from "../../api/system";
 import { sysRoleDelete } from "../../api/system";
 import { sysUserMenuList } from "../../api/system";
-import { tenantGet, tenantAdd } from "../../api/system";
+import { tenantGet, tenantAdd, tenantDetail } from "../../api/system";
 import upOss from '@/components/up-oss'
 
 export default {
@@ -142,7 +147,14 @@ export default {
           pageIndex: 1,
           pageSize: 10
         },
-        searchKey: ""
+        searchKey: "",
+      },
+      tenantData: {
+        localDeploy: '2',
+        pushCourse: '1',
+        authorizeType: '10',
+        ossPublic: '1',
+        status: '1'
       },
       tableTitle: "角色管理列表",
       tableOperate: [
@@ -161,20 +173,16 @@ export default {
         },
         {
           name: "学生数",
-          prop: "createTime"
+          prop: "studentCount"
         },
         {
           name: "教师数",
-          prop: "createName"
+          prop: "teacherCount"
         },
         {
           name: "课程数",
-          prop: "createName"
+          prop: "courseCount"
         },
-        {
-          name: "课程包数",
-          prop: "createName"
-        }
       ],
       operateList: [
         {
@@ -185,7 +193,7 @@ export default {
       tableData: []
     };
   },
-  created: function() {
+  created() {
     this.tenantList()
     // this.queryRoleList();
   },
@@ -196,17 +204,17 @@ export default {
         this.tableData = response.data.pageData;
       });
     },
-    showComponentInfo: function(type, info) {
+    showComponentInfo(type, info) {
       console.log("type", type, "info", info);
       switch (type) {
         case "created":
           console.log("here is created");
-          this.form = {}
-          this.appendRole();
+          // this.form = {}
+          this.addManager();
           break;
         case "edit":
           console.log("here is edit");
-          this.editRole(info);
+          this.editManager(info);
           break;
         case "delete":
           this.delete("one", info);
@@ -221,40 +229,55 @@ export default {
     },
     upLogo(...params) {
       console.log(params)
-      this.form.tenantLogo = params[0]
+      this.$set(this.tenantData, 'tenantLogo', params[0])
     },
     upPic(...params) {
       console.log(params)
-      this.form.tenantPic = params[0]
+      this.$set(this.tenantData, 'tenantPic', params[0])
     },
-    appendRole: function() {
+    addManager() {
       this.dialogVisible = true;
       this.addForm.title = "创建租户";
       this.addForm.data = { roleName: "" };
     },
-    editRole: function(roleInfo) {
-      this.dialogVisible = true;
+    editManager(roleInfo) {
+      tenantDetail({tenantId: roleInfo.tenantId})
+      .then(response=> {
+        console.log(response.data)
+        response.data.pushCourse = String(response.data.pushCourse)
+        response.data.ossPublic = String(response.data.ossPublic)
+        response.data.localDeploy = String(response.data.localDeploy)
+        response.data.authorizeType = String(response.data.authorizeType)
+        response.data.status = String(response.data.status)
+        this.tenantData = response.data
+      })
       this.addForm.title = "修改信息";
-      this.form = roleInfo
+      this.dialogVisible = true;
     },
-    editMenu: function(roleInfo) {
+    editMenu(roleInfo) {
     },
-    save: function() {
+    save() {
       console.log(this.addForm)
       if(this.addForm.title === "创建租户") {
-        tenantAdd(this.form)
+        tenantAdd(this.tenantData)
         .then(response=> {
           if(response.code === 200) {
             this.$message({
               message: '添加成功',
               type: 'success'
             })
+            this.tenantData.tenantName = ''
+            this.tenantData.shortName = ''
+            this.tenantData.tenantWebsite = ''
+            this.tenantData.tenantLogo = ''
+            this.tenantData.tenantPic = ''
+            this.tenantData.tenantDomain = ''
             this.tableData.push(response.data)
             this.dialogVisible = false;
           }
         })
       }else {
-        tenantMod(this.form)
+        tenantMod(this.tenantData)
         .then(response=> {
           if(response.code === 200) {
             this.$message({
@@ -267,9 +290,9 @@ export default {
         })
       }
     },
-    delete: function(type, list) {
+    delete(type, list) {
     },
-    handleCurrentChange: function(number) {
+    handleCurrentChange(number) {
       this.form.pageIndex = number;
       // this.queryRoleList();
     },

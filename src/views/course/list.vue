@@ -90,7 +90,7 @@
       <el-dialog title="复制课程" :visible.sync="copyDialog">
         <el-input placeholder="输入课程名" v-model="copyCourseObj.courseName"></el-input>
         <span slot="footer" class="dialog-footer">
-            <el-button @click="questionDialog = false">取 消</el-button>
+            <el-button @click="copyDialog = false">取 消</el-button>
             <el-button type="primary" @click="ensureCopy">确 定</el-button>
           </span>
       </el-dialog>
@@ -208,16 +208,26 @@ export default {
       })
     },
     closeCourse(id) {
-      close(id)
-      .then(response=> {
-        if(response.code === 200) {
-          this.$message({
-            message: '关闭成功',
-            type: 'success'
-          })
-          this.getList()
+      this.$store.commit(
+        'DELETECONFIRM',{
+          title: '提示',
+          message: '确认关闭课程?', 
+          fn:() => {
+            close(id)
+            .then(response=> {
+              if(response.code === 200) {
+                this.$message({
+                  message: '关闭成功',
+                  type: 'success'
+                })
+                this.getList()
+              }
+            })
+          }
         }
-      })
+        
+      )
+      
     },
     courseStatus (val) {
       let vals = Number(val)
