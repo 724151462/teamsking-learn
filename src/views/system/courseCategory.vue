@@ -1,11 +1,29 @@
 <template>
   <div class="courseCategory" id="courseCategory">
     <div class="tab">
-      <div class="tabBar" :class="{ active:showTab1}" @click="switchTab('first')">创建课程分类</div>
       <div class="tabBar" :class="{ active:!showTab1}" @click="switchTab('second')">课程分类列表</div>
+      <div class="tabBar" :class="{ active:showTab1}" @click="switchTab('first')">创建课程分类</div>
+
+      <div class="tabContent" v-show="!showTab1">
+        <tableNoHeader
+          :tableData="tableData"
+          :tables="tables"
+          :buttonStylus="sysButton"
+          @showComponentInfo="showComponentInfo"
+        ></tableNoHeader>
+        <!-- 展示二级分类弹窗 -->
+        <el-dialog :visible.sync="dialogVisible">
+          <tableNoHeader
+            :tableData="level2"
+            :tables="tables"
+            :buttonStylus="sysButton1"
+            @showComponentInfo="showComponentInfo"
+          ></tableNoHeader>
+        </el-dialog>
+      </div>
 
       <div class="tabContent" v-show="showTab1">
-        <el-form ref="form" :model="catalogObj" label-width="80px">
+        <el-form ref="form" :model="catalogObj" label-width="80px" style="padding: 20px">
           <el-form-item label="分类名称" required>
             <el-input style="width: 200px;" v-model="catalogObj.name" placeholder="请输入内容"></el-input>
           </el-form-item>
@@ -34,25 +52,7 @@
             <el-input style="width: 200px;" v-model="catalogObj.description" placeholder="请输入描述"></el-input>
           </el-form-item>
         </el-form>
-        <el-button @click="saveCatalog" type="primary">保存</el-button>
-      </div>
-
-      <div class="tabContent" v-show="!showTab1">
-        <tableNoHeader
-          :tableData="tableData"
-          :tables="tables"
-          :buttonStylus="sysButton"
-          @showComponentInfo="showComponentInfo"
-        ></tableNoHeader>
-        <!-- 展示二级分类弹窗 -->
-        <el-dialog :visible.sync="dialogVisible">
-          <tableNoHeader
-            :tableData="level2"
-            :tables="tables"
-            :buttonStylus="sysButton1"
-            @showComponentInfo="showComponentInfo"
-          ></tableNoHeader>
-        </el-dialog>
+        <el-button @click="saveCatalog" type="primary" style="margin-left: 20px;margin-bottom: 10px">保存</el-button>
       </div>
       <!-- 保存分类弹窗 -->
       <el-dialog
@@ -177,7 +177,6 @@ export default {
         });
         this.tableData = response.data;
         this.cataOptions = response.data;
-        this.cataOptions.unshift({categoryId: null,categoryName: '一级分类'})
       });
     },
     saveCatalog() {
@@ -338,6 +337,7 @@ export default {
   width: 200px;
   height: 100%;
   /*background: cyan;*/
+  cursor: pointer;
   flex-shrink: 0;
   border: 1px solid rgb(230, 230, 230);
   border-bottom: none;

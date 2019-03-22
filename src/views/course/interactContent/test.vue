@@ -6,8 +6,9 @@
     <div style="margin-bottom: 20px;">
       <el-button size="small" type="primary" @click="addTestBtn(editableTabsValue)">请选择题目</el-button>
     </div>
+    <span v-if="editableTabs.length === 0">您还没有选择试题，点击选择题目按钮选择</span>
     <el-tabs v-model="editableTabsValue" type="card" closable @tab-remove="removeTab">
-      <el-tab-pane
+      <el-tab-pane style="min-height: 270px;"
         v-for="item in editableTabs"
         :key="item.name"
         :label="item.tabName"
@@ -24,7 +25,7 @@
                 >{{option.optionTitle}}</p>
               </div>
             </div>
-      </el-tab-pane>
+    </el-tab-pane>
     </el-tabs>
     <el-form :model="testObj" :rules="rules" ref="testForm" label-width="100px">
         <el-form-item label="标题" prop="examTitle">
@@ -144,14 +145,15 @@ export default {
       interactExam({ examId: this.$route.query.interactId }).then(response => {
         let subject = [];
         let checkedQuizIds = [];
-        response.data.libraryQuizVOS.forEach((element, i) => {
+        let newTabName
+        response.data.libraryQuizVOS.forEach((element, index) => {
+          newTabName = String(element.quizId);
           console.log(element);
           subject.push({
-            quizTitle: element.quizTitle,
-            quizId: element.quizId,
-            title: `第${i + 1}题`,
-            name: String(i + 1),
-            option: element.quizOption
+            tabName: `第${index+1}题`,
+            title: element.quizTitle,
+            name: newTabName,
+            content: element.quizOption
           });
           checkedQuizIds.push(element.quizId);
           this.checkedQuiz = checkedQuizIds;
@@ -161,6 +163,7 @@ export default {
         response.data.testHour = Math.floor(response.data.limitTime / 60);
         response.data.testMinute = response.data.limitTime % 60;
         response.data.quizList = subject;
+        this.editableTabs = subject
         response.data.courseId = this.$route.query.id;
         this.testObj = response.data;
       });
@@ -211,12 +214,13 @@ export default {
           content: element.option
         });
       });
-     
+      this.testObj.quizList = list;
       this.editableTabsValue = newTabName;
     },
     removeTab(targetName) {
       let tabs = this.editableTabs;
       let activeName = this.editableTabsValue;
+      console.log(activeName, targetName)
       if (activeName === targetName) {
         tabs.forEach((tab, index) => {
           if (tab.name === targetName) {
@@ -257,6 +261,23 @@ export default {
       this.addTab(checkedList);
       this.dialogVisible = false;
     },
+    handleSuccess() {
+      this.routerType = 'success'
+      let chapterArr = JSON.parse(localStorage.getItem('localInteractId'))
+      Cookie.set('interactionStatus', "10")
+      let index = ''
+      let findFlag = chapterArr.some((element, i)=> {
+        if(element === this.testObj.chapterId) {
+          index = i
+        }
+      })
+      if(index !== '') {
+        Cookie.set('interactActiveIndex', index)
+      }else{
+        Cookie.set('interactActiveIndex', chapterArr.length)
+      }
+      this.$router.push({path:"/course/list/interact",query: {id: this.$route.query.id}})
+    },
     savetestArr() {
       console.log(this.$route.query.operation);
       if (this.$route.query.operation === "edit") {
@@ -264,8 +285,10 @@ export default {
           Number(this.testObj.testHour) * 60 + Number(this.testObj.testMinute);
         this.testObj.limitTime = minute;
         let idArr = [];
-        this.testObj.quizList.forEach(element => {
-          idArr.push(element.quizId);
+        console.log(this.testObj.quizList)
+        // 从tabs上的题目拿数据 name为quizId
+        this.editableTabs.forEach(element => {
+          idArr.push(Number(element.name));
         });
         this.testObj.quizIds = idArr;
         examPut(this.testObj).then(response => {
@@ -288,6 +311,7 @@ export default {
           Number(this.testObj.testHour) * 60 + Number(this.testObj.testMinute);
         this.testObj.limitTime = minute;
         let idArr = [];
+        console.log(this.testObj.quizList)
         this.testObj.quizList.forEach(element => {
           idArr.push(element.quizId);
         });
@@ -316,23 +340,23 @@ export default {
           }
         });
       }
-    },
-    beforeRouteLeave (to, from, next) {
-      let msg = '跳转将丢失未保存数据，是否跳转'
-      if(this.routerType === 'cancel') {
-        msg = '跳转将丢失未保存数据，是否跳转'
-      }else {
-        msg = '添加成功，是否跳活动转列表页'
-      }
-      this.$confirm(msg, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        next()
-      }).catch(() => {      
-      });
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    let msg = '跳转将丢失未保存数据，是否跳转'
+    if(this.routerType === 'cancel') {
+      msg = '跳转将丢失未保存数据，是否跳转'
+    }else {
+      msg = '添加成功，是否跳活动转列表页'
+    }
+    this.$confirm(msg, {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      next()
+    }).catch(() => {      
+    });
   }
 };
 </script>

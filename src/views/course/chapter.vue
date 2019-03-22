@@ -1064,7 +1064,7 @@ export default {
       let fileName = params[1].replace(
         /[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g,
         ""
-      );
+      ).substring(13);
       this.docForm.itemResource.resourceTitle = fileName; // 名称
       this.docForm.itemResource.resourceUrl = params[0]; // 路径
       this.docForm.itemResource.resourceType = 20; // 资源类型
