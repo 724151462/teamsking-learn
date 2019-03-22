@@ -122,6 +122,13 @@ export function tenantMod (data) {
 }
 
 /**
+ * 租户详情
+ **/
+export function tenantDetail (data) {
+  return commonsAjax(`/api/v1/tenant/${data.tenantId}`,data,'get')
+}
+
+/**
  * 分页查询系统消息
  * */
 export function sysManage (data) {
