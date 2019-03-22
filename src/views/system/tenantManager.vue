@@ -161,15 +161,15 @@ export default {
         },
         {
           name: "学生数",
-          prop: "createTime"
+          prop: "studentCount"
         },
         {
           name: "教师数",
-          prop: "createName"
+          prop: "teacherCount"
         },
         {
           name: "课程数",
-          prop: "createName"
+          prop: "courseCount"
         },
       ],
       operateList: [
