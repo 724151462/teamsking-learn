@@ -133,23 +133,28 @@ export default {
       this.delMsg()
     },
     delMsg() {
-        console.log(this.delArr)
-        sysMessageDel({ messageIds: this.delArr })
-        .then(response=> {
-            if(response.code === 200) {
-                this.getMessageList()
-                this.$message({
-                    message: '删除成功',
-                    type: 'success'
-                })
-            }
-            if(response.code === 403) {
-                this.$message({
-                    message: '没有权限删除',
-                    type: 'warning'
-                })
-            }
-        });
+      this.$store.commit('DELETECONFIRM',{
+        title: '提示',
+        message: '确认删除消息?', 
+        fn:() => {
+          sysMessageDel({ messageIds: this.delArr })
+          .then(response=> {
+              if(response.code === 200) {
+                  this.getMessageList()
+                  this.$message({
+                      message: '删除成功',
+                      type: 'success'
+                  })
+              }
+              if(response.code === 403) {
+                  this.$message({
+                      message: '没有权限删除',
+                      type: 'warning'
+                  })
+              }
+          });
+        }
+      })
     },
     ensureAdd() {
         this.addUp.courseId = this.$route.query.id
