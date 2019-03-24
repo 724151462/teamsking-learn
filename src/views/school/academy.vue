@@ -108,7 +108,6 @@ export default {
       addForm: {
         title: "添加学院",
         teacherName: "",
-
         data: {
           collegeName: "",
           manager: []
@@ -184,11 +183,7 @@ export default {
       // console.log("父组件接收到的类型：", type + "父组件接收到的信息：", info);
       switch (type) {
         case "edit":
-          this.dialogVisible = true;
-          this.addForm.title = "编辑院信息";
-          this.addForm.data.collegeId = info.collegeId;
-          this.addForm.data.collegeName = info.collegeName;
-          this.addForm.data.manager = info.manager;
+          this.edit(JSON.parse(JSON.stringify(info)));
           break;
         case "add":
           this.dialogVisible = true;
@@ -243,10 +238,18 @@ export default {
         }
       });
     },
+    edit(info) {
+      this.dialogVisible = true;
+      this.addForm.title = "编辑院信息";
+      this.addForm.data.collegeId = info.collegeId;
+      this.addForm.data.collegeName = info.collegeName;
+      this.addForm.data.manager = info.manager;
+    },
     // 删除 || 批量删除
     deleteAcademy: function(academyList) {
       let academyIdList = [];
       if (academyList.length == 0) {
+        this.$message.warning("请勾选要删除的目标");
         return false;
       }
       if (academyList.collegeId) {

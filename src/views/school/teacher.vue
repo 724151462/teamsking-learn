@@ -209,8 +209,6 @@ export default {
             );
           }
         );
-
-        console.log("121", this.searchDepartmentList);
         this.searchForm.department = -1;
       }
     },

@@ -71,10 +71,8 @@ export function sysDepartmentPage(data) {
  * 获取全部的系
  * /sys/department/list
  * */
-export function sysDepartmentList() {
-  return commonsAjax(`/api/v1/sys/department/list`, {
-    collegeId: -1
-  }, 'get')
+export function sysDepartmentList(data) {
+  return commonsAjax(`/api/v1/sys/department/list`, data, 'get')
 }
 /**
  * 获取全部的系

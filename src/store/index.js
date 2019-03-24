@@ -1,9 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import socket from './modules/socket'
-import { stat } from 'fs';
+import {
+  stat
+} from 'fs';
 import Cookie from 'js-cookie'
 import Globe_VM from '../main'
+import {
+  getErrorMsg
+} from "@/utils/utils";
 import {
   SHOWLOADING,
   HIDELOADING,
@@ -12,25 +17,25 @@ import {
 
 Vue.use(Vuex)
 const state = {
-  showLoading:false,
+  showLoading: false,
   allMenu: [],
   filterMenu: [],
-  leftNavState: '课程中心' ,
+  leftNavState: '课程中心',
   modelActive: Cookie.get('modelActive') || "1",
-  msgNum:0,
-  isFullScreen:false,
+  msgNum: 0,
+  isFullScreen: false,
   loadingText: '正在加载',
-  userAvatar:Cookie.get('avatar') || require('@/assets/images/user.png')
+  userAvatar: Cookie.get('avatar') || require('@/assets/images/user.png')
 }
 
 const mutations = {
-  [SHOWLOADING](state){
+  [SHOWLOADING](state) {
     state.showLoading = true;
   },
-  [HIDELOADING](state){
+  [HIDELOADING](state) {
     state.showLoading = false;
   },
-  [DELETECONFIRM](state, data){
+  [DELETECONFIRM](state, data) {
     Globe_VM.$confirm(data.message, data.title, {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -44,32 +49,36 @@ const mutations = {
       });
     });
   },
-  setAllMenu: (state, list)=> {
+  setAllMenu: (state, list) => {
     // console.log('rwq', list)
-    if(state.allMenu.length !== 0) {
+    if (state.allMenu.length !== 0) {
       return
     }
     list.forEach(element => {
       state.allMenu.push(element)
     });
   },
+  //接口请求失败消息弹窗
+  ERR_MSG: (state, data) => {
+    Globe_VM.$message.error(getErrorMsg(data));
+  },
   //�޸�δ����Ϣ
-  MSG_READY:(state, data)=>{
+  MSG_READY: (state, data) => {
     state.msgNum = state.msgNum - Number(data)
   },
-  SET_LOADING_TEXT:(state,data)=>{
+  SET_LOADING_TEXT: (state, data) => {
     state.loadingText = data
   },
-  SET_MSG:(state, data)=>{
+  SET_MSG: (state, data) => {
     state.msgNum = Number(data)
   },
   //�޸��û�ͷ��
-  CHANGE_AVATAR:(state, data)=>{
+  CHANGE_AVATAR: (state, data) => {
     state.userAvatar = data
   },
   //ȫ��
-  SET_FULLSCREEN(state, data){
-    if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
+  SET_FULLSCREEN(state, data) {
+    if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
       } else if (document.documentElement.msRequestFullscreen) {
@@ -100,13 +109,12 @@ const mutations = {
 }
 
 const getters = {
-  showLoading(state){
+  showLoading(state) {
     return state.showLoading
   }
 }
 
-const actions = {
-}
+const actions = {}
 
 export default new Vuex.Store({
   state,
