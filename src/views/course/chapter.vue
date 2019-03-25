@@ -220,6 +220,8 @@
             :poster="coverUrl"
             :state="videoState"
             @resetStatus="resetStatus"
+            :timePoint.sync="preViewTP"
+            :subjectInfo="subjectInfo"
           ></videoPlayer>
         </div>
         <div class="subject-right">
@@ -230,20 +232,28 @@
           <div class="row-container margin" v-for="(subject, index) in subjectList" :key="index">
             <div>
               <span>第{{index + 1}}处:</span>
-              <input
-                v-model="subject.time"
-                type="text"
-                style="border: 1px solid black; width: 120px; margin-left:5px"
-                placeholder="输入00:00:00格式"
-                @blur="saveAddTime(subject)"
-              >
-              <span
-                v-if="subject.timeFormatTip === true"
-                style="color:red;margin-left:2px"
-              >输入00:00:00格式</span>
+              <div class="time-node">
+                <input
+                  size="small"
+                  style="width: 24px;text-align: center"
+                  v-model="subject.minute"
+                  placeholder=""
+                  @blur="checkAddTime(subject.minute, 'm', index)"
+                />
+                : 
+                <input
+                  size="small"
+                  style="width: 24px;"
+                  v-model="subject.second"
+                  placeholder=""
+                  @blur="checkAddTime(subject.second, 's', index)"
+                />
+              </div>
+              
             </div>
-            <div class="subject-operate">
-              <span>预览</span>
+            <div class="subject-operate" v-if="subject.timeFormatError === false">
+              
+              <span @click="preview(index)">预览</span>
               <span @click="editSubject(index)">编辑</span>
               <span @click="delSubject(index)">删除</span>
             </div>
@@ -262,7 +272,7 @@
         <div>
           <span style="color:rgb(85, 200, 255)">资源库导入</span>
         </div>
-        <div style="float: right">
+        <!-- <div style="float: right">
           <el-input
             type="text"
             placeholder="请输入测试题名称"
@@ -270,7 +280,7 @@
             style="width: 300px"
           ></el-input>
           <el-button>查询</el-button>
-        </div>
+        </div> -->
         <div class="subjRadio">
           <Tree
             :sourceData="quizList"
@@ -352,7 +362,7 @@ import {
   subjectGet,
   subjectDel
 } from "@/api/course";
-import { getResList, localUpload, getTestFileFold } from "@/api/library";
+import { getResList, localUpload, getTestFileFold, quizInfo } from "@/api/library";
 import { fileKind } from '@/utils/utils'
 import { mapGetters } from "vuex";
 import Square from "@/components/cubeShadow.vue";
@@ -428,8 +438,11 @@ export default {
       quizList: [],
       subjectVisible: false,
       subjectList: [],
+      subjectInfo: {},
       // 题目弹窗的视频地址
       videoUrl: "",
+      // 预览时间点
+      preViewTP: "",
       // 课程资源
       resource: {
         courseId: this.$route.query.id
@@ -782,7 +795,6 @@ export default {
     },
     // 资源类型图标
     typeIcon(info) {
-      console.log(info)
       let type = fileKind(info.itemName)
       switch (type) {
         case 'ppt':
@@ -839,21 +851,21 @@ export default {
       subjectGet({ itemId: subject.itemId }).then(response => {
         response.data.forEach((element, i) => {
           console.log(Math.floor(element.timePoint / 3600));
-          let hour = Math.floor(element.timePoint / 3600);
           let minute =
             element.timePoint > 60
-              ? Math.floor((element.timePoint - hour * 3600) / 60)
+              ? Math.floor(element.timePoint / 60)
               : 0;
           let second = element.timePoint % 60;
-          hour = String(hour).length === 1 ? "0" + String(hour) : String(hour);
           minute =
             String(minute).length === 1 ? "0" + String(minute) : String(minute);
           second =
             String(second).length === 1 ? "0" + String(second) : String(second);
-          element.time = `${hour}:${minute}:${second}`;
-          element.timeFormatTip = false;
+          element.minute = minute
+          element.second = second
+          element.timeFormatError = false;
         });
         this.subjectList = response.data;
+        console.log(this.subjectList)
       });
       this.subjectVisible = true;
     },
@@ -907,27 +919,35 @@ export default {
       //   alert("亲，3题差不多了哦");
       //   return;
       // } else {
-      this.subjectList.push({ timePoint: "", timeFormatTip: false });
+      this.subjectList.push({ timePoint: "", timeFormatError: false });
+      this.preViewTP = 'reset'
       // }
     },
     // 保存时间点
-    saveAddTime(subject) {
-      console.log(subject);
-      if (
-        subject.time.split(":").length - 1 !== 2 ||
-        subject.time.length !== 8
-      ) {
-        subject.timeFormatTip = true;
-      } else {
-        subject.timeFormatTip = false;
+    checkAddTime(val, type, index) {
+      if(val === 0 ) val = '00'
+      let reg = /^\d{2}$/
+      if(!reg.test(val) || val === '') {
+        this.$message({
+          message: '请输入2位小数',
+          type: 'warning'
+        })
+        this.subjectList[index].timeFormatError = true
+        if(type == 'm') {
+          this.subjectList[index].minute = ''
+        }else {
+          this.subjectList[index].second = ''
+        }
+      }else{
+        this.subjectList[index].timeFormatError = false
+        // 分秒都不为空的时候，赋值给timePoint和priViewTP
+        if(this.subjectList[index].minute && this.subjectList[index].second) {
+          this.subjectList[index].timePoint = 
+          Number(this.subjectList[index].minute) * 60 +  Number(this.subjectList[index].second);
+          this.preViewTP = this.subjectList[index].timePoint
+          this.editSubject(index)
+        }
       }
-      let timeSplit = subject.time.split(":");
-      let second =
-        Number(timeSplit[0]) * 3600 +
-        Number(timeSplit[1]) * 60 +
-        Number(timeSplit[2]);
-      console.log(timeSplit[0], timeSplit[1], timeSplit[2], second);
-      subject.timePoint = second;
     },
     // 删除时间点
     delSubject(index) {
@@ -952,9 +972,12 @@ export default {
         }
       });
     },
+    // 预览
+    preview(index) {
+      this.preViewTP = this.subjectList[index].timePoint
+    },
     // 编辑题目弹窗
     editSubject(index) {
-      console.log("当前点击的添加时间点", index);
       this.sourceSubListIndex = index;
       this.editSubjectVisible = true;
       this.checkedQuizFiles(this.temCheckedList);
@@ -965,6 +988,12 @@ export default {
     },
     // 选完题确认按钮
     editEnsure() {
+      // 预览时渲染题目信息请求
+      console.log("试题ID", this.subjectList[this.sourceSubListIndex].quizId);
+      quizInfo(this.subjectList[this.sourceSubListIndex].quizId)
+      .then(response=> {
+        this.subjectInfo = response.data
+      })
       this.subjectList[this.sourceSubListIndex].courseId = this.courseId;
       this.subjectList[this.sourceSubListIndex].itemId = this.tempItems.itemId;
       this.subjectList[
@@ -978,7 +1007,7 @@ export default {
     saveAllSubj() {
       console.log(this.subjectList);
       this.subjectList.forEach(element => {
-        if (element.timeFormatTip === true) {
+        if (element.timeFormatError === true) {
           this.$message({
             message: "时间点格式有误",
             type: "warning"
@@ -1310,7 +1339,14 @@ export default {
       justify-content: space-between;
       margin: 0 auto;
       width: 94%;
-
+        .time-node {
+          display: inline-block;
+          width: 60px;
+          height: 26px;
+          line-height: 24px;
+          border: 1px solid #B4C6CC;
+          border-radius: 2px
+        }
       .test-btn {
         background-color: rgb(82, 204, 102);
         padding: 5px 10px;
