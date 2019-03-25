@@ -46,6 +46,7 @@
         <el-select
           filterable
           clearable
+          remote
           class="my-select"
           @change="(value)=>{
             if(value !== ''){
@@ -73,6 +74,7 @@
         <el-select
           filterable
           clearable
+          remote
           class="my-select"
           @change="(value)=>{
             if(value !== ''){
@@ -149,15 +151,25 @@
             ></el-option>
           </el-select>
         </el-form-item>-->
+        <template v-if="addForm.info.show">
+          <el-form-item label="所属院：">{{addForm.info.college || '-'}}</el-form-item>
+          <el-form-item label="所属系：">{{addForm.info.department || '-'}}</el-form-item>
+        </template>
         <el-form-item label="专业：" prop="specialityId">
           <el-select
             filterable
             clearable
             :filter-method="(query)=>{
-            if(query !== ''){
-              querySpecialityList(query,'AddSpecialityList') 
-            }
-          }"
+              if(query !== ''){
+                querySpecialityList(query,'AddSpecialityList') 
+              }
+            }"
+            @clear="hiddenInfo"
+            @change="(value)=>{
+              if(value !== ''){
+                getSpecialityInfo(value)
+              }
+            }"
             v-model="addForm.data.specialityId"
             placeholder="请选择所属专业"
           >
@@ -212,7 +224,6 @@
           </span>
         </el-form-item>
       </el-form>
-
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
         <el-button type="primary" @click="save">保 存</el-button>
@@ -230,16 +241,13 @@ import {
   sysCollegeList,
   sysDepartmentPage,
   sysTeacherPage,
+  sysSpecialityInfo,
   sysSpecialityPage
 } from "../../api/school";
 import { sysClass } from "../../api/school";
 import { sysClassUpdate } from "../../api/school";
 import { sysClassDelete } from "../../api/school";
 import { getErrorMsg } from "@/utils/utils";
-
-// import { sysDepartment } from '../../api/school'
-// import { sysDepartmentEdit } from '../../api/school'
-// import { sysDepartmentDelete } from '../../api/school'
 
 export default {
   name: "",
@@ -257,10 +265,6 @@ export default {
       },
       departmentSelectList: [],
       specialityList: [],
-      collegeAndDepartment: "",
-      popCollegeAndDepartment: "",
-      popError: "",
-      input: "",
       form: {
         specialityId: -1,
         collegeId: -1,
@@ -270,6 +274,11 @@ export default {
       addForm: {
         title: "添加系",
         teacherName: "",
+        info: {
+          show: false,
+          college: "",
+          department: ""
+        },
         data: {
           specialityId: "",
           className: "",
@@ -375,10 +384,12 @@ export default {
     headerTheAgain
   },
   created: function() {
+    this.queryClass();
+  },
+  mounted() {
     this.getCollegeList(); //获取院列表
     this.getSysDepartmentList(); //获取系列表
     this.querySpecialityList(); //获取专业列表
-    this.queryClass();
   },
   methods: {
     showComponentInfo: function(type, info) {
@@ -390,6 +401,10 @@ export default {
           this.appendNewClass();
           break;
         case "deleteAll":
+          if (info.length == 0) {
+            this.$message.warning("请勾选要删除的目标");
+            return false;
+          }
           this.deleteClass("list", info);
           break;
         case "delete":
@@ -415,6 +430,7 @@ export default {
           this.departmentList = res.data.pageData;
         })
         .catch(error => {
+          this.$store.commit("ERR_MSG", error.msg);
           console.log(error);
         });
     },
@@ -444,6 +460,24 @@ export default {
         })
         .catch(error => console.log(error));
     },
+    //获取专业信息
+    getSpecialityInfo(id) {
+      sysSpecialityInfo(id)
+        .then(res => {
+          this.addForm.info.show = true;
+          this.addForm.info.college = res.data.collegeName;
+          this.addForm.info.department = res.data.departmentName;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    //隐藏专业信息
+    hiddenInfo() {
+      this.addForm.info.show = false;
+      this.addForm.info.college = "";
+      this.addForm.info.department = "";
+    },
     //查询条件清空
     queryClear(target) {
       (this.searchForm[target] = ""),
@@ -454,24 +488,10 @@ export default {
       this.$refs["id_addForm"].validate(valid => {
         if (valid) {
           if (this.addForm.title !== "添加班级") {
-            sysSpecialityEdit(this.addForm.data)
+            sysClassUpdate(this.addForm.data)
               .then(res => {
-                if (res.code === 200) {
+                if (res.code == 200) {
                   this.successMsg("修改成功");
-                  this.handleClose();
-                  this.querySpeciality();
-                } else {
-                  this.$store.commit("ERR_MSG", res.msg);
-                }
-              })
-              .catch(error => {
-                this.$store.commit("ERR_MSG", res.msg);
-              });
-          } else {
-            sysClass(this.addForm.data)
-              .then(res => {
-                if (res.code === 200) {
-                  this.successMsg("添加成功");
                   this.handleClose();
                   this.querySpeciality();
                 } else {
@@ -481,81 +501,77 @@ export default {
               .catch(error => {
                 this.$store.commit("ERR_MSG", error.msg);
               });
+          } else {
+            sysClass(this.addForm.data)
+              .then(res => {
+                if (res.code == 200) {
+                  this.successMsg("添加成功");
+                  this.handleClose();
+                  this.querySpeciality();
+                } else {
+                  this.$store.commit("ERR_MSG", res.msg);
+                }
+              })
+              .catch(error => {
+                console.log(error);
+                this.$store.commit("ERR_MSG", error.msg);
+              });
           }
         } else {
           console.log("error submit!!");
           return false;
         }
       });
-      // }
-      // if (this.addForm.title === "添加班级") {
-      //   sysClass(this.addForm.data)
-      //     .then(res => {
-      //       console.log("添加成功", res);
-      //     })
-      //     .catch(error => {
-      //       console.log("添加失败", error);
-      //     });
-      // } else if (this.addForm.title === "修改班级") {
-      //   sysClassUpdate(this.addForm.data)
-      //     .then(res => {
-      //       console.log("修改成功", res);
-      //     })
-      //     .catch(error => {
-      //       console.log("修改失败", error);
-      //     });
-      // }
-      // this.dialogVisible = false;
-      // setTimeout(() => this.queryClass(), 500);
     },
+    //删除班级
     deleteClass: function(type, classList) {
       let classIdList = [];
-      if (type === "list") {
+      if (type == "list") {
         classList.filter(item => {
           classIdList.push(parseInt(item.classId));
         });
-      }
-      if (type === "one") {
+      } else {
         classIdList.push(parseInt(classList.classId));
       }
-      sysClassDelete(classIdList)
-        .then(res => {
-          console.log("删除成功");
+      this.$confirm("是否删除？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          sysClassDelete(classIdList)
+            .then(res => {
+              console.log(res);
+              if (res.code === 200) {
+                this.successMsg("删除成功");
+                this.queryClass();
+              } else {
+                this.$store.commit("ERR_MSG", res.msg);
+                this.queryClass();
+              }
+            })
+            .catch(error => {
+              this.$store.commit("ERR_MSG", error.msg);
+            });
         })
-        .catch(error => {
-          this.$store.commit("ERR_MSG", error.msg);
-          console.log("删除失败", error);
-        });
-      //console.log( '删除的班级列表', classIdList);
-      setTimeout(() => {
-        this.queryClass();
-      }, 300);
+        .catch(() => {});
     },
-    addInput: function() {
-      this.popError = "";
-      if (this.addForm.data.manager.length < 5) {
-        this.addForm.data.manager.push({
-          realName: "",
-          userId: "",
-          workNumber: ""
-        });
-      } else {
-        this.popError = "最多添加五位院负责人";
-      }
-      this.queryWorkNumber();
-    },
-    deleteInput: function(index) {
-      this.addForm.data.manager.splice(index, 1);
-    },
+    //添加班级
     appendNewClass: function() {
       this.dialogVisible = !this.dialogVisible;
       this.addForm.title = "添加班级";
       this.querySpecialityList(null, "AddSpecialityList");
     },
+    //编辑班级
     edit: function(info) {
       this.dialogVisible = !this.dialogVisible;
       this.querySpecialityList(info.specialityName, "AddSpecialityList");
       this.addForm.title = "修改班级";
+      this.addForm.info.show = true;
+      this.addForm.info.college = info.collegeName;
+      this.addForm.info.department = info.departmentName;
+      this.addForm.info.show = true;
+
       this.addForm.data = info;
     },
     handleClose() {
@@ -564,15 +580,20 @@ export default {
       this.addForm.teacherName = "";
       this.addForm.data.classId = null;
       this.addForm.data.className = "";
+      this.addForm.data.classYear = "";
       this.addForm.data.specialityId = "";
       this.addForm.data.manager = [];
-      // this.querySpecialityList(null,'AddSpecialityList')
+      this.hiddenInfo();
     },
+    //分页改变
     handleCurrentChange: function(number) {
-      // console.log( number );
-      this.form.pageIndex = number;
-      this.queryClass();
-      console.log("this.form.pageIndex", this.form.pageIndex);
+      this.queryClass(number);
+    },
+    successMsg(msg) {
+      this.$message({
+        message: msg,
+        type: "success"
+      });
     },
     //添加负责人时的搜索函数
     querySearchAsync(queryString, cb) {

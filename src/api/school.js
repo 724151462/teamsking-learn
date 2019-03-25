@@ -59,7 +59,6 @@ export function sysCollegeEdit(data) {
 export function sysCollegeList() {
   return commonsAjax(`/api/v1/sys/college/list`, '', 'get')
 }
-
 /***
  * 获取系列表
  */
@@ -111,6 +110,12 @@ export function sysDepartmentDelete(data) {
  */
 export function sysSpecialityPage(data) {
   return commonsAjax(`/api/v1/sys/speciality/page`, data, 'get')
+}
+/***
+ * 获取专业信息
+ */
+export function sysSpecialityInfo(id) {
+  return commonsAjax(`/api/v1/sys/speciality/${id}`, '', 'get')
 }
 /**
  * 添加专业 /sys/speciality
@@ -334,7 +339,7 @@ export function sysClassPage(data) {
  * 添加班级 /sys/class
  * */
 export function sysClass(data) {
-  return commonsAjax(`/api/v1/class`, data, 'post')
+  return commonsAjax(`/api/v1/sys/class`, data, 'post')
 }
 
 /**

@@ -259,24 +259,31 @@ export default {
           name: "院",
           prop: "collegeName",
           slot: true,
+          select: false,
+
           minWidth: 200
         },
         {
           name: "系",
           prop: "departmentName",
           slot: true,
+          select: false,
           minWidth: 200
         },
         {
           name: "专业",
           prop: "specialityName",
           slot: true,
+          select: false,
+
           minWidth: 200
         },
         {
           name: "班级",
           prop: "className",
           slot: true,
+          select: false,
+
           minWidth: 200
         },
         {
@@ -401,12 +408,6 @@ export default {
         this.tableData3 = dataArr;
       });
     },
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
-    handleDelete(index, row) {
-      console.log(index, row);
-    },
     // 院值变化
     filterChange(value) {
       this.studentInit(this.searchForm);
@@ -499,12 +500,17 @@ export default {
       // console.log(student.length);
       let delArr = [];
       if (student.length == 0) {
-        return false
+        this.$message.warning("请勾选要删除的目标");
+        return false;
+      }
+      if (student.studentId) {
+        delArr.push(student.studentId);
       } else {
         student.forEach(element => {
           delArr.push(element.studentId);
         });
       }
+
       this.$confirm("是否删除学生？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -533,7 +539,6 @@ export default {
     //是否启用学生
     changeStatus(info) {
       let switchInfo = { id: info.studentId, status: info.status };
-
       this.$confirm("变更学生状态", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
