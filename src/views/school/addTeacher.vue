@@ -61,7 +61,9 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="ensureBtn()">提交</el-button>
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button @click="()=>{
+            this.$router.push({path:'/school/teacher'})
+          }">取消</el-button>
       </el-form-item>
     </el-form>
   </div>

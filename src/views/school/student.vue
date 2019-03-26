@@ -461,12 +461,12 @@ export default {
           this.delStudent(info);
           break;
         case "addStudent":
-          this.dialogTitle = "添加学生";
-          this.formEvent = "addNewStudent";
-          this.initStudent();
-          this.mobileEnable = false;
-          // console.log(this.mobileEnable);
-          this.dialogVisible = true;
+          this.$router.push({ path: "/school/student/add" });
+          // this.dialogTitle = "添加学生";
+          // this.formEvent = "addNewStudent";
+          // this.initStudent();
+          // this.mobileEnable = false;
+          // this.dialogVisible = true;
           break;
         case "edit":
           this.dialogTitle = "编辑学生";
@@ -480,12 +480,6 @@ export default {
     },
     check: function() {
       this.dialogVisible = !this.dialogVisible;
-    },
-    onSubmit: function() {
-      // this.specialityRows.forEach(element => {
-      //     console.log('---',element)
-      // });
-      console.log(123);
     },
     editStudent() {
       this.dialogTitle = "编辑学生";
@@ -666,7 +660,6 @@ export default {
 <style scoped lang="stylus" type="text/stylus">
 .my-input {
   padding: 0;
-
   input {
     border: 0;
   }
