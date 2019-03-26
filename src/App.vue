@@ -58,8 +58,8 @@
       input 
         padding-right 50px
     .my-select
-      padding 0
-      width inherit
+      padding-left 0!important
+      width 80%
       div
         padding-left 0
         padding 0

@@ -3,15 +3,14 @@
     <!-- <el-header style="padding:0">
       <headers :navs="nav"></headers>
     </el-header>-->
-    <el-container
-      style="
+    <el-container style="
           background:#ffffff;
-          height: calc(100% - 80px);"
-    >
+          height: calc(100% - 80px);">
       <el-aside
         width="220px"
         style="
             height:100%;
+            padding-top: 60px;
             border-right:1px solid #fff;
             position: fixed"
       >
@@ -57,7 +56,7 @@
           </template>
         </el-menu>
       </el-aside>
-      <el-main style="margin-left: 220px;margin-bottom:40px">
+      <el-main style="margin-left: 220px;margin-top: 60px;">
         <router-view></router-view>
       </el-main>
     </el-container>
@@ -120,12 +119,12 @@ export default {
 };
 </script>
 <style scoped lang="stylus" type="text/stylus">
-  .warp
-    height 100%
-    width 100%
-    background #F6F7F9
-    max-width 1920px
-    margin 0 auto
-
+.warp {
+  height: 100%;
+  width: 100%;
+  background: #F6F7F9;
+  max-width: 1920px;
+  margin: 0 auto;
+}
 </style>
 

@@ -259,24 +259,31 @@ export default {
           name: "院",
           prop: "collegeName",
           slot: true,
+          select: false,
+
           minWidth: 200
         },
         {
           name: "系",
           prop: "departmentName",
           slot: true,
+          select: false,
           minWidth: 200
         },
         {
           name: "专业",
           prop: "specialityName",
           slot: true,
+          select: false,
+
           minWidth: 200
         },
         {
           name: "班级",
           prop: "className",
           slot: true,
+          select: false,
+
           minWidth: 200
         },
         {
@@ -401,12 +408,6 @@ export default {
         this.tableData3 = dataArr;
       });
     },
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
-    handleDelete(index, row) {
-      console.log(index, row);
-    },
     // 院值变化
     filterChange(value) {
       this.studentInit(this.searchForm);
@@ -460,12 +461,12 @@ export default {
           this.delStudent(info);
           break;
         case "addStudent":
-          this.dialogTitle = "添加学生";
-          this.formEvent = "addNewStudent";
-          this.initStudent();
-          this.mobileEnable = false;
-          // console.log(this.mobileEnable);
-          this.dialogVisible = true;
+          this.$router.push({ path: "/school/student/add" });
+          // this.dialogTitle = "添加学生";
+          // this.formEvent = "addNewStudent";
+          // this.initStudent();
+          // this.mobileEnable = false;
+          // this.dialogVisible = true;
           break;
         case "edit":
           this.dialogTitle = "编辑学生";
@@ -480,12 +481,6 @@ export default {
     check: function() {
       this.dialogVisible = !this.dialogVisible;
     },
-    onSubmit: function() {
-      // this.specialityRows.forEach(element => {
-      //     console.log('---',element)
-      // });
-      console.log(123);
-    },
     editStudent() {
       this.dialogTitle = "编辑学生";
       this.initStudent(info);
@@ -499,12 +494,17 @@ export default {
       // console.log(student.length);
       let delArr = [];
       if (student.length == 0) {
-        return false
+        this.$message.warning("请勾选要删除的目标");
+        return false;
+      }
+      if (student.studentId) {
+        delArr.push(student.studentId);
       } else {
         student.forEach(element => {
           delArr.push(element.studentId);
         });
       }
+
       this.$confirm("是否删除学生？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -533,7 +533,6 @@ export default {
     //是否启用学生
     changeStatus(info) {
       let switchInfo = { id: info.studentId, status: info.status };
-
       this.$confirm("变更学生状态", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -661,7 +660,6 @@ export default {
 <style scoped lang="stylus" type="text/stylus">
 .my-input {
   padding: 0;
-
   input {
     border: 0;
   }

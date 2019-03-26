@@ -167,10 +167,8 @@ export function fileKind(name){
 
   return fileType
 }
-/*
-*错误信息处理
- * 参数：后台返回的错误消息
-* */
+
+//处理后台返回的错误消息
 export function  getErrorMsg(res) {
   return res.split('|')[res.split('|').length-1]
 }

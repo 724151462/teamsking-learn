@@ -2,11 +2,11 @@
   <div class="teacher">
     <header-the-again headerTitle="教师管理">
       <div style="display:inline-block;position: relative;">
-        <el-input v-model="searchForm.teacherInfo" placeholder="老师名称/工号/手机号" style="width:230px"></el-input>
+        <el-input v-model="searchForm.teacherInfo" placeholder="老师名称/工号" style="width:230px"></el-input>
         <el-button
           type="primary"
           style="position: absolute;right:0;border-radius: 0;"
-          @click="teacherSearch"
+          @click="teacherInit"
           icon="el-icon-search"
         ></el-button>
       </div>
@@ -28,7 +28,11 @@
           class="my-select"
           v-model="searchForm.college"
           placeholder="院"
-          @change="collegeChange"
+          remote
+          :remote-method="remoteCollege"
+          @focus='()=>{remoteCollege()}'
+          :loading="searchStatus.collegeLoading"
+          @change="teacherInit"
         >
           <el-option
             v-for="(item, index) in searchCollegeList"
@@ -42,11 +46,14 @@
         <el-select
           filterable
           clearable
+          remote
           class="my-select"
           v-model="searchForm.department"
-          :readonly="true"
           placeholder="系"
-          @change="departmentChange"
+          :remote-method="remoteDepartment"
+          @focus='()=>{remoteDepartment()}'
+          :loading="searchStatus.departmentLoading"
+          @change="teacherInit"
         >
           <el-option
             v-for="(item, index) in searchDepartmentList"
@@ -62,7 +69,6 @@
       background
       layout="prev, pager, next"
       :total="totalCount"
-      :page-size="2"
       :current-page="searchForm.pageIndex"
       @current-change="pageChange"
     ></el-pagination>
@@ -72,11 +78,14 @@
 <script>
 import tableTheAgain from "../../components/table-theAgain";
 import headerTheAgain from "../../components/header-theAgain";
+import mbNav from "@/components/breadcrumb";
 
 import {
   sysCollegeList,
+  sysCollegePage,
   sysDepartmentList,
   sysTeacherPage,
+  sysDepartmentPage,
   sysTeacherSwitch,
   sysTeacherReset
 } from "../../api/school";
@@ -85,7 +94,6 @@ export default {
   name: "",
   data() {
     return {
-      dialogVisible: false,
       tableOperate: [
         {
           content: "+添加教师",
@@ -93,7 +101,7 @@ export default {
         },
         {
           content: "批量重置密码",
-          type: "resetAll",
+          type: "resetAll"
         }
       ],
       tableTitle: "教师管理列表",
@@ -103,34 +111,36 @@ export default {
         },
         {
           name: "姓名",
-          prop: "teacherName",
+          prop: "teacherName"
         },
         {
           name: "工号",
-          minWidth:100,
+          minWidth: 100,
           prop: "teacherNumber"
         },
         {
           name: "手机号",
           prop: "mobile",
-          minWidth:150
+          minWidth: 150
         },
         {
           name: "院",
           slot: true,
+          select: false,
           minWidth: 200,
-          prop: "collegeName",
+          prop: "collegeName"
         },
         {
           name: "系",
           slot: true,
+          select: false,
           minWidth: 200,
           prop: "departmentName"
         },
         {
           name: "创建课程",
           prop: "courseCount",
-          width:85,
+          width: 85
         }
       ],
       operateList: [
@@ -146,6 +156,10 @@ export default {
       tableData3: [],
       popContentItem: [],
       textarea: "",
+      searchStatus:{
+        departmentLoading:false,
+        collegeLoading:false,
+      },
       searchForm: {
         college: "",
         department: "",
@@ -154,7 +168,6 @@ export default {
       },
       searchCollegeList: [],
       searchDepartmentList: [],
-      departmentRows: [],
       collegeList: [],
       totalCount: 0,
       pageIndex: 1
@@ -162,112 +175,35 @@ export default {
   },
   components: {
     tableTheAgain,
-    headerTheAgain
+    headerTheAgain,
   },
   computed: {},
   mounted() {
-    // 教师列表
-    sysTeacherPage({ pageIndex: this.pageIndex }).then(response => {
-      let dataArr = [];
-      response.data.pageData.forEach(element => {
-        element.status = String(element.status);
-        console.log(typeof element.status);
-        dataArr.push(element);
-      });
-      this.totalCount = Number(response.data.totalCount);
-      console.log(this.totalCount);
-      this.tableData3 = dataArr;
-    });
+    this.teacherInit();
     // 院列表
-    sysCollegeList().then(response => {
-      if (response.code === 200) {
-        this.collegeList = response.data;
-        this.searchCollegeList = response.data;
-      }
-    });
-    // 系列表
-    sysDepartmentList().then(response => {
-      if (response.code === 200) {
-        this.departmentRows = response.data;
-        this.searchDepartmentList = response.data;
-      }
-    });
   },
   methods: {
-    // 院搜索值变化
-    collegeChange(value) {
-      // console.log(value)
-      // console.log('a',this.departmentRows)
-      if (value === -1) {
-        this.searchDepartmentList = this.departmentRows;
-        this.searchForm.department = -1;
-      } else {
-        this.searchDepartmentList = this.departmentRows.filter(
-          (item, index) => {
-            return (
-              item.collegeId == value || item.collegeId == -1 || index == 0
-            );
-          }
-        );
-
-        console.log("121", this.searchDepartmentList);
-        this.searchForm.department = -1;
-      }
-    },
-    // 系搜索值变化
-    departmentChange(value) {
-      console.log("dep", value);
-      // if(value === -1){
-      //     return this.specialityRows
-      // }
-      // this.searchForm.speciality = -1
-      // this.searchSpecialityList = this.specialityRows.filter((item)=>{
-      //     return item.departmentId == value || item.departmentId == -1
-      // })
-    },
-    teacherSearch() {
-      this.searchForm.pageIndex = 1;
+    //获取教师列表
+    teacherInit() {
       sysTeacherPage(this.searchForm).then(response => {
-        console.log(response);
         let dataArr = [];
         response.data.pageData.forEach(element => {
           element.status = String(element.status);
-          console.log(typeof element.status);
           dataArr.push(element);
         });
-        this.tableData3 = dataArr;
         this.totalCount = Number(response.data.totalCount);
-        this.pageIndex = 1;
+        this.tableData3 = dataArr;
       });
     },
+    //分页改变
     pageChange(pageNum) {
       this.searchForm.pageIndex = pageNum;
-      sysTeacherPage(this.searchForm).then(response => {
-        console.log(response);
-        let dataArr = [];
-        response.data.pageData.forEach(element => {
-          element.status = String(element.status);
-          console.log(typeof element.status);
-          dataArr.push(element);
-        });
-        this.tableData3 = dataArr;
-      });
+      this.teacherInit()
     },
     showComponentInfo: function(type, info) {
-      console.log(
-        "父组件接收到的类型：" + type + "父组件接收到的信息：" + info
-      );
       switch (type) {
-        case "check":
-          //console.log(info);
-          this.popContentItem = this.info;
-          this.check(info);
-          break;
         case "switch":
-          let switchInfo = { id: info.teacherId, status: info.status };
-          sysTeacherSwitch(switchInfo).then(response => {
-            console.log(response);
-          });
+          this.changeStatus(info)
           break;
         case "addTeacher":
           this.$router.push({ path: "/school/teacher/addteacher" });
@@ -276,6 +212,10 @@ export default {
           this.resetPassword(info);
           break;
         case "resetAll":
+          if(info.length ==0){
+            this.$message.warning('请勾选教师')
+            return false
+          }
           this.resetPassword(info);
           break;
         case "edit":
@@ -286,20 +226,16 @@ export default {
           break;
       }
     },
-    check: function() {
-      this.dialogVisible = !this.dialogVisible;
-    },
+    //重置密码
     resetPassword(teacher) {
-      console.log(teacher.length);
       let resetArr = [];
-      if (teacher.length == undefined) {
-        resetArr.push(teacher.teacherId);
+      if (teacher.teacherId) {
+        resetArr.push(teacher.userId);
       } else {
         teacher.forEach(element => {
-          resetArr.push(element.teacherId);
+          resetArr.push(element.userId);
         });
       }
-
       this.$confirm("是否重置密码？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -317,15 +253,53 @@ export default {
         })
         .catch(() => {});
     },
-    handleClose(done) {
-      this.$confirm("确认关闭？")
-        .then(_ => {
-          done();
+    //变更教师状态
+    changeStatus(info){
+      let switchInfo = { id: info.teacherId, status: info.status };
+      this.$confirm("变更教师状态", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          sysTeacherSwitch(switchInfo).then(response => {
+            if (response.code === 200) {
+              this.$message.success("操作成功");
+              this.teacherInit();
+            } else {
+              this.$store.commit("ERR_MSG", response.msg);
+            }
+          });
         })
-        .catch(_ => {});
+        .catch(() => {
+          this.teacherInit();
+        });
     },
-    onSubmit: function() {
-      console.log("onSubmit!!");
+    //远程搜索系列表
+    remoteCollege(collegeName = null){
+      this.searchStatus.collegeLoading = true;
+      sysCollegePage({collegeName})
+        .then(res => {
+          this.searchCollegeList = res.data.pageData;
+          this.searchStatus.collegeLoading = false;
+        })
+        .catch(error => {
+          this.$store.commit("ERR_MSG", error.msg);
+          console.log(error);
+        });
+    },
+    //远程搜索院列表
+    remoteDepartment(query = null){
+      this.searchStatus.departmentLoading = true;
+      sysDepartmentPage({ collegeId:-1, departmentName:query })
+        .then(res => {
+          this.searchDepartmentList = res.data.pageData;
+          this.searchStatus.departmentLoading = false;
+        })
+        .catch(error => {
+          this.$store.commit("ERR_MSG", error.msg);
+          console.log(error);
+        });
     }
   }
 };

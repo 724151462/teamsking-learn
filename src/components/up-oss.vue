@@ -211,7 +211,9 @@ export default {
       } else if (this.fileKind === "certificate") {
         dir = "teskedu/img/certificate/";
       } else {
-        dir = name;
+        console.log('fileKind传参错误');
+        return false
+        // dir = name;
       }
       return dir;
     }

@@ -25,7 +25,7 @@
           }"
       title="发布通知"
       :visible.sync="isDialog"
-      width="60%"
+      width="600px"
     >
       <el-form>
         <el-form-item label="标 题：">
@@ -50,7 +50,7 @@
             placeholder="请输入内容"
             v-model="addUp.content"
           ></el-input>
-          <span style="position:relative;display:inline-bloke;right:50px;top:30px">
+          <span style="position:relative;display:inline-bloke;top:10px">
             <span style="color:red;">{{this.contentLength}}</span>/1000
           </span>
         </el-form-item>
@@ -94,7 +94,8 @@ export default {
         },
         {
           name: "通知内容",
-          prop: "content"
+          prop: "content",
+          minWidth: '200'
         },
         {
           name: "发布人",

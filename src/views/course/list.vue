@@ -284,6 +284,7 @@ export default {
             message: '发布成功',
             type: 'success'
           })
+          this.getList()
         } else {
           this.$message({
             message: '发布失败',

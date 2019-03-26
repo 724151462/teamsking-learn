@@ -86,7 +86,22 @@
             :key="index"
           >
             <template slot="header" slot-scope="scope">
-              <slot :name="list.prop"></slot>
+              <template v-if="list.select">
+                <slot :name="list.prop"></slot>
+                <i
+                  style="vertical-align: super;"
+                  class="el-icon-search select-icon blue-icon"
+                  @click="()=>{list.select= !list.select}"
+                ></i>
+              </template>
+              <div v-else>
+                {{list.name}}
+                <i
+                  style="vertical-align: text-bottom;;margin-left:10px"
+                  class="el-icon-search select-icon"
+                  @click="()=>{list.select= !list.select}"
+                ></i>
+              </div>
             </template>
           </el-table-column>
         </template>
@@ -191,6 +206,15 @@ export default {
   .tableOperate, a {
     display: inline-block;
     margin-right: 5px;
+  }
+
+  .select-icon {
+    font-size: 20px;
+    cursor: pointer;
+    text-align: right;
+  }
+  .blue-icon{
+    color: #409EFF;
   }
 }
 </style>

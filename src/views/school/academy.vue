@@ -2,11 +2,11 @@
   <div class="academy">
     <header-the-again headerTitle="院管理">
       <div style="display:inline-block;position: relative;">
-        <el-input v-model="form.collegeName" placeholder="学院名称" style="width:230px"></el-input>
+        <el-input v-model="searchKey" placeholder="学院名称" style="width:230px"></el-input>
         <el-button
           type="primary"
           style="position: absolute;right:0;border-radius: 0;"
-          @click="queryAcademy"
+          @click="queryAcademy(1,searchKey)"
           icon="el-icon-search"
         ></el-button>
       </div>
@@ -32,10 +32,10 @@
     <el-dialog
       :title="addForm.title"
       :visible.sync="dialogVisible"
-      width="600px"
+      width="500px"
       :before-close="handleClose"
     >
-      <el-form :model="addForm.data" ref="addForm" label-width="100px">
+      <el-form :model="addForm.data" ref="id_addForm" label-width="100px">
         <el-form-item
           :rules="[{ required: true, message: '请填写学院名称',trigger: 'blur'}]"
           label="学院："
@@ -52,7 +52,13 @@
         <el-form-item style="margin-bottom:10px">
           <p v-for="(item, index) in addForm.data.manager" :key="index">
             <span style="diaplay:inline-block">{{item.realName}}</span>
-            <i class="el-icon-remove" style="font-size: 20px;vertical-align: middle;margin-left: 10px;color:#f56c6c"></i>
+            <i
+              @click="()=>{
+                addForm.data.manager.splice(index,1)
+              }"
+              class="el-icon-remove"
+              style="font-size: 20px;vertical-align: middle;margin-left: 10px;color:#f56c6c;cursor:pointer;"
+            ></i>
           </p>
         </el-form-item>
         <el-form-item label="负责人：">
@@ -61,25 +67,17 @@
             suffix-icon="el-icon-search"
             :fetch-suggestions="querySearchAsync"
             @select="handleSelect"
-            v-model="addForm.data.teacherName"
+            v-model="addForm.teacherName"
             placeholder="输入名字查找教师"
-            clearable
           ></el-autocomplete>
           <span style="display:inline-block;margin-left:10px">
-            <span style="color:red">0</span>/5
+            <span style="color:red;">{{addForm.data.manager.length}}</span>/5
           </span>
         </el-form-item>
       </el-form>
 
-      <div class="pop-academy">
-        <div class="item-title">
-          <span class="color-red"></span>
-          <span>院负责人：</span>
-        </div>
-      </div>
-
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="handleClose">取 消</el-button>
         <el-button type="primary" @click="save">保 存</el-button>
       </span>
     </el-dialog>
@@ -99,28 +97,20 @@ import {
   sysCollegeEdit,
   sysCollegeList
 } from "../../api/school";
-
+import { truncate, truncateSync } from "fs";
+import { getErrorMsg } from "@/utils/utils";
 export default {
   name: "",
   data() {
     return {
       academySelectList: [],
-      form: {
-        pageIndex: 1,
-        collegeName: ""
-      },
+      searchKey: "",
       addForm: {
-        title: "添加院系",
+        title: "添加学院",
+        teacherName: "",
         data: {
           collegeName: "",
-          teacherName: "",
-          manager: [
-            {
-              realName: "",
-              userId: "",
-              workNumber: ""
-            }
-          ]
+          manager: []
         }
       },
       tableData: {},
@@ -190,17 +180,14 @@ export default {
   },
   methods: {
     showComponentInfo: function(type, info) {
-      console.log("父组件接收到的类型：", type + "父组件接收到的信息：", info);
+      // console.log("父组件接收到的类型：", type + "父组件接收到的信息：", info);
       switch (type) {
-        case "check":
-          console.log("checkInfo", info);
-          // this.check(info);
-          break;
         case "edit":
-          this.edit(info);
+          this.edit(JSON.parse(JSON.stringify(info)));
           break;
         case "add":
-          this.appendNewAcademy(info);
+          this.dialogVisible = true;
+          this.addForm.title = "添加学院";
           break;
         case "deleteAll":
           this.deleteAcademy(info);
@@ -210,75 +197,59 @@ export default {
           break;
       }
     },
+    //保存 || 修改学院
     save: function() {
-      this.$refs["addForm"].validate(valid => {
+      this.$refs["id_addForm"].validate(valid => {
         if (valid) {
-          alert("submit!");
+          if (this.addForm.title !== "添加学院") {
+            sysCollegeEdit(this.addForm.data)
+              .then(res => {
+                if (res.code === 200) {
+                  this.successMsg("修改成功");
+                  this.handleClose();
+                  this.queryAcademy();
+                } else {
+                  this.errMsg(getErrorMsg(res.msg));
+                }
+                console.log("编辑成功与否", res);
+              })
+              .catch(error => {
+                this.errMsg(getErrorMsg(res.msg));
+              });
+          } else {
+            // this.dialogVisible = false;
+            sysCollege(this.addForm.data)
+              .then(res => {
+                if (res.code === 200) {
+                  this.successMsg("添加成功");
+                  this.handleClose();
+                  this.queryAcademy();
+                } else {
+                  this.errMsg(getErrorMsg(res.msg));
+                }
+              })
+              .catch(error => {
+                this.errMsg("添加失败");
+              });
+          }
         } else {
           console.log("error submit!!");
           return false;
         }
       });
-      // this.popError = "";
-      // //  this.blurFunction(this.addForm.data.manager.length-1);
-      // // this.blurFunction()?"":reuturn;
-      // if (this.blurFunction()) {
-      //   if (this.popError !== "") return;
-      //   //检测manager中的信息
-      //   for (let i = this.addForm.data.manager.length - 1; i >= 0; i--) {
-      //     if (
-      //       this.addForm.data.manager[i].realName === "暂无此负责人" ||
-      //       this.addForm.data.manager[i].realName === ""
-      //     ) {
-      //       this.addForm.data.manager.splice(i, 1);
-      //     }
-      //   }
-      //   //console.log('manager信息:',this.addForm.data.manager);
-      //   if (this.addForm.data.collegeId !== "") {
-      //     // this.dialogVisible = false;
-      //     // console.log( "提交信息:", this.addForm.data );
-      //     sysCollegeEdit(this.addForm.data)
-      //       .then(res => {
-      //         if (res.code === 200) {
-      //           this.successMsg("编辑成功");
-      //           closePop();
-      //         } else {
-      //           this.popError = "编辑失败：" + res.msg;
-      //           this.errMsg();
-      //         }
-      //         console.log("编辑成功与否", res);
-      //       })
-      //       .catch(error => {
-      //         this.popError = "编辑失败：" + error;
-      //         this.errMsg();
-      //       });
-      //   } else {
-      //     // this.dialogVisible = false;
-      //     sysCollege(this.addForm.data)
-      //       .then(res => {
-      //         if (res.code === 200) {
-      //           this.successMsg("添加成功");
-      //           closePop();
-      //         } else {
-      //           this.errMsg("添加失败");
-      //         }
-      //       })
-      //       .catch(error => {
-      //         this.popError = "添加失败：" + error;
-      //         this.errMsg();
-      //       });
-      //   }
-
-      //   let that = this;
-      //   function closePop() {
-      //     that.dialogVisible = false;
-      //     that.queryAcademy();
-      //   }
-      // }
     },
+    edit(info) {
+      this.dialogVisible = true;
+      this.addForm.title = "编辑院信息";
+      this.addForm.data.collegeId = info.collegeId;
+      this.addForm.data.collegeName = info.collegeName;
+      this.addForm.data.manager = info.manager;
+    },
+    // 删除 || 批量删除
     deleteAcademy: function(academyList) {
       let academyIdList = [];
       if (academyList.length == 0) {
+        this.$message.warning("请勾选要删除的目标");
         return false;
       }
       if (academyList.collegeId) {
@@ -300,24 +271,18 @@ export default {
                 this.successMsg("删除成功");
                 this.queryAcademy();
               } else {
-                this.popError = "删除失败";
-                this.errMsg("删除失败");
+                this.errMsg(getErrorMsg(res.msg));
               }
             })
             .catch(error => {
-              this.popError = "删除失败:" + error;
-              this.errMsg();
+              this.errMsg(getErrorMsg(res.msg));
             });
         })
         .catch(() => {});
     },
-    queryAcademy: function(pageSize = 10) {
-      let data = {
-        pageSize,
-        pageIndex: this.form.pageIndex,
-        collegeName: this.form.collegeName
-      };
-      sysCollegePage(data)
+    //查询租户下的分院
+    queryAcademy: function(pageIndex = 1, collegeName = "") {
+      sysCollegePage({ pageIndex, collegeName })
         .then(res => {
           if (res.code === 200) {
             this.tableData = res.data;
@@ -332,79 +297,17 @@ export default {
           this.errMsg();
         });
     },
-    addInput: function() {
-      this.popError = "";
-      if (this.addForm.data.manager.length < 5) {
-        this.addForm.data.manager.push({
-          realName: "",
-          userId: "",
-          workNumber: ""
-        });
-      } else {
-        this.popError = "最多添加五位院负责人";
-      }
-      this.queryWorkNumber();
-    },
-    deleteInput: function(index) {
-      this.addForm.data.manager.splice(index, 1);
-    },
-    appendNewAcademy: function() {
-      this.dialogVisible = !this.dialogVisible;
-      this.addForm.title = "添加学院";
-      this.addForm.data.collegeId = "";
+    //关闭编辑弹窗
+    handleClose() {
+      this.dialogVisible = false;
+      this.$refs["id_addForm"].resetFields();
+      this.addForm.teacherName = "";
       this.addForm.data.collegeName = "";
-      this.addForm.data.manager = [{ realName: "", userId: 1, workNumber: "" }];
+      this.addForm.data.manager = [];
     },
-    edit: function(info) {
-      this.dialogVisible = !this.dialogVisible;
-      this.addForm.title = "编辑院信息";
-      this.addForm.data.collegeId = info.collegeId;
-      this.addForm.data.tenantId = "";
-      this.addForm.data.collegeName = info.collegeName;
-      this.addForm.data.manager =
-        info.manager.length === 0
-          ? [{ realName: "", userId: "", workNumber: "" }]
-          : info.manager;
-    },
-    blurFunction: function(id, index) {
-      //console.log("失去焦点执行函数");
-      this.popError = "";
-      let a = this.addForm.data.manager.filter((element, index, arr) => {
-        //this.queryWorkNumber(element.workNumber);
-        if (element.workNumber === "") return false;
-        for (let i = index + 1; i < arr.length; i++) {
-          if (element.workNumber === arr[i].workNumber && index !== i)
-            return true;
-        }
-        return false;
-      });
-      this.queryWorkNumber(id, index);
-      if (a.length > 0) {
-        this.popError = "院负责人不能重复";
-        this.errMsg();
-        return false;
-      }
-      return true;
-    },
-    queryWorkNumber: function(id, index) {
-      //console.log("id:"+id);
-      sysTenantTeacher(id)
-        .then(res => {
-          //console.log( '返回信息:' , res.data.realName,res.data.userId );
-          this.addForm.data.manager[index].realName = res.data.realName;
-          this.addForm.data.manager[index].userId = res.data.userId;
-        })
-        .catch(() => {
-          //console.log(error);
-          this.addForm.data.manager[index].realName = "暂无此负责人";
-        });
-    },
-    handleClose(done) {
-      done();
-    },
+    //分页改变
     handleCurrentChange: function(number) {
-      this.form.pageIndex = number;
-      this.queryAcademy();
+      this.queryAcademy(number);
     },
     successMsg(msg) {
       this.$message({
@@ -416,29 +319,44 @@ export default {
       this.$message.error(msg);
     },
     querySearchAsync(queryString, cb) {
-      var restaurants = this.restaurants;
-      var results = queryString
-        ? restaurants.filter(this.createStateFilter(queryString))
-        : restaurants;
-
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
-        cb(results);
-      }, 3000 * Math.random());
-    },
-    createStateFilter(queryString) {
-      return state => {
-        return (
-          state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-        );
-      };
+      sysTeacherPage({ teacherInfo: queryString, pageSize: 10 })
+        .then(res => {
+          if (Number(res.code) == 200) {
+            let results = res.data.pageData.filter(item => {
+              item.value = item.teacherName;
+              return item;
+            });
+            cb(results);
+          } else {
+            this.errMsg("查询失败");
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     handleSelect(item) {
-      console.log(item);
+      if (this.addForm.data.manager.length >= 5) {
+        this.$message.warning("最多添加5个负责人");
+        return false;
+      }
+      let hasTeacher = false;
+      this.addForm.data.manager.forEach(list => {
+        if (list.workNumber == item.teacherNumber) {
+          hasTeacher = true;
+          this.$message.warning("已选择该教师");
+        }
+      });
+      if (!hasTeacher) {
+        this.addForm.data.manager.push({
+          realName: item.teacherName,
+          userId: item.userId,
+          workNumber: item.teacherNumber
+        });
+      }
+      this.addForm.teacherName = "";
     }
-  },
-  watch: {},
-  mounted: function() {}
+  }
 };
 </script>
 
