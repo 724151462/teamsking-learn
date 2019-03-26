@@ -15,12 +15,16 @@
       </div>
     </el-form-item>
     <el-form-item label="logo" required>
-      <upOss :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo" :fileKind="'img'"></upOss>
-      <div><img width="100px" :src="logoSrc" alt=""></div>
+      <div class="logoContent">
+        <upOss :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo" :fileKind="'img'"></upOss>
+        <img width="100px" :src="logoSrc" alt="">
+      </div>
     </el-form-item>
     <el-form-item label="平台图片" required>
-      <upOss :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic" :fileKind="'img'"></upOss>
-      <div><img width="100px" :src="platSrc" alt=""></div>
+      <div class="logoContent">
+        <upOss :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic" :fileKind="'img'"></upOss>
+        <img width="100px" :src="platSrc" alt="">
+      </div>
     </el-form-item>
     <el-button type="primary" @click="saveInfo" style="margin-left: 200px;margin-top: 20px">保存</el-button>
   </el-form>
@@ -82,5 +86,7 @@
   }
 </script>
 <style lang="stylus" scoped>
-
+  .logoContent
+    display flex
+    align-items center
 </style>

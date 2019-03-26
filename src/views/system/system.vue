@@ -69,7 +69,7 @@
   import tableTheAgain from '@/components/table-theAgain'
 
 
-  import { sysManagerPage } from '../../api/system'
+  import { sysManagerPage, sysManagerAdd } from '../../api/system'
   import { sysRoleAdd } from '../../api/system'
   import { sysRoleEdit } from '../../api/system'
   import { sysRoleDelete } from '../../api/system'
@@ -248,7 +248,15 @@
       },
       save() {
         if(this.addForm.title === '添加管理员'){
-          
+          sysManagerAdd(this.form)
+          .then(response=> {
+            if(response.code === 200) {
+              this.$message({
+                message: "添加成功",
+                type: 'success'
+              })
+            }
+          })
         }
       },
       handleCurrentChange:function( number ){

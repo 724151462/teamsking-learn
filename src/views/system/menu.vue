@@ -197,6 +197,10 @@ import { get } from 'http';
       },
       editMenu(data){
         let menuForm = Object.assign({}, data)
+        console.log(menuForm)
+        menuForm.isLeaf = String(menuForm.isLeaf)
+        menuForm.type = String(menuForm.type)
+        menuForm.showCode = String(menuForm.showCode)
         this.routeConfig = menuForm
         this.addForm.title = "修改菜单"
         this.dialogVisible = true
