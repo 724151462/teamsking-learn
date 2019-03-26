@@ -15,6 +15,13 @@ export function sysManagerPage (data) {
 }
 
 /**
+ * 添加管理员 
+ * */
+export function sysManagerAdd (data) {
+  return commonsAjax(`/api/v1/sys/admin/manager`,data,'post')
+}
+
+/**
  * 角色列表 
  * */
 export function sysRoleList (data) {
