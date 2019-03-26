@@ -188,8 +188,8 @@ export function sysStudentAdd(data) {
 /***
  * 获取学生信息
  */
-export function sysStudentInfo(data) {
-  return commonsAjax(`/api/v1/sys/student/${data.studentId}`, '', 'get')
+export function sysStudentInfo(id) {
+  return commonsAjax(`/api/v1/sys/student/${id}`, '', 'get')
 }
 
 

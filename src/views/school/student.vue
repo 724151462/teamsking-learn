@@ -103,88 +103,6 @@
       </template>
     </table-the-again>
 
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%">
-      <el-form ref="form1" :model="form" label-width="80px">
-        <el-form-item label="学号">
-          <el-input v-model="form.studentNo"></el-input>
-        </el-form-item>
-        <el-form-item label="姓名">
-          <el-input v-model="form.realName"></el-input>
-        </el-form-item>
-        <!-- <el-form-item label="性别">
-          <el-radio-group v-model="form.sex">
-              <el-radio label="男"></el-radio>
-              <el-radio label="女"></el-radio>
-          </el-radio-group>
-        </el-form-item>-->
-        <el-form-item label="手机号码">
-          <el-input v-model="form.mobile" :disabled="mobileEnable"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-select
-            v-model="searchForm.college"
-            :readonly="true"
-            placeholder="院"
-            @change="collegeChange"
-          >
-            <el-option
-              v-for="(item, index) in searchCollegeList"
-              :key="index"
-              :label="item.collegeName"
-              :value="item.collegeId"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-select
-            v-model="searchForm.department"
-            :readonly="true"
-            placeholder="系"
-            @change="departmentChange"
-          >
-            <el-option
-              v-for="(item, index) in searchDepartmentList"
-              :key="index"
-              :label="item.departmentName"
-              :value="item.departmentId"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-select v-model="searchForm.speciality" placeholder="专业" @change="specialityChange">
-            <el-option
-              v-for="(item, index) in searchSpecialityList"
-              :key="index"
-              :label="item.specialityName"
-              :value="item.specialityId"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-select v-model="searchForm.studentClass" placeholder="班级">
-            <el-option
-              v-for="(item, index) in classSearchList"
-              :key="index"
-              :label="item.className"
-              :value="item.classId"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="是否启用">
-          <el-switch
-            active-value="1"
-            inactive-value="2"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            v-model="status"
-          ></el-switch>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="ensureBtn()">提交</el-button>
-          <el-button @click="dialogVisible = false">取消</el-button>
-        </el-form-item>
-      </el-form>
-    </el-dialog>
     <el-pagination
       background
       layout="prev, pager, next"
@@ -218,7 +136,6 @@ export default {
     return {
       search: "",
       classSearchList: [],
-      state4: "",
       searchForm: {
         college: "",
         department: "",
@@ -260,7 +177,6 @@ export default {
           prop: "collegeName",
           slot: true,
           select: false,
-
           minWidth: 200
         },
         {
@@ -283,7 +199,6 @@ export default {
           prop: "className",
           slot: true,
           select: false,
-
           minWidth: 200
         },
         {
@@ -398,7 +313,6 @@ export default {
       let newData = {};
       Object.assign(newData, data, { pageIndex: this.pageIndex });
       sysStudentPage(newData).then(response => {
-        console.log("学生列表", response.data.pageData);
         let dataArr = [];
         response.data.pageData.forEach(element => {
           element.status = String(element.status);
@@ -447,9 +361,6 @@ export default {
       });
     },
     showComponentInfo: function(type, info) {
-      // console.log(
-      //   "父组件接收到的类型：" + type + "父组件接收到的信息：" + info
-      // );
       switch (type) {
         case "switch":
           this.changeStatus(info);
@@ -462,32 +373,14 @@ export default {
           break;
         case "addStudent":
           this.$router.push({ path: "/school/student/add" });
-          // this.dialogTitle = "添加学生";
-          // this.formEvent = "addNewStudent";
-          // this.initStudent();
-          // this.mobileEnable = false;
-          // this.dialogVisible = true;
           break;
         case "edit":
-          this.dialogTitle = "编辑学生";
-          this.initStudent(info);
-          this.mobileEnable = true;
-          // console.log(this.mobileEnable);
-          this.formEvent = "editStudent";
-          this.dialogVisible = true;
+          this.$router.push({
+            path: "/school/student/add",
+            query: { studentId: info.studentId }
+          });
           break;
       }
-    },
-    check: function() {
-      this.dialogVisible = !this.dialogVisible;
-    },
-    editStudent() {
-      this.dialogTitle = "编辑学生";
-      this.initStudent(info);
-      this.mobileEnable = true;
-      console.log(this.mobileEnable);
-      this.formEvent = "editStudent";
-      this.dialogVisible = true;
     },
     //删除学生
     delStudent(student) {
@@ -523,13 +416,6 @@ export default {
         })
         .catch(() => {});
     },
-    ensureBtn() {
-      if (this.formEvent == "addNewStudent") {
-        this.addNewStudent();
-      } else if (this.formEvent == "editStudent") {
-        this.editStudent();
-      }
-    },
     //是否启用学生
     changeStatus(info) {
       let switchInfo = { id: info.studentId, status: info.status };
@@ -552,94 +438,6 @@ export default {
           this.studentInit();
         });
     },
-    // 添加新学生
-    addNewStudent: function() {
-      console.log(123, this.form.classId);
-      let sex = this.form.sex == "男" ? 1 : 2;
-      let formData = {
-        classId: this.searchForm.studentClass,
-        collegeId: this.searchForm.collegeId,
-        realName: this.form.realName,
-        specialityId: this.searchForm.specialityId,
-        gender: sex,
-        mobile: this.form.mobile,
-        studentNo: this.form.studentNo,
-        departmentId: this.departmentId,
-        status: this.status
-      };
-      sysStudentAdd(formData).then(response => {
-        if (response.code === 200) {
-          this.$message({
-            type: "success",
-            message: "添加成功！"
-          });
-          this.dialogVisible = false;
-        } else {
-          this.$message({
-            type: "error",
-            message: JSON.parse(response.msg)[0].message
-          });
-        }
-      });
-    },
-    // 初始化修改表单的学生信息
-    initStudent(info) {
-      if (info) {
-        let sex = info.sex == "男" ? 1 : 2;
-        this.form.realName = info.realName;
-        this.collegeId = info.collegeId == null ? "无院" : info.collegeId;
-        this.departmentId =
-          info.departmentId == null ? "无系" : info.departmentId;
-        this.specialityId =
-          info.specialityId == null ? "无专业" : info.specialityId;
-        this.classId = info.classId == null ? "请添加班级" : info.classId;
-        this.form.mobile = info.mobile;
-        this.form.studentNo = info.studentNo;
-        this.form.sex = info.gender;
-        this.status = info.status;
-        this.studentId = info.studentId;
-      } else {
-        this.form.realName = "";
-        this.collegeId = "";
-        this.departmentId = "";
-        this.specialityId = "";
-        this.classId = "";
-        this.form.mobile = "";
-        this.form.studentNo = "";
-        this.form.sex = "男";
-        this.status = 2;
-      }
-    },
-    // 修改学生信息
-    editStudent() {
-      let sex = this.form.sex == "男" ? 1 : 2;
-      let formData = {
-        studentId: this.studentId,
-        status: this.status,
-        classId: this.classId,
-        collegeId: this.collegeId == "无院" ? -1 : this.collegeId,
-        realName: this.form.realName,
-        specialityId: this.specialityId,
-        gender: sex,
-        mobile: this.form.mobile,
-        studentNo: this.form.studentNo,
-        departmentId: this.departmentId
-      };
-      sysStudentModify(formData).then(response => {
-        if (response.code === 200) {
-          this.$message({
-            type: "success",
-            message: "修改成功！"
-          });
-          this.dialogVisible = false;
-        } else {
-          this.$message({
-            type: "error",
-            message: JSON.parse(response.msg)[0].message
-          });
-        }
-      });
-    },
     pageChange(pageNum) {
       this.searchForm.pageIndex = pageNum;
       sysStudentPage(this.searchForm).then(response => {
@@ -660,6 +458,7 @@ export default {
 <style scoped lang="stylus" type="text/stylus">
 .my-input {
   padding: 0;
+
   input {
     border: 0;
   }

@@ -141,9 +141,6 @@
           }
         ],
         tableData:'',
-
-
-
         data2: [{
           id: 1,
           label: '一级 1',

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mb-nav :pathList="[{path:'/school/student',name:'学生管理'}]" nowName="添加学生"></mb-nav>
+    <mb-nav :pathList="[{path:'/school/student',name:'学生管理'}]" :nowName="`${currentRouter}学生`"></mb-nav>
     <p style="color: red;margin-bottom:20px">提示：学号也是学生的登录账号，密码默认为学号后6位</p>
     <el-form ref="form" :rules="rules" :model="form" label-width="80px">
       <el-form-item label="学号" prop="studentNo">
@@ -45,8 +45,12 @@
           clearable
           v-model="form.department"
           placeholder="系"
-          @clear="clearSelect(1,'department')"
-          @change="selectChange"
+          @clear="clearSelect('department')"
+          @change="(value)=>{
+            if(value !== ''){
+            selectChange('department',value)
+            }
+          }"
         >
           <el-option
             v-for="(item, index) in departmentList"
@@ -59,10 +63,14 @@
       <el-form-item label="所属专业">
         <el-select
           clearable
-          @clear="clearSelect(2,'speciality')"
+          @clear="clearSelect('speciality')"
           v-model="form.speciality"
           placeholder="专业"
-          @change="selectChange"
+          @change="(value)=>{
+            if(value !== ''){
+            selectChange('speciality',value)
+            }
+          }"
         >
           <el-option
             v-for="(item, index) in specialityList"
@@ -73,7 +81,17 @@
         </el-select>
       </el-form-item>
       <el-form-item label="所属班级">
-        <el-select clearable @clear="clearSelect(3,'class')" v-model="form.class" placeholder="班级">
+        <el-select
+          clearable
+          @change="(value)=>{
+            if(value !== ''){
+            selectChange('class',value)
+            }
+          }"
+          @clear="clearSelect('class')"
+          v-model="form.class"
+          placeholder="班级"
+        >
           <el-option
             v-for="(item, index) in classList"
             :key="index"
@@ -105,12 +123,21 @@
 </template>
 
 <script>
-import { sysCollegeList, sysDepartmentList } from "@/api/school";
+import {
+  sysCollegeList,
+  sysStudentAdd,
+  sysStudentModify,
+  sysStudentInfo,
+  sysDepartmentList,
+  sysSpecialityList,
+  sysClassList
+} from "@/api/school";
 import mbNav from "@/components/breadcrumb";
 
 export default {
   data() {
     return {
+      currentRouter: "添加",
       form: {
         studentNo: "",
         realName: "",
@@ -146,6 +173,36 @@ export default {
     mbNav
   },
   mounted() {
+    this.$route.query.studentId
+      ? (this.currentRouter = "编辑")
+      : (this.currentRouter = "添加");
+    if (this.$route.query.studentId) {
+      sysStudentInfo(this.$route.query.studentId)
+        .then(res => {
+          if (res.code === 200) {
+            console.log(res);
+            this.form = {
+              studentNo: res.data.studentNo,
+              realName: res.data.realName,
+              sex: res.data.gender,
+              speciality: res.data.specialityId,
+              mobile: res.data.mobile,
+              department: res.data.departmentId,
+              college: res.data.collegeId,
+              class: res.data.classId,
+              status: 1
+            };
+            this.departmentInit(res.data.collegeId);
+            this.specialityInit(res.data.departmentId);
+            this.classInit(res.data.specialityId);
+          } else {
+            this.$store.commit("ERR_MSG", res.msg);
+          }
+        })
+        .catch(err => {
+          this.$store.commit("ERR_MSG", err.msg);
+        });
+    }
     this.collegeInit();
   },
   methods: {
@@ -188,35 +245,34 @@ export default {
     // 班级列表
     classInit(specialityId = -1) {
       sysClassList({ specialityId }).then(response => {
-        console.log("班级列表", response.data);
         if (response.code === 200) {
           this.classList = response.data;
         }
       });
     },
     //联选选中时
-    selectChange(target,id){
+    selectChange(target, id) {
       let selectArray = ["college", "department", "speciality", "class"],
-          index = selectArray.indexOf(target);
-      let targetArr = selectArray.slice(index, 4);
-      console.log(selectArray[index+1]);
-      this[selectArray[index+1]]()
-      // target.forEach(item => {
-      //   this.form[item] = ''
-      // });
+        index = selectArray.indexOf(target),
+        children = selectArray[index + 1],
+        targetArr = selectArray.slice(index + 1, 4);
+      targetArr.forEach(item => {
+        this.form[item] = "";
+        item == target ? "" : (this[`${item}List`] = []);
+      });
+      target == "class" ? "" : this[`${children}Init`](id);
     },
     //清空选线时，联动清空
     clearSelect(target) {
       let selectArray = ["college", "department", "speciality", "class"];
-      let targetArr = selectArray.slice(selectArray.indexOf(target), 4);      
-      targetArr.forEach(item => {        
-        this.form[item] = ''
-        item == target ? '' : this[`${item}List`] = []
+      let targetArr = selectArray.slice(selectArray.indexOf(target), 4);
+      targetArr.forEach(item => {
+        this.form[item] = "";
+        item == target ? "" : (this[`${item}List`] = []);
       });
     },
     //新增学生
     addNewStudent: function() {
-      let sex = this.form.sex == "男" ? 1 : 2;
       let formData = {
         classId: this.form.class,
         collegeId: this.form.college,
@@ -225,30 +281,48 @@ export default {
         gender: this.form.sex,
         mobile: this.form.mobile,
         studentNo: this.form.studentNo,
-        departmentId: this.department,
-        status: this.status
+        departmentId: this.form.department,
+        status: this.form.status
       };
       this.$refs["form"].validate(valid => {
         if (valid) {
-          // sysStudentAdd(formData)
-          //   .then(response => {
-          //     if (response.code === 200) {
-          //       this.resetFormData();
-          //       this.open2();
-          //     } else {
-          //       this.$store.commit("ERR_MSG", response.msg);
-          //     }
-          //   })
-          //   .catch(err => {
-          //     this.$store.commit("ERR_MSG", err.msg);
-          //   });
+          if (this.$route.query.studentId) {
+            sysStudentModify(formData)
+              .then(response => {
+                if (response.code === 200) {
+                  this.$alert("修改成功", "提示", {
+                    confirmButtonText: "确定",
+                    type: "success"
+                  }).then(() => {
+                    this.$router.push({ path: "/school/teacher" });
+                  });
+                } else {
+                  this.$store.commit("ERR_MSG", response.msg);
+                }
+              })
+              .catch(err => {
+                this.$store.commit("ERR_MSG", err.msg);
+              });
+          } else {
+            sysStudentAdd(formData)
+              .then(response => {
+                if (response.code === 200) {
+                  this.resetFormData();
+                  this.open2();
+                } else {
+                  this.$store.commit("ERR_MSG", response.msg);
+                }
+              })
+              .catch(err => {
+                this.$store.commit("ERR_MSG", err.msg);
+              });
+          }
         } else {
           console.log("error submit!!");
           return false;
         }
       });
     },
-    collegeChange() {},
     open2() {
       this.$confirm("添加成功, 是否继续添加?", "提示", {
         confirmButtonText: "确定",
@@ -257,20 +331,20 @@ export default {
       })
         .then(() => {})
         .catch(() => {
-          this.$router.push({ path: "/school/teacher" });
+          this.$router.push({ path: "/school/student" });
         });
     },
     resetFormData() {
       this.form = {
-        teacherNo: "",
+        studentNo: "",
         realName: "",
-        gender: "",
+        sex: 1,
+        speciality: "",
         mobile: "",
-        jobName: "",
-        jobYear: "",
-        collegeId: "",
-        departmentId: "",
-        introduct: ""
+        department: "",
+        college: "",
+        class: "",
+        status: 1
       };
       this.$refs["form"].resetFields();
     }
