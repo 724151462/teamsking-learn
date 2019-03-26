@@ -28,8 +28,8 @@ module.exports = {
     proxy: {
       '/api': {
          // target: 'http://192.168.10.48:9008',
-        target: 'http://apidev.tskedu.cn:9008',
-        // target: 'https://api.tskedu.com',
+        // target: 'http://apidev.tskedu.cn:9008',
+        target: 'https://api.tskedu.com',
         secure: false,
         ws: true,
         changeOrigin: true

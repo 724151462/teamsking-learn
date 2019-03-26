@@ -948,7 +948,7 @@ export function classRoomData(data) {
  * 讨论列表
  */
 export function discussGet(data) {
-  let ul = `/api/v1/study/${data.courseId}/discussion/page`
+  let url = `/api/v1/study/${data.courseId}/discussion/page`
   return commonsAjax(url, data, 'get')
 }
 //======长连接签到相关w

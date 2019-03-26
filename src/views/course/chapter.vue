@@ -209,7 +209,7 @@
       title="添加题目"
       top="30vh"
       :visible.sync="subjectVisible"
-      width="65%"
+      width="1200px"
       :before-close="handleVideoClose"
     >
       <div class="subject-container">
@@ -286,6 +286,8 @@
             :sourceData="quizList"
             @checkedList="checkedQuizFiles"
             :treeName="'tree3'"
+            :nodeKey="'resourceId'"
+            ref="tree3"
             :props="quizProps"
           ></Tree>
         </div>
@@ -980,6 +982,10 @@ export default {
     editSubject(index) {
       this.sourceSubListIndex = index;
       this.editSubjectVisible = true;
+      this.$nextTick(()=> {
+        this.$refs.tree3.clear()
+      })
+      // this.$refs.tree3.setCheckedKeys([]);
       this.checkedQuizFiles(this.temCheckedList);
     },
     // 重置视频播放状态
@@ -988,6 +994,10 @@ export default {
     },
     // 选完题确认按钮
     editEnsure() {
+      // 选单题才执行后续逻辑
+      if(this.subjectList[this.sourceSubListIndex].quizId === undefined) {
+        return
+      }
       // 预览时渲染题目信息请求
       console.log("试题ID", this.subjectList[this.sourceSubListIndex].quizId);
       quizInfo(this.subjectList[this.sourceSubListIndex].quizId)
@@ -1047,8 +1057,6 @@ export default {
         });
         return false;
       }
-      let ids = (this.subjectList[this.sourceSubListIndex].ids = []);
-      ids.push(checkedList[0]);
     },
     // 添加题目
     checkedQuizFiles(checkedList) {
@@ -1066,6 +1074,8 @@ export default {
         });
         return false;
       }
+      // 单个文件选择逻辑控制
+      if(checkedList.length !== 1) return
       this.subjectList[this.sourceSubListIndex].quizId =
         checkedList[0].resourceId;
     },

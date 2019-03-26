@@ -37,11 +37,11 @@
             <span class="quiz-submit" v-if="answerRes !== ''" @click="goOnLook">继续观看</span>
           </div>
         </div>
-        <div class="test-container no-content" v-else>
+        <!-- <div class="test-container no-content" v-else>
           <div class="quiz-main" style="text-align: center;line-height: 200px">
             <span>您所选的时间点还未添加题目</span>
           </div>
-        </div>
+        </div> -->
     </div>
   </div>
 </template>
@@ -106,11 +106,19 @@
         if(subjectInfo.quizType === 10) {
           
         }else{
+          // 筛选正确答案
           let correctAns = subjectInfo.quizOption.filter(res=> res.correctFlag === 1)
+          // 答案个数不对return
           if(this.checkList.length !== correctAns.length) {
             this.answerRes = false
+            this.answerStr = ''
+            correctAns.forEach(ele => {
+              this.answerStr += ele.optionTitle + ','
+            })
+            this.answerStr = this.answerStr.substring(0,this.answerStr.length-1)
             return
           }
+          // 判断答题是否正确
           this.checkList.forEach(res => {
             correctAns.forEach(ele => {
               if(res !== ele.optionId) {
@@ -128,31 +136,31 @@
             })
             this.answerStr = this.answerStr.substring(0,this.answerStr.length-1)
           }
+          this.checkList = []
         }
       },
       goOnLook() {
         clearTimeout(this.timer)
         this.testDialog = false
+        this.$refs.videoPlayer.player.play()
       },
       getParentUrl(url) {
         this.playerOptions.sources[0].src = url
       },
       onPlayerPlay(player) {
-        // this.playerOptions.sources[0].src = this.isMp4
+        player.currentTime(this.timePoint-3)
+        if(player.currentTime() === this.timePoint) {
+          this.$refs.videoPlayer.player.pause()
+          this.testDialog = true
+        }
         let currentTP = document.getElementsByClassName('vjs-current-time-display')[0].innerHTML
         console.log(this.timePoint)
-        if(this.answerRes === '') {
+        if(this.answerRes === '' && this.timePoint !== '') {
           this.timer = setTimeout(() => {
             this.$refs.videoPlayer.player.pause()
             this.testDialog = true
-          }, (this.timePoint+1) * 1000);
-          document.getElementsByClassName('vjs-control-bar')[0].style.display = 'none'
+          }, 3000);
         }
-        
-        
-        console.log('play', this.isMp4)
-        console.log(document.getElementsByClassName('vjs-current-time-display')[0].innerHTML)
-        // alert("play");
       },
       onPlayerPause(player){
         // alert("pause");
@@ -196,7 +204,7 @@
         }
         this.answerRes = ''
         this.$refs.videoPlayer.player.src(this.isMp4)
-        document.getElementsByClassName('vjs-control-bar')[0].style.display = 'flex'
+        this.testDialog = false
         console.log(this.$refs.videoPlayer.player)
       },
       state: function (val) {
@@ -226,8 +234,8 @@
     background: rgba(0,0,0,0.5);
   .test-container
     background: #fff;
-    height: 80%;
-    width: 90%;
+    height: 94%;
+    width: 98%;
     margin: 0 auto;
     position: relative;
     top: 38px;
