@@ -119,6 +119,40 @@ export function sysTenantManagerPage (data) {
   return commonsAjax(`/api/v1/sys/tenant/manager/page`,data,'get')
 }
 
+/**
+ * 分页查询租户管理员 
+ * */
+export function sysManagerAdminPage (data) {
+  return commonsAjax(`/api/v1/sys/admin/manager/page`,data,'get')
+}
+
+/**
+ * 新增管理员
+ * */
+export function sysManagerAdminAdd (data) {
+  return commonsAjax(`/api/v1/sys/admin/manager`,data,'post')
+}
+
+/**
+ * 重置管理员密码
+ **/
+export function sysManagerReset (data) {
+  return commonsAjax(`/api/v1/sys/admin/manager/reset`,data,'delete')
+}
+
+/**
+ * 修改管理员
+ **/
+export function sysManagerModify (data) {
+  return commonsAjax(`/api/v1/sys/adminmanager`,data,'put')
+}
+
+/**
+ * 删除管理员
+ **/
+export function sysManagerDel (data) {
+  return commonsAjax(`/api/v1/sys/admin/manager`,data,'delete')
+}
 
 
 /**

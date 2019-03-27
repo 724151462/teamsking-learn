@@ -39,7 +39,13 @@
 
       <el-form ref="managerForm" :model="form">
         <el-form-item label="管理员用户名">
-          <el-input style="width: 300px" v-model="form.realName" type="text" placeholder="请输入管理员用户名"></el-input>
+          <el-input style="width: 300px" v-model="form.userName" type="text" placeholder="请输入管理员用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="管理员昵称">
+          <el-input style="width: 300px" v-model="form.nickName" type="text" placeholder="请输入管理员昵称"></el-input>
+        </el-form-item>
+        <el-form-item label="管理员工号">
+          <el-input style="width: 300px" v-model="form.managerNumber" type="text" placeholder="请输入管理员工号"></el-input>
         </el-form-item>
         <el-form-item label="是否启用">
           <el-switch
@@ -69,7 +75,7 @@
   import tableTheAgain from '@/components/table-theAgain'
 
 
-  import { sysManagerPage, sysManagerAdd } from '../../api/system'
+  import { sysManagerAdminPage, sysManagerAdminAdd, sysManagerReset, sysManagerModify, sysManagerDel } from '../../api/system'
   import { sysRoleAdd } from '../../api/system'
   import { sysRoleEdit } from '../../api/system'
   import { sysRoleDelete } from '../../api/system'
@@ -97,11 +103,11 @@
         tableOperate:[
            {
             content:'重置',
-            type:'created'
+            type:'reset'
           },
           {
             content:'删除',
-            type:'created'
+            type:'delete'
           },
            {
             content:'创建管理员',
@@ -115,11 +121,11 @@
           },
           {
             name:'工号',
-            prop:'managerId'
+            prop:'managerNumber'
           },
           {
             name:'用户名',
-            prop:'realName'
+            prop:'userName'
           },
           {
             name:'创建时间',
@@ -129,7 +135,7 @@
         operateList:[
           {
             content:'重置密码',
-            type:'delete'
+            type:'reset'
           },
           {
             content:'删除',
@@ -137,13 +143,10 @@
           },
           {
             content:'编辑',
-            type:'delete'
+            type:'edit'
           }
         ],
-        tableData:'',
-
-
-
+        tableData:[],
         data2: [{
           id: 1,
           label: '一级 1',
@@ -191,50 +194,66 @@
     created:function(){
       this.getManagerPage();
     },
-    mounted:function(){
-      sysUserMenuList().then(
-        res => {
-          console.log("权限菜单:",res);
-
-          let menuTree = res.data.filter(
-            element => {
-              return element.parentId === 0
-            }
-          );
-
-          for( let i = 0; i < menuTree.length; i++  ){
-            menuTree[i].children = [];
-            menuTree[i].children.push( res.data.filter(
-              element => {
-                return element.parentId === menuTree[i].menuId
-              }
-            ) )
-          }
-
-
-          console.log( 'menuTree' , menuTree );
-
-        }
-      ).catch()
-
-    },
     methods:{
       showComponentInfo:function(type,info){
-        console.log('type',type,'info',info);
+        // console.log('type',type,'info',info);
         switch(type){
           case 'create':
             this.addForm.title = '添加管理员'
             this.form = {}
             this.dialogVisible = true
             break
+          case 'reset':
+            this.resetPassword(info)
+            break
           case 'switch':
             console.log(info)
             break
+          case 'edit':
+            this.addForm.title = '修改管理员'
+            this.form = Object.assign({}, info)
+            this.dialogVisible = true
+            break
+          case 'delete':
+            this.delManager(info)
+            break
         }
       },
-      getManagerPage:function () {
+      resetPassword(info) {
+        let resetArr = []
+        if(info instanceof Array) {
+          info.forEach(element => {
+            console.log(element)
+            resetArr.push(element.administratorId)
+          });
+        }else{
+          resetArr.push(info.administratorId)
+        }
+        this.$store.commit('DELETECONFIRM',
+        {
+          title: '提示',
+          message: '确认重置密码?', 
+          fn:() => {
+            sysManagerReset(resetArr)
+            .then(response=> {
+              if(response.code === 200) {
+                this.$message({
+                  message: '重置成功',
+                  type: 'success'
+                })
+              }else{
+                this.$message({
+                  message: '出错了',
+                  type: 'warning'
+                })
+              }
+            })
+          }
+        })
+      },
+      getManagerPage() {
         console.log('this.form',this.form);
-        sysManagerPage(this.form).then(
+        sysManagerAdminPage(this.form).then(
           res => {
             res.data.pageData.forEach(element => {
               element.status = String(element.status)
@@ -248,21 +267,74 @@
       },
       save() {
         if(this.addForm.title === '添加管理员'){
-          sysManagerAdd(this.form)
+          sysManagerAdminAdd(this.form)
           .then(response=> {
             if(response.code === 200) {
               this.$message({
                 message: "添加成功",
                 type: 'success'
               })
+              this.form = {}
+              this.getManagerPage()
             }else{
               this.$message({
                 message: response.msg,
                 type: 'warning'
               })
             }
+            this.dialogVisible = false
+          })
+        }else{
+          sysManagerModify(this.form)
+          .then(response=> {
+            if(response.code === 200) {
+              this.$message({
+                message: "修改成功",
+                type: 'success'
+              })
+              this.form = {}
+              this.getManagerPage()
+            }else{
+              this.$message({
+                message: response.msg,
+                type: 'warning'
+              })
+            }
+            this.dialogVisible = false
           })
         }
+      },
+      delManager(info) {
+        let delArr = []
+        if(info instanceof Array) {
+          info.forEach(element => {
+            console.log(element)
+            delArr.push(element.administratorId)
+          });
+        }else{
+          delArr.push(info.administratorId)
+        }
+        this.$store.commit('DELETECONFIRM',
+        {
+          title: '提示',
+          message: '确认删除管理员?', 
+          fn:() => {
+            sysManagerDel(delArr)
+            .then(response=> {
+              if(response.code === 200) {
+                this.$message({
+                  message: '删除成功',
+                  type: 'success'
+                })
+              }else{
+                this.$message({
+                  message: '出错了',
+                  type: 'warning'
+                })
+              }
+            })
+          }
+        })
       },
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;

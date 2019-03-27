@@ -319,20 +319,20 @@ export default {
     editMenu: function(roleInfo) {
       this.selectedPower = []
       sysRolePowerGet({roleId: roleInfo.roleId})
-      // .then(response=> {
-      //   let arr = []
-      //   response.data.menuList.forEach(item=> {
-      //     arr.push(item.menuId)
-      //   })
-      //   this.selectedPower = arr
-      //   console.log(this.selectedPower)
-      // })
-      // this.menuDialogVisible = true;
-      // this.addPowerParams.createdId = Number(Cookie.get('userId'))
-      // this.addPowerParams.roleId = roleInfo.roleId
-      // this.addForm.title = "设置权限";
-      // this.addForm.data = roleInfo;
-      // console.log("this.addForm.data.menuList", this.addForm.data.menuList);
+      .then(response=> {
+        let arr = []
+        response.data.menuList.forEach(item=> {
+          arr.push(item.menuId)
+        })
+        this.selectedPower = arr
+        console.log(this.selectedPower)
+      })
+      this.menuDialogVisible = true;
+      this.addPowerParams.createdId = Number(Cookie.get('userId'))
+      this.addPowerParams.roleId = roleInfo.roleId
+      this.addForm.title = "设置权限";
+      this.addForm.data = roleInfo;
+      console.log("this.addForm.data.menuList", this.addForm.data.menuList);
     },
     save: function() {
       if (this.addForm.title === "添加角色") {
