@@ -255,6 +255,11 @@
                 message: "添加成功",
                 type: 'success'
               })
+            }else{
+              this.$message({
+                message: response.msg,
+                type: 'warning'
+              })
             }
           })
         }

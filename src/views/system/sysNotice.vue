@@ -65,24 +65,6 @@ export default {
         }
       ],
       tableData: [
-        {
-          title: "通知标题sss",
-          content: "我是通知内容",
-          fbr: "xxx老师",
-          time: "2018-1-1"
-        },
-        {
-          title: "通知标题sss",
-          content: "我是通知内容",
-          fbr: "xxx老师",
-          time: "2018-1-1"
-        },
-        {
-          title: "通知标题sss",
-          content: "我是通知内容",
-          fbr: "xxx老师",
-          time: "2018-1-1"
-        }
       ],
       tableStylus: [
         {

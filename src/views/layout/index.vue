@@ -73,7 +73,7 @@ export default {
   },
   data() {
     return {
-      activeIndex: "",
+      activeIndex:  sessionStorage.getItem("activeIndex") || "",
       nodes: [],
       defaultOpens: [String(sessionStorage.getItem("defaultOpens"))] || []
     };
@@ -84,6 +84,7 @@ export default {
     //另外在开发的时候，可能由于是热部署，也会不断重复的给nodes添加元素，造成导航条有重复的，简单解决，可以设置一个开关
     // let isLoadNodes = sessionStorage.getItem('isLoadNodes')
     // if (!isLoadNodes) {
+    console.log(sessionStorage.getItem("defaultOpens"))
     let data = this.$store.state.allMenu;
     this.nodes.push(...data);
     // console.log(this.nodes)
@@ -92,28 +93,20 @@ export default {
   },
   methods: {
     handleOpen(...params) {
-      // console.log(params)
-      sessionStorage.setItem("defaultOpens", params[0]);
+      console.log(params[0])
+      sessionStorage.setItem("defaultOpens", params[0]); 
     }
   },
   watch: {
     $route: function(to, from) {
       console.log(this.$route.path);
       this.activeIndex = this.$route.path;
-      // 路由改变时执行
-      // console.info(
-      //   "$store.state.leftNavState:" + this.$store.state.leftNavState
-      // );
-      // this.defaultOpens = [String(sessionStorage.getItem("defaultOpens"))];
-      if (to.matched[0].path !== from.matched[0].path) {
-        sessionStorage.setItem("defaultOpens", 0);
-        this.defaultOpens = [String(sessionStorage.getItem("defaultOpens"))];
-      }
-      // console.log(this.defaultOpens);
+      sessionStorage.setItem("activeIndex", this.$route.path);
+      this.defaultOpens = [String(sessionStorage.getItem("defaultOpens"))];
     },
     defaultOpens: function(val) {
       // console.log(val);
-      // return String(sessionStorage.getItem('defaultOpens'))
+      return String(sessionStorage.getItem('defaultOpens'))
     }
   }
 };

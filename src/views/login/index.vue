@@ -45,6 +45,7 @@
                   placeholder="密码"
                   v-model="data.password"
                   class="input-item"
+                  @keyup.native.enter="goLogin"
                 ></el-input>
               </el-form-item>
               <el-form-item style="margin-bottom: 0">
