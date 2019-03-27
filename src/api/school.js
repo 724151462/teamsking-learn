@@ -183,7 +183,31 @@ export function sysClassList(data) {
 export function sysStudentAdd(data) {
   return commonsAjax(`/api/v1/sys/student`, data, 'post')
 }
+/***
+ * 获取学生模板
+ */
+export function sysStudentTemp() {
+  return commonsAjax(`/api/v1/sys/student/excel`, '', 'get')
+}
 
+/***
+ * 上传学生模板
+ */
+export function sysUpTemp(data) {
+  return commonsAjax(`/api/v1/sys/student/excel`, data, 'post')
+}
+/***
+ * 获取excel解析缓存
+ */
+export function sysGetTempData(data) {
+  return commonsAjax(`/api/v1/sys/student/excel/tmp`, '', 'get')
+}
+/***
+ * 导入学生信息
+ */
+export function sysPushTemp(data) {
+  return commonsAjax(`/api/v1/sys/student/excel`, data, 'put')
+}
 
 /***
  * 获取学生信息

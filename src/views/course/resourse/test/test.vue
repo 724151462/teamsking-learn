@@ -403,7 +403,7 @@
         let arr = [...this.quizArr]
         this.expan = [parentId]
         deleteQuiz(arr).then(res => {
-                    this.$store.commit("HIDELOADING");
+          this.$store.commit("HIDELOADING");
           console.log(res)
           if (Number(res.code) === 200) {
             this.$message.success('试题删除成功');

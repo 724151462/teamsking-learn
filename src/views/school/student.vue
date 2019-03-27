@@ -18,6 +18,7 @@
         ></el-button>
       </div>
     </header-the-again>
+    <input type="file" id="upTemp" @change="upStudentTemp" name="upload">
     <table-the-again
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
@@ -109,9 +110,36 @@
       :total="totalCount"
       @current-change="pageChange"
     ></el-pagination>
+
+    <el-dialog
+      title="学生导入"
+      :visible.sync="upDiago"
+      width="500px"
+      class="up-warp"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+    >
+      <div
+        :class="{progress : upData.isUp,'progress-success' : !upData.isUp}"
+        class="progress-init"
+      ></div>
+      <p style="color:red" v-if="upData.isUp">{{this.upData.text}}</p>
+      <template v-else>
+        <p>
+          解析完成：模板内一共
+          <span style="color:red">{{upData.total}}</span>条数据，成功解析
+          <span style="color:red">{{upData.success}}</span>条
+        </p>
+        <p style="color:red">点击确认按钮将数据导入库中,点击取消则放弃此次导入</p>
+      </template>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="open4">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
-
 <script>
 import tableTheAgain from "../../components/table-theAgain";
 import headerTheAgain from "../../components/header-theAgain";
@@ -122,19 +150,32 @@ import {
   sysDepartmentList,
   DepartmentList,
   sysSpecialityList,
+  sysStudentTemp,
+  sysUpTemp,
+  sysGetTempData,
+  sysPushTemp,
   sysClassList,
   sysStudentAdd,
   sysStudentModify,
   sysStudentDelete
 } from "../../api/school";
-import tip from "@/components/tip";
+import axios from "axios";
 import searchInput from "@/components/search-input";
 import { setTimeout } from "timers";
+import Cookie from "js-cookie";
+import { log } from "util";
 export default {
   name: "",
   data() {
     return {
       search: "",
+      upDiago: false,
+      upData: {
+        isUp: true,
+        text: "正在解析模板，请不要关闭页面",
+        total: "",
+        success: ""
+      },
       classSearchList: [],
       searchForm: {
         college: "",
@@ -157,6 +198,14 @@ export default {
         {
           content: "批量删除",
           type: "deleteAll"
+        },
+        {
+          content: "下载模板",
+          type: "downTemp"
+        },
+        {
+          content: "导入模板",
+          type: "upTemp"
         }
       ],
       columnNameList: [
@@ -224,7 +273,7 @@ export default {
       tableData3: [],
       filterSelect: {},
       selectOptions: [],
-      dialogVisible: false,
+      dialogVisible: true,
       // 院列表
       collegeList: [],
       collegeSelected: "",
@@ -371,6 +420,13 @@ export default {
         case "deleteAll":
           this.delStudent(info);
           break;
+        case "downTemp":
+          this.down();
+          break;
+        case "upTemp":
+          let a = document.getElementById("upTemp");
+          a.click();
+          break;
         case "addStudent":
           this.$router.push({ path: "/school/student/add" });
           break;
@@ -397,7 +453,6 @@ export default {
           delArr.push(element.studentId);
         });
       }
-
       this.$confirm("是否删除学生？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -450,6 +505,70 @@ export default {
         });
         this.tableData3 = dataArr;
       });
+    },
+    down() {
+      axios
+        .get("/api/v1/sys/student/excel", {
+          headers: {
+            "content-type": "application/vnd.ms-excel",
+            token: Cookie.get("BackstageToken")
+          },
+          responseType: "blob"
+        })
+        .then(response => {
+          //由于后台接口没有返回体，请求直接被catch捕获
+        })
+        .catch(function(response) {
+          let blob = new Blob([response], { type: "application/vnd.ms-excel" });
+          let url = window.URL.createObjectURL(blob);
+          let link = document.createElement("a");
+          link.style.display = "none";
+          link.href = url;
+          link.setAttribute("download", "学生模板.xlsx");
+          document.body.appendChild(link);
+          link.click();
+        });
+    },
+    upStudentTemp(item) {
+      let upFile = item.target.files[0];
+      let fileFormData = new FormData();
+      fileFormData.append("file", upFile);
+      this.upDiago = true;
+      this.upData.isUp = true;
+      this.upData.text = "正在解析模板，请不要关闭页面";
+      sysUpTemp(fileFormData)
+        .then(res => {
+          let a = document.getElementById("upTemp");
+          a.value = "";
+          this.upData.total = res.data.length;
+        })
+        .then(() => {
+          sysGetTempData().then(res => {
+            console.log(res);
+            this.upData.success = res.data.list.length;
+            this.upData.isUp = false;
+          });
+        })
+        .then(data => {
+          // sysPushTemp().then(() => {});
+          // console.log(data);
+        })
+        .catch(error => {
+          let a = document.getElementById("upTemp");
+          a.value = "";
+          console.log(error);
+        });
+    },
+    open4() {
+      this.$confirm("取消导入，确定吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+      .then(() => {
+        this.upDiago = false
+      })
+      .catch(() => {});
     }
   }
 };
@@ -469,6 +588,42 @@ export default {
 }
 
 .student {
+  @keyframes slidein {
+    from {
+      background: rgb(19, 206, 102);
+      width: 0;
+    }
+
+    to {
+      background: rgb(19, 206, 102);
+      width: 100%;
+    }
+  }
+
+  .up-warp {
+    .progress {
+      border-radius: 30px;
+      width: 420px;
+      height: 20px;
+      background: #ccc;
+      animation: slidein 5s linear 1s infinite;
+    }
+
+    .progress-init {
+      border-radius: 30px;
+      width: 420px;
+      height: 20px;
+      background: #ccc;
+    }
+
+    .progress-success {
+      border-radius: 30px;
+      width: 420px;
+      height: 20px;
+      background: rgb(19, 206, 102);
+    }
+  }
+
   .el-pagination {
     margin: 20px 2.5% 0 0;
     display: flex;

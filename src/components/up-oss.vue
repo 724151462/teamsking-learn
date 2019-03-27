@@ -210,7 +210,9 @@ export default {
         }
       } else if (this.fileKind === "certificate") {
         dir = "teskedu/img/certificate/";
-      } else {
+      } else if (this.fileKind === "temp") {
+        dir = "ExcelTemplate";
+      }else {
         console.log('fileKind传参错误');
         return false
         // dir = name;
