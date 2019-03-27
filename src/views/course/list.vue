@@ -193,7 +193,7 @@ export default {
       console.log(this.copyCourseObj)
       let data = {
         courseName: this.copyCourseObj.courseName,
-        id: this.copyCourseObj.courseId
+        courseId: this.copyCourseObj.courseId
       }
       copy(data)
         .then(response=> {
