@@ -199,6 +199,10 @@
       },
       queryTenantList:function () {
         console.log('请求的参数信息:',this.searchForm);
+        // if(this.searchForm.tenantId){
+        //   delete this.searchForm.search
+        //   console.log(this.searchForm)
+        // }
         sysTenantManagerPage(this.searchForm).then(
           res => {
             if(res.code === 200){

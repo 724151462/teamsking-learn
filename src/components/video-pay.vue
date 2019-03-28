@@ -92,7 +92,8 @@
         checkList: [],
         answerRes: '',
         answerStr: '',
-        timer: ''
+        timer: '',
+        shortTimePoint: false // 防止时间点过早重复触发暂停事件
       }
     },
     mounted() {
@@ -142,25 +143,49 @@
       goOnLook() {
         clearTimeout(this.timer)
         this.testDialog = false
+        this.shortTimePoint = true
         this.$refs.videoPlayer.player.play()
       },
       getParentUrl(url) {
         this.playerOptions.sources[0].src = url
       },
       onPlayerPlay(player) {
-        player.currentTime(this.timePoint-3)
-        if(player.currentTime() === this.timePoint) {
-          this.$refs.videoPlayer.player.pause()
-          this.testDialog = true
-        }
-        let currentTP = document.getElementsByClassName('vjs-current-time-display')[0].innerHTML
         console.log(this.timePoint)
+        if(this.shortTimePoint === false) {
+          // 当前时间店判断
+        // if(this.timePoint < 4) {
+        //   player.currentTime(this.timePoint)
+        // }else{
+        //   player.currentTime(this.timePoint-3)
+        // }
+        // if(player.currentTime() === this.timePoint) {
+        //   this.timer = setTimeout(() => {
+        //     this.$refs.videoPlayer.player.pause()
+        //     this.testDialog = true
+        //   },0)
+        // }
+        player.currentTime(0)
+        console.log(this.timePoint)
+        // 没有回答过且时间点非空
         if(this.answerRes === '' && this.timePoint !== '') {
-          this.timer = setTimeout(() => {
+          if(this.timePoint === 0) {
             this.$refs.videoPlayer.player.pause()
             this.testDialog = true
-          }, 3000);
+          }else if(this.timePoint > 0 && this.timePoint < 4){
+            this.timer = setTimeout(() => {
+              this.$refs.videoPlayer.player.pause()
+              this.testDialog = true
+            }, (this.timePoint + 1) * 1000);
+          }else{
+            player.currentTime(this.timePoint - 3000)
+            this.timer = setTimeout(() => {
+              this.$refs.videoPlayer.player.pause()
+              this.testDialog = true
+            }, 4000);
+          }
         }
+        }
+        
       },
       onPlayerPause(player){
         // alert("pause");
@@ -202,6 +227,7 @@
         if(val === 'reset') {
           this.testDialog = false
         }
+        this.shortTimePoint = false
         this.answerRes = ''
         this.$refs.videoPlayer.player.src(this.isMp4)
         this.testDialog = false

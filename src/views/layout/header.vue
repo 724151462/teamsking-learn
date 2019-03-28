@@ -137,9 +137,6 @@ export default {
     Square
   },
   methods: {
-    jumpTo(url) {
-      this.$router.push(url);
-    },
     //退出登录
     doLogout() {
       removeToken();
