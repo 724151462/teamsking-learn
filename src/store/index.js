@@ -25,7 +25,8 @@ const state = {
   msgNum: 0,
   isFullScreen: false,
   loadingText: '正在加载',
-  userAvatar: Cookie.get('avatar') || require('@/assets/images/user.png')
+  userAvatar: Cookie.get('avatar') || require('@/assets/images/user.png'),
+  isYuan: '100', //是否启用分院(临时)
 }
 
 const mutations = {
@@ -105,6 +106,10 @@ const mutations = {
       state.isFullScreen = false
       // console.log('全屏')
     }
+  },
+  //是否启用分院，临时
+  CHANGE_YUAN(state,data){
+    state.isYuan = data
   }
 }
 

@@ -1,6 +1,19 @@
 <template>
   <div class="academy">
     <header-the-again headerTitle="院管理">
+      <div style="display:inline-block;float:left;margin-left:20px;line-height:40px">
+        是否启用分院:
+        <el-switch
+          v-model="$store.state.isYuan"
+          @change="(value)=>{
+            enableAcademy(value)
+          }"
+          active-color="#13ce66"
+          inactive-color="rgb(220, 223, 230)"
+          active-value="100"
+          inactive-value="0"
+        ></el-switch>
+      </div>
       <div style="display:inline-block;position: relative;">
         <el-input v-model="searchKey" placeholder="学院名称" style="width:230px"></el-input>
         <el-button
@@ -44,6 +57,7 @@
           <el-input
             require
             class="input-pop"
+            :disabled="$store.state.isYuan == '0'"
             v-model="addForm.data.collegeName"
             placeholder="请填写院"
             clearable
@@ -103,6 +117,7 @@ export default {
   name: "",
   data() {
     return {
+      value5:"100",
       academySelectList: [],
       searchKey: "",
       addForm: {
@@ -355,6 +370,19 @@ export default {
         });
       }
       this.addForm.teacherName = "";
+    },
+    enableAcademy(value){
+      this.$confirm("是否变更分院状态？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$store.commit('CHANGE_YUAN',value)
+        })
+        .catch(() => {
+          this.$store.commit('CHANGE_YUAN',value)
+        });
     }
   }
 };

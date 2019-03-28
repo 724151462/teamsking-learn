@@ -64,6 +64,7 @@
             @clear="()=>{this.addForm.data.collegeId = null}"
             filterable
             clearable
+            :disabled="$store.state.isYuan == '0'"
             v-model="addForm.data.collegeId"
             placeholder="请选择院"
           >

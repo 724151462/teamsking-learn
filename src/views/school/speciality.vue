@@ -94,6 +94,7 @@
         >
           <el-select
             filterable
+            :disabled="$store.state.isYuan == '0'"
             clearable
             v-model="addForm.data.collegeId"
             placeholder="请选择院"
