@@ -4,7 +4,8 @@
 
     <el-form ref="form" :inline="true" label-width="100px" class="form-query">
       <el-form-item label="输入搜索：">
-        <el-input v-model="form.search"  style="width: 200px;margin-left: 10px;" placeholder="姓名/昵称"></el-input>
+        <el-input v-model="form.userName"  style="width: 200px;margin-left: 10px;" placeholder="姓名"></el-input>
+        <el-input v-model="form.managerNumber"  style="width: 200px;margin-left: 10px;" placeholder="工号"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="getManagerPage">查询</el-button>
@@ -326,6 +327,7 @@
                   message: '删除成功',
                   type: 'success'
                 })
+                this.getManagerPage()
               }else{
                 this.$message({
                   message: '出错了',

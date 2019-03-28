@@ -14,7 +14,7 @@
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
       :columnNameList="columnNameList"
-      :tableData="tableData"
+      :tableData="tableData.pageData"
       :operateList="operateList"
       @showComponentInfo="showComponentInfo"
     ></table-the-again>
@@ -88,7 +88,7 @@
             试用
           </el-radio>
         </el-form-item>
-        <el-form-item label="使用oss平台" required>
+        <el-form-item label="使用平台的oss" required>
           <el-radio v-model="tenantData.ossPublic" label="1">
             是
           </el-radio>
@@ -201,7 +201,7 @@ export default {
     tenantList() {
       tenantGet(this.form).then(response => {
         console.log(response.data.pageData);
-        this.tableData = response.data.pageData;
+        this.tableData = response.data;
       });
     },
     showComponentInfo(type, info) {
@@ -272,7 +272,7 @@ export default {
             this.tenantData.tenantLogo = ''
             this.tenantData.tenantPic = ''
             this.tenantData.tenantDomain = ''
-            this.tableData.push(response.data)
+            this.tableData.pageData.push(response.data)
             this.dialogVisible = false;
           }
         })
@@ -293,8 +293,8 @@ export default {
     delete(type, list) {
     },
     handleCurrentChange(number) {
-      this.form.pageIndex = number;
-      // this.queryRoleList();
+      this.form.pageParam.pageIndex = number;
+      this.tenantList();
     },
     handleClose(done) {
       done();
