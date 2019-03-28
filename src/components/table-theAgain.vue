@@ -68,11 +68,9 @@
           </el-table-column>
         </template>
         <template v-else-if="list.imgList">
-          <el-table-column :label="list.name" align="center" :key="index">
+          <el-table-column :width="list.width" :label="list.name" align="center" :key="index">
             <template scope="scope">
-              <div>
-                <img v-for="(item, index) in scope.row[list.prop]" :src="item.imgUrl" :key="index">
-              </div>
+              <img  :width="list.imgWidth" :src="scope.row[list.prop]" :key="index">
             </template>
           </el-table-column>
         </template>

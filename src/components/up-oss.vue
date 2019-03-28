@@ -1,3 +1,21 @@
+<!--
+  接收参数：
+  btnText 按钮的文字
+    接收 String 默认：'上传'
+  
+  inputs 页面有多个上传按钮时做区分
+
+  size 文件可上传的最大字节大小 (目前未实现上传文件的大小限制功能)
+    接收 Number
+      示例：2255650
+  
+  upDir  文件要上传的路径  
+    接收 String
+      示例：'teskedu/avatar',
+      如果传'resource',则根据文件类型自动判定，'tskedu/resource/*'
+      如果不传则上传到'other目录'
+
+-->
 <template>
   <div style="display: inline-block;margin: 0 10px">
     <el-button type="primary" @click="goUp" id="male">{{btnText}}</el-button>
@@ -26,8 +44,8 @@ export default {
     fileType: {
       default: ""
     },
-    fileKind: {
-      default: "default"
+    upDir: {
+      default: ""
     }
   },
   data() {
@@ -47,8 +65,6 @@ export default {
       //需要返回的文件信息
       fileName: "",
       fileSize: "",
-      dir: ""
-      // fileName:'',
     };
   },
   methods: {
@@ -79,28 +95,19 @@ export default {
         this.ossCheck();
         return false;
       }
-      let file = this.fileData.target.files[0];
-      let name =
-        new Date().getTime() +
-        file.name.replace(
-          /[\-\s+\_\+\,\!\|\~\`\(\)\#\$\%\^\&\*\{\}\:\;\"\L\<\>\?]/g,
-          ""
-        );
-      console.log(file.type);
-
-      if (this.fileType !== "") {
-        let chekcType = this.fileType.split(",").some(element => {
-          return file.type === element;
-        });
-        if (!chekcType) {
-          this.$message({
-            message: "文件格式错误",
-            type: "error"
-          });
-          this.inputNull();
-          return false;
-        }
-      }
+      // if (this.fileType !== "") {
+      //   let chekcType = this.fileType.split(",").some(element => {
+      //     return file.type === element;
+      //   });
+      //   if (!chekcType) {
+      //     this.$message({
+      //       message: "文件格式错误",
+      //       type: "error"
+      //     });
+      //     this.inputNull();
+      //     return false;
+      //   }
+      // }
       if (file.size > this.size) {
         this.$message({
           message: "上传文件超出可上传范围，请重新选择文件上传",
@@ -109,17 +116,14 @@ export default {
         this.inputNull();
         return false;
       }
-      let client = new oss(this.ossData);
-      //多文件上传请修改这里
-      this.forInputs(client, name, file);
     },
     //获取签证
     ossCheck(name) {
-      let dir = this.resType(this.fileName);
-      this.dir = dir;
+      let dir = this.getDir();
+      this.$store.commit("SET_LOADING_TEXT", "获取验签");
+      this.$store.commit("SHOWLOADING");
       webUpload({ ossPath: dir })
         .then(res => {
-          //console.log(res)
           if (Number(res.code) === 200) {
             let request = new FormData();
             this.imageData = res.data;
@@ -130,21 +134,24 @@ export default {
             request.append("success_action_status", "200");
             request.append("Signature", res.data.signature);
             request.append("file", this.fileData.target.files[0]);
+            this.inputNull();
             this.startUp(request);
           } else {
-            this.$message.error("获取验签失败，请联系管理员");
+            this.inputNull();
+            this.closeLoading()
+            this.$message.error("获取验签失败，请重试");
           }
         })
         .catch(err => {
-          console.log(err);
-          console.log('获取验签失败');
-          this.$message.error("获取验签失败,请重试");
+          this.inputNull();
+          console.log("获取验签失败",err);
+          this.closeLoading()
+          this.$message.error("获取验签失败，请重试");
         });
     },
     //上传文件到OSS
     startUp(request) {
       this.$store.commit("SET_LOADING_TEXT", "正在上传...");
-      this.$store.commit("SHOWLOADING");
       axios({
         method: "post",
         url: this.imageData.host,
@@ -152,72 +159,73 @@ export default {
         headers: { "Content-Type": "multipart/form-data" }
       })
         .then(res => {
-          this.$store.commit("SET_LOADING_TEXT", "正在加载");
-
-          this.$store.commit("HIDELOADING");
+          this.closeLoading()
           let url = this.imageData.host + "/" + this.imageData.key;
-          this.inputNull();
           this.$emit("ossUp", url, this.fileName, this.fileSize);
         })
         .catch(function(error) {
-          this.$store.commit("SET_LOADING_TEXT", "正在加载");
-
-          this.$store.commit("HIDELOADING");
-          this.$message.error("上传失败");
+          this.closeLoading()
           console.log("error", error);
         });
+    },
+    //生成文件要上传到的路径
+    getDir() {
+      let dir = "";
+      if (this.upDir) {
+        if (this.upDir == "resource") {
+         dir =  this.resType(this.fileName);
+        } else {
+          dir = this.upDir;
+        }
+      } else {
+        dir = "other";
+      }
+      return dir
     },
     //检验文件类型，生成dir
     resType(name) {
       let dir = "";
-      if (this.fileKind === "avatar") {
-        dir = "teskedu/avatar";
-      } else if (this.fileKind === "resource") {
-        let index = name.lastIndexOf("."),
-          imgArr = ["jpeg", "jpg", "png"],
-          audioArr = ["mp3", "wav"],
-          videoArr = ["mp4", "avi", "rmvb", "wmv", "mkv"],
-          docArr = ["pdf", "txt", "doc", "docx", "xls", "xlsx", "ppt", "pptx"];
-        let curType = name.substring(index + 1, name.length).toLowerCase();
+      let index = name.lastIndexOf("."),
+        imgArr = ["jpeg", "jpg", "png"],
+        audioArr = ["mp3", "wav"],
+        videoArr = ["mp4", "avi", "rmvb", "wmv", "mkv"],
+        docArr = ["pdf", "txt", "doc", "docx", "xls", "xlsx", "ppt", "pptx"];
+      let curType = name.substring(index + 1, name.length).toLowerCase();
 
-        if (
-          imgArr.find(item => {
-            return curType == item;
-          })
-        ) {
-          dir = "teskedu/resource/img";
-        } else if (
-          videoArr.find(item => {
-            return curType == item;
-          })
-        ) {
-          dir = "teskedu/resource/video";
-        } else if (
-          docArr.find(item => {
-            return curType == item;
-          })
-        ) {
-          dir = "teskedu/resource/doc";
-        } else if (
-          audioArr.find(item => {
-            return curType == item;
-          })
-        ) {
-          dir = "teskedu/resource/audio";
-        } else {
-          this.$message.error("请上传受支持的文件类型");
-          return false;
-        }
-      } else if (this.fileKind === "certificate") {
-        dir = "teskedu/img/certificate/";
-      } else if (this.fileKind === "temp") {
-        dir = "ExcelTemplate";
-      }else {
-        console.log('fileKind传参错误');
-        return false
-        // dir = name;
+      if (
+        imgArr.find(item => {
+          return curType == item;
+        })
+      ) {
+        dir = "teskedu/resource/img";
+      } else if (
+        videoArr.find(item => {
+          return curType == item;
+        })
+      ) {
+        dir = "teskedu/resource/video";
+      } else if (
+        docArr.find(item => {
+          return curType == item;
+        })
+      ) {
+        dir = "teskedu/resource/doc";
+      } else if (
+        audioArr.find(item => {
+          return curType == item;
+        })
+      ) {
+        dir = "teskedu/resource/audio";
+      } else {
+        this.$message.error("请上传受支持的文件类型");
+        return false;
       }
       return dir;
+    },
+    //关闭loading
+    closeLoading(){
+      this.$store.commit("SET_LOADING_TEXT", "正在加载");
+      this.$store.commit("HIDELOADING");
     }
   }
 };

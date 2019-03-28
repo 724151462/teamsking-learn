@@ -1,17 +1,15 @@
-OSSÄ¿Â¼ÉÏ´«½á¹¹£º
+OSSç›®å½•ä¸Šä¼ ç»“æ„ï¼š
 
-×ÊÔ´¿âÍ¼Æ¬×ÊÔ´µÄÂ·¾¶£ºtskedu/resource/img
-×ÊÔ´¿âÒôÆµ×ÊÔ´µÄÂ·¾¶£ºteskedu/resource/audio
-×ÊÔ´¿âÊÓÆµ×ÊÔ´µÄÂ·¾¶£ºtskedu/resource/video
-×ÊÔ´¿âÎÄµµ×ÊÔ´µÄÂ·¾¶£ºteskedu/resource/doc
-
-
-Í·Ïñ´æ´¢Â·¾¶£º      teskedu/avatar
-
-ÆäËû¸½¼şÂ·¾¶:       tskedu/enclosure
+èµ„æºåº“å›¾ç‰‡èµ„æºçš„è·¯å¾„ï¼štskedu/resource/img
+èµ„æºåº“éŸ³é¢‘èµ„æºçš„è·¯å¾„ï¼šteskedu/resource/audio
+èµ„æºåº“è§†é¢‘èµ„æºçš„è·¯å¾„ï¼štskedu/resource/video
+èµ„æºåº“æ–‡æ¡£èµ„æºçš„è·¯å¾„ï¼šteskedu/resource/doc
 
 
-ÆäËüÍ¼Æ¬Â·¾¶: teskedu/img
-¿Î³Ì·âÃæ£ºteskedu/img/courseCover
-Ö¤Êé£ºteskedu/img/certificate
+å¤´åƒå­˜å‚¨è·¯å¾„ï¼š      teskedu/avatar
+
+å…¶ä»–é™„ä»¶è·¯å¾„:       other
+
+
+é—¨æˆ·logo,å¹³å°å›¾ç‰‡ï¼Œè½®æ’­å›¾  ï¼š  tskedu/logo
 

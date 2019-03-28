@@ -8,7 +8,7 @@
           <img :src="infoForm.avatar ? infoForm.avatar : defAvatar" alt="" class="user-avatar">
           <div style="text-align: center;font-size: 14px;">
             <el-button type="text" @ossUp="changeAvatar"><label for="male" style="cursor: pointer" @ossUp="changeAvatar">修改头像</label></el-button>
-            <up-oss  style="display: none" :file-kind="fileKind" @ossUp="changeAvatar"></up-oss>
+            <up-oss  style="display: none" upDir="tskedu/avatar" @ossUp="changeAvatar"></up-oss>
           </div>
         </div>
       </div>
@@ -43,16 +43,13 @@
           <el-input class="input-width" :placeholder="infoForm.mobile" v-model="newForm.mobile"> </el-input>
           <el-button type="text" style="display: inline-block;margin-left: 15px;" @click="goMobile">绑定手机>>></el-button>
         </div>
-        <div  style="padding-left: 55px;width: 400px;display: flex;align-items: center">
+        <!-- <div  style="padding-left: 55px;width: 400px;display: flex;align-items: center">
           <div><span class="span-label">证书添加</span></div>
           <div><i class="el-icon-picture avatar-uploader-icon"></i></div>
           <div>
             <i class="el-icon-circle-plus-outline up-label" @click="uploadDialog = true"></i>
-            <!--<label for="male">-->
-            <!--<i class="el-icon-circle-plus-outline up-label"></i>-->
-            <!--</label>-->
           </div>
-        </div>
+        </div> -->
       </div>
       <!--院系信息-->
       <div class="form-warp" v-show="jobForm">

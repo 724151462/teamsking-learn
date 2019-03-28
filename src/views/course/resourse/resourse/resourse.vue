@@ -114,7 +114,7 @@
                 >
                   <label for="male">上传</label>
                 </el-button>
-                <up-oss style="display: none;" :file-kind="fileKind" @ossUp="upRes"></up-oss>
+                <up-oss style="display: none;" upDir="resource" @ossUp="upRes"></up-oss>
                 <el-button
                   size="mini"
                   style="margin-left: 5px"

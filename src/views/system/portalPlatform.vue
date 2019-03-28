@@ -16,13 +16,13 @@
     </el-form-item>
     <el-form-item label="logo" required>
       <div class="logoContent">
-        <upOss :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo" :fileKind="'img'"></upOss>
+        <upOss :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo" upDir="tskedu/logo"></upOss>
         <img width="100px" :src="logoSrc" alt="">
       </div>
     </el-form-item>
     <el-form-item label="平台图片" required>
       <div class="logoContent">
-        <upOss :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic" :fileKind="'img'"></upOss>
+        <upOss :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic" upDir="tskedu/logo"></upOss>
         <img width="100px" :src="platSrc" alt="">
       </div>
     </el-form-item>

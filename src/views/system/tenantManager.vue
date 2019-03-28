@@ -46,11 +46,11 @@
           <el-input v-model="tenantData.tenantWebsite"></el-input>
         </el-form-item>
         <el-form-item label="logo">
-          <upOss :fileKind="'resource'" style="height: 100px" :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo"></upOss>
+          <upOss upDir="tskedu/logo" style="height: 100px" :btn-text="'上传logo'" :inputs="'logo'" @ossUp="upLogo"></upOss>
           <img v-if="tenantData.tenantLogo" height="80px" :src="tenantData.tenantLogo" />
         </el-form-item>
         <el-form-item label="平台图片" style="height: 100px">
-          <upOss :fileKind="'resource'" :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic"></upOss>
+          <upOss upDir="tskedu/logo" :btn-text="'上传图片'" :inputs="'pic'" @ossUp="upPic"></upOss>
           <img v-if="tenantData.tenantPic" height="80px" :src="tenantData.tenantPic" />
         </el-form-item>
         <el-form-item label="学校域名" required>

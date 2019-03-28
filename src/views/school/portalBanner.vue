@@ -1,21 +1,16 @@
 <template>
   <div class="portalTeacher">
-    <div style="height: 70px">
-      <el-button style="float: right;margin-right: 50px" type="primary" @click="addBanner(1)">添加PC轮播图</el-button>
-      <el-button style="float: right;margin-right: 50px" type="primary" @click="addBanner(2)">添加小程序轮播图</el-button>
-    </div>
-    <table-wjx
-      :tableTitle="tableTitle"
+    <tableTheAgain
       :tableOperate="tableOperate"
       :columnNameList="columnNameList"
       :tableData="tableData3"
       :operateList="operateList"
       @showComponentInfo="showComponentInfo"
-    ></table-wjx>
+    ></tableTheAgain>
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%">
       <el-form ref="form" :model="form" label-width="100px">
         <el-form-item label="图片路径">
-          <upOss :btnText="'上传轮播图'" @ossUp="getBannerUrl" :fileKind="'img'"></upOss>
+          <upOss :btnText="'上传轮播图'" @ossUp="getBannerUrl" upDir="tskedu/logo"></upOss>
         </el-form-item>
         <el-form-item label="链接web" v-if="form.carouselType === 1">
           <el-input v-model="form.linkWebUrl"></el-input>
@@ -38,6 +33,7 @@
 import aDialog from "@/components/dialog";
 import upOss from "@/components/up-oss";
 import tableWjx from "../../components/table-wjx";
+import tableTheAgain from "@/components/table-theAgain";
 
 import { bannerList, addBanner, delBanner, modBanner } from "@/api/system";
 import { error } from "util";
@@ -45,12 +41,13 @@ import { error } from "util";
 export default {
   components: {
     tableWjx,
+    tableTheAgain,
     upOss
   },
   data() {
     return {
       form: {},
-      dialogTitle: '',
+      dialogTitle: "",
       dialogVisible: false,
       activeIndex: "2",
       tableTitle: "轮播图",
@@ -62,7 +59,10 @@ export default {
         {
           name: "图片路径",
           prop: "imageUrl",
-          imgList: {}
+          imgList: {},
+          width: "220px",
+          imgWidth: "200px",
+          imgHeight: "70px"
         },
         {
           name: "链接路径",
@@ -70,15 +70,12 @@ export default {
         },
         {
           name: "轮播图类型",
+          width: "120px",
           prop: "carouselType",
-          formatter:(val)=>{
-              let carouselType = val === 1 ? 'PC端' : '小程序'
-              return carouselType
-            }
-        },
-        {
-          name: "租户id",
-          prop: "tenantId"
+          formatter: val => {
+            let carouselType = val === 1 ? "PC端" : "小程序";
+            return carouselType;
+          }
         }
       ],
       operateList: [
@@ -91,43 +88,54 @@ export default {
           type: "delete"
         }
       ],
-      tableOperate: [],
+      tableOperate: [
+        {
+          content: "+添加小程序轮播图",
+          type: "addWx"
+        },
+        {
+          content: "+添加PC轮播图",
+          type: "addPc"
+        }
+      ],
       btnType: ""
     };
   },
   methods: {
-    handleSelect(key, keyPath) {
-      console.log(key, keyPath);
-    },
     showComponentInfo: function(type, info) {
-      // console.log( '父组件接收到的类型：' , type + '父组件接收到的信息：' , info );
       switch (type) {
         case "edit":
-          console.log(info)
-          if(info.carouselType === 1) {
-            this.dialogTitle = '编辑PC端轮播图'
-            this.form.carouselType = 1
+          console.log(info);
+          if (info.carouselType === 1) {
+            this.dialogTitle = "编辑PC端轮播图";
+            this.form.carouselType = 1;
             this.form.linkWebUrl = info.linkWebUrl;
-          }else{
-            this.dialogTitle = '编辑小程序轮播图'
-            this.form.carouselType = 2
+          } else {
+            this.dialogTitle = "编辑小程序轮播图";
+            this.form.carouselType = 2;
             this.form.linkWxxUrl = info.linkWxxUrl;
           }
           this.form.carouselId = info.carouselId;
           this.form.imageUrl = info.imageUrl[0].imgUrl;
-          this.btnType = "modify"
+          this.btnType = "modify";
           this.dialogVisible = true;
           break;
         case "delete":
           this.deleteBanner(info);
           break;
+        case "addWx":
+          this.addBanner(2);
+          break;
+        case "addPc":
+          this.addBanner(1);
+          break;
       }
     },
     addBanner(type) {
-      this.form = {}
-      this.form.carouselType = type
-      this.btnType = "add"
-      this.dialogTitle = type === 1 ? '添加PC端轮播图' : '添加小程序轮播图'
+      this.form = {};
+      this.form.carouselType = type;
+      this.btnType = "add";
+      this.dialogTitle = type === 1 ? "添加PC端轮播图" : "添加小程序轮播图";
       this.dialogVisible = true;
     },
     deleteBanner(item) {
@@ -149,7 +157,7 @@ export default {
         addBanner(this.form)
           .then(response => {
             if (response.code === 200) {
-              this.getBannerList()
+              this.getBannerList();
               this.$message({
                 message: "添加成功",
                 type: "success"
@@ -194,24 +202,24 @@ export default {
     },
     getBannerList() {
       bannerList()
-      .then(res => {
-        res.data.forEach(element => {
-          if(element.carouselType === 1) {
-            element.linkUrl = element.linkWebUrl
-            // element.carouselType = 'PC端'
-          }else{
-            element.linkUrl = element.linkWxxUrl
-            // element.carouselType = '微信'
-          }
-          element.imageUrl = [{ imgUrl: element.imageUrl }];
-        });
-        this.tableData3 = res.data;
-      })
-      .catch();
+        .then(res => {
+          res.data.forEach(element => {
+            if (element.carouselType === 1) {
+              element.linkUrl = element.linkWebUrl;
+              // element.carouselType = 'PC端'
+            } else {
+              element.linkUrl = element.linkWxxUrl;
+              // element.carouselType = '微信'
+            }
+          });
+          this.tableData3 = res.data;
+          console.log(this.tableData3);
+        })
+        .catch();
     }
   },
   created: function() {
-    this.getBannerList()
+    this.getBannerList();
   }
 };
 </script>

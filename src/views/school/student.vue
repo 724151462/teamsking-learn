@@ -18,7 +18,7 @@
         ></el-button>
       </div>
     </header-the-again>
-    <input type="file" id="upTemp" @change="upStudentTemp" name="upload">
+    <input type="file" style="display:none" id="upTemp" @change="upStudentTemp" name="upload">
     <table-the-again
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
@@ -134,8 +134,8 @@
         <p style="color:red">点击确认按钮将数据导入库中,点击取消则放弃此次导入</p>
       </template>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="open4">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button @click="open4('取消导入，确定吗？')">取 消</el-button>
+        <el-button type="primary" @click="putTemp">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -382,13 +382,12 @@ export default {
     },
     // 专业搜索值变化
     specialityChange(value) {
-      console.log("spec", value);
       this.searchForm.studentClass = -1;
       if (value === -1) {
         this.classSearchList = this.classRows;
       } else {
         this.classSearchList = this.classRows.filter(item => {
-          console.log(item);
+          // console.log(item);
           return item.specialityId == value || item.classId == -1;
         });
       }
@@ -529,6 +528,7 @@ export default {
           link.click();
         });
     },
+    //模板解析
     upStudentTemp(item) {
       let upFile = item.target.files[0];
       let fileFormData = new FormData();
@@ -549,26 +549,54 @@ export default {
             this.upData.isUp = false;
           });
         })
-        .then(data => {
-          // sysPushTemp().then(() => {});
-          // console.log(data);
-        })
         .catch(error => {
           let a = document.getElementById("upTemp");
           a.value = "";
           console.log(error);
         });
     },
-    open4() {
-      this.$confirm("取消导入，确定吗？", "提示", {
+    //将模板数据导入数据库
+    putTemp() {
+      if (this.upData.isUp) {
+        this.open4("模板解析尚未完成，取消导入，确定吗？");
+      } else {
+        this.$store.commit("SHOWLOADING");
+
+        sysPushTemp()
+          .then(res => {
+            if (res.code == 200) {
+              this.$store.commit("HIDELOADING");
+
+              this.$message.success("导入成功！");
+              this.upDiago = false;
+              this.upData.isUp = true;
+              this.upData.text = "正在解析模板，请不要关闭页面";
+              this.upData.total = "";
+              this.upData.success = "";
+              this.studentInit();
+            } else {
+              this.$store.commit("ERR_MSG", res.msg);
+            }
+          })
+          .catch(err => {
+            this.$store.commit("ERR_MSG", err.msg);
+          });
+      }
+    },
+    open4(text) {
+      this.$confirm(text, "提示", {
         confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        cancelButtonText: "继续",
         type: "warning"
       })
-      .then(() => {
-        this.upDiago = false
-      })
-      .catch(() => {});
+        .then(() => {
+          this.upDiago = false;
+          this.upData.isUp = true;
+          this.upData.text = "正在解析模板，请不要关闭页面";
+          this.upData.total = "";
+          this.upData.success = "";
+        })
+        .catch(() => {});
     }
   }
 };
@@ -613,7 +641,7 @@ export default {
       border-radius: 30px;
       width: 420px;
       height: 20px;
-      background: #ccc;
+      background: white;
     }
 
     .progress-success {

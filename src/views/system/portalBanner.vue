@@ -15,7 +15,7 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%">
       <el-form ref="form" :model="form" label-width="100px">
         <el-form-item label="图片路径">
-          <upOss :btnText="'上传轮播图'" @ossUp="getBannerUrl" :fileKind="'img'"></upOss>
+          <upOss :btnText="'上传轮播图'" @ossUp="getBannerUrl" upDir="tskedu/logo"></upOss>
         </el-form-item>
         <el-form-item label="链接web" v-if="form.carouselType === 1">
           <el-input v-model="form.linkWebUrl"></el-input>

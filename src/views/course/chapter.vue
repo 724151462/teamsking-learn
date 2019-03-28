@@ -316,8 +316,8 @@
               style="margin: 0px 10px 10px 0px"
               :btnText="'上传视频'"
               @ossUp="getVideoUrl"
-              :fileKind="'resource'"
-              :fileType="'video/mp4'"
+              upDir="resource"
+              fileType='video/mp4'
             ></upOss>
             <span>请上传格式为mp4或flv格式，且小于2GB的视频</span>
           </div>

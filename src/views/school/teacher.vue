@@ -180,7 +180,6 @@ export default {
   computed: {},
   mounted() {
     this.teacherInit();
-    // 院列表
   },
   methods: {
     //获取教师列表
