@@ -122,6 +122,7 @@
                     </div>
                     <div class="operate">
                       <span v-if="content.contentType===10" @click="addSubjectBtn(content)">+内嵌题</span>
+                      <span @click="resPreview(content)">预览</span>
                       <span @click="delItem(content, jie.catalogItem, contentIndex)">删除</span>
                     </div>
                   </div>
@@ -341,6 +342,15 @@
         <el-button type="primary" @click="localVideoUpload">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 资源预览 -->
+    <el-dialog title="预览资源" :visible.sync="previewResDialog" top="30vh" :before-close="handleVideoClose">
+      <div v-if="previewResObj.resourceType === 10">
+        <videoPlayer :isMp4.sync="previewResObj.resourceUrl" :state="videoState" @resetStatus="resetStatus"></videoPlayer>
+      </div>
+      <div v-else>
+        <iframe :src="'https://doc.tskedu.cn:11443/view/url?url='+previewResObj.resourceUrl" frameborder="0" style="height: 600px;width: 100%"></iframe>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -483,7 +493,9 @@ export default {
       tempSection: [],
       // 删除小项
       tempItems: [],
-      tempItemIndex: ""
+      tempItemIndex: "",
+      previewResDialog: false, // 资源预览弹窗
+      previewResObj:{}
     };
   },
   computed: {
@@ -532,6 +544,7 @@ export default {
       this.videoState = true;
       // this.videoState = false
       this.subjectVisible = false;
+      this.previewResDialog = false;
     },
     // 发布课程
     coursePublish() {
@@ -1149,6 +1162,12 @@ export default {
           this.$store.commit("HIDELOADING");
         }
       });
+    },
+    // 资源预览
+    resPreview(content) {
+      console.log(content)
+      this.previewResObj = content
+      this.previewResDialog = true
     }
   },
   filters: {

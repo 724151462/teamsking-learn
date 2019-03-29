@@ -18,7 +18,7 @@
         <span>阅读：{{issueObj.readerCount}}人</span>
         <span>发布日期：{{issueObj.createTime}}</span>
       </div>
-      <div style="height: 400px;overflow-x: hidden">
+      <div class="dis-content">
         <div class="discuss-warp" v-for="(item,index) in replyList.pageData" :key="index">
           <div class="answer">
             <div>
@@ -44,20 +44,25 @@
           </div>
           <div class="reply" v-for="(reply, i) in item.children" :key="reply.replyId">
             <div class="answer">
-              <div>
-              <img :src="reply.avatar" width="30" alt>
-              <span
+              <div style="margin-left: 20px">
+              <template v-if="reply.parentReplyId === item.replyId">
+                <img :src="reply.avatar" width="30" alt>
+                <span
+                  style="margin-left: 10px"
+                  
+                >{{reply.userName}}评论：{{reply.replyContent}}</span>
+              </template>
+              <template v-else>
+                <img :src="reply.avatar" width="30" alt style="margin-left: 20px">
+                <span
                 style="margin-left: 10px"
-                v-if="reply.parentReplyId === item.replyId"
-              >{{reply.userName}}评论：{{reply.replyContent}}</span>
-              <span
-                style="margin-left: 10px"
-                v-else
-              >{{reply.userName}}回复{{replyer(item.children, reply.parentReplyId)}}：{{reply.replyContent}}</span>
+                >{{reply.userName}}回复{{replyer(item.children, reply.parentReplyId)}}：{{reply.replyContent}}</span>
+              </template>
+              
               <span class="reply-btn" @click="replyToggle(item.children, reply)">{{reply.repInput === true ? '收起' : '回复'}}</span>
             </div>
             <div class="answer-right">
-              <span>2019-1-18 00:00:00</span>
+              <span>{{reply.replyTime}}</span>
               <i
                 class="el-icon-delete"
                 style="color: green;font-size: 20px;margin-left: 10px; cursor: pointer"
@@ -90,6 +95,7 @@
 
 <script>
 import { discussIssue, discussReply, discussPost } from "@/api/course";
+import Cookie from 'js-cookie'
 export default {
   name: "discussDialog",
   data() {
@@ -107,7 +113,7 @@ export default {
         replyId: "",
         replyTime: "",
         userId: "",
-        userName: "b"
+        userName: Cookie.get('realName')
       },
       disscussInput: false
     };
@@ -168,6 +174,7 @@ export default {
       console.log(params)
       this.temParentId = params.replyId
       this.temParentLvId = params.levelonereplyId
+      this.disscussInput = false
       // list.forEach(element=> {
       //   if(element.replyId === params.replyId) {
       //     element.repInput = !element.repInput
@@ -198,8 +205,12 @@ export default {
     sendComment(level) {
       if(level === 'lv2'){
         this.replyForm.parentReplyId = this.temParentId
-        this.replyForm.levelonereplyId = this.temParentLvId
+        this.replyForm.levelonereplyId = this.temParentId
         console.log(this.replyForm)
+      }else if(level === 'lv1'){
+        this.replyForm.parentReplyId = this.$route.query.disId
+        this.replyForm.levelonereplyId = 0
+        this.replyForm.discussionId = this.$route.query.disId
       }else{
         this.replyForm.parentReplyId = this.temParentId
         this.replyForm.levelonereplyId = this.temParentLvId
@@ -210,13 +221,24 @@ export default {
             message: "评论成功",
             type: "success"
           });
+          this.replyForm.replyContent = ''
           this.getReply();
         }
       });
     },
     inputShow() {
       this.disscussInput = !this.disscussInput;
-      console.log(this.disscussInput);
+      this.replyList.pageData.forEach((item)=> {
+        console.log(item)
+        this.$set(item, 'repInput', false)
+        if(item.children) {
+          item.children.forEach(element => {
+            this.$set(element, 'repInput', false)
+          });
+        }
+        // item.repInput = false
+      })
+      // console.log(this.disscussInput);
     }
   }
 };
@@ -225,7 +247,7 @@ export default {
 <style scoped lang="stylus" type="text/stylus">
 .warp {
   width: 100%;
-  height: 700px;
+  height: 800px;
   margin: 0 auto;
   border: 1px solid;
   border-radius: 5px;
@@ -252,6 +274,13 @@ export default {
       font-weight: bold;
       font-family: '微软雅黑';
     }
+
+    .dis-content {
+      height: 500px;overflow-x: auto
+      
+    }
+
+    
 
     .issue-info {
       margin-top: 10px;
@@ -299,7 +328,7 @@ export default {
     }
   }
 }
-
+.dis-content::-webkit-scrollbar {display:none }
 .discuss-warp {
   padding: 15px 0;
   border-bottom: 1px solid rgb(216,216,216)

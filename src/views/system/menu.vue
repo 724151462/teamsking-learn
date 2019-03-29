@@ -22,10 +22,16 @@
         </el-form-item>
       </el-form> -->
     </header-the-again>
+    <el-input
+      placeholder="输入关键字进行过滤"
+      v-model="filterText">
+    </el-input>
     <el-tree
       :data="menuData.data"
       :props="defaultProps"
       node-key="menuId"
+      ref="tree"
+      :filter-node-method="filterNode"
       :expand-on-click-node="false"
       :render-content="renderContent">
     </el-tree>
@@ -118,6 +124,7 @@ import { get } from 'http';
     },
     data(){
       return {
+        filterText: '',
         routeConfig: {
           showCode: '1',
           type: '2',
@@ -272,13 +279,23 @@ import { get } from 'http';
           }
         )
       },
+      filterNode(value, data) {
+        console.log(value, data)
+        if (!value) return true;
+        return data.name.indexOf(value) !== -1;
+      },
       handleCurrentChange:function( number ){
         this.form.pageIndex = number;
       },
       handleClose(done) {
         done();
       },
-    }
+    },
+    watch: {
+      filterText(val) {
+        this.$refs.tree.filter(val);
+      }
+    },
   }
 </script>
 

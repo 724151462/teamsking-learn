@@ -12,7 +12,6 @@
                 <span>{{ node.label }}</span>
             </span>
         </el-tree>
-        <span @click="clear">清空</span>
     </div>
     
     
