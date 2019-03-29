@@ -1,5 +1,6 @@
 <template>
   <div class="after-class">
+    <el-button type="primary" @click="upData">更新当日数据</el-button>
     <div style="margin-bottom: 20px">
       <el-select
         filterable
@@ -48,7 +49,7 @@
   import echarts from "echarts";
   import {getBeforeDate, formatDate} from "../../utils/utils";
   import {afterOther, timeBucketOther, leanRate} from '@/api/study'
-  import {myCourseList, courseBaseInfo} from '@/api/course'
+  import {myCourseList, courseBaseInfo, updateLearnData} from '@/api/course'
   export default {
   data() {
     return {
@@ -160,6 +161,11 @@
     }
   },
   methods: {
+    // 刷新数据
+    upData() {
+      updateLearnData({courseId: this.course, type: 30})
+      
+    },
     //单选改变时间段
     changeDate(n){
       let time = this.endTime ? new Date(this.endTime).getTime() : Date.now() - 1000 * 60 * 60 * 24

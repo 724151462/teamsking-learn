@@ -1025,3 +1025,12 @@ export function evaluateDelete(data) {
   let url = `/api/v1/study/courseevaluate`
   return commonsAjax(url, data, 'delete')
 }
+
+
+/** 
+* 刷新学习中心数据
+*/
+export function updateLearnData(data) {
+  let url = `/api/v1/study/refresh`
+  return commonsAjax(url, data, 'post')
+}

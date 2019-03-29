@@ -19,7 +19,7 @@
       :tableTitle="tableTitle"
       :tableOperate="tableOperate"
       :columnNameList="columnNameList"
-      :tableData="tableData"
+      :tableData="tableData.pageData"
       :operateList="operateList"
       @showComponentInfo="showComponentInfo"
     ></table-the-again>
@@ -247,6 +247,7 @@ export default {
   methods: {
     // 选中的文件
     checkedFiles(checkedList) {
+      console.log(checkedList)
       let powerArr = [];
       checkedList.forEach(element => {
         powerArr.push(element.menuId);
@@ -294,7 +295,7 @@ export default {
       sysRoleList(this.form)
         .then(res => {
           if (res.code === 200) {
-            this.tableData = res.data.pageData;
+            this.tableData = res.data;
           } else {
             this.open4("查询失败:" + res.msg);
           }

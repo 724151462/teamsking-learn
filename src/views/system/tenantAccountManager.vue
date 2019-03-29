@@ -42,8 +42,8 @@
         style="min-width: 800px">
 
       <el-form ref="form" :model="form" label-width="120px">
-        <el-form-item label="用户名" required>
-          <el-input v-model="form.userName"></el-input>
+        <el-form-item label="工号" required>
+          <el-input v-model="form.managerNumber"></el-input>
         </el-form-item>
         <el-form-item label="密码" required>
           <el-input v-model="form.passwd"></el-input>
