@@ -43,7 +43,7 @@ router.beforeEach((to, from, next) => {
   /*如果本地 存在 token 则 不允许直接跳转到 登录页面*/
   // console.log(from.path)
   if(Cookie.get('BackstageToken')){
-    if(to.path == "/login"){
+    if(to.path == "/login" || to.path == "/"){
       localStorage.setItem('isLoadNodes', 'true')
       next({
         path:'/course/list'
