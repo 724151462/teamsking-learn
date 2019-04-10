@@ -157,7 +157,8 @@ import {
   sysClassList,
   sysStudentAdd,
   sysStudentModify,
-  sysStudentDelete
+  sysStudentDelete,
+  sysStudentReset
 } from "../../api/school";
 import axios from "axios";
 import searchInput from "@/components/search-input";
@@ -435,7 +436,36 @@ export default {
             query: { studentId: info.studentId }
           });
           break;
+        case "resetPassword":
+          this.resetPwd(info)
+          break;
       }
+    },
+    // 重置密码
+    resetPwd(info) {
+      console.log(info)
+      this.$store.commit("DELETECONFIRM", {
+          title: '提示',
+          message: '重置该用户密码?', 
+          fn:() => {
+            sysStudentReset([info.studentId])
+            .then(response=> {
+              if(response.code === 200) {
+                this.$message({
+                  message: '重置成功',
+                  type: 'success'
+                })
+              }
+            })
+            .catch(error=> {
+              this.$message({
+                message: '重置失败',
+                type: 'warning'
+              })
+            })
+          }
+          })
+      
     },
     //删除学生
     delStudent(student) {

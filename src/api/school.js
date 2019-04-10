@@ -271,6 +271,14 @@ export function sysTeacherReset(data) {
   return commonsAjax(url, data, 'post')
 }
 
+/***
+ * 重置学生密码
+ */
+export function sysStudentReset(data) {
+  let url = `/api/v1/sys/student/passwd`
+  return commonsAjax(url, data, 'post')
+}
+
 
 /***
  * 教师id查询
