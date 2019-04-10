@@ -15,9 +15,9 @@
           <el-radio :label="2">女</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="手机号码">
+      <!-- <el-form-item label="手机号码">
         <el-input v-model="form.mobile" class="input"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="所属院" prop="college">
         <el-select
           filterable
@@ -99,6 +99,11 @@
             :value="item.classId"
           ></el-option>
         </el-select>
+      </el-form-item>
+      <el-form-item label="年级">
+        <el-input v-model="form.grade" style="width:200px" placeholder="输入年级">
+
+        </el-input>
       </el-form-item>
       <el-form-item label="是否启用">
         <el-switch
@@ -282,8 +287,10 @@ export default {
         mobile: this.form.mobile,
         studentNo: this.form.studentNo,
         departmentId: this.form.department,
-        status: this.form.status
+        status: this.form.status,
+        grade: this.form.grade
       };
+      // let formData = Object.assign(this.form)
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.$route.query.studentId) {

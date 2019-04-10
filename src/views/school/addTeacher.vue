@@ -13,9 +13,9 @@
         <el-radio v-model="form.gender" :label="1">男</el-radio>
         <el-radio v-model="form.gender" :label="2">女</el-radio>
       </el-form-item>
-      <el-form-item label="手机号码">
+      <!-- <el-form-item label="手机号码">
         <el-input v-model="form.mobile" placeholder="手机号码" class="input"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="职称">
         <el-input v-model="form.jobName" placeholder="职称" class="input"></el-input>
       </el-form-item>
