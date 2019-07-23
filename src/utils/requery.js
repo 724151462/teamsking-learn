@@ -6,7 +6,7 @@ import {
   removeToken,
   getReToken,
   checkToken,
-  twoWeeksExchange
+twoWeeksExchange
 } from './auth'
 import {
   reToken

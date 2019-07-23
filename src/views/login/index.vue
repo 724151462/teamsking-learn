@@ -180,6 +180,7 @@
 <script>
 import { logins, loginDebug, getTenant } from "@/api/login";
 import { sysUserMenuList } from "@/api/system";
+import Person from '@/utils/validate'
 import {
   setToken,
   getToken,
@@ -274,6 +275,9 @@ export default {
           passwd: this.data.password
         };
       this.$store.commit("SHOWLOADING");
+      const person=new Person();
+      person.userName = data.loginAccount;
+      person.password = data.passwd;
       logins(data)
         .then(res => {
           // console.log(res);
